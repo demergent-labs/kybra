@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/compiler/kybra_generate"
+]
+exclude = ["examples"]

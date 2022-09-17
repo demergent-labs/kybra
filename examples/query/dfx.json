@@ -1,0 +1,10 @@
+{
+    "canisters": {
+        "query": {
+            "type": "custom",
+            "build": "bash -c '$(pip show kybra | grep \"Location:\" | cut -d \" \" -f2)/compiler/build.sh query src/main.py'",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/query/target/wasm32-unknown-unknown/release/query.wasm.gz"
+        }
+    }
+}
