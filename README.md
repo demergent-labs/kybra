@@ -22,6 +22,10 @@ python3 -m virtualenv .dfx/kybra/venv
 source .dfx/kybra/venv/bin/activate # you can deactivate by typing deactivate
 ```
 
+## Python Extension
+
+Install the Microsoft Python extension and then enable `python.analysis.typeCheckingMode`.
+
 ## Contributing
 
 Not currently taking contributions. Please allow time for initial code architecture and governance/legal/token work to be put in place.

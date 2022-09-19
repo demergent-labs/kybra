@@ -1,6 +1,9 @@
+use cdk_act::generators::try_from_vm_value::generate_try_from_vm_value;
+use generators::try_from_vm_value_impl::generate_try_from_vm_value_impl;
 use quote::quote;
 
 mod cdk_act;
+mod generators;
 
 pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
     // TODO keep it simple
@@ -13,8 +16,15 @@ pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
     // TODO then we determine if those functions are query or update functions
     // TODO then we create those functions' token streams
 
+    let try_from_vm_value = generate_try_from_vm_value();
+
+    let try_from_vm_value_impl = generate_try_from_vm_value_impl();
+
     quote! {
         use rustpython;
+
+        static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython::vm::Interpreter> = None;
+        static mut _KYBRA_SCOPE_OPTION: Option<rustpython::vm::scope::Scope> = None;
 
         static MAIN_PY: &'static str = #main_py;
 
@@ -24,27 +34,63 @@ pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
 
         getrandom::register_custom_getrandom!(custom_getrandom);
 
-        #[ic_cdk_macros::query]
-        fn simple_query() -> String {
-            let interpreter = rustpython::vm::Interpreter::without_stdlib(Default::default());
+        #try_from_vm_value
 
-            let result = interpreter.enter(|vm| {
-                let scope = vm.new_scope_with_builtins();
+        #try_from_vm_value_impl
 
-                vm.run_code_string(
-                    scope.clone(),
-                    MAIN_PY,
-                    "".to_owned(),
-                )
-                .unwrap();
+        #[ic_cdk_macros::init]
+        fn _kybra_init() {
+            unsafe {
+                let _kybra_interpreter = rustpython::vm::Interpreter::without_stdlib(Default::default());
+                let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
 
-                let result_value = scope.globals.get_item("result", vm).unwrap();
-                let result_string: String = result_value.try_into_value(vm).unwrap();
+                _kybra_interpreter.enter(|vm| {
+                    vm.run_code_string(
+                        _kybra_scope.clone(),
+                        MAIN_PY,
+                        "".to_owned(),
+                    ).unwrap();
+                });
 
-                result_string
-            });
+                _KYBRA_INTERPRETER_OPTION = Some(_kybra_interpreter);
+                _KYBRA_SCOPE_OPTION = Some(_kybra_scope);
+            }
+        }
 
-            result
+        #[ic_cdk_macros::post_upgrade]
+        fn _kybra_post_upgrade() {
+            unsafe {
+                let _kybra_interpreter = rustpython::vm::Interpreter::without_stdlib(Default::default());
+                let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
+
+                _kybra_interpreter.enter(|vm| {
+                    vm.run_code_string(
+                        _kybra_scope.clone(),
+                        MAIN_PY,
+                        "".to_owned(),
+                    ).unwrap();
+                });
+
+                _KYBRA_INTERPRETER_OPTION = Some(_kybra_interpreter);
+                _KYBRA_SCOPE_OPTION = Some(_kybra_scope);
+            }
+        }
+
+        #[ic_cdk_macros::update]
+        fn test() -> i128 {
+            unsafe {
+                let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
+                let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+
+                let result = _kybra_interpreter.enter(|vm| {
+                    let hello_world_py_object_ref = _kybra_scope.globals.get_item("hello_world", vm).unwrap();
+                    let result_py_object_ref = vm.invoke(&hello_world_py_object_ref, ()).unwrap();
+
+                    result_py_object_ref.try_from_vm_value(vm).unwrap()
+                });
+
+                result
+            }
         }
     }
 }

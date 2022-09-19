@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# This causes the script to exit with a non-zero exit code if any command exits with a non-zero exit code
+set -e
+
 # TODO Find a better way to get the path to the Kybra code...really we want something like npx kybra, pip kybra
 # COMPILER_PATH=.dfx/kybra/venv/lib/python3.8/site-packages/compiler
 COMPILER_PATH=$(pip show kybra | grep "Location:" | cut -d " " -f2)/compiler
