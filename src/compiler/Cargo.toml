@@ -19,7 +19,8 @@ crate-type = ["cdylib"]
 ic-cdk = "0.5.6"
 ic-cdk-macros = "0.5.6"
 candid = "0.7.16"
-rustpython = { path = "../../../../../../RustPython", default-features = false, features = [] }
+rustpython = { git = "https://github.com/demergent-labs/RustPython", branch = "kybra_initial", default-features = false, features = [] }
+# rustpython = { path = "../../../../../../RustPython", default-features = false, features = [] }
 getrandom = { version = "0.2.3", features = ["custom"] }
 # serde = "1.0.137"
 # azle-js-value-derive = { path = "./azle_js_value_derive" }
