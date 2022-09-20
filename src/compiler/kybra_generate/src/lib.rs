@@ -2,7 +2,7 @@ use cdk_act::generators::{
     try_from_vm_value::generate_try_from_vm_value, try_into_vm_value::generate_try_into_vm_value,
 };
 use generators::{
-    try_from_vm_value_impl::generate_try_from_vm_value_impl,
+    act::generate_act, try_from_vm_value_impl::generate_try_from_vm_value_impl,
     try_into_vm_value_impl::generate_try_into_vm_value_impl,
 };
 use quote::quote;
@@ -20,6 +20,9 @@ pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
     // TODO the absolute first step is to get a python AST and walk it to get the functions
     // TODO then we determine if those functions are query or update functions
     // TODO then we create those functions' token streams
+
+    let act = generate_act(main_py);
+    let act_token_stream = act.to_token_stream();
 
     let try_into_vm_value = generate_try_into_vm_value();
     let try_into_vm_value_impl = generate_try_into_vm_value_impl();
@@ -86,22 +89,24 @@ pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
             }
         }
 
-        #[ic_cdk_macros::query]
-        fn test(x: bool, y: bool) -> bool {
-            unsafe {
-                let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-                let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+        #act_token_stream
 
-                let result = _kybra_interpreter.enter(|vm| {
-                    let hello_world_py_object_ref = _kybra_scope.globals.get_item("test", vm).unwrap();
+        // #[ic_cdk_macros::query]
+        // fn test(x: bool, y: bool) -> bool {
+        //     unsafe {
+        //         let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
+        //         let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
 
-                    let result_py_object_ref = vm.invoke(&hello_world_py_object_ref, (x.try_into_vm_value(vm).unwrap(), y.try_into_vm_value(vm).unwrap())).unwrap();
+        //         let result = _kybra_interpreter.enter(|vm| {
+        //             let hello_world_py_object_ref = _kybra_scope.globals.get_item("test", vm).unwrap();
 
-                    result_py_object_ref.try_from_vm_value(vm).unwrap()
-                });
+        //             let result_py_object_ref = vm.invoke(&hello_world_py_object_ref, (x.try_into_vm_value(vm).unwrap(), y.try_into_vm_value(vm).unwrap())).unwrap();
 
-                result
-            }
-        }
+        //             result_py_object_ref.try_from_vm_value(vm).unwrap()
+        //         });
+
+        //         result
+        //     }
+        // }
     }
 }

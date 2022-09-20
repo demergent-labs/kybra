@@ -1,1 +1,1 @@
-service : { test : (bool, bool) -> (bool) query }
+service : { test : () -> (bool) query }

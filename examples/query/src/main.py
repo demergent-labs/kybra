@@ -30,5 +30,5 @@ def update(func: object):
 # TODO should go in an azle.py file that can be imported
 
 @query
-def test(x: bool, y: bool) -> bool:
-    return x and y
+def test() -> bool:
+    return True
