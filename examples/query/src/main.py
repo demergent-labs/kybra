@@ -1,21 +1,21 @@
 # TODO should go in an azle.py file that can be imported
 # from typing import Any # TODO importing Any seems to break in many cases (maybe all cases?)
 
-# int64 = int
-# int32 = int
-# int16 = int
-# int8 = int
+int64 = int
+int32 = int
+int16 = int
+int8 = int
 
-# nat = int
-# nat64 = int
-# nat32 = int
-# nat16 = int
-# nat8 = int
+nat = int
+nat64 = int
+nat32 = int
+nat16 = int
+nat8 = int
 
-# float32 = float
-# float64 = float
+float32 = float
+float64 = float
 
-# text = str
+text = str
 
 # blob = bytes
 
@@ -30,5 +30,5 @@ def update(func: object):
 # TODO should go in an azle.py file that can be imported
 
 @query
-def hello_world() -> int:
-    return 1_000
+def test(x: bool, y: bool) -> bool:
+    return x and y

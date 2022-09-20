@@ -1,5 +1,10 @@
-use cdk_act::generators::try_from_vm_value::generate_try_from_vm_value;
-use generators::try_from_vm_value_impl::generate_try_from_vm_value_impl;
+use cdk_act::generators::{
+    try_from_vm_value::generate_try_from_vm_value, try_into_vm_value::generate_try_into_vm_value,
+};
+use generators::{
+    try_from_vm_value_impl::generate_try_from_vm_value_impl,
+    try_into_vm_value_impl::generate_try_into_vm_value_impl,
+};
 use quote::quote;
 
 mod cdk_act;
@@ -16,12 +21,15 @@ pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
     // TODO then we determine if those functions are query or update functions
     // TODO then we create those functions' token streams
 
-    let try_from_vm_value = generate_try_from_vm_value();
+    let try_into_vm_value = generate_try_into_vm_value();
+    let try_into_vm_value_impl = generate_try_into_vm_value_impl();
 
+    let try_from_vm_value = generate_try_from_vm_value();
     let try_from_vm_value_impl = generate_try_from_vm_value_impl();
 
     quote! {
         use rustpython;
+        use rustpython::vm::convert::ToPyObject;
 
         static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython::vm::Interpreter> = None;
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython::vm::scope::Scope> = None;
@@ -34,8 +42,10 @@ pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
 
         getrandom::register_custom_getrandom!(custom_getrandom);
 
-        #try_from_vm_value
+        #try_into_vm_value
+        #try_into_vm_value_impl
 
+        #try_from_vm_value
         #try_from_vm_value_impl
 
         #[ic_cdk_macros::init]
@@ -76,15 +86,16 @@ pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
             }
         }
 
-        #[ic_cdk_macros::update]
-        fn test() -> i128 {
+        #[ic_cdk_macros::query]
+        fn test(x: bool, y: bool) -> bool {
             unsafe {
                 let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
                 let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
 
                 let result = _kybra_interpreter.enter(|vm| {
-                    let hello_world_py_object_ref = _kybra_scope.globals.get_item("hello_world", vm).unwrap();
-                    let result_py_object_ref = vm.invoke(&hello_world_py_object_ref, ()).unwrap();
+                    let hello_world_py_object_ref = _kybra_scope.globals.get_item("test", vm).unwrap();
+
+                    let result_py_object_ref = vm.invoke(&hello_world_py_object_ref, (x.try_into_vm_value(vm).unwrap(), y.try_into_vm_value(vm).unwrap())).unwrap();
 
                     result_py_object_ref.try_from_vm_value(vm).unwrap()
                 });
