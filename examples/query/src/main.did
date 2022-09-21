@@ -1,1 +1,1 @@
-service : { monkey : () -> (bool) query }
+service : { monkey : (text, text) -> (text) query }

@@ -3,7 +3,7 @@ use crate::cdk_act::{
     act_node::{ActNode, PrimitiveInfo},
     nodes::canister_method::{CanisterMethod, CanisterMethodActNode},
 };
-use quote::quote;
+use quote::{format_ident, quote};
 use rustpython_parser::{ast, mode};
 
 pub fn generate_act(python_source: &str) -> AbstractCanisterTree {
@@ -30,21 +30,31 @@ fn get_canister_method_act_nodes(py_mod: &ast::Mod) -> Vec<CanisterMethodActNode
                     decorator_list,
                     returns,
                     type_comment,
-                } => true,
+                } => {
+                    let is_query = is_stmt_kind_function_def_a_query(&located_stmt.node);
+                    let is_update = is_stmt_kind_function_def_an_update(&located_stmt.node);
+
+                    is_query || is_update
+                }
                 _ => false,
             })
-            .map(|stmt| {
-                eprint!("{:#?}", &stmt.node);
+            .map(|stmt| match &stmt.node {
+                ast::StmtKind::FunctionDef {
+                    name,
+                    args,
+                    body,
+                    decorator_list,
+                    returns,
+                    type_comment,
+                } => {
+                    let param_conversions = args.args.iter().map(|arg| {
+                        let param_name = format_ident!("{}", arg.node.arg);
+                        quote! {
+                            #param_name.try_into_vm_value(vm).unwrap()
+                        }
+                    });
 
-                match &stmt.node {
-                    ast::StmtKind::FunctionDef {
-                        name,
-                        args,
-                        body,
-                        decorator_list,
-                        returns,
-                        type_comment,
-                    } => CanisterMethodActNode::QueryMethod(CanisterMethod {
+                    let canister_method = CanisterMethod {
                         body: quote! {
                             unsafe {
                                 let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
@@ -53,8 +63,7 @@ fn get_canister_method_act_nodes(py_mod: &ast::Mod) -> Vec<CanisterMethodActNode
                                 let result = _kybra_interpreter.enter(|vm| {
                                     let method_py_object_ref = _kybra_scope.globals.get_item(#name, vm).unwrap();
 
-                                    // let result_py_object_ref = vm.invoke(&hello_world_py_object_ref, (x.try_into_vm_value(vm).unwrap(), y.try_into_vm_value(vm).unwrap())).unwrap();
-                                    let result_py_object_ref = vm.invoke(&method_py_object_ref, ()).unwrap();
+                                    let result_py_object_ref = vm.invoke(&method_py_object_ref, (#(#param_conversions),*)).unwrap();
 
                                     result_py_object_ref.try_from_vm_value(vm).unwrap()
                                 });
@@ -62,15 +71,28 @@ fn get_canister_method_act_nodes(py_mod: &ast::Mod) -> Vec<CanisterMethodActNode
                                 result
                             }
                         },
-                        param_names: vec![],
-                        param_types: vec![],
+                        param_names: args.args.iter().map(|arg| {
+                            format_ident!("{}", arg.node.arg)
+                        }).collect(),
+                        param_types: args.args.iter().map(|arg| {
+                            expr_kind_to_act_node(&temp(&arg.node.annotation))
+                        }).collect(),
                         inline_types: Box::new(vec![]),
                         is_manual: false,
                         name: name.clone(),
                         return_type: expr_kind_to_act_node(&temp(returns)),
-                    }),
-                    _ => panic!(""),
+                    };
+
+                    let is_query = is_stmt_kind_function_def_a_query(&stmt.node);
+
+                    if is_query {
+                        CanisterMethodActNode::QueryMethod(canister_method)
+                    }
+                    else {
+                        CanisterMethodActNode::UpdateMethod(canister_method)
+                    }
                 }
+                _ => panic!(""),
             })
             .collect(),
         _ => vec![],
@@ -88,11 +110,19 @@ fn temp(monkey: &Option<Box<ast::Located<ast::ExprKind>>>) -> Option<&ast::ExprK
 }
 
 // TODO combine these two functions
+// TODO these should probably be an enum
 fn is_stmt_kind_function_def_a_query(stmt_kind: &ast::StmtKind) -> bool {
     match stmt_kind {
         ast::StmtKind::FunctionDef { decorator_list, .. } => {
-            // TODO find a query decorator
-            true
+            decorator_list
+                .iter()
+                .any(|expr_kind| match &expr_kind.node {
+                    ast::ExprKind::Name { id, .. } => match &id[..] {
+                        "query" => true,
+                        _ => false,
+                    },
+                    _ => false,
+                })
         }
         _ => false,
     }
@@ -101,8 +131,15 @@ fn is_stmt_kind_function_def_a_query(stmt_kind: &ast::StmtKind) -> bool {
 fn is_stmt_kind_function_def_an_update(stmt_kind: &ast::StmtKind) -> bool {
     match stmt_kind {
         ast::StmtKind::FunctionDef { decorator_list, .. } => {
-            // TODO find an update decorator
-            true
+            decorator_list
+                .iter()
+                .any(|expr_kind| match &expr_kind.node {
+                    ast::ExprKind::Name { id, .. } => match &id[..] {
+                        "update" => true,
+                        _ => false,
+                    },
+                    _ => false,
+                })
         }
         _ => false,
     }

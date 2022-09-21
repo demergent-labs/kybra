@@ -22,13 +22,13 @@ text = str
 # reserved = Any
 # empty = Any
 
-# def query(func: object):
-#     return func
+def query(func: object):
+    return func
 
-# def update(func: object):
-#     return func
+def update(func: object):
+    return func
 # TODO should go in an azle.py file that can be imported
 
 @query
-def monkey() -> bool:
-    return True
+def monkey(x: str, y: str) -> str:
+    return x + y
