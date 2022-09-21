@@ -9,10 +9,14 @@ use rustpython_parser::{ast, mode};
 pub fn generate_act(python_source: &str) -> AbstractCanisterTree {
     let py_mod = rustpython_parser::parser::parse(python_source, mode::Mode::Module, "").unwrap();
 
+    let randomness_implementation = AbstractCanisterTree::generate_randomness_implementation();
+    let candid_file_generation = AbstractCanisterTree::generate_candid_file_generation("main.did");
     // TODO why do we split up query and update??
     let canister_method_act_nodes = get_canister_method_act_nodes(&py_mod);
 
     AbstractCanisterTree {
+        randomness_implementation,
+        candid_file_generation,
         query_methods: canister_method_act_nodes,
         update_methods: vec![],
     }

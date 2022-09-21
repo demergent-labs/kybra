@@ -11,16 +11,6 @@ mod cdk_act;
 mod generators;
 
 pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
-    // TODO keep it simple
-    // TODO go get the functions and create the function bodies
-    // TODO do everything with just strings
-    // TODO try to follow the py_ast, cdk_act path that azle is following
-    // TODO try not to do work that cdk_act will do for us
-
-    // TODO the absolute first step is to get a python AST and walk it to get the functions
-    // TODO then we determine if those functions are query or update functions
-    // TODO then we create those functions' token streams
-
     let act = generate_act(main_py);
     let act_token_stream = act.to_token_stream();
 
@@ -38,12 +28,6 @@ pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython::vm::scope::Scope> = None;
 
         static MAIN_PY: &'static str = #main_py;
-
-        fn custom_getrandom(_buf: &mut [u8]) -> Result<(), getrandom::Error> {
-            Ok(())
-        }
-
-        getrandom::register_custom_getrandom!(custom_getrandom);
 
         #try_into_vm_value
         #try_into_vm_value_impl
@@ -90,23 +74,5 @@ pub fn kybra_generate(main_py: &str) -> proc_macro2::token_stream::TokenStream {
         }
 
         #act_token_stream
-
-        // #[ic_cdk_macros::query]
-        // fn test(x: bool, y: bool) -> bool {
-        //     unsafe {
-        //         let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-        //         let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
-
-        //         let result = _kybra_interpreter.enter(|vm| {
-        //             let hello_world_py_object_ref = _kybra_scope.globals.get_item("test", vm).unwrap();
-
-        //             let result_py_object_ref = vm.invoke(&hello_world_py_object_ref, (x.try_into_vm_value(vm).unwrap(), y.try_into_vm_value(vm).unwrap())).unwrap();
-
-        //             result_py_object_ref.try_from_vm_value(vm).unwrap()
-        //         });
-
-        //         result
-        //     }
-        // }
     }
 }
