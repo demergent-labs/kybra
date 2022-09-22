@@ -1,1 +1,7 @@
-service : { monkey : (text, text) -> (text) query }
+service : {
+  add : (int, int) -> (int) query;
+  boolean_logic : (bool, bool) -> (bool) query;
+  concat : (text, text) -> (text) query;
+  get_message : () -> (text) query;
+  record_message : (text) -> (text);
+}

@@ -30,5 +30,25 @@ def update(func: object):
 # TODO should go in an azle.py file that can be imported
 
 @query
-def monkey(x: str, y: str) -> str:
+def concat(x: str, y: str) -> str:
     return x + y
+
+@query
+def add(x: int, y: int) -> int:
+    return x + y
+
+saved_message = ''
+
+@update
+def record_message(message: str) -> str:
+    global saved_message
+    saved_message = message
+    return saved_message
+
+@query
+def get_message() -> str:
+    return saved_message
+
+@query
+def boolean_logic(x: bool, y: bool) -> bool:
+    return x and y

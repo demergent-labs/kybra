@@ -58,6 +58,8 @@ fn get_canister_method_act_nodes(py_mod: &ast::Mod) -> Vec<CanisterMethodActNode
                         }
                     });
 
+                    let params_comma = if param_conversions.len() == 1 { quote!(,) } else { quote!() };
+
                     let canister_method = CanisterMethod {
                         body: quote! {
                             unsafe {
@@ -67,7 +69,7 @@ fn get_canister_method_act_nodes(py_mod: &ast::Mod) -> Vec<CanisterMethodActNode
                                 let result = _kybra_interpreter.enter(|vm| {
                                     let method_py_object_ref = _kybra_scope.globals.get_item(#name, vm).unwrap();
 
-                                    let result_py_object_ref = vm.invoke(&method_py_object_ref, (#(#param_conversions),*)).unwrap();
+                                    let result_py_object_ref = vm.invoke(&method_py_object_ref, (#(#param_conversions),*#params_comma)).unwrap();
 
                                     result_py_object_ref.try_from_vm_value(vm).unwrap()
                                 });
@@ -153,10 +155,49 @@ fn expr_kind_to_act_node(expr_kind_option: &Option<&ast::ExprKind>) -> ActNode {
     if let Some(expr_kind) = expr_kind_option {
         match expr_kind {
             ast::ExprKind::Name { id, .. } => match &id[..] {
+                "float64" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(f64),
+                }),
+                "float32" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(f32),
+                }),
+                "int" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(i128),
+                }),
+                "int64" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(i64),
+                }),
+                "int32" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(i32),
+                }),
+                "int16" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(i16),
+                }),
+                "int8" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(i8),
+                }),
+                "nat" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(u128),
+                }),
+                "nat64" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(u64),
+                }),
+                "nat32" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(u32),
+                }),
+                "nat16" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(u16),
+                }),
+                "nat8" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(u8),
+                }),
                 "bool" => ActNode::Primitive(PrimitiveInfo {
                     identifier: quote!(bool),
                 }),
                 "str" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(String),
+                }),
+                "text" => ActNode::Primitive(PrimitiveInfo {
                     identifier: quote!(String),
                 }),
                 _ => panic!(""),
