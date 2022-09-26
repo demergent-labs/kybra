@@ -22,9 +22,37 @@ python3 -m virtualenv .dfx/kybra/venv
 source .dfx/kybra/venv/bin/activate # you can deactivate by typing deactivate
 ```
 
+Install Kybra:
+
+```bash
+pip install kybra
+```
+
+Deploy your project:
+
+```bash
+dfx deploy
+```
+
 ## Python Extension
 
 Install the Microsoft Python extension and then enable `python.analysis.typeCheckingMode`.
+
+Also set `python.analysis.extraPaths` with the path to your source directory and the path `.dfx/kybra/venv/lib/python3.8/site-packages`.
+
+## Publishing to PyPi
+
+```bash
+# prepare on new machine
+python3 -m pip install --upgrade build
+python3 -m pip install --upgrade twine
+
+# build
+python3 -m build
+
+# upload
+python3 -m twine upload dist/*
+```
 
 ## Contributing
 
