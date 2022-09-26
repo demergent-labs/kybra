@@ -78,10 +78,13 @@ pub fn kybra_generate(
             }
         }
 
-        #[ic_cdk_macros::query]
-        fn __cdk_name() -> String {
-            "kybra".to_string()
-        }
+        // #[ic_cdk_macros::query]
+        // fn __cdk_name() -> String {
+        //     "kybra".to_string()
+        // }
+
+        #[link_section = "icp:public cdk"]
+        pub static NAME: [u8; 12] = *b"kybra v0.0.0"; // TODO we need to get the version automatically updating
 
         #act_token_stream
     }
