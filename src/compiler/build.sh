@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# TODO we should move this to __main__.py
+# TODO start by just calling the bash file from python
+# TODO but we might want to move most of this logic into Python so that it is platform-independent
+# TODO just like in Azle...though we use bashish commands for cargo, ic-cdk-optimizer, and gzip anyway
+
 # This causes the script to exit with a non-zero exit code if any command exits with a non-zero exit code
 set -e
 
