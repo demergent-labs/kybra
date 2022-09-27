@@ -1,9 +1,1 @@
-service : {
-  add : (int, int) -> (int) query;
-  boolean_logic : (bool, bool) -> (bool) query;
-  concat : (text, text) -> (text) query;
-  get_message : () -> (text) query;
-  library_hello_there : () -> (text) query;
-  print_the_monkey : () -> (text) query;
-  record_message : (text) -> (text);
-}
+service : { simple_query : () -> (text) query }

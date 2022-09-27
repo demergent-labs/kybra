@@ -1,0 +1,5 @@
+service : {
+  get_import1_message : () -> (text) query;
+  get_import2_message : () -> (text) query;
+  get_import3_message : () -> (text) query;
+}

@@ -70,9 +70,9 @@ DFX_VERSION=0.12.0-beta.2 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.s
 
 #### Kybra
 
-Follow these steps to create a Kybra project. The steps below assume a project called `alpha`:
+Follow these steps to create a Kybra project. The steps below assume a project called `hello_world`:
 
-1. Create a directory for your project (`mkdir alpha && cd alpha`)
+1. Create a directory for your project (`mkdir hello_world && cd hello_world`)
 2. Create the virtual environment: (`python3 -m virtualenv .dfx/kybra/venv`)
 3. Activate the virtual environment: (`source .dfx/kybra/venv/bin/activate`)
 4. Install Kybra (`pip install kybra`)
@@ -84,15 +84,17 @@ Your `dfx.json` file should look like this:
 ```json
 {
   "canisters": {
-    "alpha": {
+    "hello_world": {
       "type": "custom",
-      "build": "python -m kybra alpha src/main.py src/main.did",
+      "build": "python -m kybra hello_world src/main.py src/main.did",
       "candid": "src/main.did",
-      "wasm": ".dfx/kybra/alpha/target/wasm32-unknown-unknown/release/alpha.wasm.gz"
+      "wasm": ".dfx/kybra/hello_world/target/wasm32-unknown-unknown/release/hello_world.wasm.gz"
     }
   }
 }
 ```
+
+The `build` command is `python -m kybra` followed by the canister name, the relative path to your entry point Python file, and the relative path where you would like your Candid file to be generated.
 
 Your `main.py` file should look like this:
 
@@ -181,4 +183,12 @@ python3 -m build
 
 # upload
 python3 -m twine upload dist/*
+```
+
+#### Local Development
+
+Install Kybra with pip from the repository. For example, when working from an example in the examples directory:
+
+```bash
+pip install ../.. && dfx deploy
 ```

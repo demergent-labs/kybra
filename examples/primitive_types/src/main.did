@@ -1,0 +1,17 @@
+service : {
+  get_bool : () -> (bool) query;
+  get_float32 : () -> (float32) query;
+  get_float64 : () -> (float64) query;
+  get_int : () -> (int) query;
+  get_int16 : () -> (int16) query;
+  get_int32 : () -> (int32) query;
+  get_int64 : () -> (int64) query;
+  get_int8 : () -> (int8) query;
+  get_nat : () -> (nat) query;
+  get_nat16 : () -> (nat16) query;
+  get_nat32 : () -> (nat32) query;
+  get_nat64 : () -> (nat64) query;
+  get_nat8 : () -> (nat8) query;
+  get_string : () -> (text) query;
+  get_text : () -> (text) query;
+}
