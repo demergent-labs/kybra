@@ -1,30 +1,63 @@
 #!/usr/bin/env bash
 
-# TODO we should move this to __main__.py
-# TODO start by just calling the bash file from python
-# TODO but we might want to move most of this logic into Python so that it is platform-independent
-# TODO just like in Azle...though we use bashish commands for cargo, ic-cdk-optimizer, and gzip anyway
-
 # This causes the script to exit with a non-zero exit code if any command exits with a non-zero exit code
 set -e
 
-# TODO pass in some of this information from the Python environment, or just do all of this from python
+# This is the name of the canister passed into python -m kybra from the dfx.json build command
+CANISTER_NAME=$1
 
-# TODO Find a better way to get the path to the Kybra code...really we want something like npx kybra, pip kybra
-# TODO I think python -m kybra would be great
-# COMPILER_PATH=.dfx/kybra/venv/lib/python3.8/site-packages/compiler
-COMPILER_PATH=$(pip show kybra | grep "Location:" | cut -d " " -f2)/kybra/compiler
-CANISTER_PATH=.dfx/kybra/$1
+# This is the path to the developer's entry point Python file passed into python -m kybra from the dfx.json build command
+PY_ENTRY_FILE_PATH=$2
+
+# This is root directory of the developer's Python project, derived from the entry point Python file passed into python -m kybra from the dfx.json build command
+PY_ENTRY_DIR_PATH=$(dirname $PY_ENTRY_FILE_PATH)
+
+# This is the Python module name of the developer's Python project, derived from the entry point Python file passed into python -m kybra from the dfx.json build command
+PY_ENTRY_MODULE_NAME=$(basename $PY_ENTRY_FILE_PATH .py)
+
+# This is the path to the developer's Candid file passed into python -m kybra from the dfx.json build command
 DID_PATH=$3
+
+# This is the path to the Kybra compiler Rust code delivered with the Python package
+COMPILER_PATH=$4
+
+# This is the location of all code used to generate the final canister Rust code
+CANISTER_PATH=.dfx/kybra/$CANISTER_NAME
+
+# This is the final generated Rust file that is the canister
+LIB_PATH=$CANISTER_PATH/src/lib.rs
+
+# This is the location of the Candid file generated from the final generated Rust file
 GENERATED_DID_PATH=$CANISTER_PATH/main.did
+
+# This is the Rust target directory
 TARGET_PATH=$CANISTER_PATH/target
 
-cp -a $COMPILER_PATH/. $CANISTER_PATH
-cp -a $(dirname $2)/. $CANISTER_PATH/python_source
+# The location that Kybra will look to when running py_freeze!
+# py_freeze! will compile all of the Python code in the directory recursively (modules must have an __init__.py to be included)
+PY_FREEZE_PATH=$CANISTER_PATH/python_source
 
-CARGO_TARGET_DIR=$TARGET_PATH cargo run --manifest-path $CANISTER_PATH/kybra_generate/Cargo.toml $2 $(basename $2 .py) | rustfmt --edition 2018 > $CANISTER_PATH/src/lib.rs
+# We copy all of the Kybra compiler code from the installed Python package into the CANISTER_PATH
+cp -a $COMPILER_PATH/. $CANISTER_PATH
+
+# We copy all of the developer's Python code from the original location into a location where Kybra will be able to use py_freeze!
+cp -a $PY_ENTRY_DIR_PATH/. $PY_FREEZE_PATH
+
+# Generate the Rust code
+CARGO_TARGET_DIR=$TARGET_PATH cargo run --manifest-path $CANISTER_PATH/kybra_generate/Cargo.toml $PY_ENTRY_FILE_PATH $PY_ENTRY_MODULE_NAME | rustfmt --edition 2018 > $LIB_PATH
+
+# Compile the generated Rust code
 CARGO_TARGET_DIR=$TARGET_PATH cargo build --manifest-path $CANISTER_PATH/Cargo.toml --target wasm32-unknown-unknown --package kybra_generated_canister --release
+
+# Generate the Candid file
 CARGO_TARGET_DIR=$TARGET_PATH cargo test --manifest-path $CANISTER_PATH/Cargo.toml
+
+# Copy the generated Candid file to the developer's source directory
 cp $GENERATED_DID_PATH $DID_PATH
-ic-cdk-optimizer $TARGET_PATH/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o $TARGET_PATH/wasm32-unknown-unknown/release/$1.wasm
-gzip -f -k $TARGET_PATH/wasm32-unknown-unknown/release/$1.wasm
+
+# Optimize the Wasm binary
+# TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/22
+ic-cdk-optimizer $TARGET_PATH/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm
+
+# gzip the Wasm binary
+gzip -f -k $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm
