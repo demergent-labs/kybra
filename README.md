@@ -190,7 +190,7 @@ python3 -m pip install --upgrade twine
 python3 -m build
 
 # upload
-python3 -m twine upload dist/*
+python3 -m twine upload --skip-existing dist/*
 ```
 
 #### Local Development
