@@ -30,6 +30,8 @@ Most of Kybra's documentation is currently found in this README. The Kybra Book,
 
 ### Installation
 
+Follow versions exactly as stated below to avoid issues.
+
 You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)) with bash and have the following installed on your system:
 
 - [Python 3](https://www.python.org/downloads/)
@@ -71,22 +73,22 @@ DFX_VERSION=0.12.0-beta.2 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.s
 
 #### Python Extension
 
-It is highly recommended to install the [Microsoft Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) to get type errors reported in VS Code:
+It is highly recommended to use VS Code and to install the [Microsoft Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) to get full type checking support from within the editor:
 
 ```
 VS Code -> Preferences -> Extensions -> Search for Python by Microsoft
 ```
 
-Enable the setting `python.analysis.typeCheckingMode`:
+Set the setting `python.analysis.typeCheckingMode` to `strict`:
 
 ```
 VS Code -> Preferences -> Settings -> Search for python.analysis.typeCheckingMode and set it to strict
 ```
 
-If VS Code shows errors when you try to import from `kybra` or local files, then also set `python.analysis.extraPaths` with the path to your source directory and the path `.dfx/kybra/venv/lib/python[your-version-here]/site-packages`.
+Set the setting `python.analysis.extraPaths` with the path to your `site-packages` directory: `.dfx/kybra/venv/lib/python[your-version-here]/site-packages`.
 
 ```
-VS Code -> Preferences -> Settings -> Search for python.analysis.extraPaths and add the directories stated above
+VS Code -> Preferences -> Settings -> Search for python.analysis.extraPaths and add the directory stated above
 ```
 
 #### Kybra
@@ -142,8 +144,11 @@ dfx start
 # Alternatively to the above command, you can run the replica in the background
 dfx start --background
 
-# If you are running the replica in the background, you can run this command within the same terminal as the dfx start --background command
-# If you are not running the replica in the background, then open another terminal and run this command from the root directory of your project
+# If you are running the replica in the background, you can run the following commands within the same terminal as the dfx start --background command
+# If you are not running the replica in the background, then open another terminal and run the following commands from the root directory of your project
+
+# This source command is only required once per terminal session
+source .dfx/kybra/venv/bin/activate
 
 dfx deploy
 ```
