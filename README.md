@@ -141,8 +141,8 @@ dfx start
 # Alternatively to the above command, you can run the replica in the background
 dfx start --background
 
-# If you are running the replica in the background, you can run these commands within the same terminal as the dfx start --background command
-# If you are not running the replica in the background, then open another terminal and run these commands from the root directory of your project
+# If you are running the replica in the background, you can run this command within the same terminal as the dfx start --background command
+# If you are not running the replica in the background, then open another terminal and run this command from the root directory of your project
 
 dfx deploy
 ```
