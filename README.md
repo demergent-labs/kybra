@@ -94,8 +94,6 @@ Your `dfx.json` file should look like this:
 }
 ```
 
-The `build` command is `python -m kybra` followed by the canister name, the relative path to your entry Python file, and the relative path where you would like your Candid file to be generated.
-
 Your `main.py` file should look like this:
 
 ```python
@@ -113,19 +111,19 @@ You are now ready to [deploy your application](#deployment).
 It is highly recommended to install the [Microsoft Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) to get type errors reported in VS Code:
 
 ```
-VS Code -> File -> Preferences -> Extensions -> Search for Python by Microsoft
+VS Code -> Preferences -> Extensions -> Search for Python by Microsoft
 ```
 
 Enable the setting `python.analysis.typeCheckingMode`:
 
 ```
-VS Code -> File -> Preferences -> Settings -> Search for python.analysis.typeCheckingMode and set it to strict
+VS Code -> Preferences -> Settings -> Search for python.analysis.typeCheckingMode and set it to strict
 ```
 
 If VS Code shows errors when you try to import from `kybra` or local files, then also set `python.analysis.extraPaths` with the path to your source directory and the path `.dfx/kybra/venv/lib/python[your-version-here]/site-packages`.
 
 ```
-VS Code -> File -> Preferences -> Settings -> Search for python.analysis.extraPaths and add the directories stated above
+VS Code -> Preferences -> Settings -> Search for python.analysis.extraPaths and add the directories stated above
 ```
 
 ### Deployment
@@ -155,7 +153,9 @@ Deploying to the live Internet Computer generally only requires adding the `--ne
 
 ### Supported Features
 
-Kybra Alpha is very limited in features. A good guide is that you can only do what is exported from the [kybra module](/kybra/__init__.py).
+Kybra Alpha is very limited in features. A good guide is that you can only do what is exported from the [kybra module](/kybra/__init__.py). Looking at the [examples](/examples) should be very helpful as well.
+
+Keep in mind that Kybra requires the use of [Python typing](https://docs.python.org/3/library/typing.html).
 
 You can create `query` and `update` functions.
 

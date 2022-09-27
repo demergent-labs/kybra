@@ -83,8 +83,9 @@ pub fn kybra_generate(
         //     "kybra".to_string()
         // }
 
-        #[link_section = "icp:public cdk"]
-        pub static NAME: [u8; 12] = *b"kybra v0.0.0"; // TODO we need to get the version automatically updating
+        // TODO this is broken https://github.com/dfinity/motoko/issues/3462#issuecomment-1260060874
+        // #[link_section = "icp:public cdk"]
+        // pub static NAME: [u8; 12] = *b"kybra v0.0.0";
 
         #act_token_stream
     }

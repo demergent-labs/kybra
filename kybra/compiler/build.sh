@@ -43,6 +43,9 @@ cp -a $COMPILER_PATH/. $CANISTER_PATH
 # We copy all of the developer's Python code from the original location into a location where Kybra will be able to use py_freeze!
 cp -a $PY_ENTRY_DIR_PATH/. $PY_FREEZE_PATH
 
+rustup target add wasm32-unknown-unknown
+cargo install ic-cdk-optimizer --version 0.3.4
+
 # Generate the Rust code
 CARGO_TARGET_DIR=$TARGET_PATH cargo run --manifest-path $CANISTER_PATH/kybra_generate/Cargo.toml $PY_ENTRY_FILE_PATH $PY_ENTRY_MODULE_NAME | rustfmt --edition 2018 > $LIB_PATH
 
