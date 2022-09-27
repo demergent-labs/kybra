@@ -94,7 +94,7 @@ Your `dfx.json` file should look like this:
 }
 ```
 
-The `build` command is `python -m kybra` followed by the canister name, the relative path to your entry point Python file, and the relative path where you would like your Candid file to be generated.
+The `build` command is `python -m kybra` followed by the canister name, the relative path to your entry Python file, and the relative path where you would like your Candid file to be generated.
 
 Your `main.py` file should look like this:
 
@@ -161,7 +161,7 @@ You can create `query` and `update` functions.
 
 You can import and use any of these primitive types (`bool`, `int`, and `str` are built-in thus need no import): `int`, `int64`, `int32`, `int16`, `int8`, `nat`, `nat64`, `nat32`, `nat16`, `nat8`, `float64`, `float32`, `text`, `str`, `bool`.
 
-You can create and import local modules defined in your canister's root directory (the directory of your entry point Python file). If you create subdirectories, they must have a `__init__.py` file.
+You can create and import local modules defined in your canister's root directory (the directory of your entry Python file). If you create subdirectories, they must have a `__init__.py` file.
 
 There is no support for `stdlib`. There is no support for installing external modules (`pip install` just won't work).
 
