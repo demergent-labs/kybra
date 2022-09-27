@@ -33,9 +33,10 @@ Most of Kybra's documentation is currently found in this README. The Kybra Book,
 You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)) with bash and have the following installed on your system:
 
 - [Python 3](https://www.python.org/downloads/)
+- [pip](https://pip.pypa.io/en/stable/installation/)
 - [virtualenv](#virtualenv)
 - [Rust](#rust)
-- [dfx](#dfx)
+- [dfx 0.12.0-beta.2](#dfx)
 - [Python Extension](#python-extension)
 
 #### virtualenv
@@ -66,6 +67,26 @@ Run the following command to install dfx 0.12.0-beta.2:
 
 ```bash
 DFX_VERSION=0.12.0-beta.2 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+```
+
+#### Python Extension
+
+It is highly recommended to install the [Microsoft Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) to get type errors reported in VS Code:
+
+```
+VS Code -> Preferences -> Extensions -> Search for Python by Microsoft
+```
+
+Enable the setting `python.analysis.typeCheckingMode`:
+
+```
+VS Code -> Preferences -> Settings -> Search for python.analysis.typeCheckingMode and set it to strict
+```
+
+If VS Code shows errors when you try to import from `kybra` or local files, then also set `python.analysis.extraPaths` with the path to your source directory and the path `.dfx/kybra/venv/lib/python[your-version-here]/site-packages`.
+
+```
+VS Code -> Preferences -> Settings -> Search for python.analysis.extraPaths and add the directories stated above
 ```
 
 #### Kybra
@@ -106,27 +127,9 @@ def hello_world() -> str:
 
 You are now ready to [deploy your application](#deployment).
 
-#### Python Extension
-
-It is highly recommended to install the [Microsoft Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) to get type errors reported in VS Code:
-
-```
-VS Code -> Preferences -> Extensions -> Search for Python by Microsoft
-```
-
-Enable the setting `python.analysis.typeCheckingMode`:
-
-```
-VS Code -> Preferences -> Settings -> Search for python.analysis.typeCheckingMode and set it to strict
-```
-
-If VS Code shows errors when you try to import from `kybra` or local files, then also set `python.analysis.extraPaths` with the path to your source directory and the path `.dfx/kybra/venv/lib/python[your-version-here]/site-packages`.
-
-```
-VS Code -> Preferences -> Settings -> Search for python.analysis.extraPaths and add the directories stated above
-```
-
 ### Deployment
+
+Please keep in mind that you must deploy from within the `virtualenv` that you set up earlier: `source .dfx/kybra/venv/bin/activate`.
 
 #### Local Deployment
 
