@@ -106,7 +106,7 @@ def hello_world() -> str:
     return 'Hello world!'
 ```
 
-You are now ready to deploy your application.
+You are now ready to [deploy your application](#deployment).
 
 #### Python Extension
 
