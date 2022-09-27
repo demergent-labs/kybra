@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='kybra',
-    version='0.0.2',
+    version='0.0.3',
     package_data={
         '': ['compiler/**']
     },
