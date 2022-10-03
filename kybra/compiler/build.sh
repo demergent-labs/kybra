@@ -37,12 +37,6 @@ TARGET_PATH=$CANISTER_PATH/target
 # py_freeze! will compile all of the Python code in the directory recursively (modules must have an __init__.py to be included)
 PY_FREEZE_PATH=$CANISTER_PATH/python_source
 
-# We copy all of the Kybra compiler code from the installed Python package into the CANISTER_PATH
-cp -a $COMPILER_PATH/. $CANISTER_PATH
-
-# We copy all of the developer's Python code from the original location into a location where Kybra will be able to use py_freeze!
-cp -a $PY_ENTRY_DIR_PATH/. $PY_FREEZE_PATH
-
 rustup target add wasm32-unknown-unknown
 cargo install ic-cdk-optimizer --version 0.3.4
 
@@ -60,6 +54,7 @@ cp $GENERATED_DID_PATH $DID_PATH
 
 # Optimize the Wasm binary
 # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/22
+# ic-wasm $TARGET_PATH/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm shrink
 ic-cdk-optimizer $TARGET_PATH/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm
 
 # gzip the Wasm binary
