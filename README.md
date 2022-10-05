@@ -175,9 +175,45 @@ You can create `query` and `update` functions.
 
 You can import and use any of these primitive types (`bool`, `int`, and `str` are built-in thus need no import): `int`, `int64`, `int32`, `int16`, `int8`, `nat`, `nat64`, `nat32`, `nat16`, `nat8`, `float64`, `float32`, `text`, `str`, `bool`.
 
-You can create and import local modules defined in your canister's root directory (the directory of your entry Python file). If you create subdirectories, they must have a `__init__.py` file.
+You can import modules created locally or installed with `pip`. If you create a module in a subdirectory, it must have an `__init__.py` file.
 
-There is no support for `stdlib`. There is no support for installing external modules (`pip install` just won't work).
+#### stdlib
+
+There is limited support for the `stdlib`. The following modules may be supported as far as [RustPython](https://github.com/RustPython/RustPython) or the IC support them:
+
+- array
+- binascii
+- bisect
+- bz2
+- cmath
+- contextvars
+- csv
+- dis
+- faulthandler
+- fcntl
+- gc
+- grp
+- hashlib
+- json
+- math
+- mmap
+- multiprocessing
+- \_posixsubprocess
+- pyexpat
+- struct
+- random
+- re
+- resource
+- \_scproxy
+- select
+- socket
+- ssl
+- statistics
+- syslog
+- termios
+- unicodedata
+- uuid
+- zlib
 
 ### Contributing
 
