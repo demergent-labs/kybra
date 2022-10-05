@@ -3,6 +3,8 @@ import import1
 import import2
 import import2.import3
 
+# TODO also test importing from installed packages and stdlib modules (include Rust-implemented and Python implemented)
+
 @query
 def get_import1_message() -> str:
     return import1.get_message()

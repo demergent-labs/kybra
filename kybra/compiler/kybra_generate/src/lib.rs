@@ -40,6 +40,7 @@ pub fn kybra_generate(
         fn _kybra_init() {
             unsafe {
                 let _kybra_interpreter = rustpython::vm::Interpreter::with_init(Default::default(), |vm| {
+                    vm.add_native_modules(rustpython_stdlib::get_module_inits());
                     vm.add_frozen(rustpython::vm::py_freeze!(dir = "python_source"));
                 });
                 let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
@@ -61,6 +62,7 @@ pub fn kybra_generate(
         fn _kybra_post_upgrade() {
             unsafe {
                 let _kybra_interpreter = rustpython::vm::Interpreter::with_init(Default::default(), |vm| {
+                    vm.add_native_modules(rustpython_stdlib::get_module_inits());
                     vm.add_frozen(rustpython::vm::py_freeze!(dir = "python_source"));
                 });
                 let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());

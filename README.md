@@ -117,7 +117,7 @@ Your `dfx.json` file should look like this:
 }
 ```
 
-Your `main.py` file should look like this:
+Your `src/main.py` file should look like this:
 
 ```python
 from kybra import query

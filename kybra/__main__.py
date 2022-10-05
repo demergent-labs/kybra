@@ -1,5 +1,7 @@
 # type: ignore
 
+# TODO just move all of the bash stuff into here probably
+
 import kybra
 import modulegraph.modulegraph # TODO this needs to be a dependency when installing kybra somehow
 import os
@@ -16,8 +18,7 @@ build_sh_path = compiler_path + '/build.sh'
 
 shutil.copytree(compiler_path, canister_path, dirs_exist_ok=True)
 
-path = sys.path[:]
-path[0] = os.path.dirname(py_entry_file_path)
+path = list(filter(lambda x: x.startswith(os.getcwd()), sys.path)) + [os.path.dirname(py_entry_file_path)]
 
 graph = modulegraph.modulegraph.ModuleGraph(path)
 entry_point = graph.run_script(py_entry_file_path)
@@ -37,14 +38,6 @@ for node in graph.flatten(start=entry_point):
         shutil.copy(node.filename, f'{python_source_path}/{os.path.basename(node.filename)}')
 
     if type(node) == modulegraph.modulegraph.Package:
-        packagepath = node.packagepath[0]
-        destination_path = f'{python_source_path}/{node.identifier}'
-        shutil.copytree(packagepath, destination_path, dirs_exist_ok=True)
-
-    if type(node) == modulegraph.modulegraph.BuiltinModule:
-        print(node)
-
-    if type(node) == modulegraph.modulegraph.MissingModule:
-        print(node)
+        shutil.copytree(node.packagepath[0], f'{python_source_path}/{node.identifier}', dirs_exist_ok=True)
 
 subprocess.call([build_sh_path, canister_name, py_entry_file_path, did_path, compiler_path])
