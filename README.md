@@ -1,3 +1,9 @@
+<div align="center">
+    <a href="https://github.com/demergent-labs/kybra" target="_blank" rel="noopener noreferrer">
+        <img height="150" src="https://raw.githubusercontent.com/demergent-labs/kybra/main/logo/logo.svg" alt="kybra logo">
+    </a>
+</div>
+
 # Kybra (Alpha)
 
 Python CDK for the [Internet Computer](https://internetcomputer.org/).
