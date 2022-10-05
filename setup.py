@@ -7,5 +7,6 @@ setup(
         '': ['compiler/**']
     },
     include_package_data=True,
-    packages=['kybra']
+    packages=['kybra'],
+    install_requires=['modulegraph==0.19.3']
 )

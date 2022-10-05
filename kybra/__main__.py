@@ -3,7 +3,7 @@
 # TODO just move all of the bash stuff into here probably
 
 import kybra
-import modulegraph.modulegraph # TODO this needs to be a dependency when installing kybra somehow
+import modulegraph.modulegraph
 import os
 import shutil
 import subprocess
