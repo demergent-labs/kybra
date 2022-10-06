@@ -2,8 +2,8 @@ from kybra import query
 import import1
 import import2
 import import2.import3
-
-# TODO also test importing from installed packages and stdlib modules (include Rust-implemented and Python implemented)
+import math
+from sample_adds.add import add_one #type: ignore
 
 @query
 def get_import1_message() -> str:
@@ -16,3 +16,11 @@ def get_import2_message() -> str:
 @query
 def get_import3_message() -> str:
     return import2.import3.get_message()
+
+@query
+def get_math_message() -> int:
+    return math.ceil(10.4)
+
+@query
+def get_external_module_message() -> int:
+    return add_one(1, 2) #type: ignore

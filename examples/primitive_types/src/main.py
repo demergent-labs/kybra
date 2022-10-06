@@ -13,6 +13,7 @@ from kybra import (
     float32,
     text
 )
+import math
 
 @query
 def get_int() -> int:
@@ -54,15 +55,13 @@ def get_nat16() -> nat16:
 def get_nat8() -> nat8:
     return 255
 
-# TODO use math stdlib to get E
 @query
 def get_float64() -> float64:
-    return 2.7182
+    return math.e
 
-# TODO use math stdlib to get PI
 @query
 def get_float32() -> float32:
-    return 3.1459
+    return math.pi
 
 @query
 def get_text() -> text:

@@ -40,19 +40,21 @@ Follow versions exactly as stated below to avoid issues.
 
 You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)) with bash and have the following installed on your system:
 
-- [Python 3](https://www.python.org/downloads/)
-- [pip](https://pip.pypa.io/en/stable/installation/)
-- [virtualenv](#virtualenv)
+- [Python 3.10.7](#python-3.10.7)
 - [Rust](#rust)
 - [dfx 0.12.0-beta.2](#dfx)
-- [Python Extension](#python-extension)
+- [Python VS Code Extension](#python-vs-code-extension)
 
-#### virtualenv
+#### Python 3.10.7
 
-Run the following command to install virtualenv:
+It is highly recommended to install Python 3.10.7 using [pyenv](https://github.com/pyenv/pyenv). To do so, use the [pyenv installer](https://github.com/pyenv/pyenv-installer):
 
-```python
-python3 -m pip install virtualenv
+```bash
+# install pyenv
+curl https://pyenv.run | bash
+
+# install Python 3.10.7
+~/.pyenv/bin/pyenv install 3.10.7
 ```
 
 #### Rust
@@ -71,19 +73,32 @@ The following are some common Rust installation issues:
 
 #### dfx
 
-Run the following command to install dfx 0.12.0-beta.2:
+Run the following command to install dfx 0.12.0-beta.3:
 
 ```bash
-DFX_VERSION=0.12.0-beta.2 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+DFX_VERSION=0.12.0-beta.3 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
 ```
 
-#### Python Extension
+#### Python VS Code Extension
 
 It is highly recommended to use VS Code and to install the [Microsoft Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) to get full type checking support from within the editor:
 
+##### Extension
+
 ```
-VS Code -> Preferences -> Extensions -> Search for Python by Microsoft
+VS Code -> Preferences -> Extensions -> Search for Python by Microsoft and install it
 ```
+
+##### Set the interpreter to Python 3.10.7
+
+Use the `Python: Select Interpreter` command from the `Command Palette`:
+
+```
+(Ctrl+Shift+P) then search for and select "Python: Select Interpreter"
+Select or enter this path to the interpreter: ~/.pyenv/versions/3.10.7/bin/python
+```
+
+##### Set python.analysis.typeCheckingMode
 
 Set the setting `python.analysis.typeCheckingMode` to `strict`:
 
@@ -91,10 +106,12 @@ Set the setting `python.analysis.typeCheckingMode` to `strict`:
 VS Code -> Preferences -> Settings -> Search for python.analysis.typeCheckingMode and set it to strict
 ```
 
-Set the setting `python.analysis.extraPaths` with the path to your `site-packages` directory: `.dfx/kybra/venv/lib/python[your-version-here]/site-packages`.
+##### Set python.analysis.extraPaths
+
+Set the setting `python.analysis.extraPaths` with the path to your `site-packages` directory `.dfx/kybra/venv/lib/python3.10/site-packages`:
 
 ```
-VS Code -> Preferences -> Settings -> Search for python.analysis.extraPaths and add the directory stated above
+VS Code -> Preferences -> Settings -> Search for python.analysis.extraPaths and add .dfx/kybra/venv/lib/python3.10/site-packages
 ```
 
 #### Kybra
@@ -102,7 +119,7 @@ VS Code -> Preferences -> Settings -> Search for python.analysis.extraPaths and 
 Follow these steps to create a Kybra project. The steps below assume a project called `hello_world`:
 
 1. Create a directory for your project (`mkdir hello_world && cd hello_world`)
-2. Create the virtual environment: (`python3 -m virtualenv .dfx/kybra/venv`)
+2. Create the virtual environment: (`~/.pyenv/versions/3.10.7/bin/python -m venv .dfx/kybra/venv`)
 3. Activate the virtual environment: (`source .dfx/kybra/venv/bin/activate`)
 4. Install Kybra (`pip install kybra`)
 5. Create a `dfx.json` file (`touch dfx.json`)
