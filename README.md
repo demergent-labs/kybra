@@ -239,17 +239,15 @@ Not currently taking contributions, but definitely taking issues and questions. 
 #### Publishing to PyPI
 
 ```bash
-# do the following within the virtualenv
-
 # prepare on new machine
-python3 -m pip install --upgrade build
-python3 -m pip install --upgrade twine
+~/.pyenv/versions/3.10.7/bin/python -m pip install --upgrade build
+~/.pyenv/versions/3.10.7/bin/python -m pip install --upgrade twine
 
 # build
-python3 -m build
+~/.pyenv/versions/3.10.7/bin/python -m build
 
 # upload
-python3 -m twine upload --skip-existing dist/*
+~/.pyenv/versions/3.10.7/bin/python -m twine upload --skip-existing dist/*
 ```
 
 #### Local Development
