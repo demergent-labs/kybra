@@ -52,6 +52,8 @@ CARGO_TARGET_DIR=$TARGET_PATH cargo test --manifest-path $CANISTER_PATH/Cargo.to
 # Copy the generated Candid file to the developer's source directory
 cp $GENERATED_DID_PATH $DID_PATH
 
+# TODO we need to do this the way that Azle does it so it works well on M1s and other environments: https://github.com/demergent-labs/azle/blob/main/src/azle.ts#L138
+
 # Optimize the Wasm binary
 # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/22
 # ic-wasm $TARGET_PATH/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm shrink
