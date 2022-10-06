@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "cd .. && dfx generate && cd test && ./modify_last_line.sh dfx_generated && cd .. && ts-node --transpile-only --ignore=false test/test.ts"
+    "test": "cd .. && ts-node --transpile-only --ignore=false test/test.ts"
   },
   "dependencies": {
     "azle": "github:demergent-labs/azle#kybra_test_reuse"

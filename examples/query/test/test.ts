@@ -15,11 +15,7 @@ const tests: Test[] = [
         prep: async () => {
             await new Promise((resolve) => setTimeout(resolve, 5000));
 
-            execSync(`dfx canister create query`, {
-                stdio: 'inherit'
-            });
-
-            execSync(`dfx canister uninstall-code query`, {
+            execSync(`dfx canister uninstall-code query || true`, {
                 stdio: 'inherit'
             });
 
