@@ -54,10 +54,12 @@ cp $GENERATED_DID_PATH $DID_PATH
 
 # TODO we need to do this the way that Azle does it so it works well on M1s and other environments: https://github.com/demergent-labs/azle/blob/main/src/azle.ts#L138
 
+CARGO_BIN_ROOT=${CARGO_INSTALL_ROOT-${CARGO_HOME-$HOME/.cargo}}
+
 # Optimize the Wasm binary
 # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/22
 # ic-wasm $TARGET_PATH/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm shrink
-ic-cdk-optimizer $TARGET_PATH/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm
+$CARGO_BIN_ROOT/bin/ic-cdk-optimizer $TARGET_PATH/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm
 
 # gzip the Wasm binary
 gzip -f -k $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm
