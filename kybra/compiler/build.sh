@@ -38,7 +38,7 @@ TARGET_PATH=$CANISTER_PATH/target
 PY_FREEZE_PATH=$CANISTER_PATH/python_source
 
 rustup target add wasm32-unknown-unknown
-cargo install ic-cdk-optimizer --version 0.3.4
+cargo install ic-cdk-optimizer --version 0.3.4 || true
 
 # Generate the Rust code
 CARGO_TARGET_DIR=$TARGET_PATH cargo run --manifest-path $CANISTER_PATH/kybra_generate/Cargo.toml $PY_ENTRY_FILE_PATH $PY_ENTRY_MODULE_NAME | rustfmt --edition 2018 > $LIB_PATH
