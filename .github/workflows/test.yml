@@ -57,7 +57,8 @@ jobs:
               run: |
                   EXAMPLE_DIRECTORIES=$(cat << END
                   [
-                    "examples/query"
+                    "examples/query",
+                    "examples/update"
                   ]
                   END
                   )
