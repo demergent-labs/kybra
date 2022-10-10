@@ -149,11 +149,11 @@ jobs:
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}/test
-              run: source .dfx/kybra/venv/bin/activate && npm install
+              run: source ../.dfx/kybra/venv/bin/activate && npm install
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}/test
-              run: source .dfx/kybra/venv/bin/activate && npm test
+              run: source ../.dfx/kybra/venv/bin/activate && npm test
 
     check-basic-integration-tests-success:
         needs: basic-integration-tests
