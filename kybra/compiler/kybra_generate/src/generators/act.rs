@@ -69,9 +69,16 @@ fn get_canister_method_act_nodes(py_mod: &ast::Mod) -> Vec<CanisterMethodActNode
                                 let result = _kybra_interpreter.enter(|vm| {
                                     let method_py_object_ref = _kybra_scope.globals.get_item(#name, vm).unwrap();
 
-                                    let result_py_object_ref = vm.invoke(&method_py_object_ref, (#(#param_conversions),*#params_comma)).unwrap();
+                                    let result_py_object_ref = vm.invoke(&method_py_object_ref, (#(#param_conversions),*#params_comma));
 
-                                    result_py_object_ref.try_from_vm_value(vm).unwrap()
+                                    match result_py_object_ref {
+                                        Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap(),
+                                        Err(err) => {
+                                            let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+
+                                            panic!(err_string);
+                                        }
+                                    }
                                 });
 
                                 result
