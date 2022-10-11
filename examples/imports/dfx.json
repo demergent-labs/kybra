@@ -4,7 +4,16 @@
             "type": "custom",
             "build": "python -m kybra imports src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/imports/target/wasm32-unknown-unknown/release/imports.wasm.gz"
+            "wasm": ".dfx/kybra/imports/target/wasm32-unknown-unknown/release/imports.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/imports"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
         }
     }
 }

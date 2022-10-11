@@ -3,7 +3,7 @@ import import1
 import import2
 import import2.import3
 import math
-from sample_adds.add import add_one #type: ignore
+# from sample_adds.add import add_one #type: ignore TODO add an externally installed pip library in the future
 import hashlib
 
 @query
@@ -20,12 +20,13 @@ def getThree() -> str:
 
 @query
 def sha224Hash(message: str) -> str:
-    return hashlib.sha224(bytes(message.encode('utf8'))).hexdigest()
+    return hashlib.sha224(message.encode()).hexdigest()
 
 @query
 def get_math_message() -> int:
     return math.ceil(10.4)
 
-@query
-def get_external_module_message() -> int:
-    return add_one(1, 2) #type: ignore
+# TODO add an externally installed pip library in the future
+# @query
+# def get_external_module_message() -> int:
+#     return add_one(1, 2) #type: ignore
