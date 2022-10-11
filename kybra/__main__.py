@@ -1,28 +1,53 @@
 # type: ignore
 
-# TODO just move all of the bash stuff into here probably
-
 import kybra
 import modulegraph.modulegraph
 import os
 import shutil
-import subprocess
 import sys
+from pathlib import Path
 
+# This is the name of the canister passed into python -m kybra from the dfx.json build command
 canister_name = sys.argv[1]
-py_entry_file_path = sys.argv[2]
-did_path = sys.argv[3]
-compiler_path = os.path.dirname(kybra.__file__) + '/compiler'
-canister_path=f'.dfx/kybra/{canister_name}'
-build_sh_path = compiler_path + '/build.sh'
 
+# This is the path to the developer's entry point Python file passed into python -m kybra from the dfx.json build command
+py_entry_file_path = sys.argv[2]
+
+# This is the Python module name of the developer's Python project, derived from the entry point Python file passed into python -m kybra from the dfx.json build command
+py_entry_module_name = Path(py_entry_file_path).stem
+
+# This is the path to the developer's Candid file passed into python -m kybra from the dfx.json build command
+did_path = sys.argv[3]
+
+# This is the path to the Kybra compiler Rust code delivered with the Python package
+compiler_path = os.path.dirname(kybra.__file__) + '/compiler'
+
+# This is the location of all code used to generate the final canister Rust code
+canister_path=f'.dfx/kybra/{canister_name}'
+
+# This is the final generated Rust file that is the canister
+lib_path=f'{canister_path}/src/lib.rs'
+
+# This is the location of the Candid file generated from the final generated Rust file
+generated_did_path=f'{canister_path}/main.did'
+
+# This is the Rust target directory
+target_path=f'{canister_path}/target'
+
+cargo_bin_root = os.environ.get('CARGO_INSTALL_ROOT') or os.environ.get('CARGO_HOME') or f'{os.environ["HOME"]}/.cargo'
+
+# Copy all of the Rust project structure from the pip package to an area designed for Rust compiling
 shutil.copytree(compiler_path, canister_path, dirs_exist_ok=True)
 
+# Begin module bundling/gathering process
 path = list(filter(lambda x: x.startswith(os.getcwd()), sys.path)) + [os.path.dirname(py_entry_file_path)]
 
 graph = modulegraph.modulegraph.ModuleGraph(path)
 entry_point = graph.run_script(py_entry_file_path)
 
+# We want to bundle/gather all Python files into the python_source directory for RustPython freezing
+# The location that Kybra will look to when running py_freeze!
+# py_freeze! will compile all of the Python code in the directory recursively (modules must have an __init__.py to be included)
 python_source_path = f'{canister_path}/python_source'
 
 if os.path.exists(python_source_path):
@@ -40,4 +65,26 @@ for node in graph.flatten(start=entry_point):
     if type(node) == modulegraph.modulegraph.Package:
         shutil.copytree(node.packagepath[0], f'{python_source_path}/{node.identifier}', dirs_exist_ok=True)
 
-subprocess.call([build_sh_path, canister_name, py_entry_file_path, did_path, compiler_path])
+# Rust prerequisites
+os.system('rustup target add wasm32-unknown-unknown')
+os.system('cargo install ic-cdk-optimizer --version 0.3.4 || true')
+
+# Generate the Rust code
+os.system(f'CARGO_TARGET_DIR={target_path} cargo run --manifest-path {canister_path}/kybra_generate/Cargo.toml {py_entry_file_path} {py_entry_module_name} | rustfmt --edition 2018 > {lib_path}')
+
+# Compile the generated Rust code
+os.system(f'CARGO_TARGET_DIR={target_path} cargo build --manifest-path {canister_path}/Cargo.toml --target wasm32-unknown-unknown --package kybra_generated_canister --release')
+
+# Generate the Candid file
+os.system(f'CARGO_TARGET_DIR={target_path} cargo test --manifest-path {canister_path}/Cargo.toml')
+
+# Copy the generated Candid file to the developer's source directory
+os.system(f'cp {generated_did_path} {did_path}')
+
+# Optimize the Wasm binary
+# TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/22
+# $CARGO_BIN_ROOT/bin/ic-wasm $TARGET_PATH/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm shrink
+os.system(f'{cargo_bin_root}/bin/ic-cdk-optimizer {target_path}/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o {target_path}/wasm32-unknown-unknown/release/{canister_name}.wasm')
+
+# gzip the Wasm binary
+os.system(f'gzip -f -k {target_path}/wasm32-unknown-unknown/release/{canister_name}.wasm')
