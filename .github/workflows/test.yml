@@ -123,7 +123,7 @@ jobs:
                       ~/.cargo/registry/index/
                       ~/.cargo/registry/cache/
                       ~/.cargo/git/db/
-                      ${{ matrix.example_directories }}/target/
+                      ${{ matrix.example_directories }}/.dfx/kybra/*/target
                   key: kybra-cargo-${{ matrix.example_directories }}-${{ matrix.kybra_source }}-${{ hashFiles('kybra/compiler/Cargo.toml') }}
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               working-directory: ${{ matrix.example_directories }}
