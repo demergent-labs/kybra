@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='kybra',
-    version='0.0.5',
+    version='0.0.6',
     package_data={
         '': ['compiler/**']
     },

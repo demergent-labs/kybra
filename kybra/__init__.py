@@ -32,7 +32,18 @@ text = str
 # Record = TypedDict
 
 # my_tuple = tuple[str, str]
+# Record = TypedDict
 
+# def record(func: object) -> TypedDict:
+#     return func
+
+# # @record
+# class MyRecord(Record):
+#     prop1: str
+
+# temp: MyRecord = {
+#     'prop1': 'hello'
+# }
 # class MyRecord(TypedDict):
 #     prop1: str
 #     prop2: int

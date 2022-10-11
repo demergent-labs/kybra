@@ -36,7 +36,7 @@ Most of Kybra's documentation is currently found in this README. The Kybra Book,
 
 ### Installation
 
-Follow versions exactly as stated below to avoid issues.
+Follow instructions exactly as stated below to avoid issues.
 
 You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)) with bash and have the following installed on your system:
 
@@ -63,6 +63,12 @@ Run the following command to install Rust:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+If you already have Rust installed, make sure you are up to date:
+
+```bash
+rustup update
 ```
 
 The following are some common Rust installation issues:

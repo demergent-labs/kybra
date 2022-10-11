@@ -2,6 +2,7 @@ service : {
   getOne : () -> (text) query;
   getThree : () -> (text) query;
   getTwo : () -> (text) query;
+  get_external_module_message : () -> (int) query;
   get_math_message : () -> (int) query;
   sha224Hash : (text) -> (text) query;
 }
