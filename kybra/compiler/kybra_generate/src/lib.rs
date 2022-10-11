@@ -46,11 +46,17 @@ pub fn kybra_generate(
                 let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
 
                 _kybra_interpreter.enter(|vm| {
-                    vm.run_code_string(
+                    let result = vm.run_code_string(
                         _kybra_scope.clone(),
                         &format!("from {} import *", #entry_module_name),
                         "".to_owned(),
-                    ).unwrap();
+                    );
+
+                    if let Err(err) = result {
+                        let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+
+                        panic!(err_string);
+                    }
                 });
 
                 _KYBRA_INTERPRETER_OPTION = Some(_kybra_interpreter);
@@ -68,11 +74,17 @@ pub fn kybra_generate(
                 let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
 
                 _kybra_interpreter.enter(|vm| {
-                    vm.run_code_string(
+                    let result = vm.run_code_string(
                         _kybra_scope.clone(),
                         &format!("from {} import *", #entry_module_name),
                         "".to_owned(),
-                    ).unwrap();
+                    );
+
+                    if let Err(err) = result {
+                        let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+
+                        panic!(err_string);
+                    }
                 });
 
                 _KYBRA_INTERPRETER_OPTION = Some(_kybra_interpreter);
