@@ -1,0 +1,19 @@
+{
+    "canisters": {
+        "simple_user_accounts": {
+            "type": "custom",
+            "build": "python -m kybra simple_user_accounts src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/simple_user_accounts/target/wasm32-unknown-unknown/release/simple_user_accounts.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/simple_user_accounts"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}
