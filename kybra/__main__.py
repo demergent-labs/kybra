@@ -36,6 +36,9 @@ target_path=f'{canister_path}/target'
 
 cargo_bin_root = os.environ.get('CARGO_INSTALL_ROOT') or os.environ.get('CARGO_HOME') or f'{os.environ["HOME"]}/.cargo'
 
+# This is where we store custom Python modules, such as stripped-down versions of stdlib modules
+custom_modules_path = f'{compiler_path}/custom_modules'
+
 # Copy all of the Rust project structure from the pip package to an area designed for Rust compiling
 shutil.copytree(compiler_path, canister_path, dirs_exist_ok=True)
 
@@ -54,6 +57,9 @@ if os.path.exists(python_source_path):
     shutil.rmtree(python_source_path)
 
 os.makedirs(python_source_path)
+
+# Copy our custom Python modules into the python_source directory
+shutil.copytree(custom_modules_path, python_source_path, dirs_exist_ok=True)
 
 for node in graph.flatten(start=entry_point):
     if type(node) == modulegraph.modulegraph.Script:
