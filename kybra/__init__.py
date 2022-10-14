@@ -1,4 +1,4 @@
-from typing import Callable, NoReturn, Optional, TypeVar, TypedDict, Any, NoReturn, Type
+from typing import Callable, NoReturn, Optional, TypeVar, TypedDict, Any, Type
 
 int64 = int
 int32 = int
@@ -46,5 +46,10 @@ Query = Callable
 Update = Callable
 Oneway = Callable
 
-def Func(callable: Callable) -> Type[tuple[int, str]]:
+def Func(callable: Callable) -> Type[tuple[int, str]]: # type: ignore
     return type((0, ''))
+
+class ic:
+    @staticmethod
+    def print(x: Any):
+        _kybra_ic.print(str(x)) # type: ignore

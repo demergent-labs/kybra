@@ -12,6 +12,21 @@ service : {
   get_nat32 : () -> (nat32) query;
   get_nat64 : () -> (nat64) query;
   get_nat8 : () -> (nat8) query;
-  get_string : () -> (text) query;
+  get_str : () -> (text) query;
   get_text : () -> (text) query;
+  print_bool : (bool) -> (bool) query;
+  print_float32 : (float32) -> (float32) query;
+  print_float64 : (float64) -> (float64) query;
+  print_int : (int) -> (int) query;
+  print_int16 : (int16) -> (int16) query;
+  print_int32 : (int32) -> (int32) query;
+  print_int64 : (int64) -> (int64) query;
+  print_int8 : (int8) -> (int8) query;
+  print_nat : (nat) -> (nat) query;
+  print_nat16 : (nat16) -> (nat16) query;
+  print_nat32 : (nat32) -> (nat32) query;
+  print_nat64 : (nat64) -> (nat64) query;
+  print_nat8 : (nat8) -> (nat8) query;
+  print_str : (text) -> (text) query;
+  print_text : (text) -> (text) query;
 }
