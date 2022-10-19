@@ -162,6 +162,9 @@ fn expr_kind_to_act_node(expr_kind_option: &Option<&ast::ExprKind>) -> ActNode {
     if let Some(expr_kind) = expr_kind_option {
         match expr_kind {
             ast::ExprKind::Name { id, .. } => match &id[..] {
+                "empty" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(ic_cdk::export::candid::Empty),
+                }),
                 "float64" => ActNode::Primitive(PrimitiveInfo {
                     identifier: quote!(f64),
                 }),
@@ -198,8 +201,17 @@ fn expr_kind_to_act_node(expr_kind_option: &Option<&ast::ExprKind>) -> ActNode {
                 "nat8" => ActNode::Primitive(PrimitiveInfo {
                     identifier: quote!(u8),
                 }),
+                "null" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!((())),
+                }),
+                "Principal" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(ic_cdk::export::Principal),
+                }),
                 "bool" => ActNode::Primitive(PrimitiveInfo {
                     identifier: quote!(bool),
+                }),
+                "reserved" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(ic_cdk::export::candid::Reserved),
                 }),
                 "str" => ActNode::Primitive(PrimitiveInfo {
                     identifier: quote!(String),

@@ -1,7 +1,7 @@
 import { ActorSubclass, HttpAgentOptions, ActorConfig } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
 
-import { _SERVICE } from './imports.did';
+import { _SERVICE } from './primitive_types.did';
 
 export declare interface CreateActorOptions {
   agentOptions?: HttpAgentOptions;
@@ -13,4 +13,4 @@ export declare const createActor: (
   options: CreateActorOptions
 ) => ActorSubclass<_SERVICE>;
 
-export declare const imports: ActorSubclass<_SERVICE>;
+export declare const primitive_types: ActorSubclass<_SERVICE>;

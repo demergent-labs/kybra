@@ -59,7 +59,8 @@ jobs:
                   [
                     "examples/imports",
                     "examples/query",
-                    "examples/update"
+                    "examples/update",
+                    "examples/primitive_types"
                   ]
                   END
                   )

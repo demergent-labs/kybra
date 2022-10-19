@@ -1,10 +1,10 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 
 // Imports and re-exports candid interface
-import { idlFactory } from "./imports.did.js";
-export { idlFactory } from "./imports.did.js";
+import { idlFactory } from "./primitive_types.did.js";
+export { idlFactory } from "./primitive_types.did.js";
 // CANISTER_ID is replaced by webpack based on node environment
-export const canisterId = process.env.IMPORTS_CANISTER_ID;
+export const canisterId = process.env.PRIMITIVE_TYPES_CANISTER_ID;
 
 /**
  * @typedef CreateActorOptions
@@ -20,7 +20,7 @@ export const canisterId = process.env.IMPORTS_CANISTER_ID;
  * @param {CreateActorOptions["agent"]} [options.agent] An initialized agent
  * @param {CreateActorOptions["agentOptions"]} [options.agentOptions] Options to initialize an {@link HttpAgent}. Overridden if an `agent` is passed.
  * @param {CreateActorOptions["actorOptions"]} [options.actorOptions] Options of to pass during the actor initialization.
- * @return {import("@dfinity/agent").ActorSubclass<import("./imports.did.js")._SERVICE>} ActorSubclass configured for the canister
+ * @return {import("@dfinity/agent").ActorSubclass<import("./primitive_types.did.js")._SERVICE>} ActorSubclass configured for the canister
  */
 export const createActor = (canisterId, options = {}) => {
   const agent = options.agent || new HttpAgent({ ...options.agentOptions });
@@ -50,7 +50,7 @@ export const createActor = (canisterId, options = {}) => {
 };
 
 /**
- * A ready-to-use agent for the imports canister
- * @type {import("@dfinity/agent").ActorSubclass<import("./imports.did.js")._SERVICE>}
+ * A ready-to-use agent for the primitive_types canister
+ * @type {import("@dfinity/agent").ActorSubclass<import("./primitive_types.did.js")._SERVICE>}
 */
-// export const imports = createActor(canisterId);
+// export const primitive_types = createActor(canisterId);
