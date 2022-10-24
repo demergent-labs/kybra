@@ -4,7 +4,16 @@
             "type": "custom",
             "build": "python -m kybra primitive_types src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/primitive_types/target/wasm32-unknown-unknown/release/primitive_types.wasm.gz"
+            "wasm": ".dfx/kybra/primitive_types/target/wasm32-unknown-unknown/release/primitive_types.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/primitive_types"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
         }
     }
 }

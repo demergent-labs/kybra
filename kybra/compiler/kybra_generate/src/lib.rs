@@ -2,7 +2,8 @@ use cdk_act::generators::{
     try_from_vm_value::generate_try_from_vm_value, try_into_vm_value::generate_try_into_vm_value,
 };
 use generators::{
-    act::generate_act, try_from_vm_value_impl::generate_try_from_vm_value_impl,
+    act::generate_act, ic_object::generate_ic_object,
+    try_from_vm_value_impl::generate_try_from_vm_value_impl,
     try_into_vm_value_impl::generate_try_into_vm_value_impl,
 };
 use quote::quote;
@@ -23,12 +24,14 @@ pub fn kybra_generate(
     let try_from_vm_value = generate_try_from_vm_value();
     let try_from_vm_value_impl = generate_try_from_vm_value_impl();
 
-    quote! {
-        use rustpython;
-        use rustpython::vm::convert::ToPyObject;
+    let ic_object = generate_ic_object();
 
-        static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython::vm::Interpreter> = None;
-        static mut _KYBRA_SCOPE_OPTION: Option<rustpython::vm::scope::Scope> = None;
+    quote! {
+        use rustpython_vm::{class::PyClassImpl, convert::ToPyObject, PyObjectRef, VirtualMachine};
+        use rustpython_derive::{pyclass, PyPayload};
+
+        static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
+        static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;
 
         #try_into_vm_value
         #try_into_vm_value_impl
@@ -36,16 +39,21 @@ pub fn kybra_generate(
         #try_from_vm_value
         #try_from_vm_value_impl
 
+        #ic_object
+
         #[ic_cdk_macros::init]
         fn _kybra_init() {
             unsafe {
-                let _kybra_interpreter = rustpython::vm::Interpreter::with_init(Default::default(), |vm| {
+                let _kybra_interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
                     vm.add_native_modules(rustpython_stdlib::get_module_inits());
-                    vm.add_frozen(rustpython::vm::py_freeze!(dir = "python_source"));
+                    vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
                 });
                 let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
 
                 _kybra_interpreter.enter(|vm| {
+                    Ic::make_class(&vm.ctx);
+                    vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm);
+
                     let result = vm.run_code_string(
                         _kybra_scope.clone(),
                         &format!("from {} import *", #entry_module_name),
@@ -67,13 +75,16 @@ pub fn kybra_generate(
         #[ic_cdk_macros::post_upgrade]
         fn _kybra_post_upgrade() {
             unsafe {
-                let _kybra_interpreter = rustpython::vm::Interpreter::with_init(Default::default(), |vm| {
+                let _kybra_interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
                     vm.add_native_modules(rustpython_stdlib::get_module_inits());
-                    vm.add_frozen(rustpython::vm::py_freeze!(dir = "python_source"));
+                    vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
                 });
                 let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
 
                 _kybra_interpreter.enter(|vm| {
+                    Ic::make_class(&vm.ctx);
+                    vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm);
+
                     let result = vm.run_code_string(
                         _kybra_scope.clone(),
                         &format!("from {} import *", #entry_module_name),

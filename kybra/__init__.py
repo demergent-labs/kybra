@@ -1,4 +1,7 @@
-from typing import Callable, NoReturn, Optional, TypeVar, TypedDict, Any, NoReturn, Type
+from typing import Callable, NoReturn, Optional, TypeVar, TypedDict, Any, Type, TypeAlias
+from .compiler.custom_modules.principal import Principal
+
+Principal = Principal
 
 int64 = int
 int32 = int
@@ -25,7 +28,7 @@ Variant = TypedDict
 blob = bytes
 # blob = bytearray
 
-null = None
+null: TypeAlias = None
 
 reserved = Any
 empty = NoReturn # TODO in Python 3.11 I believe there is a Never type
@@ -39,12 +42,16 @@ def update(func: object):
 def canister(cls: T) -> T:
     return cls
 
-# TODO need principal
 # TODO need service
 
 Query = Callable
 Update = Callable
 Oneway = Callable
 
-def Func(callable: Callable) -> Type[tuple[int, str]]:
+def Func(callable: Callable) -> Type[tuple[int, str]]: # type: ignore
     return type((0, ''))
+
+class ic:
+    @staticmethod
+    def print(x: Any):
+        _kybra_ic.print(str(x)) # type: ignore
