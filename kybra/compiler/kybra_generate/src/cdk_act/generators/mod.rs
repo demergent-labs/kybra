@@ -1,2 +1,3 @@
-pub mod try_from_vm_value;
-pub mod try_into_vm_value;
+pub mod candid_file_generation;
+pub mod random;
+pub mod vm_value_conversion;
