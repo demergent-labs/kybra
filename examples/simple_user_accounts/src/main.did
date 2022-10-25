@@ -1,2 +1,5 @@
-type User = record { username : text };
-service : { get_user : () -> (User) query; print_user : (User) -> (User) query }
+type Reaction = variant { Sad : text; Happy };
+service : {
+  get_reaction : () -> (Reaction) query;
+  print_reaction : (Reaction) -> (bool) query;
+}
