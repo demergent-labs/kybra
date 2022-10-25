@@ -1,4 +1,4 @@
-use cdk_act::generators::{
+use cdk_act_old::generators::{
     try_from_vm_value::generate_try_from_vm_value, try_into_vm_value::generate_try_into_vm_value,
 };
 use generators::{
@@ -9,6 +9,7 @@ use generators::{
 use quote::quote;
 
 mod cdk_act;
+mod cdk_act_old;
 mod generators;
 
 pub fn kybra_generate(

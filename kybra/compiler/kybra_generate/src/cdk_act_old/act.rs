@@ -1,49 +1,68 @@
-use super::nodes::{
-    alias::AliasActNode, array::ArrayActNode,
-    cross_canister_function::CrossCanisterFunctionActNode, func::FuncActNode,
-    heartbeat_method::HeartbeatMethodActNode, init_method::InitMethodActNode,
-    inspect_message_method::InspectMessageMethodActNode, option::OptionActNode,
-    post_upgrade_method::PostUpgradeMethodActNode, pre_upgrade_method::PreUpgradeMethodActNode,
-    primitive::PrimitiveActNode, query_method::QueryMethodActNode, record::RecordActNode,
-    tuple::TupleActNode, update_method::UpdateMethodActNode, variant::VariantActNode,
-};
-use quote::quote;
+use proc_macro2::TokenStream;
 
-// TODO I'm not sure if we should have the concrete ActNode types here or just the ActNode enum itself
+use super::ToTokenStream;
+use crate::cdk_act_old::nodes::canister_method::CanisterMethodActNode;
+
 pub struct AbstractCanisterTree {
-    pub aliases: Vec<AliasActNode>, // TODO I am not sure we need this??
-    pub arrays: Vec<ArrayActNode>,
-    pub cross_canister_functions: Vec<CrossCanisterFunctionActNode>,
-    pub funcs: Vec<FuncActNode>,
-    pub heartbeat_method: HeartbeatMethodActNode,
-    pub init_method: InitMethodActNode,
-    pub inspect_message_method: InspectMessageMethodActNode,
-    pub options: Vec<OptionActNode>,
-    pub post_upgrade_method: PostUpgradeMethodActNode,
-    pub pre_upgrade_method: PreUpgradeMethodActNode,
-    pub primitives: Vec<PrimitiveActNode>,
-    pub query_methods: Vec<QueryMethodActNode>,
-    pub records: Vec<RecordActNode>,
-    pub tuples: Vec<TupleActNode>,
-    pub update_methods: Vec<UpdateMethodActNode>,
-    pub variants: Vec<VariantActNode>,
+    pub randomness_implementation: TokenStream,
+    pub candid_file_generation: TokenStream,
+    pub query_methods: Vec<CanisterMethodActNode>,
+    pub update_methods: Vec<CanisterMethodActNode>,
 }
 
-trait Act {
-    fn to_token_stream(self) -> proc_macro2::TokenStream;
-}
+impl AbstractCanisterTree {
+    pub fn to_token_stream(&self) -> TokenStream {
+        let randomness_implementation = &self.randomness_implementation;
+        let candid_file_generation = &self.candid_file_generation;
 
-impl Act for Vec<AliasActNode> {
-    fn to_token_stream(self) -> proc_macro2::TokenStream {
-        quote! {}
+        let query_methods: Vec<TokenStream> = self
+            .query_methods
+            .iter()
+            .map(|query_method| query_method.to_token_stream())
+            .collect();
+        let update_methods: Vec<TokenStream> = self
+            .update_methods
+            .iter()
+            .map(|update_method| update_method.to_token_stream())
+            .collect();
+
+        quote::quote! {
+            #randomness_implementation
+
+            #(#query_methods)*
+            #(#update_methods)*
+
+            #candid_file_generation
+        }
     }
-}
 
-impl Act for AbstractCanisterTree {
-    fn to_token_stream(self) -> proc_macro2::TokenStream {
-        // TODO turn each field in the ACT into its token stream
-        // let aliases_token_stream = self.aliases.to_token_stream();
+    pub fn generate_randomness_implementation() -> TokenStream {
+        quote::quote! {
+            fn custom_getrandom(_buf: &mut [u8]) -> Result<(), getrandom::Error> { Ok(()) }
 
-        quote! {}
+            getrandom::register_custom_getrandom!(custom_getrandom);
+        }
+    }
+
+    pub fn generate_candid_file_generation(did_path: &str) -> TokenStream {
+        quote::quote! {
+            candid::export_service!();
+
+            #[ic_cdk_macros::query(name = "__get_candid_interface_tmp_hack")]
+            fn export_candid() -> String {
+                __export_service()
+            }
+
+            #[cfg(test)]
+
+            mod tests {
+                use super::*;
+
+                #[test]
+                fn write_candid_to_disk() {
+                    std::fs::write(#did_path, export_candid()).unwrap();
+                }
+            }
+        }
     }
 }

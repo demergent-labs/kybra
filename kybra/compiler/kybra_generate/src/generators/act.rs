@@ -1,4 +1,4 @@
-use crate::cdk_act::{
+use crate::cdk_act_old::{
     act::AbstractCanisterTree,
     act_node::{ActNode, PrimitiveInfo},
     nodes::canister_method::{CanisterMethod, CanisterMethodActNode},
