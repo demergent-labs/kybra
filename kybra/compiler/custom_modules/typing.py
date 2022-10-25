@@ -8,7 +8,7 @@ import sys
 
 class Optional():
     def __class_getitem__(cls, x):
-        return True
+        return cls
 
 class Callable():
     def __class_getitem__(cls, x):
