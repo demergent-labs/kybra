@@ -219,10 +219,6 @@ fn expr_kind_to_act_node(expr_kind_option: &Option<&ast::ExprKind>) -> ActNode {
                 "text" => ActNode::Primitive(PrimitiveInfo {
                     identifier: quote!(String),
                 }),
-                "User" => ActNode::Primitive(PrimitiveInfo {
-                    // TODO remove this
-                    identifier: quote!(User),
-                }),
                 _ => panic!(""),
             },
             _ => panic!(""),
