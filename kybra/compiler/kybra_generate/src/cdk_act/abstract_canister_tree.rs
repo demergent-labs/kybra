@@ -59,10 +59,6 @@ impl ToTokenStream for AbstractCanisterTree {
         let query_methods = self.query_methods.to_token_streams();
         let update_methods = self.update_methods.to_token_streams();
 
-        // TODO: Remove these clones
-        let query_and_update_canister_methods: Vec<ActCanisterMethod> =
-            vec![self.query_methods.clone(), self.update_methods.clone()].concat();
-
         let candid_file_generation_code =
             candid_file_generation::generate_candid_file_generation_code();
 

@@ -1,29 +1,36 @@
-use cdk_act_old::generators::{
-    try_from_vm_value::generate_try_from_vm_value, try_into_vm_value::generate_try_into_vm_value,
-};
-use generators::{
-    act::generate_act, ic_object::generate_ic_object,
-    vm_value_conversion::try_from_vm_value::generate_try_from_vm_value_impls,
-    vm_value_conversion::try_into_vm_value::generate_try_into_vm_value_impls,
-};
+use cdk_act::{ToAct, ToTokenStream};
+use generators::ic_object::generate_ic_object;
+use py_ast::{KybraProgram, PyAst};
 use quote::quote;
+use rustpython_parser::parser::{self, Mode};
+use source_map::SourceMap;
 
 mod cdk_act;
-mod cdk_act_old;
+mod errors;
 mod generators;
+mod py_ast;
+mod source_map;
 
 pub fn kybra_generate(
     main_py: &str,
     entry_module_name: &str,
 ) -> proc_macro2::token_stream::TokenStream {
-    let act = generate_act(main_py);
-    let act_token_stream = act.to_token_stream();
-
-    let try_into_vm_value = generate_try_into_vm_value();
-    let try_into_vm_value_impls = generate_try_into_vm_value_impls();
-
-    let try_from_vm_value = generate_try_from_vm_value();
-    let try_from_vm_value_impls = generate_try_from_vm_value_impls();
+    let py_file_names = vec![main_py];
+    let source_map = SourceMap {};
+    let kybra_programs: Vec<KybraProgram> = py_file_names
+        .iter()
+        .map(|py_file_name| KybraProgram {
+            program: parser::parse(py_file_name, Mode::Module, "").unwrap(),
+            source_map: &source_map,
+        })
+        .collect();
+    let canister_definition = PyAst {
+        kybra_programs,
+        entry_module_name: entry_module_name.to_string(),
+    }
+    .to_kybra_ast()
+    .to_act()
+    .to_token_stream();
 
     let ic_object = generate_ic_object();
 
@@ -36,85 +43,13 @@ pub fn kybra_generate(
         static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;
 
-        #try_into_vm_value
-        #try_into_vm_value_impls
-
-        #try_from_vm_value
-        #try_from_vm_value_impls
-
         #ic_object
-
-        #[ic_cdk_macros::init]
-        fn _kybra_init() {
-            unsafe {
-                let _kybra_interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
-                    vm.add_native_modules(rustpython_stdlib::get_module_inits());
-                    vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
-                });
-                let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
-
-                _kybra_interpreter.enter(|vm| {
-                    Ic::make_class(&vm.ctx);
-                    vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm);
-
-                    let result = vm.run_code_string(
-                        _kybra_scope.clone(),
-                        &format!("from {} import *", #entry_module_name),
-                        "".to_owned(),
-                    );
-
-                    if let Err(err) = result {
-                        let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                        panic!(err_string);
-                    }
-                });
-
-                _KYBRA_INTERPRETER_OPTION = Some(_kybra_interpreter);
-                _KYBRA_SCOPE_OPTION = Some(_kybra_scope);
-            }
-        }
-
-        #[ic_cdk_macros::post_upgrade]
-        fn _kybra_post_upgrade() {
-            unsafe {
-                let _kybra_interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
-                    vm.add_native_modules(rustpython_stdlib::get_module_inits());
-                    vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
-                });
-                let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
-
-                _kybra_interpreter.enter(|vm| {
-                    Ic::make_class(&vm.ctx);
-                    vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm);
-
-                    let result = vm.run_code_string(
-                        _kybra_scope.clone(),
-                        &format!("from {} import *", #entry_module_name),
-                        "".to_owned(),
-                    );
-
-                    if let Err(err) = result {
-                        let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                        panic!(err_string);
-                    }
-                });
-
-                _KYBRA_INTERPRETER_OPTION = Some(_kybra_interpreter);
-                _KYBRA_SCOPE_OPTION = Some(_kybra_scope);
-            }
-        }
-
-        // #[ic_cdk_macros::query]
-        // fn __cdk_name() -> String {
-        //     "kybra".to_string()
-        // }
 
         // TODO this is broken https://github.com/dfinity/motoko/issues/3462#issuecomment-1260060874
         // #[link_section = "icp:public cdk"]
         // pub static NAME: [u8; 12] = *b"kybra v0.0.0";
 
-        #act_token_stream
+        #canister_definition
+
     }
 }
