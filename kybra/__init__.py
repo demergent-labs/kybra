@@ -48,6 +48,7 @@ Query = Callable
 Update = Callable
 Oneway = Callable
 
+# TODO we might want to just make this a dict[int, str] to keep the derive simple, or maybe a class with a principal and method name field
 def Func(callable: Callable) -> Type[tuple[int, str]]: # type: ignore
     return type((0, ''))
 

@@ -4,7 +4,7 @@ pub fn generate_try_into_vm_value_impl() -> proc_macro2::TokenStream {
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for () {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                Ok(().to_pyobject(vm)) // TODO this should be a null PyObjectRef
+                Ok(().to_pyobject(vm))
             }
         }
 
