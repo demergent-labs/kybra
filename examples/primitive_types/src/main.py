@@ -1,7 +1,7 @@
-# TODO check that all primitive types are represented, and add tests to Azle
-
 from kybra import (
-    query,
+    empty,
+    float64,
+    float32,
     ic,
     int64,
     int32,
@@ -12,8 +12,10 @@ from kybra import (
     nat32,
     nat16,
     nat8,
-    float64,
-    float32,
+    null,
+    Principal,
+    reserved,
+    query,
     text
 )
 import math
@@ -126,11 +128,6 @@ def print_float32(float32: float32)-> float32:
     ic.print(type(float32))
     return float32
 
-# TODO add principal
-# TODO add null
-# TODO add reserved
-# TODO add empty
-
 @query
 def get_text() -> text:
     return 'this is a string defined with text'
@@ -157,3 +154,41 @@ def get_bool() -> bool:
 def print_bool(bool: bool)-> bool:
     ic.print(type(bool))
     return bool
+
+@query
+def get_principal() -> Principal:
+    return Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai')
+
+@query
+def print_principal(principal: Principal) -> Principal:
+    ic.print(type(principal))
+    return principal
+
+@query
+def get_null() -> null:
+    return None
+
+@query
+def print_null(null: null) -> null:
+    ic.print(type(null))
+    return null
+
+@query
+def get_reserved() -> reserved:
+    return 'anything'
+
+@query
+def print_reserved(reserved: reserved) -> reserved:
+    ic.print(type(reserved))
+    return reserved
+
+@query
+def get_empty() -> empty:
+    raise Exception('Anything you want')
+
+# Note: It is impossible to call this function because it requires an argument
+# but there is no way to pass an "empty" value as an argument.
+@query
+def print_empty(empty: empty) -> empty:
+    ic.print(type(empty))
+    raise Exception('Anything you want')

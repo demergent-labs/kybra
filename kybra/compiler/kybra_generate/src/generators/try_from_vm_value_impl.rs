@@ -42,6 +42,15 @@ pub fn generate_try_from_vm_value_impl() -> proc_macro2::TokenStream {
             }
         }
 
+        impl CdkActTryFromVmValue<ic_cdk::export::Principal, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::Principal, CdkActTryFromVmValueError> {
+                let to_str = self.get_attr("to_str", vm).unwrap();
+                let result = vm.invoke(&to_str, ()).unwrap();
+                let result_string: String = result.try_into_value(vm).unwrap();
+                Ok(ic_cdk::export::Principal::from_text(result_string).unwrap())
+            }
+        }
+
         // Number types
 
         impl CdkActTryFromVmValue<f64, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {

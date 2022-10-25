@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "kybra/compiler/kybra_generate"
+    "kybra/compiler/kybra_generate",
+    "kybra/compiler/kybra_vm_value_derive",
 ]
 exclude = ["examples"]
 edition = "2018"

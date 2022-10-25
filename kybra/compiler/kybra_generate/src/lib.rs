@@ -27,8 +27,9 @@ pub fn kybra_generate(
     let ic_object = generate_ic_object();
 
     quote! {
-        use rustpython_vm::{class::PyClassImpl, convert::ToPyObject, PyObjectRef, VirtualMachine};
+        use rustpython_vm::{builtins::PyTupleRef, class::PyClassImpl, convert::ToPyObject, PyObjectRef, VirtualMachine};
         use rustpython_derive::{pyclass, PyPayload};
+        use kybra_vm_value_derive::{CdkActTryIntoVmValue, CdkActTryFromVmValue};
 
         static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;
