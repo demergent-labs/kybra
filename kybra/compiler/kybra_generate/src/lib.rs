@@ -3,8 +3,8 @@ use cdk_act::generators::{
 };
 use generators::{
     act::generate_act, ic_object::generate_ic_object,
-    try_from_vm_value_impl::generate_try_from_vm_value_impl,
-    try_into_vm_value_impl::generate_try_into_vm_value_impl,
+    vm_value_conversion::try_from_vm_value::generate_try_from_vm_value_impls,
+    vm_value_conversion::try_into_vm_value::generate_try_into_vm_value_impls,
 };
 use quote::quote;
 
@@ -19,26 +19,27 @@ pub fn kybra_generate(
     let act_token_stream = act.to_token_stream();
 
     let try_into_vm_value = generate_try_into_vm_value();
-    let try_into_vm_value_impl = generate_try_into_vm_value_impl();
+    let try_into_vm_value_impls = generate_try_into_vm_value_impls();
 
     let try_from_vm_value = generate_try_from_vm_value();
-    let try_from_vm_value_impl = generate_try_from_vm_value_impl();
+    let try_from_vm_value_impls = generate_try_from_vm_value_impls();
 
     let ic_object = generate_ic_object();
 
     quote! {
-        use rustpython_vm::{builtins::PyTupleRef, class::PyClassImpl, convert::ToPyObject, PyObjectRef, VirtualMachine};
+        use rustpython_vm::{builtins::{PyTupleRef, PyIntRef}, class::PyClassImpl, convert::ToPyObject, PyObjectRef, VirtualMachine};
         use rustpython_derive::{pyclass, PyPayload};
         use kybra_vm_value_derive::{CdkActTryIntoVmValue, CdkActTryFromVmValue};
+        use std::str::FromStr;
 
         static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;
 
         #try_into_vm_value
-        #try_into_vm_value_impl
+        #try_into_vm_value_impls
 
         #try_from_vm_value
-        #try_from_vm_value_impl
+        #try_from_vm_value_impls
 
         #ic_object
 

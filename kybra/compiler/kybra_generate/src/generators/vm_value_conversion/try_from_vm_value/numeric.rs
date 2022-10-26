@@ -1,58 +1,5 @@
-pub fn generate_try_from_vm_value_impl() -> proc_macro2::TokenStream {
+pub fn generate_numeric_impls() -> proc_macro2::TokenStream {
     quote::quote! {
-        // Basic types
-
-        impl CdkActTryFromVmValue<(), &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<(), CdkActTryFromVmValueError> {
-                // match self.try_into_value(vm) {
-                //     Ok(value) => Ok(value),
-                //     Err(err) => Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to ()".to_string())) // TODO consider using the try_into_value err
-                // }
-                Ok(())
-            }
-        }
-
-        impl CdkActTryFromVmValue<bool, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<bool, CdkActTryFromVmValueError> {
-                match self.try_into_value(vm) {
-                    Ok(value) => Ok(value),
-                    Err(err) => Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to bool".to_string())) // TODO consider using the try_into_value err
-                }
-            }
-        }
-
-        impl CdkActTryFromVmValue<String, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<String, CdkActTryFromVmValueError> {
-                match self.try_into_value(vm) {
-                    Ok(value) => Ok(value),
-                    Err(err) => Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to String".to_string())) // TODO consider using the try_into_value err
-                }
-            }
-        }
-
-        impl CdkActTryFromVmValue<ic_cdk::export::candid::Empty, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::candid::Empty, CdkActTryFromVmValueError> {
-                panic!("PyObjectRef cannot be converted into Empty");
-            }
-        }
-
-        impl CdkActTryFromVmValue<ic_cdk::export::candid::Reserved, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::candid::Reserved, CdkActTryFromVmValueError> {
-                Ok(ic_cdk::export::candid::Reserved)
-            }
-        }
-
-        impl CdkActTryFromVmValue<ic_cdk::export::Principal, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::Principal, CdkActTryFromVmValueError> {
-                let to_str = self.get_attr("to_str", vm).unwrap();
-                let result = vm.invoke(&to_str, ()).unwrap();
-                let result_string: String = result.try_into_value(vm).unwrap();
-                Ok(ic_cdk::export::Principal::from_text(result_string).unwrap())
-            }
-        }
-
-        // Number types
-
         impl CdkActTryFromVmValue<f64, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<f64, CdkActTryFromVmValueError> {
                 match self.try_into_value(vm) {
@@ -67,6 +14,17 @@ pub fn generate_try_from_vm_value_impl() -> proc_macro2::TokenStream {
                 match self.try_into_value(vm) {
                     Ok(value) => Ok(value),
                     Err(err) => Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to f32".to_string()))
+                }
+            }
+        }
+
+        impl CdkActTryFromVmValue<ic_cdk::export::candid::Int, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::candid::Int, CdkActTryFromVmValueError> {
+                let int_result: Result<PyIntRef, _> = self.try_into_value(vm);
+
+                match int_result {
+                    Ok(int) => Ok(ic_cdk::export::candid::Int(int.as_bigint().clone())),
+                    Err(_) => Err(CdkActTryFromVmValueError("PyObjectRef is not a PyIntRef".to_string()))
                 }
             }
         }
@@ -116,6 +74,17 @@ pub fn generate_try_from_vm_value_impl() -> proc_macro2::TokenStream {
             }
         }
 
+        impl CdkActTryFromVmValue<ic_cdk::export::candid::Nat, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::candid::Nat, CdkActTryFromVmValueError> {
+                let int_result: Result<PyIntRef, _> = self.try_into_value(vm);
+
+                match int_result {
+                    Ok(int) => Ok(ic_cdk::export::candid::Nat::from_str(&int.as_bigint().to_string()).unwrap()), // TODO probably not the best conversion
+                    Err(_) => Err(CdkActTryFromVmValueError("PyObjectRef is not a PyIntRef".to_string()))
+                }
+            }
+        }
+
         impl CdkActTryFromVmValue<u128, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<u128, CdkActTryFromVmValueError> {
                 match self.try_into_value(vm) {
@@ -130,6 +99,15 @@ pub fn generate_try_from_vm_value_impl() -> proc_macro2::TokenStream {
                 match self.try_into_value(vm) {
                     Ok(value) => Ok(value),
                     Err(err) => Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to u64".to_string()))
+                }
+            }
+        }
+
+        impl CdkActTryFromVmValue<usize, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<usize, CdkActTryFromVmValueError> {
+                match self.try_into_value(vm) {
+                    Ok(value) => Ok(value),
+                    Err(err) => Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to usize".to_string()))
                 }
             }
         }
