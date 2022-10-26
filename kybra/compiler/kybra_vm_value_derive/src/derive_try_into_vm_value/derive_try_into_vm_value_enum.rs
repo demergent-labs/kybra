@@ -16,6 +16,12 @@ pub fn derive_try_into_vm_value_enum(
                 }
             }
         }
+
+        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for Vec<#enum_name> {
+            fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
+                try_into_vm_value_generic_array(self, vm)
+            }
+        }
     }
 }
 

@@ -16,6 +16,12 @@ pub fn derive_try_from_vm_value_enum(
                 return Err(CdkActTryFromVmValueError("Enum variant does not exist".to_string()));
             }
         }
+
+        impl CdkActTryFromVmValue<Vec<#enum_name>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<#enum_name>, CdkActTryFromVmValueError> {
+                try_from_vm_value_generic_array(self, vm)
+            }
+        }
     }
 }
 
