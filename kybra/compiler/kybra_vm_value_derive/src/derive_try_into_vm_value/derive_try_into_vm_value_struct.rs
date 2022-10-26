@@ -23,13 +23,11 @@ pub fn derive_try_into_vm_value_struct(
             }
         }
 
-        // TODO the body of this function is repeated in azle_into_js_value_trait.ts
-        // impl CdkActTryIntoVmValue<&mut boa_engine::Context, boa_engine::JsValue> for Vec<#struct_name> {
-        //     fn try_into_vm_value(self, context: &mut boa_engine::Context) -> boa_engine::JsValue {
-        //         let js_values = self.into_iter().map(|item| item.try_into_vm_value(context)).collect::<Vec<boa_engine::JsValue>>();
-        //         boa_engine::object::JsArray::from_iter(js_values, context).into()
-        //     }
-        // }
+        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for Vec<#struct_name> {
+            fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
+                try_into_vm_value_generic_array(self, vm)
+            }
+        }
     }
 }
 

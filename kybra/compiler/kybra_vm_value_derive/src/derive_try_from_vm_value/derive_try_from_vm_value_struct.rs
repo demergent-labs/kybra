@@ -20,51 +20,11 @@ pub fn derive_try_from_vm_value_struct(
             }
         }
 
-        // TODO the body of this function is repeated in try_from_vm_value_trait.ts
-        // impl CdkActTryFromVmValue<Vec<#struct_name>, &mut boa_engine::Context> for boa_engine::JsValue {
-        //     fn try_from_vm_value(self, context: &mut boa_engine::Context) -> Result<Vec<#struct_name>, CdkActTryFromVmValueError> {
-        //         match self.as_object() {
-        //             Some(js_object) => {
-        //                 if js_object.is_array() {
-        //                     let mut processing: bool = true;
-        //                     let mut index: usize = 0;
-
-        //                     let mut result = vec![];
-
-        //                     while processing == true {
-        //                         match js_object.get(index, context) {
-        //                             Ok(js_value) => {
-        //                                 if js_value.is_undefined() {
-        //                                     processing = false;
-        //                                 }
-        //                                 else {
-        //                                     match js_value.try_from_vm_value(&mut *context) {
-        //                                         Ok(value) => {
-        //                                             result.push(value);
-        //                                             index += 1;
-        //                                         }
-        //                                         Err(err) => {
-        //                                             return Err(err);
-        //                                         }
-        //                                     }
-        //                                 }
-        //                             },
-        //                             Err(_) => {
-        //                                 return Err(CdkActTryFromVmValueError("Item at array index does not exist".to_string()))
-        //                             }
-        //                         }
-        //                     }
-
-        //                     Ok(result)
-        //                 }
-        //                 else {
-        //                     Err(CdkActTryFromVmValueError("JsObject is not an array".to_string()))
-        //                 }
-        //             },
-        //             None => Err(CdkActTryFromVmValueError("JsValue is not an object".to_string()))
-        //         }
-        //     }
-        // }
+        impl CdkActTryFromVmValue<Vec<#struct_name>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<#struct_name>, CdkActTryFromVmValueError> {
+                try_from_vm_value_generic_array(self, vm)
+            }
+        }
     }
 }
 

@@ -26,7 +26,6 @@ Record = TypedDict
 Variant = TypedDict
 
 blob = bytes
-# blob = bytearray
 
 null: TypeAlias = None
 
