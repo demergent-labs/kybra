@@ -1,30 +1,36 @@
-from kybra import query, Record, Variant, ic
+from kybra import opt, query, Record, update
+from typing import TypedDict
 
 class User(Record):
+    id: str
     username: str
 
-@query
-def get_user() -> User:
-    return {
-        'username': 'lastmjs'
-    }
+class Db(TypedDict):
+    users: dict[str, User]
+
+db: Db = {
+    'users': {}
+}
 
 @query
-def print_user(user: User) -> User:
-    ic.print(user)
+def get_user_by_id(id: str) -> opt[User]:
+    user = db['users'].get(id, None)
+
     return user
 
-class Reaction(Variant, total=False):
-    Happy: None
-    Sad: str
-
 @query
-def get_reaction() -> Reaction:
-    return {
-        'Sad': 'yous'
+def get_all_users() -> list[User]:
+    return list(db['users'].values())
+
+@update
+def create_user(username: str) -> User:
+    id = str(len(db['users'].keys()))
+
+    user: User = {
+        'id': id,
+        'username': username
     }
 
-@query
-def print_reaction(reaction: Reaction) -> bool:
-    ic.print(reaction)
-    return True
+    db['users'][id] = user
+
+    return user
