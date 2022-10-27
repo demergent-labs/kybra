@@ -162,6 +162,9 @@ fn expr_kind_to_act_node(expr_kind_option: &Option<&ast::ExprKind>) -> ActNode {
     if let Some(expr_kind) = expr_kind_option {
         match expr_kind {
             ast::ExprKind::Name { id, .. } => match &id[..] {
+                "blob" => ActNode::Primitive(PrimitiveInfo {
+                    identifier: quote!(Vec<u8>),
+                }),
                 "empty" => ActNode::Primitive(PrimitiveInfo {
                     identifier: quote!(ic_cdk::export::candid::Empty),
                 }),

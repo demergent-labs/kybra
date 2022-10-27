@@ -1,0 +1,19 @@
+{
+    "canisters": {
+        "bytes": {
+            "type": "custom",
+            "build": "python -m kybra bytes src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/bytes/target/wasm32-unknown-unknown/release/bytes.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/bytes"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}
