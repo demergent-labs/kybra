@@ -1,0 +1,19 @@
+{
+    "canisters": {
+        "null_example": {
+            "type": "custom",
+            "build": "python -m kybra null_example src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/null_example/target/wasm32-unknown-unknown/release/null_example.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/null_example"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}
