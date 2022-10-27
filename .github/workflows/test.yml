@@ -59,6 +59,7 @@ jobs:
                   [
                     "examples/imports",
                     "examples/query",
+                    "examples/simple_erc20",
                     "examples/update",
                     "examples/primitive_types"
                   ]
