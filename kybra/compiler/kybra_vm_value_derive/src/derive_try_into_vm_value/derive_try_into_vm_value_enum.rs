@@ -60,7 +60,7 @@ fn derive_variant_branches_unnamed_fields(
             #enum_name::#variant_name => {
                 let dict = vm.ctx.new_dict();
 
-                dict.set_item(stringify!(#variant_name), ().to_pyobject(vm), vm);
+                dict.set_item(stringify!(#variant_name), vm.ctx.none(), vm);
 
                 Ok(dict.into())
             }
@@ -70,7 +70,7 @@ fn derive_variant_branches_unnamed_fields(
             #enum_name::#variant_name(value) => {
                 let dict = vm.ctx.new_dict();
 
-                dict.set_item(stringify!(#variant_name), value.to_pyobject(vm), vm);
+                dict.set_item(stringify!(#variant_name), value.try_into_vm_value(vm).unwrap(), vm);
 
                 Ok(dict.into())
             }
