@@ -1,0 +1,19 @@
+{
+    "canisters": {
+        "optional_types": {
+            "type": "custom",
+            "build": "python -m kybra optional_types src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/optional_types/target/wasm32-unknown-unknown/release/optional_types.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/optional_types"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}
