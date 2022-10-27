@@ -57,6 +57,8 @@ jobs:
               run: |
                   EXAMPLE_DIRECTORIES=$(cat << END
                   [
+                    "examples/bytes",
+                    "examples/counter",
                     "examples/imports",
                     "examples/query",
                     "examples/simple_erc20",

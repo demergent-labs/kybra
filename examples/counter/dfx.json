@@ -1,0 +1,19 @@
+{
+    "canisters": {
+        "counter": {
+            "type": "custom",
+            "build": "python -m kybra counter src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/counter/target/wasm32-unknown-unknown/release/counter.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/counter"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}

@@ -1,0 +1,1 @@
+service : { get_bytes : (vec nat8) -> (vec nat8) }
