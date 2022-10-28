@@ -7,9 +7,9 @@ class User(Record):
     primitive_two_tuple: "PrimitiveTwoTuple"
 
 
-# class Reaction(Variant, total=False):
-#     Good: None
-#     Bad: "ComplexThreeTuple"
+class Reaction(Variant, total=False):
+    Good: None
+    Bad: "ComplexThreeTuple"
 
 PrimitiveOneTuple = tuple[str]
 PrimitiveTwoTuple = tuple[str, nat64]
@@ -17,16 +17,16 @@ PrimitiveThreeTuple = tuple[str, nat64, Principal]
 
 ComplexOneTuple = tuple[PrimitiveTwoTuple]
 ComplexTwoTuple = tuple[PrimitiveTwoTuple, User]
-# ComplexThreeTuple = tuple[PrimitiveTwoTuple, User, Reaction]
+ComplexThreeTuple = tuple[PrimitiveTwoTuple, User, Reaction]
 
 Header = tuple[str, str]
 
 class HttpResponse(Record):
     headers: list[Header]
 
-# class StreamingCallbackType(Variant, total=False):
-#     with_headers: list[Header]
-#     without_headers: null
+class StreamingCallbackType(Variant, total=False):
+    with_headers: list[Header]
+    without_headers: null
 
 @query
 def primitive_one_tuple_return_type() -> PrimitiveOneTuple:
@@ -120,57 +120,57 @@ def complex_two_tuple_inline_return_type() -> tuple[PrimitiveTwoTuple, User]:
 def complex_two_tuple_inline_param(param: tuple[PrimitiveTwoTuple, User]) -> tuple[PrimitiveTwoTuple, User]:
     return param
 
-# @query
-# def complex_three_tuple_return_type() -> ComplexThreeTuple:
-#     return (
-#         ('Content-Type', 64),
-#         {
-#             'id': '0',
-#             'primitive_two_tuple': ('Content-Type', 64)
-#         },
-#         {
-#             'Bad': (
-#                 ('Content-Type', 64),
-#                 {
-#                     'id': '1',
-#                     'primitive_two_tuple': ('Content-Type', 64)
-#                 },
-#                 {
-#                     'Good': None
-#                 }
-#             )
-#         }
-#     )
+@query
+def complex_three_tuple_return_type() -> ComplexThreeTuple:
+    return (
+        ('Content-Type', 64),
+        {
+            'id': '0',
+            'primitive_two_tuple': ('Content-Type', 64)
+        },
+        {
+            'Bad': (
+                ('Content-Type', 64),
+                {
+                    'id': '1',
+                    'primitive_two_tuple': ('Content-Type', 64)
+                },
+                {
+                    'Good': None
+                }
+            )
+        }
+    )
 
-# @query
-# def complex_three_tuple_param(param: ComplexThreeTuple) -> ComplexThreeTuple:
-#     return param
+@query
+def complex_three_tuple_param(param: ComplexThreeTuple) -> ComplexThreeTuple:
+    return param
 
-# @query
-# def complex_three_tuple_inline_return_type() -> tuple[PrimitiveTwoTuple, User, Reaction]:
-#     return (
-#         ('Content-Type', 64),
-#         {
-#             'id': '0',
-#             'primitive_two_tuple': ('Content-Type', 64)
-#         },
-#         {
-#             'Bad': (
-#                 ('Content-Type', 64),
-#                 {
-#                     'id': '1',
-#                     'primitive_two_tuple': ('Content-Type', 64)
-#                 },
-#                 {
-#                     'Good': None
-#                 }
-#             )
-#         }
-#     )
+@query
+def complex_three_tuple_inline_return_type() -> tuple[PrimitiveTwoTuple, User, Reaction]:
+    return (
+        ('Content-Type', 64),
+        {
+            'id': '0',
+            'primitive_two_tuple': ('Content-Type', 64)
+        },
+        {
+            'Bad': (
+                ('Content-Type', 64),
+                {
+                    'id': '1',
+                    'primitive_two_tuple': ('Content-Type', 64)
+                },
+                {
+                    'Good': None
+                }
+            )
+        }
+    )
 
-# @query
-# def complex_three_tuple_inline_param(param: tuple[PrimitiveTwoTuple, User, Reaction]) -> tuple[PrimitiveTwoTuple, User, Reaction]:
-#     return param
+@query
+def complex_three_tuple_inline_param(param: tuple[PrimitiveTwoTuple, User, Reaction]) -> tuple[PrimitiveTwoTuple, User, Reaction]:
+    return param
 
 @query
 def tuple_array_params_and_return_type(headers: list[Header]) -> list[Header]:
@@ -185,11 +185,11 @@ def tuple_array_record_field() -> HttpResponse:
         ]
     }
 
-# @query
-# def tuple_array_variant_field() -> StreamingCallbackType:
-#     return {
-#         'with_headers': [
-#             ('Content-Type', 'application/json'),
-#             ('Accept-Ranges', 'bytes')
-#         ]
-#     }
+@query
+def tuple_array_variant_field() -> StreamingCallbackType:
+    return {
+        'with_headers': [
+            ('Content-Type', 'application/json'),
+            ('Accept-Ranges', 'bytes')
+        ]
+    }
