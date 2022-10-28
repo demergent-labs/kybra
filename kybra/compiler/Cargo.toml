@@ -28,7 +28,6 @@ rustpython-derive = { git = "https://github.com/demergent-labs/RustPython", bran
 # rustpython = { path = "../../../../../../RustPython", default-features = false, features = [] }
 getrandom = { version = "0.2.3", features = ["custom"] }
 serde = "1.0.137"
-# serde = "1.0.137"
 # azle-js-value-derive = { path = "./azle_js_value_derive" }
 # azle_generate_macro = { path = "./azle_generate_macro" }
 # async-recursion = "1.0.0"

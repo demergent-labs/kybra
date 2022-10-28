@@ -29,7 +29,7 @@ canister_path=f'.dfx/kybra/{canister_name}'
 lib_path=f'{canister_path}/src/lib.rs'
 
 # This is the location of the Candid file generated from the final generated Rust file
-generated_did_path=f'{canister_path}/main.did'
+generated_did_path=f'{canister_path}/index.did'
 
 # This is the Rust target directory
 target_path=f'{canister_path}/target'
