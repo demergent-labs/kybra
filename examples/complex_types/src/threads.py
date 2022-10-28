@@ -5,7 +5,11 @@ from .state import state, StateThread, StateUser
 from .users import get_user_from_state_user
 
 @update
-def create_thread(title: str, author_id: str, join_depth: nat32) -> Thread:
+def create_thread(
+    title: str,
+    author_id: str,
+    join_depth: nat32
+) -> Thread:
     id = str(len(state['threads'].keys()))
 
     state_thread: StateThread = {

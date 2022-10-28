@@ -32,7 +32,10 @@ def get_all_users(join_depth: nat32) -> list[User]:
         )
     )
 
-def get_user_from_state_user(state_user: StateUser, join_depth: nat32) -> User:
+def get_user_from_state_user(
+    state_user: StateUser,
+    join_depth: nat32
+) -> User:
     if join_depth == 0:
         return {
             'id': state_user['id'],
