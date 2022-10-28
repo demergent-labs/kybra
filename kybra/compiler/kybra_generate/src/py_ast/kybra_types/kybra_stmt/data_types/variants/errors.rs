@@ -1,13 +1,13 @@
 use crate::{
-    errors::{Message, WarningMessage},
+    errors::{ErrorMessage, Message},
     py_ast::kybra_types::KybraStmt,
 };
 
 impl KybraStmt<'_> {
-    pub(super) fn record_default_value_warning(&self) -> WarningMessage {
-        WarningMessage {
+    pub(super) fn not_a_variant_error(&self) -> ErrorMessage {
+        ErrorMessage {
             message: Message {
-                title: "WARNING: I don't think default values are supported are they?".to_string(),
+                title: todo!(),
                 origin: todo!(),
                 line_number: todo!(),
                 source: todo!(),
