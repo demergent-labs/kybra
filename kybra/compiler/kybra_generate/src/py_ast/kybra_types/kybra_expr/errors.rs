@@ -14,4 +14,24 @@ impl KybraExpr<'_> {
             suggestion: None,
         }
     }
+
+    pub(super) fn invalid_subscript_value_error(&self) -> ErrorMessage {
+        ErrorMessage {
+            title: "must be opt or list".to_string(),
+            origin: todo!(),
+            line_number: todo!(),
+            source: todo!(),
+            range: todo!(),
+            annotation: todo!(),
+            suggestion: todo!(),
+        }
+    }
+
+    pub(super) fn not_array_error(&self) -> String {
+        "This is is not an array".to_string()
+    }
+
+    pub(super) fn not_opt_error(&self) -> String {
+        "This is is not an opt".to_string()
+    }
 }

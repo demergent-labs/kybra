@@ -153,7 +153,13 @@ impl WhatIsIt for Located<ExprKind> {
             ExprKind::JoinedStr { .. } => "joined str".to_string(),
             ExprKind::Constant { .. } => "constant".to_string(),
             ExprKind::Attribute { .. } => "attribute".to_string(),
-            ExprKind::Subscript { .. } => "subscript".to_string(),
+            ExprKind::Subscript { value, slice, .. } => {
+                format!(
+                    "subscript: value({}), slice({})",
+                    value.to_cool(),
+                    slice.to_cool()
+                )
+            }
             ExprKind::Starred { .. } => "starred".to_string(),
             ExprKind::Name { id, .. } => format!("name: {}", id),
             ExprKind::List { .. } => "list".to_string(),
