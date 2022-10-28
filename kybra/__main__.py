@@ -16,20 +16,22 @@ py_entry_file_path = sys.argv[2]
 # This is the Python module name of the developer's Python project, derived from the entry point Python file passed into python -m kybra from the dfx.json build command
 py_entry_module_name = Path(py_entry_file_path).stem
 
+# This is the location of all code used to generate the final canister Rust code
+canister_path=f'.dfx/kybra/{canister_name}'
+
+py_file_names_file_path = f'{canister_path}/file_names.txt'
+
 # This is the path to the developer's Candid file passed into python -m kybra from the dfx.json build command
 did_path = sys.argv[3]
 
 # This is the path to the Kybra compiler Rust code delivered with the Python package
 compiler_path = os.path.dirname(kybra.__file__) + '/compiler'
 
-# This is the location of all code used to generate the final canister Rust code
-canister_path=f'.dfx/kybra/{canister_name}'
-
 # This is the final generated Rust file that is the canister
 lib_path=f'{canister_path}/src/lib.rs'
 
 # This is the location of the Candid file generated from the final generated Rust file
-generated_did_path=f'{canister_path}/index.did'
+generated_did_path = f'{canister_path}/index.did'
 
 # This is the Rust target directory
 target_path=f'{canister_path}/target'
@@ -61,7 +63,9 @@ os.makedirs(python_source_path)
 # Copy our custom Python modules into the python_source directory
 shutil.copytree(custom_modules_path, python_source_path, dirs_exist_ok=True)
 
-for node in graph.flatten(start=entry_point):
+flattened_graph = list(graph.flatten(start=entry_point))
+
+for node in flattened_graph:
     if type(node) == modulegraph.modulegraph.Script:
         shutil.copy(node.filename, f'{python_source_path}/{os.path.basename(node.filename)}')
 
@@ -71,12 +75,26 @@ for node in graph.flatten(start=entry_point):
     if type(node) == modulegraph.modulegraph.Package:
         shutil.copytree(node.packagepath[0], f'{python_source_path}/{node.identifier}', dirs_exist_ok=True)
 
+py_file_names = list(
+    filter(
+        lambda filename: filename is not None,
+        map(
+            lambda node: node.filename,
+            flattened_graph
+        )
+    )
+)
+
 # Rust prerequisites
 os.system('rustup target add wasm32-unknown-unknown')
 os.system('cargo install ic-cdk-optimizer --version 0.3.4 || true')
 
+py_file_names_file = open(py_file_names_file_path, 'w')
+py_file_names_file.write(','.join(py_file_names))
+py_file_names_file.close()
+
 # Generate the Rust code
-os.system(f'CARGO_TARGET_DIR={target_path} cargo run --manifest-path {canister_path}/kybra_generate/Cargo.toml {py_entry_file_path} {py_entry_module_name} | rustfmt --edition 2018 > {lib_path}')
+os.system(f'CARGO_TARGET_DIR={target_path} cargo run --manifest-path {canister_path}/kybra_generate/Cargo.toml {py_file_names_file_path} {py_entry_module_name} | rustfmt --edition 2018 > {lib_path}')
 
 # Compile the generated Rust code
 os.system(f'CARGO_TARGET_DIR={target_path} cargo build --manifest-path {canister_path}/Cargo.toml --target wasm32-unknown-unknown --package kybra_generated_canister --release')

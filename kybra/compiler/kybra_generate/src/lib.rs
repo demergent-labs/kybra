@@ -12,19 +12,23 @@ mod py_ast;
 mod source_map;
 
 pub fn kybra_generate(
-    main_py: &str,
+    py_file_names: &Vec<&str>,
     entry_module_name: &str,
 ) -> proc_macro2::token_stream::TokenStream {
     eprintln!("-------------------------------------------");
     eprintln!("--- STARTING ------------------------------");
     eprintln!("-------------------------------------------");
-    let py_file_names = vec![main_py];
+
     let source_map = SourceMap {};
     let kybra_programs: Vec<KybraProgram> = py_file_names
         .iter()
-        .map(|py_file_name| KybraProgram {
-            program: parser::parse(py_file_name, Mode::Module, "").unwrap(),
-            source_map: &source_map,
+        .map(|py_file_name| {
+            let source = std::fs::read_to_string(py_file_name).unwrap();
+
+            KybraProgram {
+                program: parser::parse(&source, Mode::Module, "").unwrap(),
+                source_map: &source_map,
+            }
         })
         .collect();
     let canister_definition = PyAst {
