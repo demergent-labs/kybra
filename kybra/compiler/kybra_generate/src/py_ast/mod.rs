@@ -12,18 +12,13 @@ pub struct PyAst<'a> {
 }
 
 impl PyAst<'_> {
-    pub fn to_kybra_ast(self) -> KybraAst {
-        let thing = KybraAst {
+    pub fn to_kybra_ast(&self) -> KybraAst {
+        KybraAst {
             init_method: self.build_init_method(),
             post_upgrade: self.build_post_upgrade_method(),
-            canister_methods: self.build_canister_methods(),
             canister_types: self.build_canister_types(),
-        };
-        eprintln!(
-            "Here are the canister_methods,\n{:#?}",
-            thing.canister_methods
-        );
-        thing
+            canister_methods: self.build_canister_methods(),
+        }
     }
 
     fn build_canister_methods(&self) -> Vec<ActCanisterMethod> {

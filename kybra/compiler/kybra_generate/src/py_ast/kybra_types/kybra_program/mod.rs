@@ -1,10 +1,9 @@
-use std::collections::HashSet;
-
-use rustpython_parser::ast::{Mod, StmtKind};
+use rustpython_parser::ast::Mod;
 
 use crate::{
     cdk_act::{ActCanisterMethod, ActDataType, CanisterMethodType},
     source_map::SourceMap,
+    WhatIsIt,
 };
 
 use super::KybraStmt;
@@ -49,7 +48,27 @@ impl KybraProgram<'_> {
     }
 
     pub fn get_act_data_type_nodes(&self) -> Vec<ActDataType> {
-        vec![]
+        match &self.program {
+            Mod::Module { body, .. } => body
+                .iter()
+                .filter(|stmt_kind| {
+                    let kybra_stmt = KybraStmt {
+                        stmt_kind,
+                        source_map: self.source_map,
+                    };
+                    kybra_stmt.what_is_it();
+                    kybra_stmt.is_record()
+                })
+                .map(|stmt_kind| {
+                    let kybra_stmt = KybraStmt {
+                        stmt_kind,
+                        source_map: self.source_map,
+                    };
+                    kybra_stmt.build_act_data_type()
+                })
+                .collect(),
+            _ => vec![],
+        }
     }
     // fn get_ast_function_defs(self) -> Vec<KybraFunctionDef> {
     //     match self.program {

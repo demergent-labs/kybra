@@ -16,7 +16,7 @@ from kybra import (
     Principal,
     reserved,
     query,
-    text
+    text,
 )
 import math
 

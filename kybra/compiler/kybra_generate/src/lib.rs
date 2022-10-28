@@ -10,11 +10,17 @@ mod errors;
 mod generators;
 mod py_ast;
 mod source_map;
+mod what_is_it;
+
+pub use what_is_it::WhatIsIt;
 
 pub fn kybra_generate(
     main_py: &str,
     entry_module_name: &str,
 ) -> proc_macro2::token_stream::TokenStream {
+    eprintln!("-------------------------------------------");
+    eprintln!("--- STARTING ------------------------------");
+    eprintln!("-------------------------------------------");
     let py_file_names = vec![main_py];
     let source_map = SourceMap {};
     let kybra_programs: Vec<KybraProgram> = py_file_names
@@ -31,6 +37,9 @@ pub fn kybra_generate(
     .to_kybra_ast()
     .to_act()
     .to_token_stream();
+    eprintln!("-------------------------------------------");
+    eprintln!("--- ENDING --------------------------------");
+    eprintln!("-------------------------------------------");
 
     let ic_object = generate_ic_object();
 
