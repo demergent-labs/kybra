@@ -1,5 +1,6 @@
 mod records;
 mod tuples;
+mod variants;
 
 use rustpython_parser::ast::StmtKind;
 
@@ -10,7 +11,14 @@ use super::KybraStmt;
 impl KybraStmt<'_> {
     pub fn build_act_data_type(&self) -> ActDataType {
         match &self.stmt_kind.node {
-            StmtKind::ClassDef { .. } => self.as_record(),
+            StmtKind::ClassDef { .. } => {
+                if self.is_record() {
+                    return self.as_record();
+                } else if self.is_variant() {
+                    return self.as_variant();
+                }
+                todo!();
+            }
             StmtKind::FunctionDef { .. } => todo!(),
             StmtKind::AsyncFunctionDef { .. } => todo!(),
             StmtKind::Return { .. } => todo!(),

@@ -63,6 +63,7 @@ jobs:
                     "examples/query",
                     "examples/simple_erc20",
                     "examples/simple_user_accounts",
+                    "examples/tuple_types",
                     "examples/update",
                     "examples/primitive_types"
                   ]

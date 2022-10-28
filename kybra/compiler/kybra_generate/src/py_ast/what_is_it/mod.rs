@@ -1,4 +1,4 @@
-use rustpython_parser::ast::{ExprKind, KeywordData, Located, StmtKind};
+use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
 
 use super::kybra_types::KybraStmt;
 
@@ -7,7 +7,7 @@ pub trait WhatIsIt {
 }
 
 pub trait ToDisplayString {
-    fn to_cool(&self) -> String;
+    fn to_display_string(&self) -> String;
 }
 
 impl WhatIsIt for KybraStmt<'_> {
@@ -29,14 +29,18 @@ impl WhatIsIt for Located<StmtKind> {
                 eprintln!("--------------------------------------------");
                 eprintln!("This is a Class Def");
                 eprintln!("This is the name {}", name);
-                let base_strings: Vec<String> = bases.iter().map(|base| base.to_cool()).collect();
-                let keyword_string: Vec<String> =
-                    keywords.iter().map(|keyword| keyword.to_cool()).collect();
+                let base_strings: Vec<String> =
+                    bases.iter().map(|base| base.to_display_string()).collect();
+                let keyword_string: Vec<String> = keywords
+                    .iter()
+                    .map(|keyword| keyword.to_display_string())
+                    .collect();
                 let decorator_string: Vec<String> = decorator_list
                     .iter()
-                    .map(|decorator| decorator.to_cool())
+                    .map(|decorator| decorator.to_display_string())
                     .collect();
-                let body_strings: Vec<String> = body.iter().map(|base| base.to_cool()).collect();
+                let body_strings: Vec<String> =
+                    body.iter().map(|base| base.to_display_string()).collect();
                 eprintln!("These are the bases {:?}", base_strings);
                 eprintln!("These are the keywords {:?}", keyword_string);
                 eprintln!("These are the decorators {:?}", decorator_string);
@@ -51,10 +55,10 @@ impl WhatIsIt for Located<StmtKind> {
             } => {
                 eprintln!(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                 eprintln!("This is a AnnAssign");
-                eprintln!("The target is: {}", target.to_cool());
-                eprintln!("The annotation is: {}", annotation.to_cool());
+                eprintln!("The target is: {}", target.to_display_string());
+                eprintln!("The annotation is: {}", annotation.to_display_string());
                 let value = match value {
-                    Some(value) => value.to_cool(),
+                    Some(value) => value.to_display_string(),
                     None => "None".to_string(),
                 };
                 eprintln!("The value is: {}", value);
@@ -88,9 +92,12 @@ impl WhatIsIt for Located<StmtKind> {
             } => {
                 eprintln!("--------------------------------------");
                 eprintln!("This is an assign");
-                let targets: Vec<String> = targets.iter().map(|target| target.to_cool()).collect();
+                let targets: Vec<String> = targets
+                    .iter()
+                    .map(|target| target.to_display_string())
+                    .collect();
                 eprintln!("The target are {:?}", targets);
-                eprintln!("The value is {}", value.to_cool());
+                eprintln!("The value is {}", value.to_display_string());
                 let type_comment = match type_comment {
                     Some(type_comment) => type_comment,
                     None => "None",
@@ -198,7 +205,7 @@ impl WhatIsIt for Located<StmtKind> {
 }
 
 impl ToDisplayString for Located<StmtKind> {
-    fn to_cool(&self) -> String {
+    fn to_display_string(&self) -> String {
         let stmt_kind = match &self.node {
             StmtKind::FunctionDef { .. } => "function def".to_string(),
             StmtKind::AsyncFunctionDef { .. } => "asyc function def".to_string(),
@@ -253,13 +260,20 @@ impl WhatIsIt for Located<ExprKind> {
             ExprKind::Call { .. } => "call".to_string(),
             ExprKind::FormattedValue { .. } => "formatted value".to_string(),
             ExprKind::JoinedStr { .. } => "joined str".to_string(),
-            ExprKind::Constant { .. } => "constant".to_string(),
+            ExprKind::Constant { value, kind } => {
+                let value = value.to_display_string();
+                let kind = match kind {
+                    Some(kind) => kind,
+                    None => "None",
+                };
+                format!("constant: value({}) kind({})", value, kind)
+            }
             ExprKind::Attribute { .. } => "attribute".to_string(),
             ExprKind::Subscript { value, slice, .. } => {
                 format!(
                     "subscript: value({}), slice({})",
-                    value.to_cool(),
-                    slice.to_cool()
+                    value.to_display_string(),
+                    slice.to_display_string()
                 )
             }
             ExprKind::Starred { .. } => "starred".to_string(),
@@ -272,19 +286,36 @@ impl WhatIsIt for Located<ExprKind> {
     }
 }
 
+impl ToDisplayString for Constant {
+    fn to_display_string(&self) -> String {
+        match self {
+            Constant::None => "None",
+            Constant::Bool(_) => "bool",
+            Constant::Str(_) => "str",
+            Constant::Bytes(_) => "bytes",
+            Constant::Int(_) => "int",
+            Constant::Tuple(_) => "tuple",
+            Constant::Float(_) => "float",
+            Constant::Complex { real, imag } => "complex",
+            Constant::Ellipsis => "ellipsis",
+        }
+        .to_string()
+    }
+}
+
 impl ToDisplayString for Located<KeywordData> {
-    fn to_cool(&self) -> String {
+    fn to_display_string(&self) -> String {
         let arg = match &self.node.arg {
             Some(arg) => arg.clone(),
             None => "no args".to_string(),
         };
-        let value = self.node.value.to_cool();
+        let value = self.node.value.to_display_string();
         format!("arg: {}, value: {}", arg, value)
     }
 }
 
 impl ToDisplayString for Located<ExprKind> {
-    fn to_cool(&self) -> String {
+    fn to_display_string(&self) -> String {
         let expr_kind = match &self.node {
             ExprKind::BoolOp { .. } => "bool op".to_string(),
             ExprKind::NamedExpr { .. } => "named expr".to_string(),

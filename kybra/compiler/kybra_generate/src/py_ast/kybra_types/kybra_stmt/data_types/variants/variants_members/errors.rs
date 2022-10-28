@@ -4,7 +4,7 @@ use crate::{
 };
 
 impl KybraStmt<'_> {
-    pub(super) fn record_target_must_be_a_name_error(&self) -> ErrorMessage {
+    pub(super) fn variant_target_must_be_a_name_error(&self) -> ErrorMessage {
         ErrorMessage {
             message: Message {
                 title: todo!(),
@@ -18,7 +18,7 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub(super) fn invalid_record_member_error(&self) -> ErrorMessage {
+    pub(super) fn invalid_variant_member_error(&self) -> ErrorMessage {
         ErrorMessage {
             message: Message {
                 title: todo!(),

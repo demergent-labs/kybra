@@ -46,15 +46,17 @@ impl ToActDataType for KybraExpr<'_> {
                 },
                 _ => panic!("{}", self.invalid_subscript_value_error()),
             },
-            ExprKind::Constant { value, .. } => {
-                let name = match value {
-                    Constant::Str(string) => string.clone(),
-                    _ => todo!(),
-                };
-                ActDataType::TypeRef(ActTypeRef {
-                    act_type: LiteralOrTypeAlias::Literal(ActTypeRefLit { name }),
-                })
-            }
+            ExprKind::Constant { value, .. } => match value {
+                Constant::Str(string) => ActDataType::TypeRef(ActTypeRef {
+                    act_type: LiteralOrTypeAlias::Literal(ActTypeRefLit {
+                        name: string.clone(),
+                    }),
+                }),
+                Constant::None => ActPrimitiveLit::Null.to_act_data_type(alias_name),
+                _ => {
+                    todo!()
+                }
+            },
             ExprKind::BoolOp { .. } => todo!(),
             ExprKind::NamedExpr { .. } => todo!(),
             ExprKind::BinOp { .. } => todo!(),
@@ -77,7 +79,7 @@ impl ToActDataType for KybraExpr<'_> {
             ExprKind::Attribute { .. } => todo!(),
             ExprKind::Starred { .. } => todo!(),
             ExprKind::List { .. } => todo!(),
-            ExprKind::Tuple { elts, ctx } => {
+            ExprKind::Tuple { .. } => {
                 todo!("I don't think we can handle all of the types at once here. But what if we have tuples inside of tuples? What do we do then?")
             }
             ExprKind::Slice { .. } => todo!(),

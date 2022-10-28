@@ -4,7 +4,7 @@ use crate::{
 };
 
 impl KybraStmt<'_> {
-    pub(super) fn record_default_value_warning(&self) -> WarningMessage {
+    pub(super) fn variant_default_value_warning(&self) -> WarningMessage {
         WarningMessage {
             message: Message {
                 title: "WARNING: I don't think default values are supported are they?".to_string(),
