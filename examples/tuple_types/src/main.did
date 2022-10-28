@@ -1,0 +1,52 @@
+type HttpResponse = record { headers : vec record { text; text } };
+type User = record { id : text; primitive_two_tuple : record { text; nat64 } };
+service : () -> {
+  complex_one_tuple_inline_param : (record { text; nat64 }) -> (
+      record { text; nat64 },
+    ) query;
+  complex_one_tuple_inline_return_type : () -> (record { text; nat64 }) query;
+  complex_one_tuple_param : (record { text; nat64 }) -> (
+      record { text; nat64 },
+    ) query;
+  complex_one_tuple_return_type : () -> (record { text; nat64 }) query;
+  complex_two_tuple_inline_param : (
+      record { record { text; nat64 }; User },
+    ) -> (record { record { text; nat64 }; User }) query;
+  complex_two_tuple_inline_return_type : () -> (
+      record { record { text; nat64 }; User },
+    ) query;
+  complex_two_tuple_param : (record { record { text; nat64 }; User }) -> (
+      record { record { text; nat64 }; User },
+    ) query;
+  complex_two_tuple_return_type : () -> (
+      record { record { text; nat64 }; User },
+    ) query;
+  primitive_one_tuple_inline_param : (text) -> (text) query;
+  primitive_one_tuple_inline_return_type : () -> (text) query;
+  primitive_one_tuple_param : (text) -> (text) query;
+  primitive_one_tuple_return_type : () -> (text) query;
+  primitive_three_tuple_inline_param : (record { text; nat64; principal }) -> (
+      record { text; nat64; principal },
+    ) query;
+  primitive_three_tuple_inline_return_type : () -> (
+      record { text; nat64; principal },
+    ) query;
+  primitive_three_tuple_param : (record { text; nat64; principal }) -> (
+      record { text; nat64; principal },
+    ) query;
+  primitive_three_tuple_return_type : () -> (
+      record { text; nat64; principal },
+    ) query;
+  primitive_two_tuple_inline_param : (record { text; text }) -> (
+      record { text; text },
+    ) query;
+  primitive_two_tuple_inline_return_type : () -> (record { text; text }) query;
+  primitive_two_tuple_param : (record { text; nat64 }) -> (
+      record { text; nat64 },
+    ) query;
+  primitive_two_tuple_return_type : () -> (record { text; nat64 }) query;
+  tuple_array_params_and_return_type : (vec record { text; text }) -> (
+      vec record { text; text },
+    ) query;
+  tuple_array_record_field : () -> (HttpResponse) query;
+}
