@@ -1,4 +1,5 @@
 mod records;
+mod tuples;
 
 use rustpython_parser::ast::StmtKind;
 
@@ -14,7 +15,7 @@ impl KybraStmt<'_> {
             StmtKind::AsyncFunctionDef { .. } => todo!(),
             StmtKind::Return { .. } => todo!(),
             StmtKind::Delete { .. } => todo!(),
-            StmtKind::Assign { .. } => todo!(),
+            StmtKind::Assign { .. } => self.as_tuple(),
             StmtKind::AugAssign { .. } => todo!(),
             StmtKind::AnnAssign { .. } => todo!(),
             StmtKind::For { .. } => todo!(),
