@@ -12,7 +12,7 @@ pub struct Suggestion {
     pub import_suggestion: Option<String>,
 }
 
-pub struct ErrorMessage {
+pub struct Message {
     pub title: String,
     pub origin: String,
     pub line_number: usize,
@@ -22,13 +22,33 @@ pub struct ErrorMessage {
     pub suggestion: Option<Suggestion>,
 }
 
+pub struct WarningMessage {
+    pub message: Message,
+}
+
+pub struct ErrorMessage {
+    pub message: Message,
+}
+
 impl ErrorMessage {
     fn to_string(&self) -> String {
+        self.message.to_string(AnnotationType::Error)
+    }
+}
+
+impl WarningMessage {
+    fn to_string(&self) -> String {
+        self.message.to_string(AnnotationType::Warning)
+    }
+}
+
+impl Message {
+    fn to_string(&self, annotation_type: AnnotationType) -> String {
         let error_snippet = Snippet {
             title: Some(Annotation {
                 label: Some(&self.title),
                 id: None,
-                annotation_type: AnnotationType::Error,
+                annotation_type,
             }),
             footer: vec![],
             slices: vec![Slice {
@@ -38,7 +58,7 @@ impl ErrorMessage {
                 fold: true,
                 annotations: vec![SourceAnnotation {
                     label: &self.annotation,
-                    annotation_type: AnnotationType::Error,
+                    annotation_type,
                     range: self.range,
                 }],
             }],
@@ -104,6 +124,12 @@ impl ErrorMessage {
 }
 
 impl fmt::Display for ErrorMessage {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.to_string())
+    }
+}
+
+impl fmt::Display for WarningMessage {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.to_string())
     }

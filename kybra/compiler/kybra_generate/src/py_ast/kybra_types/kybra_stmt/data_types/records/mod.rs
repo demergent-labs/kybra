@@ -40,6 +40,7 @@ impl KybraStmt<'_> {
             _ => panic!("{}", self.not_a_record_error()),
         }
     }
+
     pub fn is_record(&self) -> bool {
         match &self.stmt_kind.node {
             StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {

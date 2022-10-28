@@ -3,7 +3,6 @@ use rustpython_parser::ast::Mod;
 use crate::{
     cdk_act::{ActCanisterMethod, ActDataType, CanisterMethodType},
     source_map::SourceMap,
-    WhatIsIt,
 };
 
 use super::KybraStmt;
@@ -56,7 +55,6 @@ impl KybraProgram<'_> {
                         stmt_kind,
                         source_map: self.source_map,
                     };
-                    kybra_stmt.what_is_it();
                     kybra_stmt.is_record()
                 })
                 .map(|stmt_kind| {

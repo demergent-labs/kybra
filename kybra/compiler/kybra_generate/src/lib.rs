@@ -10,9 +10,6 @@ mod errors;
 mod generators;
 mod py_ast;
 mod source_map;
-mod what_is_it;
-
-pub use what_is_it::WhatIsIt;
 
 pub fn kybra_generate(
     main_py: &str,
