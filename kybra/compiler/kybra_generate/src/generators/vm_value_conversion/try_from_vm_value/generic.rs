@@ -1,5 +1,14 @@
 pub fn generate_generic_impls() -> proc_macro2::TokenStream {
     quote::quote! {
+        impl<T> CdkActTryFromVmValue<(T,), &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef
+        where
+            rustpython::vm::PyObjectRef: for<'a> CdkActTryFromVmValue<T, &'a rustpython::vm::VirtualMachine>
+        {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<(T,), CdkActTryFromVmValueError> {
+                Ok((self.try_from_vm_value(vm).unwrap(),))
+            }
+        }
+
         impl<T> CdkActTryFromVmValue<Box<T>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef
         where
             rustpython::vm::PyObjectRef: for<'a> CdkActTryFromVmValue<T, &'a rustpython::vm::VirtualMachine>
@@ -17,7 +26,6 @@ pub fn generate_generic_impls() -> proc_macro2::TokenStream {
             rustpython::vm::PyObjectRef: for<'a> CdkActTryFromVmValue<T, &'a rustpython::vm::VirtualMachine>
         {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Option<T>, CdkActTryFromVmValueError> {
-                // TODO make sure this works, start using vm.ctx.none() instead of ().to_pyobject(vm)
                 if self.is(&vm.ctx.none()) {
                     Ok(None)
                 }
