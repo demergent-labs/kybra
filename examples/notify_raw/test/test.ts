@@ -25,15 +25,11 @@ const tests: Test[] = [
                 stdio: 'inherit'
             });
 
-            execSync(`dfx deploy canister1`, {
-                stdio: 'inherit'
-            });
-
             execSync(`dfx canister uninstall-code canister2 || true`, {
                 stdio: 'inherit'
             });
 
-            execSync(`dfx deploy canister2`, {
+            execSync(`dfx deploy`, {
                 stdio: 'inherit'
             });
         }

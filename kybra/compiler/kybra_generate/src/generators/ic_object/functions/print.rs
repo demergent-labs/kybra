@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_ic_object_function_print() -> proc_macro2::TokenStream {
+pub fn generate_print() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn print(&self, param_py_object_ref: PyObjectRef, vm: &VirtualMachine) {
