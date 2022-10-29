@@ -1,7 +1,7 @@
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::{
-    cdk_act::{nodes::data_type_nodes::ActRecordMember, ToActDataType},
+    cdk_act::{nodes::data_type_nodes::ActVariantMember, ToActDataType},
     py_ast::kybra_types::{KybraExpr, KybraStmt},
 };
 
@@ -9,7 +9,7 @@ mod errors;
 mod warnings;
 
 impl KybraStmt<'_> {
-    pub fn as_record_member(&self) -> ActRecordMember {
+    pub fn as_variant_member(&self) -> ActVariantMember {
         match &self.stmt_kind.node {
             StmtKind::AnnAssign {
                 target,
@@ -18,24 +18,24 @@ impl KybraStmt<'_> {
                 ..
             } => {
                 match value {
-                    Some(_) => eprintln!("{}", self.record_default_value_warning()),
+                    Some(_) => eprintln!("{}", self.variant_default_value_warning()),
                     None => (),
                 }
                 let member_name = match &target.node {
                     ExprKind::Name { id, .. } => id.clone(),
-                    _ => panic!("{}", self.record_target_must_be_a_name_error()),
+                    _ => panic!("{}", self.variant_target_must_be_a_name_error()),
                 };
                 let member_type = KybraExpr {
                     located_expr: &annotation,
                     source_map: self.source_map,
                 }
                 .to_act_data_type(&None);
-                ActRecordMember {
+                ActVariantMember {
                     member_name,
                     member_type,
                 }
             }
-            _ => panic!("{}", self.invalid_record_member_error()),
+            _ => panic!("{}", self.invalid_variant_member_error()),
         }
     }
 }

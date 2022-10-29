@@ -1,7 +1,19 @@
 import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 
+export type Box = {
+    'Bad' : [
+      [string, bigint],
+      { 'id' : string, 'primitive_two_tuple' : [string, bigint] },
+      Box,
+    ]
+  } |
+  { 'Good' : null };
 export interface HttpResponse { 'headers' : Array<[string, string]> }
+export type Reaction = { 'Bad' : [[string, bigint], User, Box] } |
+  { 'Good' : null };
+export type StreamingCallbackType = { 'without_headers' : null } |
+  { 'with_headers' : Array<[string, string]> };
 export interface User {
   'id' : string,
   'primitive_two_tuple' : [string, bigint],
@@ -17,6 +29,22 @@ export interface _SERVICE {
     [[string, bigint]],
   >,
   'complex_one_tuple_return_type' : ActorMethod<[], [[string, bigint]]>,
+  'complex_three_tuple_inline_param' : ActorMethod<
+    [[[string, bigint], User, Reaction]],
+    [[string, bigint], User, Reaction],
+  >,
+  'complex_three_tuple_inline_return_type' : ActorMethod<
+    [],
+    [[string, bigint], User, Reaction],
+  >,
+  'complex_three_tuple_param' : ActorMethod<
+    [[[string, bigint], User, Box]],
+    [[string, bigint], User, Box],
+  >,
+  'complex_three_tuple_return_type' : ActorMethod<
+    [],
+    [[string, bigint], User, Box],
+  >,
   'complex_two_tuple_inline_param' : ActorMethod<
     [[[string, bigint], User]],
     [[string, bigint], User],
@@ -65,4 +93,5 @@ export interface _SERVICE {
     Array<[string, string]>,
   >,
   'tuple_array_record_field' : ActorMethod<[], HttpResponse>,
+  'tuple_array_variant_field' : ActorMethod<[], StreamingCallbackType>,
 }

@@ -25,10 +25,7 @@ const tests: Test[] = [
         }
     },
     ...get_tests(tuple_types_canister as any).filter(
-        (test) =>
-            !test.name.startsWith('complex_') &&
-            test.name !== 'tuple_array_variant_field' &&
-            test.name !== 'two_tuple_with_inline_records' // Kybra does not have the concept of inline records
+        (test) => test.name !== 'two_tuple_with_inline_records' // Kybra does not have the concept of inline records
     )
 ];
 
