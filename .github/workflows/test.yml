@@ -57,6 +57,7 @@ jobs:
               run: |
                   EXAMPLE_DIRECTORIES=$(cat << END
                   [
+                    "examples/blob_array",
                     "examples/bytes",
                     "examples/counter",
                     "examples/imports",
