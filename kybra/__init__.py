@@ -47,15 +47,16 @@ Query = Callable
 Update = Callable
 Oneway = Callable
 
+# TODO make CanisterResult generic
+class CanisterResult(Variant, total=False):
+    ok: bool
+    err: str
+
 # TODO we might want to just make this a dict[int, str] to keep the derive simple, or maybe a class with a principal and method name field
 def Func(callable: Callable) -> Type[tuple[Principal, str]]: # type: ignore
     return type((Principal.from_str('aaaaa-aa'), ''))
 
 class ic:
-    @staticmethod
-    def print(x: Any):
-        _kybra_ic.print(str(x)) # type: ignore
-
     @staticmethod
     def candid_encode(candid_string: str) -> blob:
         return _kybra_ic.candid_encode(candid_string) # type: ignore
@@ -63,3 +64,16 @@ class ic:
     @staticmethod
     def candid_decode(candid_encoded: blob) -> str:
         return _kybra_ic.candid_decode(candid_encoded) # type: ignore
+
+    @staticmethod
+    def notify_raw(
+        canister_id: Principal,
+        method: str,
+        args_raw: blob,
+        payment: nat
+    ) -> CanisterResult:
+        return _kybra_ic.notify_raw(canister_id, method, args_raw, payment) # type: ignore
+
+    @staticmethod
+    def print(x: Any):
+        _kybra_ic.print(str(x)) # type: ignore
