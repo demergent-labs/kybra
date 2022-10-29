@@ -2,7 +2,10 @@ use quote::{format_ident, quote};
 use rustpython_parser::ast::StmtKind;
 
 use crate::{
-    cdk_act::{nodes::ActFnParam, ActDataType, CanisterMethod, CanisterMethodType, ToActDataType},
+    cdk_act::{
+        nodes::{data_type_nodes::ActPrimitiveLit, ActFnParam},
+        ActDataType, CanisterMethod, CanisterMethodType, ToActDataType,
+    },
     py_ast::kybra_types::KybraExpr,
 };
 
@@ -110,7 +113,7 @@ impl KybraStmt<'_> {
                         };
                         kybra_return_type.to_act_data_type(&None)
                     }
-                    None => panic!("Needs a return type"),
+                    None => ActPrimitiveLit::Void.to_act_data_type(&None),
                 };
                 Some(CanisterMethod {
                     body,
