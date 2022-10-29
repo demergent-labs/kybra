@@ -1,6 +1,6 @@
 type Status = variant { Online; WaitingOn : principal; Offline };
 type User = record { id : principal; username : text };
-service : {
+service : () -> {
   principal_from_blob : (vec nat8) -> (principal) query;
   principal_from_hex : (text) -> (principal) query;
   principal_from_text : (text) -> (principal) query;

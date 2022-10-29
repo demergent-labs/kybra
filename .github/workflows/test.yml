@@ -65,7 +65,8 @@ jobs:
                     "examples/simple_user_accounts",
                     "examples/tuple_types",
                     "examples/update",
-                    "examples/primitive_types"
+                    "examples/primitive_types",
+                    "examples/principal"
                   ]
                   END
                   )
