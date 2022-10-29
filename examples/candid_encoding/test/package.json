@@ -8,6 +8,6 @@
     "typescript": "4.6.3"
   },
   "dependencies": {
-    "azle": "github:demergent-labs/azle#candid_encoding_tests"
+    "azle": "github:demergent-labs/azle"
   }
 }
