@@ -59,6 +59,7 @@ jobs:
                   [
                     "examples/blob_array",
                     "examples/bytes",
+                    "examples/candid_encoding",
                     "examples/counter",
                     "examples/imports",
                     "examples/null_example",

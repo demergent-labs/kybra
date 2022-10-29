@@ -55,3 +55,11 @@ class ic:
     @staticmethod
     def print(x: Any):
         _kybra_ic.print(str(x)) # type: ignore
+
+    @staticmethod
+    def candid_encode(candid_string: str) -> blob:
+        return _kybra_ic.candid_encode(candid_string) # type: ignore
+
+    @staticmethod
+    def candid_decode(candid_encoded: blob) -> str:
+        return _kybra_ic.candid_decode(candid_encoded) # type: ignore
