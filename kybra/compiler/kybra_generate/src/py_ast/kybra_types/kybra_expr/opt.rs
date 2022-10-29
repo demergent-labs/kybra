@@ -8,7 +8,7 @@ use crate::cdk_act::{
 use super::KybraExpr;
 
 impl KybraExpr<'_> {
-    pub(super) fn to_opt(&self) -> ActDataType {
+    pub(super) fn to_opt(&self, alias_name: &Option<&String>) -> ActDataType {
         match &self.located_expr.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {

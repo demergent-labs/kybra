@@ -55,7 +55,7 @@ impl KybraProgram<'_> {
                         stmt_kind,
                         source_map: self.source_map,
                     };
-                    kybra_stmt.is_record()
+                    kybra_stmt.is_record() || kybra_stmt.is_tuple()
                 })
                 .map(|stmt_kind| {
                     let kybra_stmt = KybraStmt {

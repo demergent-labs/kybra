@@ -1,7 +1,10 @@
 mod array;
 mod errors;
+mod generate_inline_name;
+mod hash;
 mod opt;
 mod to_act_data_type;
+mod tuple;
 
 use rustpython_parser::ast::{ExprKind, Located};
 

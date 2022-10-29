@@ -35,6 +35,10 @@ impl KybraExpr<'_> {
         "This is is not an array".to_string()
     }
 
+    pub(super) fn not_tuple_error(&self) -> String {
+        "This is is not a tuple".to_string()
+    }
+
     pub(super) fn not_opt_error(&self) -> String {
         "This is is not an opt".to_string()
     }

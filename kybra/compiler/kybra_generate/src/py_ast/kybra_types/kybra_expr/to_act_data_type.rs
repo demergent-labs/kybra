@@ -1,4 +1,4 @@
-use rustpython_parser::ast::ExprKind;
+use rustpython_parser::ast::{Constant, ExprKind};
 
 use crate::cdk_act::{
     nodes::data_type_nodes::{ActPrimitiveLit, ActTypeRef, ActTypeRefLit, LiteralOrTypeAlias},
@@ -39,12 +39,22 @@ impl ToActDataType for KybraExpr<'_> {
             },
             ExprKind::Subscript { value, .. } => match &value.node {
                 ExprKind::Name { id, .. } => match &id[..] {
-                    "opt" => self.to_opt(),
-                    "list" => self.to_array(),
+                    "opt" => self.to_opt(alias_name),
+                    "list" => self.to_array(alias_name),
+                    "tuple" => self.to_tuple(alias_name),
                     _ => panic!("{}", self.invalid_subscript_value_error()),
                 },
                 _ => panic!("{}", self.invalid_subscript_value_error()),
             },
+            ExprKind::Constant { value, .. } => {
+                let name = match value {
+                    Constant::Str(string) => string.clone(),
+                    _ => todo!(),
+                };
+                ActDataType::TypeRef(ActTypeRef {
+                    act_type: LiteralOrTypeAlias::Literal(ActTypeRefLit { name }),
+                })
+            }
             ExprKind::BoolOp { .. } => todo!(),
             ExprKind::NamedExpr { .. } => todo!(),
             ExprKind::BinOp { .. } => todo!(),
@@ -64,11 +74,12 @@ impl ToActDataType for KybraExpr<'_> {
             ExprKind::Call { .. } => todo!(),
             ExprKind::FormattedValue { .. } => todo!(),
             ExprKind::JoinedStr { .. } => todo!(),
-            ExprKind::Constant { .. } => todo!(),
             ExprKind::Attribute { .. } => todo!(),
             ExprKind::Starred { .. } => todo!(),
             ExprKind::List { .. } => todo!(),
-            ExprKind::Tuple { .. } => todo!(),
+            ExprKind::Tuple { elts, ctx } => {
+                todo!("I don't think we can handle all of the types at once here. But what if we have tuples inside of tuples? What do we do then?")
+            }
             ExprKind::Slice { .. } => todo!(),
         }
     }
