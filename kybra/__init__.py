@@ -47,15 +47,29 @@ Query = Callable
 Update = Callable
 Oneway = Callable
 
+# TODO make CanisterResult generic
+class CanisterResult(Variant, total=False):
+    ok: bool
+    err: str
+
+# TODO remove temp on StableMemoryError, StableGrowResult, Stable64GrowResult once multiple file analysis works
+class StableMemoryErrorTemp(Variant, total=False):
+    OutOfMemory: None
+    OutOfBounds: None
+
+class StableGrowResultTemp(Variant, total=False):
+    ok: nat32
+    err: StableMemoryErrorTemp
+
+class Stable64GrowResultTemp(Variant, total=False):
+    ok: nat64
+    err: StableMemoryErrorTemp
+
 # TODO we might want to just make this a dict[int, str] to keep the derive simple, or maybe a class with a principal and method name field
 def Func(callable: Callable) -> Type[tuple[Principal, str]]: # type: ignore
     return type((Principal.from_str('aaaaa-aa'), ''))
 
 class ic:
-    @staticmethod
-    def print(x: Any):
-        _kybra_ic.print(str(x)) # type: ignore
-
     @staticmethod
     def candid_encode(candid_string: str) -> blob:
         return _kybra_ic.candid_encode(candid_string) # type: ignore
@@ -63,3 +77,52 @@ class ic:
     @staticmethod
     def candid_decode(candid_encoded: blob) -> str:
         return _kybra_ic.candid_decode(candid_encoded) # type: ignore
+
+    @staticmethod
+    def notify_raw(
+        canister_id: Principal,
+        method: str,
+        args_raw: blob,
+        payment: nat
+    ) -> CanisterResult:
+        return _kybra_ic.notify_raw(canister_id, method, args_raw, payment) # type: ignore
+
+    @staticmethod
+    def print(x: Any):
+        _kybra_ic.print(str(x)) # type: ignore
+
+    @staticmethod
+    def stable_bytes() -> blob:
+        return _kybra_ic.stable_bytes() # type: ignore
+
+    @staticmethod
+    def stable_grow(new_pages: nat32) -> StableGrowResultTemp:
+        return _kybra_ic.stable_grow(new_pages) # type: ignore
+
+    @staticmethod
+    def stable_read(offset: nat32, length: nat32) -> blob:
+        return _kybra_ic.stable_read(offset, length) # type: ignore
+
+    @staticmethod
+    def stable_size() -> nat32:
+        return _kybra_ic.stable_size() # type: ignore
+
+    @staticmethod
+    def stable_write(offset: nat32, buf: blob):
+        _kybra_ic.stable_write(offset, buf) # type: ignore
+
+    @staticmethod
+    def stable64_grow(new_pages: nat64) -> Stable64GrowResultTemp:
+        return _kybra_ic.stable64_grow(new_pages) # type: ignore
+
+    @staticmethod
+    def stable64_read(offset: nat64, length: nat64) -> blob:
+        return _kybra_ic.stable64_read(offset, length) # type: ignore
+
+    @staticmethod
+    def stable64_size() -> nat64:
+        return _kybra_ic.stable64_size() # type: ignore
+
+    @staticmethod
+    def stable64_write(offset: nat64, buf: blob):
+        _kybra_ic.stable64_write(offset, buf) # type: ignore

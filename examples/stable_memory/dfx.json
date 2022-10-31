@@ -1,0 +1,19 @@
+{
+    "canisters": {
+        "stable_memory": {
+            "type": "custom",
+            "build": "python -m kybra stable_memory src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/stable_memory/target/wasm32-unknown-unknown/release/stable_memory.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/stable_memory"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}
