@@ -32,9 +32,9 @@ pub fn generate_ic_object() -> proc_macro2::TokenStream {
     let stable64_write = generate_stable64_write();
 
     quote! {
-        #[pyclass(module = false, name = "ic")]
-        #[derive(Debug, PyPayload)]
-        struct Ic {}
+            #[pyclass(module = false, name = "ic")]
+            #[derive(Debug, PyPayload)]
+            struct Ic {}
 
         #[pyclass]
         impl Ic {

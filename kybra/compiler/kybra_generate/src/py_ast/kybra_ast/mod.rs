@@ -1,7 +1,12 @@
 mod to_act;
 
+use proc_macro2::TokenStream;
+
 use crate::cdk_act::{
-    nodes::{ActInitMethod, ActPostUpgradeMethod},
+    nodes::{
+        ActHeartbeatMethod, ActInitMethod, ActInspectMessageMethod, ActPostUpgradeMethod,
+        ActPreUpgradeMethod,
+    },
     ActCanisterMethod, ActDataType,
 };
 
@@ -9,7 +14,11 @@ pub struct KybraAst {
     pub canister_methods: Vec<ActCanisterMethod>,
     pub canister_types: Vec<ActDataType>,
     pub init_method: ActInitMethod,
+    pub inspect_method: Option<ActInspectMessageMethod>,
+    pub pre_upgrade: ActPreUpgradeMethod,
     pub post_upgrade: ActPostUpgradeMethod,
+    pub heartbeat: Option<ActHeartbeatMethod>,
+    pub rust_code: TokenStream,
 }
 
 pub trait ToKybraAst {

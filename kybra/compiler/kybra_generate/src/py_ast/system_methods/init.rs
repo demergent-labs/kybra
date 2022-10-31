@@ -1,7 +1,24 @@
-use crate::{cdk_act::nodes::ActInitMethod, py_ast::PyAst};
+use crate::{
+    cdk_act::{nodes::ActInitMethod, CanisterMethodType},
+    generators::ic_object,
+    py_ast::PyAst,
+};
 
 impl PyAst<'_> {
     pub fn build_init_method(&self) -> ActInitMethod {
+        let ic_object = ic_object::generate_ic_object();
+
+        let init_function_def = self.get_function_def_of_type(CanisterMethodType::Init);
+
+        if init_function_def.len() > 1 {
+            todo!();
+        }
+
+        let params = match init_function_def.get(0) {
+            Some(init_function_def) => init_function_def.build_params(),
+            None => vec![],
+        };
+
         let entry_module_name = &self.entry_module_name;
         let body = quote::quote! {
             unsafe {
@@ -30,11 +47,11 @@ impl PyAst<'_> {
 
                 _KYBRA_INTERPRETER_OPTION = Some(_kybra_interpreter);
                 _KYBRA_SCOPE_OPTION = Some(_kybra_scope);
+
+                #ic_object
+
             }
         };
-        ActInitMethod {
-            params: vec![],
-            body,
-        }
+        ActInitMethod { params, body }
     }
 }
