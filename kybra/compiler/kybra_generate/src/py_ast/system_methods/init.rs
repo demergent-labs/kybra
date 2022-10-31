@@ -1,3 +1,5 @@
+use quote::quote;
+
 use crate::{
     cdk_act::{nodes::ActInitMethod, CanisterMethodType},
     generators::ic_object,
@@ -8,15 +10,22 @@ impl PyAst<'_> {
     pub fn build_init_method(&self) -> ActInitMethod {
         let ic_object = ic_object::generate_ic_object();
 
-        let init_function_def = self.get_function_def_of_type(CanisterMethodType::Init);
+        let init_function_defs = self.get_function_def_of_type(CanisterMethodType::Init);
 
-        if init_function_def.len() > 1 {
+        if init_function_defs.len() > 1 {
             todo!();
         }
 
-        let params = match init_function_def.get(0) {
+        let init_function_def_option = init_function_defs.get(0);
+
+        let params = match init_function_def_option {
             Some(init_function_def) => init_function_def.build_params(),
             None => vec![],
+        };
+
+        let call_to_init_py_function = match init_function_def_option {
+            Some(init_function_def) => init_function_def.generate_call_to_py_function(),
+            None => quote!(),
         };
 
         let entry_module_name = &self.entry_module_name;
@@ -49,6 +58,8 @@ impl PyAst<'_> {
                 _KYBRA_SCOPE_OPTION = Some(_kybra_scope);
 
                 #ic_object
+
+                #call_to_init_py_function
 
             }
         };
