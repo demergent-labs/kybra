@@ -82,22 +82,20 @@ impl KybraStmt<'_> {
                         let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
                         let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
 
-                        let result = _kybra_interpreter.enter(|vm| {
-                            let method_py_object_ref = _kybra_scope.globals.get_item(#name, vm).unwrap();
+                        let vm = &_kybra_interpreter.vm;
 
-                            let result_py_object_ref = vm.invoke(&method_py_object_ref, (#(#param_conversions),*#params_comma));
+                        let method_py_object_ref = _kybra_scope.globals.get_item(#name, vm).unwrap();
 
-                            match result_py_object_ref {
-                                Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap(),
-                                Err(err) => {
-                                    let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+                        let invoke_result = vm.invoke(&method_py_object_ref, (#(#param_conversions),*#params_comma));
 
-                                    panic!("{}", err_string);
-                                }
+                        match invoke_result {
+                            Ok(py_object_ref) => _kybra_async_result_handler(vm, &py_object_ref, vm.ctx.none()).await.try_from_vm_value(vm).unwrap(),
+                            Err(err) => {
+                                let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+
+                                panic!("{}", err_string);
                             }
-                        });
-
-                        result
+                        }
                     }
                 };
 

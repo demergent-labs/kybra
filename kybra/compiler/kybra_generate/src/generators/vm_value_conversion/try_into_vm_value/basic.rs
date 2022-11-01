@@ -48,49 +48,49 @@ Principal
                     ic_cdk::api::call::RejectionCode::NoError => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("NoError", ().to_pyobject(vm), vm);
+                        dict.set_item("NoError", vm.ctx.none(), vm);
 
                         Ok(dict.into())
                     }
                     ic_cdk::api::call::RejectionCode::SysFatal => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("SysFatal", ().to_pyobject(vm), vm);
+                        dict.set_item("SysFatal", vm.ctx.none(), vm);
 
                         Ok(dict.into())
                     }
                     ic_cdk::api::call::RejectionCode::SysTransient => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("SysTransient", ().to_pyobject(vm), vm);
+                        dict.set_item("SysTransient", vm.ctx.none(), vm);
 
                         Ok(dict.into())
                     }
                     ic_cdk::api::call::RejectionCode::DestinationInvalid => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("DestinationInvalid", ().to_pyobject(vm), vm);
+                        dict.set_item("DestinationInvalid", vm.ctx.none(), vm);
 
                         Ok(dict.into())
                     }
                     ic_cdk::api::call::RejectionCode::CanisterReject => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("CanisterReject", ().to_pyobject(vm), vm);
+                        dict.set_item("CanisterReject", vm.ctx.none(), vm);
 
                         Ok(dict.into())
                     }
                     ic_cdk::api::call::RejectionCode::CanisterError => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("CanisterError", ().to_pyobject(vm), vm);
+                        dict.set_item("CanisterError", vm.ctx.none(), vm);
 
                         Ok(dict.into())
                     }
                     ic_cdk::api::call::RejectionCode::Unknown => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("Unknown", ().to_pyobject(vm), vm);
+                        dict.set_item("Unknown", vm.ctx.none(), vm);
 
                         Ok(dict.into())
                     }
@@ -100,7 +100,7 @@ Principal
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::candid::Reserved {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                Ok(().to_pyobject(vm))
+                Ok(vm.ctx.none())
             }
         }
 
@@ -110,14 +110,14 @@ Principal
                     ic_cdk::api::stable::StableMemoryError::OutOfMemory => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("OutOfMemory", ().to_pyobject(vm), vm);
+                        dict.set_item("OutOfMemory", vm.ctx.none(), vm);
 
                         Ok(dict.into())
                     }
                     ic_cdk::api::stable::StableMemoryError::OutOfBounds => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("OutOfBounds", ().to_pyobject(vm), vm);
+                        dict.set_item("OutOfBounds", vm.ctx.none(), vm);
 
                         Ok(dict.into())
                     }

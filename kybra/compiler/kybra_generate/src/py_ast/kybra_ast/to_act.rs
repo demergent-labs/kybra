@@ -4,7 +4,10 @@ use crate::{
     cdk_act::{
         nodes::ActPreUpgradeMethod, AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct,
     },
-    generators::vm_value_conversion::{try_from_vm_value, try_into_vm_value},
+    generators::{
+        async_result_handler::generate_async_result_handler,
+        vm_value_conversion::{try_from_vm_value, try_into_vm_value},
+    },
 };
 
 use super::KybraAst;
@@ -112,7 +115,7 @@ impl ToAct for KybraAst {
         let try_into_vm_value_impls = try_into_vm_value::generate_try_into_vm_value_impls();
         let try_from_vm_value_impls = try_from_vm_value::generate_try_from_vm_value_impls();
 
-        let async_result_handler = quote!();
+        let async_result_handler = generate_async_result_handler();
         let get_top_level_call_frame_fn = quote!();
 
         let cross_canister_call_functions = quote!();

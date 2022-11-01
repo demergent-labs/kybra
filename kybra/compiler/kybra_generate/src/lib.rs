@@ -45,7 +45,7 @@ pub fn kybra_generate(
     let ic_object = generate_ic_object();
 
     quote! {
-        use rustpython_vm::{AsObject, builtins::{PyListRef, PyTupleRef, PyIntRef}, class::PyClassImpl, convert::ToPyObject, PyObjectRef, VirtualMachine};
+        use rustpython_vm::{AsObject, builtins::{PyGenerator, PyListRef, PyTupleRef, PyIntRef}, class::PyClassImpl, convert::ToPyObject, function::IntoFuncArgs, PyObjectRef, VirtualMachine, protocol::{PyIter, PyIterReturn}};
         use rustpython_derive::{pyclass, PyPayload};
         use kybra_vm_value_derive::{CdkActTryIntoVmValue, CdkActTryFromVmValue};
         use std::str::FromStr;

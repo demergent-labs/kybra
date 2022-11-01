@@ -1,8 +1,8 @@
-from kybra import ic, Principal, update, Variant
+from kybra import ic, Principal, RejectionCode, update, Variant
 
 class SendNotificationResult(Variant, total=False):
     ok: bool
-    err: str
+    err: RejectionCode
 
 @update
 def send_notification() -> SendNotificationResult:
