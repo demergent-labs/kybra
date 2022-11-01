@@ -22,15 +22,16 @@ impl PyAst<'_> {
         };
 
         let body = quote! {
-            let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-            let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+            unsafe {
+                let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
+                let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
 
-            _kybra_interpreter.enter(|vm| {
-                #call_to_pre_upgrade_py_function
-            });
+                _kybra_interpreter.enter(|vm| {
+                    #call_to_pre_upgrade_py_function
+                });
 
-            // TODO handle stable storage stuff
-
+                // TODO handle stable storage stuff
+            }
         };
 
         ActPreUpgradeMethod { body }

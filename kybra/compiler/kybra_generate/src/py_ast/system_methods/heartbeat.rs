@@ -27,7 +27,7 @@ impl PyAst<'_> {
                         _kybra_interpreter.enter(|vm| {
                             #call_to_heartbeat_py_function
                         });
-                        todo!("What about this azle azync result handler that is in the other heartbeat?")
+                        // TODO todo!("What about this azle azync result handler that is in the other heartbeat?")
                     });
                 }
             };

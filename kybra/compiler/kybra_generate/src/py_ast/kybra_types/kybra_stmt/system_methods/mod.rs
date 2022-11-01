@@ -63,19 +63,36 @@ impl KybraStmt<'_> {
             rustpython_parser::ast::StmtKind::FunctionDef { .. } => {
                 let function_name = self.get_function_name();
                 let param_name_idents = self.get_param_name_idents();
-                quote! {
-                    let method_py_object_ref = _kybra_scope.globals.get_item(#function_name, vm).unwrap();
 
-                    let result_py_object_ref = vm.invoke(&method_py_object_ref, vec![#(#param_name_idents),*]);
-
-                    match result_py_object_ref {
-                        Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap(),
-                        Err(err) => {
-                            let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                            panic!("{}", err_string);
-                        }
+                let param_conversions = param_name_idents.iter().map(|arg| {
+                    quote! {
+                        #arg.try_into_vm_value(vm).unwrap()
                     }
+                });
+                let params_comma = if param_conversions.len() == 1 {
+                    quote!(,)
+                } else {
+                    quote!()
+                };
+
+                quote! {
+                    let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
+                    let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+
+                    _kybra_interpreter.enter(|vm| {
+                        let method_py_object_ref = _kybra_scope.globals.get_item(#function_name, vm).unwrap();
+
+                        let result_py_object_ref = vm.invoke(&method_py_object_ref, (#(#param_conversions),*#params_comma));
+
+                        match result_py_object_ref {
+                            Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap(),
+                            Err(err) => {
+                                let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+
+                                panic!("{}", err_string);
+                            }
+                        }
+                    });
                 }
             }
             _ => panic!("{}", self.not_a_function_def_error()),

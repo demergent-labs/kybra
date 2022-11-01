@@ -1,0 +1,34 @@
+from kybra import init, opt, Principal, query, Record, Variant;
+
+class User(Record):
+    id: str
+
+class Reaction(Variant, total=False):
+    Fire: None
+    Wave: None
+
+user: opt[User] = None
+reaction: opt[Reaction] = None
+owner: opt[Principal] = None
+
+@init
+def init_(init_user: User, init_reaction: Reaction, init_owner: Principal):
+    global user
+    global reaction
+    global owner
+
+    user = init_user
+    reaction = init_reaction
+    owner = init_owner
+
+@query
+def getUser() -> opt[User]:
+    return user
+
+@query
+def getReaction() -> opt[Reaction]:
+    return reaction
+
+@query
+def getOwner() -> opt[Principal]:
+    return owner

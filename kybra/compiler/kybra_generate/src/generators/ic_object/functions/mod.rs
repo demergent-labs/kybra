@@ -1,5 +1,7 @@
+pub mod accept_message;
 pub mod candid_decode;
 pub mod candid_encode;
+pub mod method_name;
 pub mod notify_raw;
 pub mod print;
 pub mod stable64_grow;
