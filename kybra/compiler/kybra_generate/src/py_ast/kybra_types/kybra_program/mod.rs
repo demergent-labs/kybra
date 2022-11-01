@@ -13,6 +13,26 @@ pub struct KybraProgram<'a> {
 }
 
 impl KybraProgram<'_> {
+    pub fn get_function_defs_of_type(&self, method_type: CanisterMethodType) -> Vec<KybraStmt> {
+        match &self.program {
+            Mod::Module { body, .. } => body
+                .iter()
+                .filter(|stmt_kind| {
+                    let kybra_stmt = KybraStmt {
+                        stmt_kind,
+                        source_map: self.source_map,
+                    };
+                    kybra_stmt.is_canister_method_type(method_type.clone())
+                })
+                .map(|stmt_kind| KybraStmt {
+                    stmt_kind,
+                    source_map: self.source_map,
+                })
+                .collect(),
+            _ => vec![],
+        }
+    }
+
     pub fn build_canister_method_act_nodes(&self) -> Vec<ActCanisterMethod> {
         match &self.program {
             Mod::Module { body, .. } => body

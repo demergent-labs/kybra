@@ -1,9 +1,5 @@
-use quote::quote;
-
 use crate::{
-    cdk_act::{
-        nodes::ActPreUpgradeMethod, AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct,
-    },
+    cdk_act::{AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct},
     generators::vm_value_conversion::{try_from_vm_value, try_into_vm_value},
 };
 
@@ -103,19 +99,16 @@ impl ToAct for KybraAst {
             .map(|act| act.clone())
             .collect();
 
-        let heartbeat_method = None;
+        let heartbeat_method = self.heartbeat.clone();
         let init_method = self.init_method.clone();
-        let inspect_message_method = None;
+        let inspect_message_method = self.inspect_method.clone();
         let post_upgrade_method = self.post_upgrade.clone();
-        let pre_upgrade_method = ActPreUpgradeMethod { body: quote!() };
+        let pre_upgrade_method = self.pre_upgrade.clone();
 
         let try_into_vm_value_impls = try_into_vm_value::generate_try_into_vm_value_impls();
         let try_from_vm_value_impls = try_from_vm_value::generate_try_from_vm_value_impls();
 
-        let async_result_handler = quote!();
-        let get_top_level_call_frame_fn = quote!();
-
-        let cross_canister_call_functions = quote!();
+        let rust_code = self.rust_code.clone();
 
         AbstractCanisterTree {
             update_methods,
@@ -125,11 +118,7 @@ impl ToAct for KybraAst {
             inspect_message_method,
             post_upgrade_method,
             pre_upgrade_method,
-            rust_code: quote! {
-                #cross_canister_call_functions
-                #async_result_handler
-                #get_top_level_call_frame_fn
-            },
+            rust_code,
             arrays,
             funcs,
             options,

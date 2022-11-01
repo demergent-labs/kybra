@@ -1,5 +1,6 @@
 mod canister_method;
 mod data_types;
+mod system_methods;
 
 use rustpython_parser::ast::{Located, StmtKind};
 

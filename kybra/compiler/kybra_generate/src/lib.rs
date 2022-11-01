@@ -1,5 +1,4 @@
 use cdk_act::{ToAct, ToTokenStream};
-use generators::ic_object::generate_ic_object;
 use py_ast::{KybraProgram, PyAst};
 use quote::quote;
 use rustpython_parser::parser::{self, Mode};
@@ -42,8 +41,6 @@ pub fn kybra_generate(
     eprintln!("--- ENDING --------------------------------");
     eprintln!("-------------------------------------------");
 
-    let ic_object = generate_ic_object();
-
     quote! {
         use rustpython_vm::{AsObject, builtins::{PyListRef, PyTupleRef, PyIntRef}, class::PyClassImpl, convert::ToPyObject, PyObjectRef, VirtualMachine};
         use rustpython_derive::{pyclass, PyPayload};
@@ -52,8 +49,6 @@ pub fn kybra_generate(
 
         static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;
-
-        #ic_object
 
         // TODO this is broken https://github.com/dfinity/motoko/issues/3462#issuecomment-1260060874
         // #[link_section = "icp:public cdk"]
