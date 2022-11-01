@@ -3,7 +3,7 @@ import { execSync } from 'child_process';
 import { get_tests } from 'azle/examples/inspect_message/test/tests';
 import { createActor } from './dfx_generated/inspect_message';
 
-const inspect_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const inspect_message_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
@@ -24,7 +24,7 @@ const tests: Test[] = [
             });
         }
     },
-    ...get_tests(inspect_canister)
+    ...get_tests(inspect_message_canister)
 ];
 
 run_tests(tests);

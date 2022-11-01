@@ -8,5 +8,5 @@ def heartbeat_():
     initialized = True
 
 @query
-def getInitialized() -> bool:
+def get_initialized() -> bool:
     return initialized

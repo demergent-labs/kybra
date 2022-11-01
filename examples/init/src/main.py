@@ -22,13 +22,13 @@ def init_(init_user: User, init_reaction: Reaction, init_owner: Principal):
     owner = init_owner
 
 @query
-def getUser() -> opt[User]:
+def get_user() -> opt[User]:
     return user
 
 @query
-def getReaction() -> opt[Reaction]:
+def get_reaction() -> opt[Reaction]:
     return reaction
 
 @query
-def getOwner() -> opt[Principal]:
+def get_owner() -> opt[Principal]:
     return owner

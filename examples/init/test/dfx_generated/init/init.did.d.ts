@@ -5,7 +5,7 @@ export type Reaction = { 'Fire' : null } |
   { 'Wave' : null };
 export interface User { 'id' : string }
 export interface _SERVICE {
-  'getOwner' : ActorMethod<[], [] | [Principal]>,
-  'getReaction' : ActorMethod<[], [] | [Reaction]>,
-  'getUser' : ActorMethod<[], [] | [User]>,
+  'get_owner' : ActorMethod<[], [] | [Principal]>,
+  'get_reaction' : ActorMethod<[], [] | [Reaction]>,
+  'get_user' : ActorMethod<[], [] | [User]>,
 }

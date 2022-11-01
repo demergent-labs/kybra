@@ -3,7 +3,7 @@ import { execSync } from 'child_process';
 import { get_tests } from 'azle/examples/heartbeat/test/tests';
 import { createActor } from './dfx_generated/heartbeat';
 
-const init_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const heartbeat_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
@@ -24,7 +24,7 @@ const tests: Test[] = [
             });
         }
     },
-    ...get_tests(init_canister)
+    ...get_tests(heartbeat_canister)
 ];
 
 run_tests(tests);

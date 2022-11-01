@@ -22,5 +22,5 @@ def inaccessible() -> bool:
     return False
 
 @update
-def alsoInaccessible() -> bool:
+def also_inaccessible() -> bool:
     return False
