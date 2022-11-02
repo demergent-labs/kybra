@@ -1,16 +1,14 @@
-from kybra import Async, blob, CanisterResult, ic, Principal, update
+from kybra import Async, blob, call, Canister, CanisterResult, Principal, update
 
-# TODO we really need to use the ManagementCanister to get this to work appropriately, because of the candid decoding
-# TODO swap out ic.call_raw for the ManagementCanister once we have general cross-canister calls enabled
+class ManagementCanister(Canister):
+    @call
+    def raw_rand(self) -> blob: ...
 
 @update
 def get_randomness_directly() -> Async[blob]:
-    randomness_result: CanisterResult[blob, str] = yield ic.call_raw(
-        Principal.from_str('aaaaa-aa'),
-        'raw_rand',
-        ic.candid_encode('()'),
-        0
-    )
+    management_canister = ManagementCanister(Principal.from_str('aaaaa-aa'))
+
+    randomness_result: CanisterResult[blob, str] = yield management_canister.raw_rand()
 
     if randomness_result[0] is None:
         return bytes()
@@ -44,12 +42,9 @@ def get_randomness_level2() -> Async[blob]:
     return randomness
 
 def get_randomness() -> Async[blob]:
-    randomness_result: CanisterResult[blob, str] = yield ic.call_raw(
-        Principal.from_str('aaaaa-aa'),
-        'raw_rand',
-        ic.candid_encode('()'),
-        0
-    )
+    management_canister = ManagementCanister(Principal.from_str('aaaaa-aa'))
+
+    randomness_result: CanisterResult[blob, str] = yield management_canister.raw_rand()
 
     if randomness_result[0] is None:
         return bytes()

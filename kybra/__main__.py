@@ -87,7 +87,9 @@ py_file_names = list(
 
 # Rust prerequisites
 os.system('rustup target add wasm32-unknown-unknown')
+# TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/43?u=lastmjs
 os.system('cargo install ic-cdk-optimizer --version 0.3.4 || true')
+# os.system('cargo install ic-wasm --version 0.3.0 || true')
 
 py_file_names_file = open(py_file_names_file_path, 'w')
 py_file_names_file.write(','.join(py_file_names))
@@ -106,9 +108,9 @@ os.system(f'CARGO_TARGET_DIR={target_path} cargo test --manifest-path {canister_
 os.system(f'cp {generated_did_path} {did_path}')
 
 # Optimize the Wasm binary
-# TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/22
-# $CARGO_BIN_ROOT/bin/ic-wasm $TARGET_PATH/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o $TARGET_PATH/wasm32-unknown-unknown/release/$CANISTER_NAME.wasm shrink
+# TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/43?u=lastmjs
 os.system(f'{cargo_bin_root}/bin/ic-cdk-optimizer {target_path}/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o {target_path}/wasm32-unknown-unknown/release/{canister_name}.wasm')
+# os.system(f'{cargo_bin_root}/bin/ic-wasm {target_path}/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o {target_path}/wasm32-unknown-unknown/release/{canister_name}.wasm shrink')
 
 # gzip the Wasm binary
 os.system(f'gzip -f -k {target_path}/wasm32-unknown-unknown/release/{canister_name}.wasm')

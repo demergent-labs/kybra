@@ -45,6 +45,7 @@ pub fn kybra_generate(
         use rustpython_derive::{pyclass, PyPayload};
         use kybra_vm_value_derive::{CdkActTryIntoVmValue, CdkActTryFromVmValue};
         use std::str::FromStr;
+        use ic_cdk::api::call::CallResult;
 
         static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;

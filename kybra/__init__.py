@@ -1,4 +1,4 @@
-from typing import Callable, Generator, Generic, NoReturn, Optional, TypedDict, TypeVar, Any, Type, TypeAlias
+from typing import Any, Callable, Generator, Generic, NoReturn, Optional, ParamSpec, TypedDict, TypeVar, Type, TypeAlias
 from .compiler.custom_modules.principal import Principal
 
 Principal = Principal
@@ -192,3 +192,31 @@ class ic(Generic[T]):
     @staticmethod
     def stable64_write(offset: nat64, buf: blob):
         _kybra_ic.stable64_write(offset, buf) # type: ignore
+
+class Canister:
+    canister_id: Principal
+
+    def __init__(self, canister_id: Principal):
+        self.canister_id = canister_id
+
+P = ParamSpec('P')
+
+# TODO https://stackoverflow.com/questions/2704434/intercept-method-calls-in-python
+# TODO try to get rid of the need for the call decorator by iterating over the methods in the superclass
+# TODO watch out for *kwargs
+# TODO we might want to experiment with Concatenate to get rid of the self: https://peps.python.org/pep-0612/
+def call(func: Callable[P, T]) -> Callable[P, CanisterResult[T, str]]:
+    def intermediate_func(*args): # type: ignore
+        the_self = args[0] # type: ignore
+        selfless_args = args[1:] # type: ignore
+
+        return {
+            'name': 'call',
+            'args': [
+                the_self.canister_id, # type: ignore
+                func.__qualname__, # type: ignore
+                *selfless_args
+            ]
+        } # type: ignore
+
+    return intermediate_func # type: ignore
