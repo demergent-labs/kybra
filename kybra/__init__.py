@@ -43,6 +43,21 @@ def update(func: object):
 def canister(cls: T) -> T:
     return cls
 
+def init(func: object):
+    return func
+
+def heartbeat(func: object):
+    return func
+
+def pre_upgrade(func: object):
+    return func
+
+def post_upgrade(func: object):
+    return func
+
+def inspect_message(func: object):
+    return func
+
 # TODO need service
 
 Query = Callable
@@ -114,12 +129,20 @@ class ic(Generic[T]):
         } # type: ignore
 
     @staticmethod
+    def accept_message():
+        _kybra_ic.accept_message() #type:ignore
+
+    @staticmethod
     def candid_encode(candid_string: str) -> blob:
         return _kybra_ic.candid_encode(candid_string) # type: ignore
 
     @staticmethod
     def candid_decode(candid_encoded: blob) -> str:
         return _kybra_ic.candid_decode(candid_encoded) # type: ignore
+
+    @staticmethod
+    def method_name() -> str:
+        return _kybra_ic.method_name() #type:ignore
 
     @staticmethod
     def notify_raw(

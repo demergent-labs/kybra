@@ -1,0 +1,19 @@
+{
+    "canisters": {
+        "heartbeat": {
+            "type": "custom",
+            "build": "python -m kybra heartbeat src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/heartbeat/target/wasm32-unknown-unknown/release/heartbeat.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/heartbeat"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}

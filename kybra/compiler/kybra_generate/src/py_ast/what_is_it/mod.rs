@@ -1,4 +1,4 @@
-use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
+use rustpython_parser::ast::{ArgData, Constant, ExprKind, KeywordData, Located, StmtKind};
 
 use super::kybra_types::KybraStmt;
 
@@ -238,9 +238,29 @@ impl ToDisplayString for Located<StmtKind> {
     }
 }
 
+impl WhatIsIt for Located<ArgData> {
+    fn what_is_it(&self) -> () {
+        eprintln!("--------------------------------------");
+        eprintln!("This is an arg data");
+        let annotation = match &self.node.annotation {
+            Some(annotation) => annotation.to_display_string(),
+            None => "None".to_string(),
+        };
+        let type_comment = match &self.node.type_comment {
+            Some(type_comment) => type_comment.clone(),
+            None => "None".to_string(),
+        };
+        eprintln!(
+            "arg({}), annotation({}), type_comment({})",
+            self.node.arg, annotation, type_comment
+        );
+        eprintln!("--------------------------------------");
+    }
+}
+
 impl WhatIsIt for Located<ExprKind> {
     fn what_is_it(&self) -> () {
-        let thing = match &self.node {
+        let expr_kind_type = match &self.node {
             ExprKind::BoolOp { .. } => "bool op".to_string(),
             ExprKind::NamedExpr { .. } => "named expr".to_string(),
             ExprKind::BinOp { .. } => "bin op".to_string(),
@@ -282,7 +302,7 @@ impl WhatIsIt for Located<ExprKind> {
             ExprKind::Tuple { .. } => "tuple".to_string(),
             ExprKind::Slice { .. } => "slice".to_string(),
         };
-        eprintln!("This Expr Kind is a {}", thing);
+        eprintln!("This Expr Kind is a {}", expr_kind_type);
     }
 }
 
@@ -296,7 +316,7 @@ impl ToDisplayString for Constant {
             Constant::Int(_) => "int",
             Constant::Tuple(_) => "tuple",
             Constant::Float(_) => "float",
-            Constant::Complex { real, imag } => "complex",
+            Constant::Complex { .. } => "complex",
             Constant::Ellipsis => "ellipsis",
         }
         .to_string()

@@ -1,0 +1,19 @@
+{
+    "canisters": {
+        "inspect_message": {
+            "type": "custom",
+            "build": "python -m kybra inspect_message src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/inspect_message/target/wasm32-unknown-unknown/release/inspect_message.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/inspect_message"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}
