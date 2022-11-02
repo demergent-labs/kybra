@@ -1,3 +1,5 @@
+use std::collections::{HashMap, HashSet};
+
 use quote::quote;
 
 use crate::generators::async_result_handler::generate_async_result_handler;
@@ -6,8 +8,8 @@ use cdk_framework::{
     ActCanisterMethod, ActDataType, CanisterMethodType,
 };
 
-use self::kybra_types::KybraStmt;
 pub use self::{kybra_ast::KybraAst, kybra_types::KybraProgram};
+use self::{kybra_types::KybraStmt, traits::GetDependencies};
 
 mod kybra_ast;
 mod kybra_types;
@@ -21,6 +23,43 @@ pub struct PyAst<'a> {
 }
 
 impl PyAst<'_> {
+    pub fn get_dependencies(&self) -> HashSet<String> {
+        let kybra_canister_method_stmts = self.get_kybra_canister_method_stmts();
+        let kybra_canister_stmts = self.get_kybra_canister_stmts();
+        let type_alias_lookup = self.generate_type_alias_lookup();
+
+        let canister_method_dependencies = kybra_canister_method_stmts.iter().fold(
+            HashSet::new(),
+            |acc, kybra_canister_method_stmt| {
+                acc.union(&kybra_canister_method_stmt.get_dependent_types(&type_alias_lookup, &acc))
+                    .cloned()
+                    .collect()
+            },
+        );
+        let canister_dependencies =
+            kybra_canister_stmts
+                .iter()
+                .fold(HashSet::new(), |acc, kybra_canister_stmt| {
+                    acc.union(&kybra_canister_stmt.get_dependent_types(&type_alias_lookup, &acc))
+                        .cloned()
+                        .collect()
+                });
+
+        canister_method_dependencies
+            .union(&canister_dependencies)
+            .cloned()
+            .collect()
+    }
+
+    pub fn generate_type_alias_lookup(&self) -> HashMap<String, KybraStmt> {
+        self.kybra_programs
+            .iter()
+            .fold(HashMap::new(), |mut acc, kybra_type_alias| {
+                acc.extend(kybra_type_alias.generate_type_alias_lookup());
+                acc
+            })
+    }
+
     pub fn to_kybra_ast(&self) -> KybraAst {
         let canister_types = self.build_canister_types();
         let types_alias_inline_types = data_type_nodes::build_inline_type_acts(&canister_types);
@@ -55,6 +94,22 @@ impl PyAst<'_> {
         }
     }
 
+    fn get_kybra_canister_method_stmts(&self) -> Vec<KybraStmt> {
+        self.kybra_programs
+            .iter()
+            .fold(vec![], |acc, kybra_program| {
+                vec![acc, kybra_program.get_kybra_canister_method_stmts()].concat()
+            })
+    }
+
+    fn get_kybra_canister_stmts(&self) -> Vec<KybraStmt> {
+        self.kybra_programs
+            .iter()
+            .fold(vec![], |acc, kybra_program| {
+                vec![acc, kybra_program.get_kybra_canister_stmts()].concat()
+            })
+    }
+
     fn build_canister_methods(&self) -> Vec<ActCanisterMethod> {
         self.kybra_programs
             .iter()
@@ -64,10 +119,11 @@ impl PyAst<'_> {
     }
 
     fn build_canister_types(&self) -> Vec<ActDataType> {
+        let dependencies = self.get_dependencies();
         self.kybra_programs
             .iter()
             .fold(vec![], |acc, kybra_program| {
-                vec![acc, kybra_program.get_act_data_type_nodes()].concat()
+                vec![acc, kybra_program.get_act_data_type_nodes(&dependencies)].concat()
             })
     }
 

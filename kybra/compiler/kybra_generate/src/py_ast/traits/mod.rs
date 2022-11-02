@@ -1,5 +1,8 @@
 use std::collections::hash_map::DefaultHasher;
+use std::collections::{HashMap, HashSet};
 use std::hash::{Hash, Hasher};
+
+use super::kybra_types::KybraStmt;
 
 pub trait GenerateInlineName
 where
@@ -11,4 +14,12 @@ where
         self.hash(&mut s);
         format!("{}", s.finish()).to_string()
     }
+}
+
+pub trait GetDependencies {
+    fn get_dependent_types(
+        &self,
+        type_alias_lookup: &HashMap<String, KybraStmt>,
+        found_type_names: &HashSet<String>,
+    ) -> HashSet<String>;
 }
