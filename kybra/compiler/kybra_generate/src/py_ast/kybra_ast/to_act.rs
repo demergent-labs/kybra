@@ -1,7 +1,5 @@
-use crate::{
-    cdk_act::{AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct},
-    generators::vm_value_conversion::{try_from_vm_value, try_into_vm_value},
-};
+use crate::generators::vm_value_conversion::{try_from_vm_value, try_into_vm_value};
+use cdk_framework::{AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct};
 
 use super::KybraAst;
 
@@ -129,6 +127,7 @@ impl ToAct for KybraAst {
             tuples,
             type_refs,
             variants,
+            external_canisters: vec![],
         }
     }
 }

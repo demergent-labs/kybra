@@ -1,10 +1,7 @@
 use quote::quote;
 
-use crate::{
-    cdk_act::{nodes::ActPostUpgradeMethod, CanisterMethodType},
-    generators::ic_object,
-    py_ast::PyAst,
-};
+use crate::{generators::ic_object, py_ast::PyAst};
+use cdk_framework::{nodes::ActPostUpgradeMethod, CanisterMethodType};
 
 impl PyAst<'_> {
     pub fn build_post_upgrade_method(&self) -> ActPostUpgradeMethod {

@@ -1,14 +1,12 @@
 use rustpython_parser::ast::ExprKind;
 
-use crate::{
-    cdk_act::{
-        nodes::data_type_nodes::{
-            act_tuple::{Tuple, TupleLiteral, TupleTypeAlias},
-            ActTuple, ActTupleElem, LiteralOrTypeAlias,
-        },
-        ActDataType, ToActDataType,
+use crate::py_ast::traits::GenerateInlineName;
+use cdk_framework::{
+    nodes::data_type_nodes::{
+        act_tuple::{Tuple, TupleLiteral, TupleTypeAlias},
+        ActTuple, ActTupleElem, LiteralOrTypeAlias,
     },
-    py_ast::traits::GenerateInlineName,
+    ActDataType, ToActDataType,
 };
 
 use super::KybraExpr;

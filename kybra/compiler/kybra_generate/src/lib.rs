@@ -1,10 +1,9 @@
-use cdk_act::{ToAct, ToTokenStream};
+use cdk_framework::{ToAct, ToTokenStream};
 use py_ast::{KybraProgram, PyAst};
 use quote::quote;
 use rustpython_parser::parser::{self, Mode};
 use source_map::SourceMap;
 
-mod cdk_act;
 mod errors;
 mod generators;
 mod py_ast;

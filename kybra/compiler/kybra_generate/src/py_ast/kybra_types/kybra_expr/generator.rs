@@ -1,6 +1,6 @@
 use rustpython_parser::ast::ExprKind;
 
-use crate::cdk_act::{ActDataType, ToActDataType};
+use cdk_framework::{ActDataType, ToActDataType};
 
 use super::KybraExpr;
 

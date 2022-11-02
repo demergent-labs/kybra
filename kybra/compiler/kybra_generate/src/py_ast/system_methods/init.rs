@@ -1,10 +1,7 @@
 use quote::quote;
 
-use crate::{
-    cdk_act::{nodes::ActInitMethod, CanisterMethodType},
-    generators::ic_object,
-    py_ast::PyAst,
-};
+use crate::{generators::ic_object, py_ast::PyAst};
+use cdk_framework::{nodes::ActInitMethod, CanisterMethodType};
 
 impl PyAst<'_> {
     pub fn build_init_method(&self) -> ActInitMethod {
