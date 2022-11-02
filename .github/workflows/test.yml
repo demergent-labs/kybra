@@ -62,6 +62,7 @@ jobs:
                     "examples/call_raw",
                     "examples/candid_encoding",
                     "examples/counter",
+                    "examples/generators",
                     "examples/heartbeat",
                     "examples/imports",
                     "examples/init",
