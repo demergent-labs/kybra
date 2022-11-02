@@ -4,7 +4,7 @@ mod variants;
 
 use rustpython_parser::ast::StmtKind;
 
-use crate::cdk_act::ActDataType;
+use cdk_framework::ActDataType;
 
 use super::KybraStmt;
 

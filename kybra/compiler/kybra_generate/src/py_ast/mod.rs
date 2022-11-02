@@ -1,11 +1,9 @@
 use quote::quote;
 
-use crate::{
-    cdk_act::{
-        nodes::{act_canister_method, data_type_nodes},
-        ActCanisterMethod, ActDataType, CanisterMethodType,
-    },
-    generators::async_result_handler::generate_async_result_handler,
+use crate::generators::async_result_handler::generate_async_result_handler;
+use cdk_framework::{
+    nodes::{act_canister_method, data_type_nodes},
+    ActCanisterMethod, ActDataType, CanisterMethodType,
 };
 
 use self::kybra_types::KybraStmt;

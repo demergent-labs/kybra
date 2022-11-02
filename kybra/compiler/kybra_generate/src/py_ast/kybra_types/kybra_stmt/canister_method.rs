@@ -1,12 +1,10 @@
 use quote::{format_ident, quote};
 use rustpython_parser::ast::StmtKind;
 
-use crate::{
-    cdk_act::{
-        nodes::{data_type_nodes::ActPrimitiveLit, ActFnParam},
-        ActDataType, CanisterMethod, CanisterMethodType, ToActDataType,
-    },
-    py_ast::kybra_types::KybraExpr,
+use crate::py_ast::kybra_types::KybraExpr;
+use cdk_framework::{
+    nodes::{data_type_nodes::ActPrimitiveLit, ActFnParam},
+    ActDataType, CanisterMethod, CanisterMethodType, ToActDataType,
 };
 
 use super::KybraStmt;

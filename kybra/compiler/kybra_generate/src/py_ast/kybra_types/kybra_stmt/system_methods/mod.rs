@@ -2,10 +2,8 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
 use super::KybraStmt;
-use crate::{
-    cdk_act::{nodes::ActFnParam, ToActDataType},
-    py_ast::{kybra_types::KybraExpr, what_is_it::WhatIsIt},
-};
+use crate::py_ast::{kybra_types::KybraExpr, what_is_it::WhatIsIt};
+use cdk_framework::{nodes::ActFnParam, ToActDataType};
 
 mod errors;
 

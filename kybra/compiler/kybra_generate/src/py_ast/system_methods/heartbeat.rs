@@ -1,9 +1,7 @@
 use quote::quote;
 
-use crate::{
-    cdk_act::{nodes::ActHeartbeatMethod, CanisterMethodType},
-    py_ast::PyAst,
-};
+use crate::py_ast::PyAst;
+use cdk_framework::{nodes::ActHeartbeatMethod, CanisterMethodType};
 
 impl PyAst<'_> {
     pub fn build_heartbeat_method(&self) -> Option<ActHeartbeatMethod> {

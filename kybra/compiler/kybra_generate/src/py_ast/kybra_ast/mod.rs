@@ -2,7 +2,7 @@ mod to_act;
 
 use proc_macro2::TokenStream;
 
-use crate::cdk_act::{
+use cdk_framework::{
     nodes::{
         ActHeartbeatMethod, ActInitMethod, ActInspectMessageMethod, ActPostUpgradeMethod,
         ActPreUpgradeMethod,

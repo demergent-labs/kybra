@@ -61,6 +61,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "cdk_framework"
+version = "0.0.0"
+source = "git+https://github.com/demergent-labs/cdk_framework?rev=6527827e8f4113f3bf9c273d3ebf053d88341ca9#6527827e8f4113f3bf9c273d3ebf053d88341ca9"
+dependencies = [
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -112,6 +121,7 @@ name = "kybra_generate"
 version = "0.0.0"
 dependencies = [
  "annotate-snippets",
+ "cdk_framework",
  "proc-macro2",
  "quote",
  "rustpython-parser",

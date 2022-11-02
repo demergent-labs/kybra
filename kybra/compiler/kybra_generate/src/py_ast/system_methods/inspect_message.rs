@@ -1,9 +1,7 @@
 use quote::quote;
 
-use crate::{
-    cdk_act::{nodes::ActInspectMessageMethod, CanisterMethodType},
-    py_ast::PyAst,
-};
+use crate::py_ast::PyAst;
+use cdk_framework::{nodes::ActInspectMessageMethod, CanisterMethodType};
 
 impl PyAst<'_> {
     pub fn build_inspect_method(&self) -> Option<ActInspectMessageMethod> {

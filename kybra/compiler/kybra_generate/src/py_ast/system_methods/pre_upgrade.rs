@@ -1,9 +1,7 @@
 use quote::quote;
 
-use crate::{
-    cdk_act::{nodes::ActPreUpgradeMethod, CanisterMethodType},
-    py_ast::PyAst,
-};
+use crate::py_ast::PyAst;
+use cdk_framework::{nodes::ActPreUpgradeMethod, CanisterMethodType};
 
 impl PyAst<'_> {
     pub fn build_pre_upgrade_method(&self) -> ActPreUpgradeMethod {

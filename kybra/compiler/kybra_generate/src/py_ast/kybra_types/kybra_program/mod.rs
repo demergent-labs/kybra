@@ -1,9 +1,7 @@
 use rustpython_parser::ast::Mod;
 
-use crate::{
-    cdk_act::{ActCanisterMethod, ActDataType, CanisterMethodType},
-    source_map::SourceMap,
-};
+use crate::source_map::SourceMap;
+use cdk_framework::{ActCanisterMethod, ActDataType, CanisterMethodType};
 
 use super::KybraStmt;
 
