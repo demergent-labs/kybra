@@ -14,6 +14,14 @@ class Callable():
     def __class_getitem__(cls, x):
         return True
 
+class Generator():
+    def __class_getitem__(cls, x):
+        return cls
+
+class Generic():
+    def __class_getitem__(cls, x):
+        return cls
+
 def TypeAlias(self, parameters):
     raise TypeError(f"{self} is not subscriptable")
 

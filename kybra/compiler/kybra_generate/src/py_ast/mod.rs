@@ -1,8 +1,11 @@
 use quote::quote;
 
-use crate::cdk_act::{
-    nodes::{act_canister_method, data_type_nodes},
-    ActCanisterMethod, ActDataType, CanisterMethodType,
+use crate::{
+    cdk_act::{
+        nodes::{act_canister_method, data_type_nodes},
+        ActCanisterMethod, ActDataType, CanisterMethodType,
+    },
+    generators::async_result_handler::generate_async_result_handler,
 };
 
 use self::kybra_types::KybraStmt;
@@ -36,7 +39,11 @@ impl PyAst<'_> {
         ]
         .concat();
 
-        let rust_code = quote!();
+        let async_result_handler = generate_async_result_handler();
+
+        let rust_code = quote! {
+            #async_result_handler
+        };
 
         KybraAst {
             init_method: self.build_init_method(),

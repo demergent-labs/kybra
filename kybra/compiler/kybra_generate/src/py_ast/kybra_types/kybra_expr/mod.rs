@@ -1,6 +1,7 @@
 mod array;
 mod errors;
 mod generate_inline_name;
+mod generator;
 mod hash;
 mod opt;
 mod to_act_data_type;
