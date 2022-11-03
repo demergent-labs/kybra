@@ -1,5 +1,7 @@
 from kybra import Async, blob, call, Canister, CanisterResult, Principal, update
 
+# TODO rerun dfx generate once cross canister calls are fully implemented
+
 class ManagementCanister(Canister):
     @call
     def raw_rand(self) -> blob: ...
@@ -8,12 +10,12 @@ class ManagementCanister(Canister):
 def get_randomness_directly() -> Async[blob]:
     management_canister = ManagementCanister(Principal.from_str('aaaaa-aa'))
 
-    randomness_result: CanisterResult[blob, str] = yield management_canister.raw_rand()
+    randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if randomness_result[0] is None:
+    if randomness_result.ok is None:
         return bytes()
 
-    return randomness_result[0]
+    return randomness_result.ok
 
 @update
 def get_randomness_indirectly() -> Async[blob]:
@@ -44,9 +46,9 @@ def get_randomness_level2() -> Async[blob]:
 def get_randomness() -> Async[blob]:
     management_canister = ManagementCanister(Principal.from_str('aaaaa-aa'))
 
-    randomness_result: CanisterResult[blob, str] = yield management_canister.raw_rand()
+    randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if randomness_result[0] is None:
+    if randomness_result.ok is None:
         return bytes()
 
-    return randomness_result[0]
+    return randomness_result.ok

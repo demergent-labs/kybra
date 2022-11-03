@@ -11,20 +11,20 @@ def execute_call_raw(
     candid_args: str,
     payment: nat64
 ) -> Async[ExecuteCallRawResult]:
-    canister_result: CanisterResult[blob, str] = yield ic.call_raw(
+    canister_result: CanisterResult[blob] = yield ic.call_raw(
         canister_id,
         method,
         ic.candid_encode(candid_args),
         payment
     )
 
-    if canister_result[0] is None:
+    if canister_result.ok is None:
         return {
-            'err': canister_result[1]
+            'err': canister_result.err
         }
 
     return {
-        'ok': ic.candid_decode(canister_result[0])
+        'ok': ic.candid_decode(canister_result.ok)
     }
 
 class ExecuteCallRaw128Result(Variant, total=False):
@@ -38,18 +38,18 @@ def execute_call_raw128(
     candid_args: str,
     payment: nat
 ) -> Async[ExecuteCallRawResult]:
-    canister_result: CanisterResult[blob, str] = yield ic.call_raw128(
+    canister_result: CanisterResult[blob] = yield ic.call_raw128(
         canister_id,
         method,
         ic.candid_encode(candid_args),
         payment
     )
 
-    if canister_result[0] is None:
+    if canister_result.ok is None:
         return {
-            'err': canister_result[1]
+            'err': canister_result.err
         }
 
     return {
-        'ok': ic.candid_decode(canister_result[0])
+        'ok': ic.candid_decode(canister_result.ok)
     }

@@ -40,6 +40,20 @@ impl PyAst<'_> {
         let async_result_handler = generate_async_result_handler();
 
         let rust_code = quote! {
+            pub fn unwrap_rust_python_result<T>(
+                rust_python_result: Result<T, PyRef<PyBaseException>>,
+                vm: &rustpython::vm::VirtualMachine
+            ) -> T {
+                match rust_python_result {
+                    Ok(ok) => ok,
+                    Err(err) => {
+                        let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+
+                        panic!("{}", err_string);
+                    },
+                }
+            }
+
             #async_result_handler
         };
 

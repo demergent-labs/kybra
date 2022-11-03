@@ -64,7 +64,19 @@ Query = Callable
 Update = Callable
 Oneway = Callable
 
-CanisterResult = tuple
+class CanisterResult(Generic[T]):
+    ok: Optional[T]
+    err: str
+
+    def __init__(self, ok: T, err: str):
+        self.ok = ok
+        self.err = err
+
+    def notify(self) -> "CanisterResult[None]": ...
+
+    def with_cycles(self, cycles: nat64) -> "CanisterResult[T]": ...
+
+    def with_cycles128(self, cycles: nat) -> "CanisterResult[T]": ...
 
 # TODO Once RustPython supports Python 3.11, we can use the below and unify CanisterResult with the other Variants
 # TODO The problem is that you can't really use generics with TypedDict yet: https://github.com/python/cpython/issues/89026
@@ -103,30 +115,25 @@ class Stable64GrowResultTemp(Variant, total=False):
 def Func(callable: Callable) -> Type[tuple[Principal, str]]: # type: ignore
     return type((Principal.from_str('aaaaa-aa'), ''))
 
+# TODO make sure call_raw with notify works
 class ic(Generic[T]):
     @staticmethod
-    def call_raw(canister_id: Principal, method: str, args_raw: blob, payment: nat64) -> CanisterResult[T, str]:
-        return {
-            'name': 'call_raw',
-            'args': [
-                canister_id,
-                method,
-                args_raw,
-                payment
-            ]
-        } # type: ignore
+    def call_raw(canister_id: Principal, method: str, args_raw: blob, payment: nat64) -> CanisterResult[T]:
+        return AsyncInfo('call_raw', [
+            canister_id,
+            method,
+            args_raw,
+            payment
+        ]) # type: ignore
 
     @staticmethod
-    def call_raw128(canister_id: Principal, method: str, args_raw: blob, payment: nat) -> CanisterResult[T, str]:
-        return {
-            'name': 'call_raw128',
-            'args': [
-                canister_id,
-                method,
-                args_raw,
-                payment
-            ]
-        } # type: ignore
+    def call_raw128(canister_id: Principal, method: str, args_raw: blob, payment: nat) -> CanisterResult[T]:
+        return AsyncInfo('call_raw128', [
+            canister_id,
+            method,
+            args_raw,
+            payment
+        ]) # type: ignore
 
     @staticmethod
     def accept_message():
@@ -193,6 +200,10 @@ class ic(Generic[T]):
     def stable64_write(offset: nat64, buf: blob):
         _kybra_ic.stable64_write(offset, buf) # type: ignore
 
+    @staticmethod
+    def trap(message: str) -> NoReturn: # type: ignore
+        _kybra_ic.trap(message) # type: ignore
+
 class Canister:
     canister_id: Principal
 
@@ -201,22 +212,34 @@ class Canister:
 
 P = ParamSpec('P')
 
-# TODO https://stackoverflow.com/questions/2704434/intercept-method-calls-in-python
-# TODO try to get rid of the need for the call decorator by iterating over the methods in the superclass
+class AsyncInfo:
+    name: str
+    args: list[Any]
+
+    def __init__(self, name: str, args: list[Any]):
+        self.name = name
+        self.args = args
+
+    def with_cycles(self, cycles: nat64) -> "AsyncInfo":
+        return AsyncInfo('call_with_payment', [*self.args, cycles])
+
+    def with_cycles128(self, cycles: nat) -> "AsyncInfo":
+        return AsyncInfo('call_with_payment128', [*self.args, cycles])
+
+    def notify(self):
+        # TODO calculate the notify function name here...actually, maybe we should just do this in the same way as the other calls? Just to keep it simple?
+        _kybra_ic['notify_function_name'] # type: ignore
+
 # TODO watch out for *kwargs
-# TODO we might want to experiment with Concatenate to get rid of the self: https://peps.python.org/pep-0612/
-def call(func: Callable[P, T]) -> Callable[P, CanisterResult[T, str]]:
+def call(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
     def intermediate_func(*args): # type: ignore
         the_self = args[0] # type: ignore
         selfless_args = args[1:] # type: ignore
 
-        return {
-            'name': 'call',
-            'args': [
-                the_self.canister_id, # type: ignore
-                func.__qualname__, # type: ignore
-                *selfless_args
-            ]
-        } # type: ignore
+        return AsyncInfo('call', [
+            the_self.canister_id, # type: ignore
+            func.__qualname__,
+            *selfless_args
+        ])
 
     return intermediate_func # type: ignore

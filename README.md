@@ -82,7 +82,7 @@ The following are some common Rust installation issues:
 Run the following command to install dfx 0.12.0-beta.3:
 
 ```bash
-DFX_VERSION=0.12.0-beta.3 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+DFX_VERSION=0.12.0-beta.4 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
 ```
 
 #### Python VS Code Extension
