@@ -3,6 +3,16 @@ use rustpython_parser::ast::Location;
 #[derive(Clone)]
 pub struct SourceMap {}
 
+pub trait GetSourceInfo {
+    fn get_text(&self) -> String;
+    fn get_range(&self) -> (usize, usize);
+    fn get_source(&self) -> String;
+    fn generate_modified_source(&self, replacement: &String) -> String;
+    fn generate_modified_range(&self, replacement: &String) -> (usize, usize);
+    fn get_origin(&self) -> String;
+    fn get_line_number(&self) -> usize;
+}
+
 impl SourceMap {
     pub fn get_text(&self, span: Location) -> String {
         let line = self.get_source(span);
@@ -115,7 +125,7 @@ pub struct SourceFile {
 }
 
 impl SourceFile {
-    fn get_line(self, line_number: usize) -> Option<String> {
+    fn get_line(self, _line_number: usize) -> Option<String> {
         Some("def this_is_the_fake_python(we_are: going): with".to_string())
     }
 }
