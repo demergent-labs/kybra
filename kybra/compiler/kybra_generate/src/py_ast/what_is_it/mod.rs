@@ -40,7 +40,7 @@ impl WhatIsIt for Located<StmtKind> {
                     .map(|decorator| decorator.to_display_string())
                     .collect();
                 let body_strings: Vec<String> =
-                    body.iter().map(|base| base.to_display_string()).collect();
+                    body.iter().map(|stmt| stmt.to_display_string()).collect();
                 eprintln!("These are the bases {:?}", base_strings);
                 eprintln!("These are the keywords {:?}", keyword_string);
                 eprintln!("These are the decorators {:?}", decorator_string);
@@ -65,9 +65,22 @@ impl WhatIsIt for Located<StmtKind> {
                 eprintln!("The simple is: {}", simple);
                 eprintln!(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             }
-            StmtKind::FunctionDef { .. } => {
+            StmtKind::FunctionDef {
+                name,
+                args,
+                body,
+                decorator_list,
+                returns,
+                type_comment,
+            } => {
                 eprintln!("--------------------------------------");
                 eprintln!("This is a function def");
+                eprintln!("The name is: {}", name);
+                eprintln!("The args are: {:?}", args);
+                eprintln!("The body is: {:?}", body);
+                eprintln!("The decorators are: {:?}", decorator_list);
+                eprintln!("The returns are: {:?}", returns);
+                eprintln!("The type_comment is: {:?}", type_comment);
                 eprintln!("--------------------------------------");
             }
             StmtKind::AsyncFunctionDef { .. } => {
