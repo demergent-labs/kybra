@@ -137,7 +137,6 @@ impl PyAst<'_> {
             })
     }
 
-    // TODO: Consider catching duplicate canister and method names
     fn build_external_canisters(&self) -> Vec<ActExternalCanister> {
         self.kybra_programs
             .iter()

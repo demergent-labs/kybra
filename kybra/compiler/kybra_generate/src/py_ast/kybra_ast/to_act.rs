@@ -120,7 +120,6 @@ impl ToAct for KybraAst {
             pre_upgrade_method,
             rust_code,
             arrays,
-            external_canisters,
             funcs,
             options,
             primitives,
@@ -130,6 +129,7 @@ impl ToAct for KybraAst {
             tuples,
             type_refs,
             variants,
+            external_canisters,
         }
     }
 }
