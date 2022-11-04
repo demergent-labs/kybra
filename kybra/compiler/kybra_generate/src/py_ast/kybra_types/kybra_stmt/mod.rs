@@ -40,9 +40,4 @@ impl KybraStmt<'_> {
             _ => None,
         }
     }
-
-    pub fn is_canister(&self) -> bool {
-        // TODO implement when the canister format is finalized
-        false
-    }
 }
