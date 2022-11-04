@@ -70,7 +70,7 @@ impl KybraProgram<'_> {
                         stmt_kind,
                         source_map: self.source_map,
                     };
-                    kybra_stmt.is_canister()
+                    kybra_stmt.is_external_canister()
                 })
                 .map(|stmt_kind| KybraStmt {
                     stmt_kind,
