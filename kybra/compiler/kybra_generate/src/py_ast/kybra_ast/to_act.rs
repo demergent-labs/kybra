@@ -103,6 +103,8 @@ impl ToAct for KybraAst {
         let post_upgrade_method = self.post_upgrade.clone();
         let pre_upgrade_method = self.pre_upgrade.clone();
 
+        let external_canisters = self.external_canisters.clone();
+
         let try_into_vm_value_impls = try_into_vm_value::generate_try_into_vm_value_impls();
         let try_from_vm_value_impls = try_from_vm_value::generate_try_from_vm_value_impls();
 
@@ -127,7 +129,7 @@ impl ToAct for KybraAst {
             tuples,
             type_refs,
             variants,
-            external_canisters: vec![],
+            external_canisters,
         }
     }
 }

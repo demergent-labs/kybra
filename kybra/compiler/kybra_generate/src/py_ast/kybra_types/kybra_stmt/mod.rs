@@ -1,5 +1,6 @@
 mod canister_method;
 mod data_types;
+mod external_canisters;
 mod get_dependencies;
 mod get_source_info;
 mod system_methods;

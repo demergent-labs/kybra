@@ -4,7 +4,7 @@ use quote::quote;
 
 use crate::generators::async_result_handler::generate_async_result_handler;
 use cdk_framework::{
-    nodes::{act_canister_method, data_type_nodes},
+    nodes::{act_canister_method, data_type_nodes, ActExternalCanister},
     ActCanisterMethod, ActDataType, CanisterMethodType,
 };
 
@@ -90,6 +90,7 @@ impl PyAst<'_> {
             heartbeat: self.build_heartbeat_method(),
             canister_types: all_types,
             canister_methods: self.build_canister_methods(),
+            external_canisters: self.build_external_canisters(),
             rust_code,
         }
     }
@@ -134,5 +135,13 @@ impl PyAst<'_> {
                 acc.extend(kybra_program.get_function_defs_of_type(method_type.clone()));
                 acc
             })
+    }
+
+    fn build_external_canisters(&self) -> Vec<ActExternalCanister> {
+        self.kybra_programs
+            .iter()
+            .map(|program| program.build_external_canisters())
+            .collect::<Vec<Vec<ActExternalCanister>>>()
+            .concat()
     }
 }
