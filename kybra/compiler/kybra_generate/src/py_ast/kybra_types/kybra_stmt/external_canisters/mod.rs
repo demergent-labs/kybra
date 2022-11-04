@@ -2,7 +2,7 @@ use cdk_framework::{
     nodes::{ActExternalCanister, ActExternalCanisterMethod},
     ToActDataType,
 };
-use rustpython_parser::ast::{ExprKind, StmtKind};
+use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use super::KybraStmt;
 use crate::py_ast::kybra_types::{KybraArguments, KybraExpr};
@@ -16,7 +16,9 @@ impl KybraStmt<'_> {
                     .iter()
                     .map(|located_statement| -> ActExternalCanisterMethod {
                         match &located_statement.node {
-                            StmtKind::FunctionDef { name, args, body: _, decorator_list: _, returns, type_comment: _ } => {
+                            StmtKind::FunctionDef { name, args, body: _, decorator_list, returns, type_comment: _ } => {
+                                ensure_decorated_as_method_or_panic(decorator_list, &canister_name, name);
+
                                 let params = KybraArguments {
                                     arguments: args.as_ref(),
                                     source_map: self.source_map
@@ -66,5 +68,42 @@ impl KybraStmt<'_> {
             }),
             _ => false,
         }
+    }
+}
+
+fn ensure_decorated_as_method_or_panic(
+    decorator_list: &Vec<Located<ExprKind>>,
+    canister_name: &String,
+    method_name: &String,
+) {
+    let decorator_name = "@method";
+
+    if decorator_list.len() == 0 {
+        panic!(
+            "{}.{} is missing a \"{}\" decorator. Please add it above the method",
+            canister_name, method_name, decorator_name
+        );
+    }
+
+    if decorator_list.len() > 1 {
+        panic!(
+            "{}.{} has too many decorators. Please remove all but \"{}\"",
+            canister_name, method_name, decorator_name
+        )
+    }
+
+    match &decorator_list[0].node {
+        ExprKind::Name { id, ctx: _ } => {
+            if id != "method" {
+                panic!(
+                    "{}.{} has the wrong decorator: expected \"{}\", got \"@{}\"",
+                    canister_name, method_name, decorator_name, id
+                )
+            }
+        }
+        _ => panic!(
+            "{}.{} has an invalid decorator. Change it to \"{}\"",
+            canister_name, method_name, decorator_name
+        ),
     }
 }
