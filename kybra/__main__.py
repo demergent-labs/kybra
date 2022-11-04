@@ -10,6 +10,8 @@ from pathlib import Path
 # This is the name of the canister passed into python -m kybra from the dfx.json build command
 canister_name = sys.argv[1]
 
+print(f'\nBuilding canister {canister_name}\n')
+
 # This is the path to the developer's entry point Python file passed into python -m kybra from the dfx.json build command
 py_entry_file_path = sys.argv[2]
 
@@ -96,12 +98,15 @@ py_file_names_file.write(','.join(py_file_names))
 py_file_names_file.close()
 
 # Generate the Rust code
+print('[1/3] 🔨 Compiling Python...')
 os.system(f'CARGO_TARGET_DIR={target_path} cargo run --manifest-path {canister_path}/kybra_generate/Cargo.toml {py_file_names_file_path} {py_entry_module_name} | rustfmt --edition 2018 > {lib_path}')
 
 # Compile the generated Rust code
+print('[2/3] 🚧 Building Wasm binary...')
 os.system(f'CARGO_TARGET_DIR={target_path} cargo build --manifest-path {canister_path}/Cargo.toml --target wasm32-unknown-unknown --package kybra_generated_canister --release')
 
 # Generate the Candid file
+print('[3/3] 📝 Generating Candid file...')
 os.system(f'CARGO_TARGET_DIR={target_path} cargo test --manifest-path {canister_path}/Cargo.toml')
 
 # Copy the generated Candid file to the developer's source directory

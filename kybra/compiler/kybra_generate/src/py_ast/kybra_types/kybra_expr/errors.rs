@@ -3,30 +3,17 @@ use crate::errors::{ErrorMessage, Message};
 use super::KybraExpr;
 
 impl KybraExpr<'_> {
-    pub(super) fn type_not_supported_error(&self) -> ErrorMessage {
+    pub(super) fn invalid_subscript_value_error(&self) -> ErrorMessage {
         ErrorMessage {
             message: Message {
-                title: "Invalid Type".to_string(),
+                title: "Only Async, list, opt, or tuple are allowed subscripts for candid values"
+                    .to_string(),
                 origin: self.source_map.get_origin(self.located_expr.location),
                 line_number: self.source_map.get_line_number(self.located_expr.location),
                 source: self.source_map.get_source(self.located_expr.location),
                 range: self.source_map.get_range(self.located_expr.location),
-                annotation: "invalid type here".to_string(),
+                annotation: "Invalid subscript here".to_string(),
                 suggestion: None,
-            },
-        }
-    }
-
-    pub(super) fn invalid_subscript_value_error(&self) -> ErrorMessage {
-        ErrorMessage {
-            message: Message {
-                title: "must be opt or list".to_string(),
-                origin: todo!(),
-                line_number: todo!(),
-                source: todo!(),
-                range: todo!(),
-                annotation: todo!(),
-                suggestion: todo!(),
             },
         }
     }

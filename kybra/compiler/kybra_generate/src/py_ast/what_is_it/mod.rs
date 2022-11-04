@@ -40,7 +40,7 @@ impl WhatIsIt for Located<StmtKind> {
                     .map(|decorator| decorator.to_display_string())
                     .collect();
                 let body_strings: Vec<String> =
-                    body.iter().map(|base| base.to_display_string()).collect();
+                    body.iter().map(|stmt| stmt.to_display_string()).collect();
                 eprintln!("These are the bases {:?}", base_strings);
                 eprintln!("These are the keywords {:?}", keyword_string);
                 eprintln!("These are the decorators {:?}", decorator_string);
@@ -65,9 +65,22 @@ impl WhatIsIt for Located<StmtKind> {
                 eprintln!("The simple is: {}", simple);
                 eprintln!(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             }
-            StmtKind::FunctionDef { .. } => {
+            StmtKind::FunctionDef {
+                name,
+                args,
+                body,
+                decorator_list,
+                returns,
+                type_comment,
+            } => {
                 eprintln!("--------------------------------------");
                 eprintln!("This is a function def");
+                eprintln!("The name is: {}", name);
+                eprintln!("The args are: {:?}", args);
+                eprintln!("The body is: {:?}", body);
+                eprintln!("The decorators are: {:?}", decorator_list);
+                eprintln!("The returns are: {:?}", returns);
+                eprintln!("The type_comment is: {:?}", type_comment);
                 eprintln!("--------------------------------------");
             }
             StmtKind::AsyncFunctionDef { .. } => {
@@ -299,7 +312,10 @@ impl WhatIsIt for Located<ExprKind> {
             ExprKind::Starred { .. } => "starred".to_string(),
             ExprKind::Name { id, .. } => format!("name: {}", id),
             ExprKind::List { .. } => "list".to_string(),
-            ExprKind::Tuple { .. } => "tuple".to_string(),
+            ExprKind::Tuple { elts, .. } => {
+                let types: Vec<String> = elts.iter().map(|elt| elt.to_display_string()).collect();
+                format!("tuple: {:?}", types)
+            }
             ExprKind::Slice { .. } => "slice".to_string(),
         };
         eprintln!("This Expr Kind is a {}", expr_kind_type);
@@ -308,18 +324,20 @@ impl WhatIsIt for Located<ExprKind> {
 
 impl ToDisplayString for Constant {
     fn to_display_string(&self) -> String {
-        match self {
-            Constant::None => "None",
-            Constant::Bool(_) => "bool",
-            Constant::Str(_) => "str",
-            Constant::Bytes(_) => "bytes",
-            Constant::Int(_) => "int",
-            Constant::Tuple(_) => "tuple",
-            Constant::Float(_) => "float",
-            Constant::Complex { .. } => "complex",
-            Constant::Ellipsis => "ellipsis",
-        }
-        .to_string()
+        format!(
+            "Constant: {}",
+            match self {
+                Constant::None => "None",
+                Constant::Bool(_) => "bool",
+                Constant::Str(_) => "str",
+                Constant::Bytes(_) => "bytes",
+                Constant::Int(_) => "int",
+                Constant::Tuple(_) => "tuple",
+                Constant::Float(_) => "float",
+                Constant::Complex { .. } => "complex",
+                Constant::Ellipsis => "ellipsis",
+            },
+        )
     }
 }
 
@@ -362,7 +380,10 @@ impl ToDisplayString for Located<ExprKind> {
             ExprKind::Starred { .. } => "starred".to_string(),
             ExprKind::Name { id, .. } => format!("name: {}", id),
             ExprKind::List { .. } => "list".to_string(),
-            ExprKind::Tuple { .. } => "tuple".to_string(),
+            ExprKind::Tuple { elts, .. } => {
+                let types: Vec<String> = elts.iter().map(|elt| elt.to_display_string()).collect();
+                format!("tuple: {:?}", types)
+            }
             ExprKind::Slice { .. } => "slice".to_string(),
         };
         format!("Located<ExprKind>: {}", expr_kind)

@@ -1,5 +1,5 @@
 use quote::{format_ident, quote};
-use rustpython_parser::ast::StmtKind;
+use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::KybraExpr;
 use cdk_framework::{
@@ -10,6 +10,11 @@ use cdk_framework::{
 use super::KybraStmt;
 
 impl KybraStmt<'_> {
+    pub fn is_canister_method_stmt(&self) -> bool {
+        self.is_canister_method_type(CanisterMethodType::Update)
+            || self.is_canister_method_type(CanisterMethodType::Query)
+    }
+
     pub fn is_canister_method_type(&self, canister_method_type: CanisterMethodType) -> bool {
         self.is_decorator_same_as(match canister_method_type {
             CanisterMethodType::Heartbeat => "heartbeat",
@@ -28,7 +33,7 @@ impl KybraStmt<'_> {
                 decorator_list
                     .iter()
                     .any(|expr_kind| match &expr_kind.node {
-                        rustpython_parser::ast::ExprKind::Name { id, .. } => id == decorator_name,
+                        ExprKind::Name { id, .. } => id == decorator_name,
                         _ => false,
                     })
             }
