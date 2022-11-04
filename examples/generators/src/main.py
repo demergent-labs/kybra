@@ -1,9 +1,9 @@
-from kybra import Async, blob, call, Canister, CanisterResult, Principal, update
+from kybra import Async, blob, Canister, CanisterResult, method, Principal, update
 
-# TODO rerun dfx generate once cross canister calls are fully implemented
+# TODO create a special system canisters module like in Azle
 
 class ManagementCanister(Canister):
-    @call
+    @method
     def raw_rand(self) -> blob: ...
 
 @update

@@ -231,7 +231,7 @@ class AsyncInfo:
         _kybra_ic['notify_function_name'] # type: ignore
 
 # TODO watch out for *kwargs
-def call(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
+def method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
     def intermediate_func(*args): # type: ignore
         the_self = args[0] # type: ignore
         selfless_args = args[1:] # type: ignore
