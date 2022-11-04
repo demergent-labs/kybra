@@ -3,17 +3,95 @@
 import kybra
 import modulegraph.modulegraph
 import os
+import re
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
-# This is the name of the canister passed into python -m kybra from the dfx.json build command
-canister_name = sys.argv[1]
+# region Colors
+def red(text):
+    return f'\x1b[31m{text}\x1b[0m'
 
-print(f'\nBuilding canister {canister_name}\n')
+def yellow(text):
+    return f'\x1b[33m{text}\x1b[0m'
+
+def green(text):
+    return f'\x1b[32m{text}\x1b[0m'
+
+def blue(text):
+    return f'\x1b[34m{text}\x1b[0m'
+
+def purple(text):
+    return f'\x1b[35m{text}\x1b[0m'
+
+def dim(text):
+    return f'\x1b[2m{text}\x1b[0m'
+# endregion Colors
+
+# region Helper Methods
+def parse_args(args: list[str]):
+    args = args[1:] # Discard the path to kybra
+
+    flags = [arg for arg in args if (arg.startswith('-') or arg.startswith('--')) ]
+    args = [arg for arg in args if not (arg.startswith('-') or arg.startswith('--')) ]
+
+    if len(args) == 0:
+        print('\nkybra v0.0.4')
+        print('\nUsage: kybra [-v|--verbose] <canister_name> <entry_point> <did_path>')
+        sys.exit(0)
+
+    if len(args) != 3:
+        print(red('\n💣 wrong number of arguments\n'))
+        print('Usage: kybra [-v|--verbose] <canister_name> <entry_point> <did_path>')
+        print('\n💀 Build failed!')
+        sys.exit(1)
+
+    return {
+        'empty': False,
+        'flags': {
+            'verbose': '--verbose' in flags or '-v' in flags
+        },
+        'canister_name': args[0],
+        'entry_point': args[1],
+        'did_path': args[2]
+    }
+
+def parse_kybra_generate_error(stdout: bytes):
+    err = stdout.decode('utf-8')
+    std_err_lines = err.splitlines()
+    try:
+        line_where_error_message_starts = next(i for i,v in enumerate(std_err_lines) if v.startswith("thread 'main' panicked at '"))
+        line_where_error_message_ends = next(i for i,v in enumerate(std_err_lines) if "', src/" in v)
+    except:
+        return 'The underlying cause is likely at the bottom of the following output:\n\n' + err
+
+    err_lines = std_err_lines[line_where_error_message_starts:line_where_error_message_ends + 1]
+    err_lines[0] = err_lines[0].replace("thread 'main' panicked at '", '')
+    err_lines[-1] = re.sub("', src\/.*", "", err_lines[-1])
+
+    return red("\n".join(err_lines))
+
+def create_file(file_path: str, contents: str):
+    file = open(file_path, 'w')
+    file.write(contents)
+    file.close()
+# endregion Helper Methods
+
+args = parse_args(sys.argv)
+
+
+# if args['flags']['verbose']:
+#     print('We are in verbose mode!')
+
+# This is the name of the canister passed into python -m kybra from the dfx.json build command
+canister_name = args['canister_name']
+
+print(f'\nBuilding canister {green(canister_name)}')
 
 # This is the path to the developer's entry point Python file passed into python -m kybra from the dfx.json build command
-py_entry_file_path = sys.argv[2]
+py_entry_file_path = args['entry_point']
+
 
 # This is the Python module name of the developer's Python project, derived from the entry point Python file passed into python -m kybra from the dfx.json build command
 py_entry_module_name = Path(py_entry_file_path).stem
@@ -24,7 +102,7 @@ canister_path=f'.dfx/kybra/{canister_name}'
 py_file_names_file_path = f'{canister_path}/file_names.txt'
 
 # This is the path to the developer's Candid file passed into python -m kybra from the dfx.json build command
-did_path = sys.argv[3]
+did_path = args['did_path']
 
 # This is the path to the Kybra compiler Rust code delivered with the Python package
 compiler_path = os.path.dirname(kybra.__file__) + '/compiler'
@@ -99,13 +177,34 @@ os.system('rustup target add wasm32-unknown-unknown')
 os.system('cargo install ic-cdk-optimizer --version 0.3.4 || true')
 # os.system('cargo install ic-wasm --version 0.3.0 || true')
 
-py_file_names_file = open(py_file_names_file_path, 'w')
-py_file_names_file.write(','.join(py_file_names))
-py_file_names_file.close()
+create_file(py_file_names_file_path, ','.join(py_file_names))
 
 # Generate the Rust code
 print('[1/3] 🔨 Compiling Python...')
-os.system(f'CARGO_TARGET_DIR={target_path} cargo run --manifest-path {canister_path}/kybra_generate/Cargo.toml {py_file_names_file_path} {py_entry_module_name} | rustfmt --edition 2018 > {lib_path}')
+cargo_run_env = os.environ.copy()
+cargo_run_env['CARGO_TARGET_DIR'] = target_path # TODO: Find a way to combine this and line above
+kybra_generate_result = subprocess.run(['cargo', 'run', f'--manifest-path={canister_path}/kybra_generate/Cargo.toml', py_file_names_file_path, py_entry_module_name], capture_output=True, env=cargo_run_env)
+
+if kybra_generate_result.returncode != 0:
+    print(red("\n💣 Something about your Python code violates Kybra's requirements\n"))
+    print(parse_kybra_generate_error(kybra_generate_result.stderr))
+    print('\nIf you are unable to decipher the error above, reach out in the #typescript')
+    print('channel of the DFINITY DEV OFFICIAL discord:')
+    print('\nhttps://discord.com/channels/748416164832608337/1019372359775440988\n')
+    sys.exit(1)
+
+generated_rust_code = kybra_generate_result.stdout
+
+rustfmt_result = subprocess.run(['rustfmt', '--edition=2018'], capture_output=True, input=generated_rust_code)
+
+if rustfmt_result.returncode != 0:
+    print(red("\n💣 Kybra has experienced an internal error while trying to\n   format your generated rust canister"))
+    print(f'\nPlease open an issue at https://github.com/demergent-labs/kybra/issues/new\nincluding this message and the following error:\n\n {red(rustfmt_result.stderr.decode("utf-8"))}')
+    sys.exit(1)
+
+formatted_lib_file = rustfmt_result.stdout.decode('utf-8')
+
+create_file(lib_path, formatted_lib_file)
 
 # Compile the generated Rust code
 print('[2/3] 🚧 Building Wasm binary...')
