@@ -299,7 +299,10 @@ impl WhatIsIt for Located<ExprKind> {
             ExprKind::Starred { .. } => "starred".to_string(),
             ExprKind::Name { id, .. } => format!("name: {}", id),
             ExprKind::List { .. } => "list".to_string(),
-            ExprKind::Tuple { .. } => "tuple".to_string(),
+            ExprKind::Tuple { elts, .. } => {
+                let types: Vec<String> = elts.iter().map(|elt| elt.to_display_string()).collect();
+                format!("tuple: {:?}", types)
+            }
             ExprKind::Slice { .. } => "slice".to_string(),
         };
         eprintln!("This Expr Kind is a {}", expr_kind_type);
@@ -308,18 +311,20 @@ impl WhatIsIt for Located<ExprKind> {
 
 impl ToDisplayString for Constant {
     fn to_display_string(&self) -> String {
-        match self {
-            Constant::None => "None",
-            Constant::Bool(_) => "bool",
-            Constant::Str(_) => "str",
-            Constant::Bytes(_) => "bytes",
-            Constant::Int(_) => "int",
-            Constant::Tuple(_) => "tuple",
-            Constant::Float(_) => "float",
-            Constant::Complex { .. } => "complex",
-            Constant::Ellipsis => "ellipsis",
-        }
-        .to_string()
+        format!(
+            "Constant: {}",
+            match self {
+                Constant::None => "None",
+                Constant::Bool(_) => "bool",
+                Constant::Str(_) => "str",
+                Constant::Bytes(_) => "bytes",
+                Constant::Int(_) => "int",
+                Constant::Tuple(_) => "tuple",
+                Constant::Float(_) => "float",
+                Constant::Complex { .. } => "complex",
+                Constant::Ellipsis => "ellipsis",
+            },
+        )
     }
 }
 
@@ -362,7 +367,10 @@ impl ToDisplayString for Located<ExprKind> {
             ExprKind::Starred { .. } => "starred".to_string(),
             ExprKind::Name { id, .. } => format!("name: {}", id),
             ExprKind::List { .. } => "list".to_string(),
-            ExprKind::Tuple { .. } => "tuple".to_string(),
+            ExprKind::Tuple { elts, .. } => {
+                let types: Vec<String> = elts.iter().map(|elt| elt.to_display_string()).collect();
+                format!("tuple: {:?}", types)
+            }
             ExprKind::Slice { .. } => "slice".to_string(),
         };
         format!("Located<ExprKind>: {}", expr_kind)
