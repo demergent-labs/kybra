@@ -1,5 +1,17 @@
-pub fn generate_async_result_handler() -> proc_macro2::TokenStream {
-    quote::quote! {
+use cdk_framework::nodes::act_external_canister::ActExternalCanister;
+use quote::{format_ident, quote};
+
+// TODO remember that cdk_framework needs a way to define the _azle or _kybra or whatever prefix
+
+pub fn generate_async_result_handler(
+    external_canisters: &Vec<ActExternalCanister>,
+) -> proc_macro2::TokenStream {
+    let call_match_arms = generate_call_match_arms(external_canisters);
+    let call_with_payment_match_arms = generate_call_with_payment_match_arms(external_canisters);
+    let call_with_payment128_match_arms =
+        generate_call_with_payment128_match_arms(external_canisters);
+
+    quote! {
         #[async_recursion::async_recursion(?Send)]
         async fn _kybra_async_result_handler(vm: &rustpython::vm::VirtualMachine, py_object_ref: &rustpython::vm::PyObjectRef, arg: PyObjectRef) -> rustpython::vm::PyObjectRef {
             if _kybra_is_generator(vm, &py_object_ref) == false {
@@ -22,6 +34,8 @@ pub fn generate_async_result_handler() -> proc_macro2::TokenStream {
 
                     match &name[..] {
                         "call" => _kybra_async_result_handler_call(vm, py_object_ref, &args).await,
+                        "call_with_payment" => _kybra_async_result_handler_call_with_payment(vm, py_object_ref, &args).await,
+                        "call_with_payment128" => _kybra_async_result_handler_call_with_payment128(vm, py_object_ref, &args).await,
                         "call_raw" => _kybra_async_result_handler_call_raw(vm, py_object_ref, &args).await,
                         "call_raw128" => _kybra_async_result_handler_call_raw128(vm, py_object_ref, &args).await,
                         _ => panic!("async operation not supported")
@@ -41,29 +55,49 @@ pub fn generate_async_result_handler() -> proc_macro2::TokenStream {
             }
         }
 
+        // TODO some _azle prefixes need to be changed once the cdk_framework is updated
         async fn _kybra_async_result_handler_call(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
             let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
             let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
 
-            ic_cdk::println!("qualname: {}", qualname);
-
-            let cross_canister_call_function_name = format!("_kybra_call_{}", qualname.replace(".", "_"));
-
-            ic_cdk::println!("cross_canister_call_function_name: {}", cross_canister_call_function_name);
-
-            // TODO once we have the external canisters built, we should be able to create the match arms
-            // TODO just match on the cross canister call function name, and then call try_from_vm_value on each param
-            // TODO get the result and turn it into the CanisterResult tuple
+            let cross_canister_call_function_name = format!("_azle_call_{}", qualname.replace(".", "_"));
 
             let call_result_instance = match &cross_canister_call_function_name[..] {
-                "_kybra_call_ManagementCanister_raw_rand" => {
-                    // TODO dynamically add params, calling try_from_vm_value on args
-                    create_call_result_instance(vm, _kybra_call_ManagementCanister_raw_rand(canister_id_principal).await)
-                },
+                #(#call_match_arms),*
                 _ => panic!("cross canister function does not exist")
             };
 
-            _kybra_async_result_handler(vm, py_object_ref, call_result_instance.into()).await
+            _kybra_async_result_handler(vm, py_object_ref, call_result_instance).await
+        }
+
+        // TODO some _azle prefixes need to be changed once the cdk_framework is updated
+        async fn _kybra_async_result_handler_call_with_payment(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
+            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
+            let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
+
+            let cross_canister_call_with_payment_function_name = format!("_azle_call_with_payment_{}", qualname.replace(".", "_"));
+
+            let call_result_instance = match &cross_canister_call_with_payment_function_name[..] {
+                #(#call_with_payment_match_arms),*
+                _ => panic!("cross canister function does not exist")
+            };
+
+            _kybra_async_result_handler(vm, py_object_ref, call_result_instance).await
+        }
+
+        // TODO some _azle prefixes need to be changed once the cdk_framework is updated
+        async fn _kybra_async_result_handler_call_with_payment128(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
+            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
+            let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
+
+            let cross_canister_call_with_payment128_function_name = format!("_azle_call_with_payment128_{}", qualname.replace(".", "_"));
+
+            let call_result_instance = match &cross_canister_call_with_payment128_function_name[..] {
+                #(#call_with_payment128_match_arms),*
+                _ => panic!("cross canister function does not exist")
+            };
+
+            _kybra_async_result_handler(vm, py_object_ref, call_result_instance).await
         }
 
         async fn _kybra_async_result_handler_call_raw(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
@@ -79,7 +113,7 @@ pub fn generate_async_result_handler() -> proc_macro2::TokenStream {
                 payment
             ).await;
 
-            _kybra_async_result_handler(vm, py_object_ref, create_call_result_instance(vm, call_raw_result).into()).await
+            _kybra_async_result_handler(vm, py_object_ref, create_call_result_instance(vm, call_raw_result)).await
         }
 
         async fn _kybra_async_result_handler_call_raw128(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
@@ -95,7 +129,7 @@ pub fn generate_async_result_handler() -> proc_macro2::TokenStream {
                 payment
             ).await;
 
-            _kybra_async_result_handler(vm, py_object_ref, create_call_result_instance(vm, call_raw_result).into()).await
+            _kybra_async_result_handler(vm, py_object_ref, create_call_result_instance(vm, call_raw_result)).await
         }
 
         fn create_call_result_instance<T>(vm: &rustpython::vm::VirtualMachine, call_result: CallResult<T>) -> PyObjectRef
@@ -139,14 +173,174 @@ CanisterResult
                 }
             }
         }
-
-        // TODO remove all of these hard-coded cross canister call functions once cross canister functions are generated automatically
-        async fn _kybra_call_ManagementCanister_raw_rand(canister_id_principal: ic_cdk::export::Principal) -> CallResult<(Vec<u8>,)> {
-            ic_cdk::api::call::call(
-                canister_id_principal,
-                "raw_rand",
-                ()
-            ).await
-        }
     }
+}
+
+fn generate_call_match_arms(
+    external_canisters: &Vec<ActExternalCanister>,
+) -> Vec<proc_macro2::TokenStream> {
+    external_canisters
+    .iter()
+    .map(|act_external_canister| {
+        let canister_name = &act_external_canister.name;
+
+        let arms: Vec<proc_macro2::TokenStream> = act_external_canister
+            .methods
+            .iter()
+            .map(|act_external_canister_method| {
+                let cross_canister_function_call_name = format!(
+                    "_azle_call_{}_{}",
+                    canister_name, act_external_canister_method.name
+                );
+
+                let cross_canister_function_call_name_ident = format_ident!("{}", cross_canister_function_call_name);
+
+                let param_variable_definitions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
+                    let variable_name = format_ident!("{}", act_fn_param.name);
+                    let actual_index = index + 2;
+
+                    quote! {
+                        let #variable_name = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
+                    }
+                }).collect();
+
+                let param_vm_value_conversions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
+                    let param_name = format_ident!("{}", act_fn_param.name);
+
+                    quote!(#param_name.try_from_vm_value(vm).unwrap())
+                }).collect();
+
+                quote! {
+                    #cross_canister_function_call_name => {
+                        let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
+
+                        #(#param_variable_definitions)*
+
+                        create_call_result_instance(vm, #cross_canister_function_call_name_ident(canister_id_principal, #(#param_vm_value_conversions),*).await)
+                    }
+                }
+            })
+            .collect();
+
+        quote! {
+            #(#arms)*
+        }
+    })
+    .collect()
+}
+
+fn generate_call_with_payment_match_arms(
+    external_canisters: &Vec<ActExternalCanister>,
+) -> Vec<proc_macro2::TokenStream> {
+    external_canisters
+    .iter()
+    .map(|act_external_canister| {
+        let canister_name = &act_external_canister.name;
+
+        let arms: Vec<proc_macro2::TokenStream> = act_external_canister
+            .methods
+            .iter()
+            .map(|act_external_canister_method| {
+                let cross_canister_function_call_with_payment_name = format!(
+                    "_azle_call_with_payment_{}_{}",
+                    canister_name, act_external_canister_method.name
+                );
+
+                let cross_canister_function_call_with_payment_name_ident = format_ident!("{}", cross_canister_function_call_with_payment_name);
+
+                let param_variable_definitions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
+                    let variable_name = format_ident!("{}", act_fn_param.name);
+                    let actual_index = index + 2;
+
+                    quote! {
+                        let #variable_name = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
+                    }
+                }).collect();
+
+                let param_vm_value_conversions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
+                    let param_name = format_ident!("{}", act_fn_param.name);
+
+                    quote!(#param_name.try_from_vm_value(vm).unwrap())
+                }).collect();
+
+                let payment_comma = if act_external_canister_method.params.len() == 0 { quote! {} } else { quote! { , } };
+                let payment_index = act_external_canister_method.params.len() + 2;
+                let payment_variable_definition = quote!(let payment: u64 = args[#payment_index].clone().try_from_vm_value(vm).unwrap(););
+
+                quote! {
+                    #cross_canister_function_call_with_payment_name => {
+                        let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
+
+                        #(#param_variable_definitions)*
+                        #payment_variable_definition
+
+                        create_call_result_instance(vm, #cross_canister_function_call_with_payment_name_ident(canister_id_principal, #(#param_vm_value_conversions),* #payment_comma payment).await)
+                    }
+                }
+            })
+            .collect();
+
+        quote! {
+            #(#arms)*
+        }
+    })
+    .collect()
+}
+
+fn generate_call_with_payment128_match_arms(
+    external_canisters: &Vec<ActExternalCanister>,
+) -> Vec<proc_macro2::TokenStream> {
+    external_canisters
+    .iter()
+    .map(|act_external_canister| {
+        let canister_name = &act_external_canister.name;
+
+        let arms: Vec<proc_macro2::TokenStream> = act_external_canister
+            .methods
+            .iter()
+            .map(|act_external_canister_method| {
+                let cross_canister_function_call_with_payment128_name = format!(
+                    "_azle_call_with_payment128_{}_{}",
+                    canister_name, act_external_canister_method.name
+                );
+
+                let cross_canister_function_call_with_payment128_name_ident = format_ident!("{}", cross_canister_function_call_with_payment128_name);
+
+                let param_variable_definitions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
+                    let variable_name = format_ident!("{}", act_fn_param.name);
+                    let actual_index = index + 2;
+
+                    quote! {
+                        let #variable_name = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
+                    }
+                }).collect();
+
+                let param_vm_value_conversions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
+                    let param_name = format_ident!("{}", act_fn_param.name);
+
+                    quote!(#param_name.try_from_vm_value(vm).unwrap())
+                }).collect();
+
+                let payment_comma = if act_external_canister_method.params.len() == 0 { quote! {} } else { quote! { , } };
+                let payment_index = act_external_canister_method.params.len() + 2;
+                let payment_variable_definition = quote!(let payment: u128 = args[#payment_index].clone().try_from_vm_value(vm).unwrap(););
+
+                quote! {
+                    #cross_canister_function_call_with_payment128_name => {
+                        let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
+
+                        #(#param_variable_definitions)*
+                        #payment_variable_definition
+
+                        create_call_result_instance(vm, #cross_canister_function_call_with_payment128_name_ident(canister_id_principal, #(#param_vm_value_conversions),* #payment_comma payment).await)
+                    }
+                }
+            })
+            .collect();
+
+        quote! {
+            #(#arms)*
+        }
+    })
+    .collect()
 }

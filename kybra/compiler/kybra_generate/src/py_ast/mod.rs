@@ -37,7 +37,7 @@ impl PyAst<'_> {
         ]
         .concat();
 
-        let async_result_handler = generate_async_result_handler();
+        let async_result_handler = generate_async_result_handler(&vec![]);
 
         let rust_code = quote! {
             pub fn unwrap_rust_python_result<T>(
