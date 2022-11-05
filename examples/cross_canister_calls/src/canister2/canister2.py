@@ -1,5 +1,5 @@
 from kybra import ic, nat64, opt, query, update
-from .types import Account, AccountArgs, State
+from src.canister2.types import Account, AccountArgs, State
 
 state: State = {
     'accounts': {
@@ -11,21 +11,29 @@ state: State = {
     'notification': ''
 }
 
+# TODO Update Azle's example to match the changes here
 @update
 def transfer(
     from_: str,
     to: str,
     amount: nat64
 ) -> nat64:
-    # TODO check and make sure this all works well
-    from_balance = state['accounts'][from_].get('balance', 0)
+    from_account = state['accounts'].get(from_, None)
+
+    if from_account is None:
+        state['accounts'][from_] = {
+            'id': from_,
+            'balance': 0
+        }
+
+    from_balance = state['accounts'][from_]['balance']
 
     if from_balance < amount:
         return 0
 
-    to_balance = state['accounts'][to]['balance']
+    to_account = state['accounts'].get(to, None)
 
-    if  to_balance is None:
+    if  to_account is None:
         state['accounts'][to] = {
             'id': to,
             'balance': 0
@@ -38,7 +46,7 @@ def transfer(
 
 @query
 def balance(id: str) -> nat64:
-    return state['accounts'][id].get('balance', 0) # TODO test none stuff
+    return state['accounts'].get(id, {}).get('balance', 0)
 
 @query
 def account(account_args: AccountArgs) -> opt[Account]:

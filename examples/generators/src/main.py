@@ -12,7 +12,7 @@ def get_randomness_directly() -> Async[blob]:
 
     randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if randomness_result.ok is None:
+    if randomness_result.err is not None:
         return bytes()
 
     return randomness_result.ok
@@ -48,7 +48,7 @@ def get_randomness() -> Async[blob]:
 
     randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if randomness_result.ok is None:
+    if randomness_result.err is not None:
         return bytes()
 
     return randomness_result.ok

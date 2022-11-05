@@ -77,12 +77,18 @@ for node in flattened_graph:
     if type(node) == modulegraph.modulegraph.Package:
         shutil.copytree(node.packagepath[0], f'{python_source_path}/{node.identifier}', dirs_exist_ok=True)
 
+    if type(node) == modulegraph.modulegraph.NamespacePackage:
+        shutil.copytree(node.packagepath[0], f'{python_source_path}/{node.identifier}', dirs_exist_ok=True)
+
 py_file_names = list(
     filter(
         lambda filename: filename is not None,
         map(
             lambda node: node.filename,
-            flattened_graph
+            filter(
+                lambda node: node.filename is not '-', # This filters out namespace packages
+                flattened_graph
+            )
         )
     )
 )

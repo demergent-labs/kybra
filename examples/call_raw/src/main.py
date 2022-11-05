@@ -18,7 +18,7 @@ def execute_call_raw(
         payment
     )
 
-    if canister_result.ok is None:
+    if canister_result.err is not None:
         return {
             'err': canister_result.err
         }
@@ -45,7 +45,7 @@ def execute_call_raw128(
         payment
     )
 
-    if canister_result.ok is None:
+    if canister_result.err is not None:
         return {
             'err': canister_result.err
         }

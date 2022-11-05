@@ -65,14 +65,14 @@ Update = Callable
 Oneway = Callable
 
 class CanisterResult(Generic[T]):
-    ok: Optional[T]
-    err: str
+    ok: T
+    err: Optional[str]
 
     def __init__(self, ok: T, err: str):
         self.ok = ok
         self.err = err
 
-    def notify(self) -> "CanisterResult[None]": ...
+    def notify(self) -> "NotifyResult": ...
 
     def with_cycles(self, cycles: nat64) -> "CanisterResult[T]": ...
 
@@ -94,7 +94,8 @@ class RejectionCode(Variant, total=False):
     CanisterError: None
     Unknown: None
 
-class NotifyRawResult(Variant, total=False):
+# TODO we might want this to act more like CanisterResult
+class NotifyResult(Variant, total=False):
     ok: None
     err: RejectionCode
 
@@ -157,7 +158,7 @@ class ic(Generic[T]):
         method: str,
         args_raw: blob,
         payment: nat
-    ) -> NotifyRawResult:
+    ) -> NotifyResult:
         return _kybra_ic.notify_raw(canister_id, method, args_raw, payment) # type: ignore
 
     @staticmethod
@@ -226,9 +227,9 @@ class AsyncInfo:
     def with_cycles128(self, cycles: nat) -> "AsyncInfo":
         return AsyncInfo('call_with_payment128', [*self.args, cycles])
 
-    def notify(self):
+    def notify(self) -> NotifyResult:
         # TODO calculate the notify function name here...actually, maybe we should just do this in the same way as the other calls? Just to keep it simple?
-        _kybra_ic['notify_function_name'] # type: ignore
+        return _kybra_ic['notify_function_name'] # type: ignore
 
 # TODO watch out for *kwargs
 def method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:

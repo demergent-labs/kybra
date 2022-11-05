@@ -1,4 +1,4 @@
-use cdk_framework::nodes::act_external_canister::ActExternalCanister;
+use cdk_framework::{nodes::act_external_canister::ActExternalCanister, ToTokenStream};
 use quote::{format_ident, quote};
 
 // TODO remember that cdk_framework needs a way to define the _azle or _kybra or whatever prefix
@@ -197,17 +197,18 @@ fn generate_call_match_arms(
 
                 let param_variable_definitions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
                     let variable_name = format_ident!("{}", act_fn_param.name);
+                    let variable_type = act_fn_param.data_type.to_token_stream();
                     let actual_index = index + 2;
 
                     quote! {
-                        let #variable_name = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
+                        let #variable_name: #variable_type = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
                     }
                 }).collect();
 
-                let param_vm_value_conversions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
+                let param_names: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
                     let param_name = format_ident!("{}", act_fn_param.name);
 
-                    quote!(#param_name.try_from_vm_value(vm).unwrap())
+                    quote!(#param_name)
                 }).collect();
 
                 quote! {
@@ -216,7 +217,7 @@ fn generate_call_match_arms(
 
                         #(#param_variable_definitions)*
 
-                        create_call_result_instance(vm, #cross_canister_function_call_name_ident(canister_id_principal, #(#param_vm_value_conversions),*).await)
+                        create_call_result_instance(vm, #cross_canister_function_call_name_ident(canister_id_principal, #(#param_names),*).await)
                     }
                 }
             })
@@ -250,17 +251,18 @@ fn generate_call_with_payment_match_arms(
 
                 let param_variable_definitions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
                     let variable_name = format_ident!("{}", act_fn_param.name);
+                    let variable_type = act_fn_param.data_type.to_token_stream();
                     let actual_index = index + 2;
 
                     quote! {
-                        let #variable_name = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
+                        let #variable_name: #variable_type = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
                     }
                 }).collect();
 
-                let param_vm_value_conversions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
+                let param_names: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
                     let param_name = format_ident!("{}", act_fn_param.name);
 
-                    quote!(#param_name.try_from_vm_value(vm).unwrap())
+                    quote!(#param_name)
                 }).collect();
 
                 let payment_comma = if act_external_canister_method.params.len() == 0 { quote! {} } else { quote! { , } };
@@ -274,7 +276,7 @@ fn generate_call_with_payment_match_arms(
                         #(#param_variable_definitions)*
                         #payment_variable_definition
 
-                        create_call_result_instance(vm, #cross_canister_function_call_with_payment_name_ident(canister_id_principal, #(#param_vm_value_conversions),* #payment_comma payment).await)
+                        create_call_result_instance(vm, #cross_canister_function_call_with_payment_name_ident(canister_id_principal, #(#param_names),* #payment_comma payment).await)
                     }
                 }
             })
@@ -308,17 +310,18 @@ fn generate_call_with_payment128_match_arms(
 
                 let param_variable_definitions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
                     let variable_name = format_ident!("{}", act_fn_param.name);
+                    let variable_type = act_fn_param.data_type.to_token_stream();
                     let actual_index = index + 2;
 
                     quote! {
-                        let #variable_name = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
+                        let #variable_name: #variable_type = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
                     }
                 }).collect();
 
-                let param_vm_value_conversions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
+                let param_names: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
                     let param_name = format_ident!("{}", act_fn_param.name);
 
-                    quote!(#param_name.try_from_vm_value(vm).unwrap())
+                    quote!(#param_name)
                 }).collect();
 
                 let payment_comma = if act_external_canister_method.params.len() == 0 { quote! {} } else { quote! { , } };
@@ -332,7 +335,7 @@ fn generate_call_with_payment128_match_arms(
                         #(#param_variable_definitions)*
                         #payment_variable_definition
 
-                        create_call_result_instance(vm, #cross_canister_function_call_with_payment128_name_ident(canister_id_principal, #(#param_vm_value_conversions),* #payment_comma payment).await)
+                        create_call_result_instance(vm, #cross_canister_function_call_with_payment128_name_ident(canister_id_principal, #(#param_names),* #payment_comma payment).await)
                     }
                 }
             })
