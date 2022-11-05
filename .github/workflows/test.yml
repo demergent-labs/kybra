@@ -62,6 +62,8 @@ jobs:
                     "examples/call_raw",
                     "examples/candid_encoding",
                     "examples/counter",
+                    "examples/cross_canister_calls",
+                    "examples/generators",
                     "examples/heartbeat",
                     "examples/imports",
                     "examples/init",
@@ -125,7 +127,7 @@ jobs:
               with:
                   node-version: 18
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-              run: DFX_VERSION=0.12.0-beta.3 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+              run: DFX_VERSION=0.12.0-beta.4 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               name: Install Rust ${{ matrix.rust }}
               uses: actions-rs/toolchain@v1

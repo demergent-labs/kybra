@@ -41,11 +41,11 @@ pub fn kybra_generate(
     eprintln!("-------------------------------------------");
 
     quote! {
-        use ic_cdk::api::call::CallResult;
-        use rustpython_vm::{AsObject, builtins::{PyGenerator, PyListRef, PyTupleRef, PyIntRef}, class::PyClassImpl, convert::ToPyObject, function::IntoFuncArgs, PyObjectRef, VirtualMachine, protocol::{PyIter, PyIterReturn}};
+        use rustpython_vm::{AsObject, builtins::{PyBaseException, PyGenerator, PyListRef, PyTupleRef, PyIntRef}, class::PyClassImpl, convert::ToPyObject, function::IntoFuncArgs, PyObjectRef, PyRef, VirtualMachine, protocol::{PyIter, PyIterReturn}};
         use rustpython_derive::{pyclass, PyPayload};
         use kybra_vm_value_derive::{CdkActTryIntoVmValue, CdkActTryFromVmValue};
         use std::str::FromStr;
+        use ic_cdk::api::call::CallResult;
 
         static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;

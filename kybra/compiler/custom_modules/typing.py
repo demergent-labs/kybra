@@ -28,6 +28,9 @@ def TypeAlias(self, parameters):
 def TypeVar(x):
     pass
 
+def ParamSpec(x):
+    pass
+
 Type = type
 
 def Any(self, parameters):

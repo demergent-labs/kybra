@@ -13,3 +13,4 @@ pub mod stable_grow;
 pub mod stable_read;
 pub mod stable_size;
 pub mod stable_write;
+pub mod trap;

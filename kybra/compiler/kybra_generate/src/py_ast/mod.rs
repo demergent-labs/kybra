@@ -76,9 +76,25 @@ impl PyAst<'_> {
         ]
         .concat();
 
-        let async_result_handler = generate_async_result_handler();
+        let external_canisters = self.build_external_canisters();
+
+        let async_result_handler = generate_async_result_handler(&external_canisters);
 
         let rust_code = quote! {
+            pub fn unwrap_rust_python_result<T>(
+                rust_python_result: Result<T, PyRef<PyBaseException>>,
+                vm: &rustpython::vm::VirtualMachine
+            ) -> T {
+                match rust_python_result {
+                    Ok(ok) => ok,
+                    Err(err) => {
+                        let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+
+                        panic!("{}", err_string);
+                    },
+                }
+            }
+
             #async_result_handler
         };
 
@@ -90,7 +106,7 @@ impl PyAst<'_> {
             heartbeat: self.build_heartbeat_method(),
             canister_types: all_types,
             canister_methods: self.build_canister_methods(),
-            external_canisters: self.build_external_canisters(),
+            external_canisters,
             rust_code,
         }
     }
