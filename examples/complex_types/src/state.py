@@ -1,4 +1,4 @@
-from .candid_types import ReactionType
+from src.candid_types import ReactionType
 from typing import TypedDict
 
 state: "State" = {

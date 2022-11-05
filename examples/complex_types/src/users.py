@@ -1,9 +1,6 @@
 from kybra import nat32, query, update
-from .candid_types import User
-from .posts import get_post_from_state_post
-from .reactions import get_reaction_from_state_reaction
-from .state import state, StateUser
-from .threads import get_thread_from_state_thread
+from src.candid_types import User
+from src.state import state, StateUser
 
 @update
 def create_user(username: str, join_depth: nat32) -> User:
@@ -36,6 +33,11 @@ def get_user_from_state_user(
     state_user: StateUser,
     join_depth: nat32
 ) -> User:
+    # These are here because of problems with circular dependencies
+    from src.posts import get_post_from_state_post
+    from src.reactions import get_reaction_from_state_reaction
+    from src.threads import get_thread_from_state_thread
+
     if join_depth == 0:
         return {
             'id': state_user['id'],

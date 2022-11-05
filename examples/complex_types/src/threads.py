@@ -1,8 +1,6 @@
 from kybra import nat32, query, update
-from .candid_types import Thread
-from .posts import get_post_from_state_post
-from .state import state, StateThread, StateUser
-from .users import get_user_from_state_user
+from src.candid_types import Thread
+from src.state import state, StateThread, StateUser
 
 @update
 def create_thread(
@@ -43,6 +41,10 @@ def get_thread_from_state_thread(
     state_thread: StateThread,
     join_depth: nat32
 ) -> Thread:
+    # These are here because of problems with circular dependencies
+    from src.posts import get_post_from_state_post
+    from src.users import get_user_from_state_user
+
     state_author = state['users'][state_thread['author_id']]
     author = get_user_from_state_user(state_author, join_depth)
 
