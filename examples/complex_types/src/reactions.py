@@ -1,8 +1,6 @@
 from kybra import nat32, query, update
-from .candid_types import Reaction, ReactionType
-from .posts import get_post_from_state_post
-from .state import state, StatePost, StateReaction, StateUser
-from .users import get_user_from_state_user
+from src.candid_types import Reaction, ReactionType
+from src.state import state, StatePost, StateReaction, StateUser
 
 @update
 def create_reaction(
@@ -52,6 +50,10 @@ def get_reaction_from_state_reaction(
     state_reaction: StateReaction,
     join_depth: nat32
 ) -> Reaction:
+    # These are here because of problems with circular dependencies
+    from src.posts import get_post_from_state_post
+    from src.users import get_user_from_state_user
+
     state_author = state['users'][state_reaction['author_id']]
     author = get_user_from_state_user(state_author, join_depth)
 
