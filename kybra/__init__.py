@@ -149,8 +149,40 @@ class ic(Generic[T]):
         return _kybra_ic.candid_decode(candid_encoded) # type: ignore
 
     @staticmethod
+    def canister_balance() -> nat64:
+        return _kybra_ic.canister_balance() # type: ignore
+
+    @staticmethod
+    def canister_balance128() -> nat:
+        return _kybra_ic.canister_balance128() # type: ignore
+
+    @staticmethod
     def method_name() -> str:
         return _kybra_ic.method_name() #type:ignore
+
+    @staticmethod
+    def msg_cycles_accept(max_amount: nat64) -> nat64:
+        return _kybra_ic.msg_cycles_accept(max_amount) # type: ignore
+
+    @staticmethod
+    def msg_cycles_accept128(max_amount: nat) -> nat:
+        return _kybra_ic.msg_cycles_accept128(max_amount) # type: ignore
+
+    @staticmethod
+    def msg_cycles_available() -> nat64:
+        return _kybra_ic.msg_cycles_available() # type: ignore
+
+    @staticmethod
+    def msg_cycles_available128() -> nat:
+        return _kybra_ic.msg_cycles_available128() # type: ignore
+
+    @staticmethod
+    def msg_cycles_refunded() -> nat64:
+        return _kybra_ic.msg_cycles_refunded() # type: ignore
+
+    @staticmethod
+    def msg_cycles_refunded128() -> nat:
+        return _kybra_ic.msg_cycles_refunded128() # type: ignore
 
     @staticmethod
     def notify_raw(

@@ -11,7 +11,6 @@ state: State = {
     'notification': ''
 }
 
-# TODO Update Azle's example to match the changes here
 @update
 def transfer(
     from_: str,

@@ -1,7 +1,15 @@
 pub mod accept_message;
 pub mod candid_decode;
 pub mod candid_encode;
+pub mod canister_balance;
+pub mod canister_balance128;
 pub mod method_name;
+pub mod msg_cycles_accept;
+pub mod msg_cycles_accept128;
+pub mod msg_cycles_available;
+pub mod msg_cycles_available128;
+pub mod msg_cycles_refunded;
+pub mod msg_cycles_refunded128;
 pub mod notify_raw;
 pub mod print;
 pub mod stable64_grow;
