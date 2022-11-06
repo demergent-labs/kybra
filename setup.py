@@ -4,7 +4,7 @@ setup(
     name='kybra',
     version='0.0.6',
     package_data={
-        '': ['compiler/**']
+        'kybra': ['compiler/**', 'canisters/**']
     },
     include_package_data=True,
     packages=['kybra'],

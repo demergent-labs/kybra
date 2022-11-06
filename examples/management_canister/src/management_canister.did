@@ -1,0 +1,1 @@
+service : () -> { raw_rand : () -> (vec nat8); test : () -> (text) query }

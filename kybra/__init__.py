@@ -1,4 +1,6 @@
 from typing import Any, Callable, Generator, Generic, NoReturn, Optional, ParamSpec, TypedDict, TypeVar, Type, TypeAlias
+
+# TODO I think we can simplify this just like we're doing with canisters
 from .compiler.custom_modules.principal import Principal
 
 Principal = Principal
