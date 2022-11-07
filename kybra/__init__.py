@@ -115,7 +115,7 @@ class Stable64GrowResultTemp(Variant, total=False):
     err: StableMemoryErrorTemp
 
 # TODO we might want to just make this a dict[int, str] to keep the derive simple, or maybe a class with a principal and method name field
-def Func(callable: Callable) -> Type[tuple[Principal, str]]: # type: ignore
+def Func(callable: Callable[..., Any]) -> Type[tuple[Principal, str]]:
     return type((Principal.from_str('aaaaa-aa'), ''))
 
 # TODO make sure call_raw with notify works

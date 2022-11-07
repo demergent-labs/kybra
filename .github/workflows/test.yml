@@ -71,6 +71,7 @@ jobs:
                     "examples/init",
                     "examples/inspect_message",
                     "examples/key_value_store",
+                    "examples/ledger_canister",
                     "examples/management_canister",
                     "examples/notify_raw",
                     "examples/null_example",
