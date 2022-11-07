@@ -1,4 +1,6 @@
 from typing import Any, Callable, Generator, Generic, NoReturn, Optional, ParamSpec, TypedDict, TypeVar, Type, TypeAlias
+
+# TODO I think we can simplify this just like we're doing with canisters
 from .compiler.custom_modules.principal import Principal
 
 Principal = Principal
@@ -263,6 +265,7 @@ class AsyncInfo:
         # TODO calculate the notify function name here...actually, maybe we should just do this in the same way as the other calls? Just to keep it simple?
         return _kybra_ic['notify_function_name'] # type: ignore
 
+# TODO this decorator is removing the static type checking of the self parameter for instance methods
 # TODO watch out for *kwargs
 def method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
     def intermediate_func(*args): # type: ignore

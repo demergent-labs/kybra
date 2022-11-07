@@ -14,11 +14,11 @@ Please exercise caution when using Kybra. It is alpha software that you use at y
 
 Demergent Labs may officially recommend Kybra for production use when at least the following have occurred:
 
-- [ ] Many example-based unit/integration tests
-- [ ] Feature parity with the Azle, Motoko, and Rust CDKs
-- [ ] Extensive automated benchmarking
-- [ ] Extensive automated property testing
-- [ ] Multiple independent security reviews/audits
+-   [ ] Many example-based unit/integration tests
+-   [ ] Feature parity with the Azle, Motoko, and Rust CDKs
+-   [ ] Extensive automated benchmarking
+-   [ ] Extensive automated property testing
+-   [ ] Multiple independent security reviews/audits
 
 ## Discussion
 
@@ -28,11 +28,11 @@ Feel free to open issues or join us in the [Discord channel](https://discord.com
 
 Most of Kybra's documentation is currently found in this README. The Kybra Book, similar to [Sudograph's](https://i67uk-hiaaa-aaaae-qaaka-cai.raw.ic0.app/), will later be hosted on the Internet Computer.
 
-- [Examples](/examples)
-- [Installation](#installation)
-- [Deployment](#deployment)
-- [Supported Features](#supported-features)
-- [Contributing](#contributing)
+-   [Examples](/examples)
+-   [Installation](#installation)
+-   [Deployment](#deployment)
+-   [Supported Features](#supported-features)
+-   [Contributing](#contributing)
 
 ### Installation
 
@@ -40,10 +40,10 @@ Follow instructions exactly as stated below to avoid issues.
 
 You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)) with bash and have the following installed on your system:
 
-- [Python 3.10.7](#python-3.10.7)
-- [Rust](#rust)
-- [dfx 0.12.0-beta.2](#dfx)
-- [Python VS Code Extension](#python-vs-code-extension)
+-   [Python 3.10.7](#python-3.10.7)
+-   [Rust](#rust)
+-   [dfx 0.12.0-beta.4](#dfx)
+-   [Python VS Code Extension](#python-vs-code-extension)
 
 #### Python 3.10.7
 
@@ -73,9 +73,9 @@ rustup update
 
 The following are some common Rust installation issues:
 
-- Ubuntu
-  - error: linker cc not found (sudo apt install build-essential)
-  - is cmake not installed? (sudo apt install cmake)
+-   Ubuntu
+    -   error: linker cc not found (sudo apt install build-essential)
+    -   is cmake not installed? (sudo apt install cmake)
 
 #### dfx
 
@@ -135,14 +135,14 @@ Your `dfx.json` file should look like this:
 
 ```json
 {
-  "canisters": {
-    "hello_world": {
-      "type": "custom",
-      "build": "python -m kybra hello_world src/main.py src/main.did",
-      "candid": "src/main.did",
-      "wasm": ".dfx/kybra/hello_world/target/wasm32-unknown-unknown/release/hello_world.wasm.gz"
+    "canisters": {
+        "hello_world": {
+            "type": "custom",
+            "build": "python -m kybra hello_world src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/hello_world/target/wasm32-unknown-unknown/release/hello_world.wasm.gz"
+        }
     }
-  }
 }
 ```
 
@@ -204,39 +204,39 @@ You can import modules created locally or installed with `pip`. If you create a 
 
 There is limited support for the `stdlib`. The following modules may be supported as far as [RustPython](https://github.com/RustPython/RustPython) or the IC support them:
 
-- array
-- binascii
-- bisect
-- bz2
-- cmath
-- contextvars
-- csv
-- dis
-- faulthandler
-- fcntl
-- gc
-- grp
-- hashlib
-- json
-- math
-- mmap
-- multiprocessing
-- \_posixsubprocess
-- pyexpat
-- struct
-- random
-- re
-- resource
-- \_scproxy
-- select
-- socket
-- ssl
-- statistics
-- syslog
-- termios
-- unicodedata
-- uuid
-- zlib
+-   array
+-   binascii
+-   bisect
+-   bz2
+-   cmath
+-   contextvars
+-   csv
+-   dis
+-   faulthandler
+-   fcntl
+-   gc
+-   grp
+-   hashlib
+-   json
+-   math
+-   mmap
+-   multiprocessing
+-   \_posixsubprocess
+-   pyexpat
+-   struct
+-   random
+-   re
+-   resource
+-   \_scproxy
+-   select
+-   socket
+-   ssl
+-   statistics
+-   syslog
+-   termios
+-   unicodedata
+-   uuid
+-   zlib
 
 ### Contributing
 
