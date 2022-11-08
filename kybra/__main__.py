@@ -80,18 +80,16 @@ def create_file(file_path: str, contents: str):
 
 args = parse_args(sys.argv)
 
-
 # if args['flags']['verbose']:
 #     print('We are in verbose mode!')
 
 # This is the name of the canister passed into python -m kybra from the dfx.json build command
 canister_name = args['canister_name']
 
-print(f'\nBuilding canister {green(canister_name)}')
+print(f'\nBuilding canister {green(canister_name)}\n')
 
 # This is the path to the developer's entry point Python file passed into python -m kybra from the dfx.json build command
 py_entry_file_path = args['entry_point']
-
 
 # This is the Python module name of the developer's Python project, derived from the entry point Python file passed into python -m kybra from the dfx.json build command
 py_entry_module_name = Path(py_entry_file_path).stem
@@ -115,6 +113,12 @@ generated_did_path = f'{canister_path}/index.did'
 
 # This is the Rust target directory
 target_path=f'{canister_path}/target'
+
+# This is the unzipped generated Wasm that is the canister
+wasm_path = f'{target_path}/wasm32-unknown-unknown/release/{canister_name}.wasm'
+
+# This is the final zipped generated Wasm that will actually run on the Internet Computer
+gzipped_wasm_path = f'{wasm_path}.gz'
 
 cargo_bin_root = os.environ.get('CARGO_INSTALL_ROOT') or os.environ.get('CARGO_HOME') or f'{os.environ["HOME"]}/.cargo'
 
@@ -171,19 +175,35 @@ py_file_names = list(
     )
 )
 
+print('[1/3] 🔨 Compiling Python...')
+
 # Rust prerequisites
-os.system('rustup target add wasm32-unknown-unknown')
+add_wasm_target_result = subprocess.run(['rustup', 'target', 'add', 'wasm32-unknown-unknown'], capture_output=True)
+
+if add_wasm_target_result.returncode != 0:
+    print(red("\n💣 Unable to add wasm32-unknown-unknown compilation target\n"))
+    print(add_wasm_target_result.stderr.decode('utf-8'))
+    print('💀 Build failed')
+    sys.exit(1)
+
+
 # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/43?u=lastmjs
-os.system('cargo install ic-cdk-optimizer --version 0.3.4 || true')
-# os.system('cargo install ic-wasm --version 0.3.0 || true')
+install_cdk_optimizer_result = subprocess.run(['cargo', 'install', 'ic-cdk-optimizer', '--version=0.3.4'], capture_output=True)
+# install_cdk_optimizer_result = subprocess.run(['cargo', 'install', 'ic-wasm', '--version=0.3.0'], capture_output=True)
+
+if install_cdk_optimizer_result.returncode != 0:
+    print(red("\n💣 Unable to install dependency \"ic-cdk-optimizer\"\n"))
+    print(install_cdk_optimizer_result.stderr.decode('utf-8'))
+    print('💀 Build failed')
+    sys.exit(1)
 
 create_file(py_file_names_file_path, ','.join(py_file_names))
 
+# Add CARGO_TARGET_DIR to env for all cargo commands
+cargo_env = { **os.environ.copy(), 'CARGO_TARGET_DIR': target_path }
+
 # Generate the Rust code
-print('[1/3] 🔨 Compiling Python...')
-cargo_run_env = os.environ.copy()
-cargo_run_env['CARGO_TARGET_DIR'] = target_path # TODO: Find a way to combine this and line above
-kybra_generate_result = subprocess.run(['cargo', 'run', f'--manifest-path={canister_path}/kybra_generate/Cargo.toml', py_file_names_file_path, py_entry_module_name], capture_output=True, env=cargo_run_env)
+kybra_generate_result = subprocess.run(['cargo', 'run', f'--manifest-path={canister_path}/kybra_generate/Cargo.toml', py_file_names_file_path, py_entry_module_name], capture_output=True, env=cargo_env)
 
 if kybra_generate_result.returncode != 0:
     print(red("\n💣 Something about your Python code violates Kybra's requirements\n"))
@@ -191,6 +211,7 @@ if kybra_generate_result.returncode != 0:
     print('\nIf you are unable to decipher the error above, reach out in the #typescript')
     print('channel of the DFINITY DEV OFFICIAL discord:')
     print('\nhttps://discord.com/channels/748416164832608337/1019372359775440988\n')
+    print('💀 Build failed')
     sys.exit(1)
 
 generated_rust_code = kybra_generate_result.stdout
@@ -200,6 +221,7 @@ rustfmt_result = subprocess.run(['rustfmt', '--edition=2018'], capture_output=Tr
 if rustfmt_result.returncode != 0:
     print(red("\n💣 Kybra has experienced an internal error while trying to\n   format your generated rust canister"))
     print(f'\nPlease open an issue at https://github.com/demergent-labs/kybra/issues/new\nincluding this message and the following error:\n\n {red(rustfmt_result.stderr.decode("utf-8"))}')
+    print('💀 Build failed')
     sys.exit(1)
 
 formatted_lib_file = rustfmt_result.stdout.decode('utf-8')
@@ -208,19 +230,78 @@ create_file(lib_path, formatted_lib_file)
 
 # Compile the generated Rust code
 print('[2/3] 🚧 Building Wasm binary...')
-os.system(f'CARGO_TARGET_DIR={target_path} cargo build --manifest-path {canister_path}/Cargo.toml --target wasm32-unknown-unknown --package kybra_generated_canister --release')
+cargo_build_result = subprocess.run(
+    [
+        "cargo",
+        "build",
+        f"--manifest-path={canister_path}/Cargo.toml",
+        "--target=wasm32-unknown-unknown",
+        "--package=kybra_generated_canister",
+        "--release",
+    ],
+    capture_output=True,
+    env=cargo_env,
+)
+
+if cargo_build_result.returncode != 0:
+    print(red("\n💣 Error building Wasm binary:"))
+    print(cargo_build_result.stderr.decode('utf-8'))
+    print('💀 Build failed')
+    sys.exit(1)
+
 
 # Generate the Candid file
 print('[3/3] 📝 Generating Candid file...')
-os.system(f'CARGO_TARGET_DIR={target_path} cargo test --manifest-path {canister_path}/Cargo.toml')
+generate_candid_result = subprocess.run(
+    [
+        "cargo",
+        "test",
+        f"--manifest-path={canister_path}/Cargo.toml",
+    ],
+    capture_output=True,
+    env=cargo_env,
+)
+
+if generate_candid_result.returncode != 0:
+    print(red("\n💣 Error generating candid:"))
+    print(generate_candid_result.stderr.decode('utf-8'))
+    print('💀 Build failed')
+    sys.exit(1)
 
 # Copy the generated Candid file to the developer's source directory
 os.system(f'cp {generated_did_path} {did_path}')
 
 # Optimize the Wasm binary
 # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/43?u=lastmjs
-os.system(f'{cargo_bin_root}/bin/ic-cdk-optimizer {target_path}/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o {target_path}/wasm32-unknown-unknown/release/{canister_name}.wasm')
-# os.system(f'{cargo_bin_root}/bin/ic-wasm {target_path}/wasm32-unknown-unknown/release/kybra_generated_canister.wasm -o {target_path}/wasm32-unknown-unknown/release/{canister_name}.wasm shrink')
+optimization_result = subprocess.run(
+    [
+        f'{cargo_bin_root}/bin/ic-cdk-optimizer',
+        f'{target_path}/wasm32-unknown-unknown/release/kybra_generated_canister.wasm',
+        f'-o={wasm_path}',
+    ],
+    capture_output=True
+)
+# optimization_result = subprocess.run(
+#     [
+#         f'{cargo_bin_root}/bin/ic-wasm',
+#         f'{target_path}/wasm32-unknown-unknown/release/kybra_generated_canister.wasm',
+#         f'-o={wasm_path}',
+#         'shrink'
+#     ],
+#     capture_output=True
+# )
+
+if optimization_result.returncode != 0:
+    print(red("\n💣 Error optimizing generated Wasm:"))
+    print(optimization_result.stderr.decode('utf-8'))
+    print('💀 Build failed')
+    sys.exit(1)
+
+# Copy the generated Candid file to the developer's source directory
+os.system(f'cp {generated_did_path} {did_path}')
+
 
 # gzip the Wasm binary
-os.system(f'gzip -f -k {target_path}/wasm32-unknown-unknown/release/{canister_name}.wasm')
+os.system(f'gzip -f -k {wasm_path}')
+
+print(f'\n🎉 Built canister {green(canister_name)} at {dim(gzipped_wasm_path)}')
