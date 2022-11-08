@@ -262,8 +262,11 @@ class AsyncInfo:
         return AsyncInfo('call_with_payment128', [*self.args, cycles])
 
     def notify(self) -> NotifyResult:
-        # TODO calculate the notify function name here...actually, maybe we should just do this in the same way as the other calls? Just to keep it simple?
-        return _kybra_ic['notify_function_name'] # type: ignore
+        qualname: str = self.args[1]
+        with_payment = 'with_payment128_' if self.name == 'call_with_payment' or self.name == 'call_with_payment128' else ''
+        notify_function_name = f'_azle_notify_{with_payment}{qualname.replace(".", "_")}_wrapper'
+
+        return getattr(_kybra_ic, notify_function_name)(self.args) # type: ignore
 
 # TODO this decorator is removing the static type checking of the self parameter for instance methods
 # TODO watch out for *kwargs

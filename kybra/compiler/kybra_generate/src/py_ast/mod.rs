@@ -99,9 +99,9 @@ impl PyAst<'_> {
         };
 
         KybraAst {
-            init_method: self.build_init_method(),
+            init_method: self.build_init_method(&external_canisters),
             pre_upgrade: self.build_pre_upgrade_method(),
-            post_upgrade: self.build_post_upgrade_method(),
+            post_upgrade: self.build_post_upgrade_method(&external_canisters),
             inspect_method: self.build_inspect_method(),
             heartbeat: self.build_heartbeat_method(),
             canister_types: all_types,

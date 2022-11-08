@@ -1,3 +1,4 @@
+use cdk_framework::nodes::ActExternalCanister;
 use quote::quote;
 
 use crate::generators::ic_object::functions::accept_message::generate_accept_message;
@@ -12,7 +13,9 @@ use crate::generators::ic_object::functions::msg_cycles_available::generate_msg_
 use crate::generators::ic_object::functions::msg_cycles_available128::generate_msg_cycles_available128;
 use crate::generators::ic_object::functions::msg_cycles_refunded::generate_msg_cycles_refunded;
 use crate::generators::ic_object::functions::msg_cycles_refunded128::generate_msg_cycles_refunded128;
+use crate::generators::ic_object::functions::notify_functions::generate_notify_functions;
 use crate::generators::ic_object::functions::notify_raw::generate_notify_raw;
+use crate::generators::ic_object::functions::notify_with_payment128_functions::generate_notify_with_payment128_functions;
 use crate::generators::ic_object::functions::print::generate_print;
 use crate::generators::ic_object::functions::stable64_grow::generate_stable64_grow;
 use crate::generators::ic_object::functions::stable64_read::generate_stable64_read;
@@ -27,7 +30,9 @@ use crate::generators::ic_object::functions::trap::generate_trap;
 
 mod functions;
 
-pub fn generate_ic_object() -> proc_macro2::TokenStream {
+pub fn generate_ic_object(
+    external_canisters: &Vec<ActExternalCanister>,
+) -> proc_macro2::TokenStream {
     let accept_message = generate_accept_message();
     let candid_decode = generate_candid_decode();
     let candid_encode = generate_candid_encode();
@@ -40,7 +45,10 @@ pub fn generate_ic_object() -> proc_macro2::TokenStream {
     let msg_cycles_available128 = generate_msg_cycles_available128();
     let msg_cycles_refunded = generate_msg_cycles_refunded();
     let msg_cycles_refunded128 = generate_msg_cycles_refunded128();
+    let notify_functions = generate_notify_functions(external_canisters);
     let notify_raw = generate_notify_raw();
+    let notify_with_payment128_functions =
+        generate_notify_with_payment128_functions(external_canisters);
     let print = generate_print();
     let stable_bytes = generate_stable_bytes();
     let stable_grow = generate_stable_grow();
@@ -54,9 +62,9 @@ pub fn generate_ic_object() -> proc_macro2::TokenStream {
     let trap = generate_trap();
 
     quote! {
-            #[pyclass(module = false, name = "ic")]
-            #[derive(Debug, PyPayload)]
-            struct Ic {}
+        #[pyclass(module = false, name = "ic")]
+        #[derive(Debug, PyPayload)]
+        struct Ic {}
 
         #[pyclass]
         impl Ic {
@@ -72,7 +80,9 @@ pub fn generate_ic_object() -> proc_macro2::TokenStream {
             #msg_cycles_available128
             #msg_cycles_refunded
             #msg_cycles_refunded128
+            #(#notify_functions)*
             #notify_raw
+            #(#notify_with_payment128_functions)*
             #print
             #stable_bytes
             #stable_grow

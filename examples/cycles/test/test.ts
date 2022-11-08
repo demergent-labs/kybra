@@ -41,10 +41,7 @@ const tests: Test[] = [
             });
         }
     },
-    // TODO remove filter once notify is supported
-    ...get_tests(cycles_canister, intermediary_canister).filter(
-        (test) => !test.name.includes('notify')
-    )
+    ...get_tests(cycles_canister, intermediary_canister)
 ];
 
 run_tests(tests);
