@@ -119,6 +119,15 @@ def create_paths(args):
         'custom_modules': custom_modules_path,
     }
 
+def compile_python_or_exit(paths, cargo_env):
+    print('[1/3] 🔨 Compiling Python...')
+    bundle_python_code(paths)
+    add_wasm_compilation_target_or_exit()
+    install_ic_ckd_optimizer_or_exit()
+    generated_rust_code = run_kybra_generate_or_exit(paths, cargo_env)
+    formatted_lib_file = run_rustfmt_or_exit(generated_rust_code)
+    create_file(paths['lib'], formatted_lib_file)
+
 def bundle_python_code(paths):
     # Begin module bundling/gathering process
     path = list(filter(lambda x: x.startswith(os.getcwd()), sys.path)) + [os.path.dirname(paths['py_entry_file'])]
@@ -165,15 +174,6 @@ def bundle_python_code(paths):
     )
 
     create_file(paths['py_file_names_file'], ','.join(py_file_names))
-
-def compile_python_or_exit(paths, cargo_env):
-    print('[1/3] 🔨 Compiling Python...')
-    bundle_python_code(paths)
-    add_wasm_compilation_target_or_exit()
-    install_ic_ckd_optimizer_or_exit()
-    generated_rust_code = run_kybra_generate_or_exit(paths, cargo_env)
-    formatted_lib_file = run_rustfmt_or_exit(generated_rust_code)
-    create_file(paths['lib'], formatted_lib_file)
 
 def add_wasm_compilation_target_or_exit():
     add_wasm_target_result = subprocess.run(['rustup', 'target', 'add', 'wasm32-unknown-unknown'], capture_output=True)
@@ -222,6 +222,21 @@ def run_kybra_generate_or_exit(paths, cargo_env):
         sys.exit(1)
 
     return kybra_generate_result.stdout
+
+def parse_kybra_generate_error(stdout: bytes):
+    err = stdout.decode('utf-8')
+    std_err_lines = err.splitlines()
+    try:
+        line_where_error_message_starts = next(i for i,v in enumerate(std_err_lines) if v.startswith("thread 'main' panicked at '"))
+        line_where_error_message_ends = next(i for i,v in enumerate(std_err_lines) if "', src/" in v)
+    except:
+        return 'The underlying cause is likely at the bottom of the following output:\n\n' + err
+
+    err_lines = std_err_lines[line_where_error_message_starts:line_where_error_message_ends + 1]
+    err_lines[0] = err_lines[0].replace("thread 'main' panicked at '", '')
+    err_lines[-1] = re.sub("', src\/.*", "", err_lines[-1])
+
+    return red("\n".join(err_lines))
 
 def run_rustfmt_or_exit(generated_rust_code):
     rustfmt_result = subprocess.run(['rustfmt', '--edition=2018'], capture_output=True, input=generated_rust_code)
@@ -333,21 +348,6 @@ def purple(text):
 def dim(text):
     return f'\x1b[2m{text}\x1b[0m'
 # endregion Colors
-
-def parse_kybra_generate_error(stdout: bytes):
-    err = stdout.decode('utf-8')
-    std_err_lines = err.splitlines()
-    try:
-        line_where_error_message_starts = next(i for i,v in enumerate(std_err_lines) if v.startswith("thread 'main' panicked at '"))
-        line_where_error_message_ends = next(i for i,v in enumerate(std_err_lines) if "', src/" in v)
-    except:
-        return 'The underlying cause is likely at the bottom of the following output:\n\n' + err
-
-    err_lines = std_err_lines[line_where_error_message_starts:line_where_error_message_ends + 1]
-    err_lines[0] = err_lines[0].replace("thread 'main' panicked at '", '')
-    err_lines[-1] = re.sub("', src\/.*", "", err_lines[-1])
-
-    return red("\n".join(err_lines))
 
 def create_file(file_path: str, contents: str):
     file = open(file_path, 'w')
