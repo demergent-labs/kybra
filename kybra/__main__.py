@@ -13,11 +13,12 @@ from pathlib import Path
 def main():
     args = parse_args_or_exit(sys.argv)
     paths = create_paths(args)
+    is_verbose = args['flags']['verbose']
 
     # This is the name of the canister passed into python -m kybra from the dfx.json build command
     canister_name = args['canister_name']
 
-    verbose_mode_qualifier = ' in verbose mode' if args['flags']['verbose'] else ''
+    verbose_mode_qualifier = ' in verbose mode' if is_verbose else ''
 
     print(f'\nBuilding canister {green(canister_name)}{verbose_mode_qualifier}\n')
 
@@ -27,9 +28,9 @@ def main():
     # Add CARGO_TARGET_DIR to env for all cargo commands
     cargo_env = { **os.environ.copy(), 'CARGO_TARGET_DIR': paths['target'] }
 
-    inline_timed('[1/3] 🔨 Compiling Python...', compile_python_or_exit, paths, cargo_env)
-    inline_timed('[2/3] 🚧 Building Wasm binary...', build_wasm_binary_or_exit, paths, cargo_env)
-    inline_timed('[3/3] 📝 Generating Candid file...', generate_candid_file_or_exit, paths, cargo_env)
+    inline_timed('[1/3] 🔨 Compiling Python...', compile_python_or_exit, paths, cargo_env, verbose=is_verbose)
+    inline_timed('[2/3] 🚧 Building Wasm binary...', build_wasm_binary_or_exit, paths, cargo_env, verbose=is_verbose)
+    inline_timed('[3/3] 📝 Generating Candid file...', generate_candid_file_or_exit, paths, cargo_env, verbose=is_verbose)
 
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
 
@@ -119,13 +120,12 @@ def create_paths(args):
         'custom_modules': custom_modules_path,
     }
 
-def compile_python_or_exit(paths, cargo_env):
+def compile_python_or_exit(paths, cargo_env, verbose = False):
     bundle_python_code(paths)
-    add_wasm_compilation_target_or_exit()
-    install_ic_ckd_optimizer_or_exit()
-    generated_rust_code = run_kybra_generate_or_exit(paths, cargo_env)
-    formatted_lib_file = run_rustfmt_or_exit(generated_rust_code)
-    create_file(paths['lib'], formatted_lib_file)
+    add_wasm_compilation_target_or_exit(verbose)
+    install_ic_ckd_optimizer_or_exit(verbose)
+    run_kybra_generate_or_exit(paths, cargo_env, verbose)
+    run_rustfmt_or_exit(paths, verbose)
 
 def bundle_python_code(paths):
     # Begin module bundling/gathering process
@@ -174,8 +174,8 @@ def bundle_python_code(paths):
 
     create_file(paths['py_file_names_file'], ','.join(py_file_names))
 
-def add_wasm_compilation_target_or_exit():
-    add_wasm_target_result = subprocess.run(['rustup', 'target', 'add', 'wasm32-unknown-unknown'], capture_output=True)
+def add_wasm_compilation_target_or_exit(verbose = False):
+    add_wasm_target_result = subprocess.run(['rustup', 'target', 'add', 'wasm32-unknown-unknown'], capture_output=not verbose)
 
     if add_wasm_target_result.returncode != 0:
         print(red("\n💣 Unable to add wasm32-unknown-unknown compilation target\n"))
@@ -183,13 +183,13 @@ def add_wasm_compilation_target_or_exit():
         print('💀 Build failed')
         sys.exit(1)
 
-def install_ic_ckd_optimizer_or_exit():
+def install_ic_ckd_optimizer_or_exit(verbose = False):
     # TODO: Figure out why this fails and how we want to handle it. Previously, we chained on an `||  true`.
     # TODO: We might also be able to do `--force`
 
     # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/43?u=lastmjs
-    install_cdk_optimizer_result = subprocess.run(['cargo', 'install', 'ic-cdk-optimizer', '--version=0.3.4'], capture_output=True)
-    # install_ic_wasm_result = subprocess.run(['cargo', 'install', 'ic-wasm', '--version=0.3.0'], capture_output=True)
+    install_cdk_optimizer_result = subprocess.run(['cargo', 'install', 'ic-cdk-optimizer', '--version=0.3.4'], capture_output=not verbose)
+    # install_ic_wasm_result = subprocess.run(['cargo', 'install', 'ic-wasm', '--version=0.3.0'], capture_output=not verbose)
 
     if install_cdk_optimizer_result.returncode != 0:
         print(red("\n💣 Unable to install dependency \"ic-cdk-optimizer\"\n"))
@@ -197,7 +197,7 @@ def install_ic_ckd_optimizer_or_exit():
         print('💀 Build failed')
         sys.exit(1)
 
-def run_kybra_generate_or_exit(paths, cargo_env):
+def run_kybra_generate_or_exit(paths, cargo_env, verbose):
     # Generate the Rust code
     kybra_generate_result = subprocess.run(
         [
@@ -205,9 +205,10 @@ def run_kybra_generate_or_exit(paths, cargo_env):
             'run',
             f"--manifest-path={paths['canister']}/kybra_generate/Cargo.toml",
             paths['py_file_names_file'],
-            paths['py_entry_module_name']
+            paths['py_entry_module_name'],
+            paths['lib']
         ],
-        capture_output=True,
+        capture_output=not verbose,
         env=cargo_env
     )
 
@@ -219,8 +220,6 @@ def run_kybra_generate_or_exit(paths, cargo_env):
         print('\nhttps://discord.com/channels/748416164832608337/1019372359775440988\n')
         print('💀 Build failed')
         sys.exit(1)
-
-    return kybra_generate_result.stdout
 
 def parse_kybra_generate_error(stdout: bytes):
     err = stdout.decode('utf-8')
@@ -237,8 +236,8 @@ def parse_kybra_generate_error(stdout: bytes):
 
     return red("\n".join(err_lines))
 
-def run_rustfmt_or_exit(generated_rust_code):
-    rustfmt_result = subprocess.run(['rustfmt', '--edition=2018'], capture_output=True, input=generated_rust_code)
+def run_rustfmt_or_exit(paths, verbose = False):
+    rustfmt_result = subprocess.run(['rustfmt', '--edition=2018', paths['lib']], capture_output=not verbose)
 
     if rustfmt_result.returncode != 0:
         print(red("\n💣 Kybra has experienced an internal error while trying to\n   format your generated rust canister"))
@@ -246,9 +245,7 @@ def run_rustfmt_or_exit(generated_rust_code):
         print('💀 Build failed')
         sys.exit(1)
 
-    return rustfmt_result.stdout.decode('utf-8')
-
-def build_wasm_binary_or_exit(paths, cargo_env):
+def build_wasm_binary_or_exit(paths, cargo_env, verbose = False):
     # Compile the generated Rust code
     cargo_build_result = subprocess.run(
         [
@@ -259,7 +256,7 @@ def build_wasm_binary_or_exit(paths, cargo_env):
             "--package=kybra_generated_canister",
             "--release",
         ],
-        capture_output=True,
+        capture_output=not verbose,
         env=cargo_env,
     )
 
@@ -279,7 +276,7 @@ def build_wasm_binary_or_exit(paths, cargo_env):
             f"{paths['target']}/wasm32-unknown-unknown/release/kybra_generated_canister.wasm",
             f"-o={paths['wasm']}",
         ],
-        capture_output=True
+        capture_output=not verbose
     )
     # optimization_result = subprocess.run(
     #     [
@@ -288,7 +285,7 @@ def build_wasm_binary_or_exit(paths, cargo_env):
     #         f"-o={paths['wasm']}",
     #         'shrink'
     #     ],
-    #     capture_output=True
+    #     capture_output=not verbose
     # )
 
 
@@ -298,21 +295,17 @@ def build_wasm_binary_or_exit(paths, cargo_env):
         print('💀 Build failed')
         sys.exit(1)
 
-    # Copy the generated Candid file to the developer's source directory
-    os.system(f"cp {paths['generated_did']} {paths['did']}")
-
-
     # gzip the Wasm binary
     os.system(f"gzip -f -k {paths['wasm']}")
 
-def generate_candid_file_or_exit(paths, cargo_env):
+def generate_candid_file_or_exit(paths, cargo_env, verbose = False):
     generate_candid_result = subprocess.run(
         [
             "cargo",
             "test",
             f"--manifest-path={paths['canister']}/Cargo.toml",
         ],
-        capture_output=True,
+        capture_output=not verbose,
         env=cargo_env,
     )
 
@@ -358,15 +351,19 @@ def timed(body):
     print(f'\nDone in {round(duration, 2)}s.')
     return end_time - start_time
 
-def inline_timed(label, body, *args):
+def inline_timed(label, body, *args, verbose = False, **kwargs):
     print(label)
     start_time = time.time()
-    body(*args)
+    body(*args, verbose=verbose, **kwargs)
     end_time = time.time()
     duration = end_time - start_time
 
-    move_cursor_up_one_line = "\x1b[1A";
-    print(f'{move_cursor_up_one_line}{label}{dim(f"{round(duration, 2)}s")}')
+    if verbose:
+        print(f'{label} finished in {round(duration, 2)}s')
+    else:
+        move_cursor_up_one_line = "\x1b[1A";
+        print(f'{move_cursor_up_one_line}{label}{dim(f"{round(duration, 2)}s")}')
+
     return end_time - start_time
 
 timed(main)
