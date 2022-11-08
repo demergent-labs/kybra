@@ -27,9 +27,9 @@ def main():
     # Add CARGO_TARGET_DIR to env for all cargo commands
     cargo_env = { **os.environ.copy(), 'CARGO_TARGET_DIR': paths['target'] }
 
-    compile_python_or_exit(paths, cargo_env)
-    build_wasm_binary_or_exit(paths, cargo_env)
-    generate_candid_file_or_exit(paths, cargo_env)
+    inline_timed('[1/3] 🔨 Compiling Python...', compile_python_or_exit, paths, cargo_env)
+    inline_timed('[2/3] 🚧 Building Wasm binary...', build_wasm_binary_or_exit, paths, cargo_env)
+    inline_timed('[3/3] 📝 Generating Candid file...', generate_candid_file_or_exit, paths, cargo_env)
 
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
 
@@ -120,7 +120,6 @@ def create_paths(args):
     }
 
 def compile_python_or_exit(paths, cargo_env):
-    print('[1/3] 🔨 Compiling Python...')
     bundle_python_code(paths)
     add_wasm_compilation_target_or_exit()
     install_ic_ckd_optimizer_or_exit()
@@ -251,7 +250,6 @@ def run_rustfmt_or_exit(generated_rust_code):
 
 def build_wasm_binary_or_exit(paths, cargo_env):
     # Compile the generated Rust code
-    print('[2/3] 🚧 Building Wasm binary...')
     cargo_build_result = subprocess.run(
         [
             "cargo",
@@ -308,8 +306,6 @@ def build_wasm_binary_or_exit(paths, cargo_env):
     os.system(f"gzip -f -k {paths['wasm']}")
 
 def generate_candid_file_or_exit(paths, cargo_env):
-    # Generate the Candid file
-    print('[3/3] 📝 Generating Candid file...')
     generate_candid_result = subprocess.run(
         [
             "cargo",
@@ -360,6 +356,17 @@ def timed(body):
     end_time = time.time()
     duration = end_time - start_time
     print(f'\nDone in {round(duration, 2)}s.')
+    return end_time - start_time
+
+def inline_timed(label, body, *args):
+    print(label)
+    start_time = time.time()
+    body(*args)
+    end_time = time.time()
+    duration = end_time - start_time
+
+    move_cursor_up_one_line = "\x1b[1A";
+    print(f'{move_cursor_up_one_line}{label}{dim(f"{round(duration, 2)}s")}')
     return end_time - start_time
 
 timed(main)
