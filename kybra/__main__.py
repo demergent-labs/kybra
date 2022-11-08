@@ -27,9 +27,9 @@ def main():
     # Add CARGO_TARGET_DIR to env for all cargo commands
     cargo_env = { **os.environ.copy(), 'CARGO_TARGET_DIR': paths['target'] }
 
-    compile_python(paths, cargo_env)
-    build_wasm_binary(paths, cargo_env)
-    generate_candid_file(paths, cargo_env)
+    compile_python_or_exit(paths, cargo_env)
+    build_wasm_binary_or_exit(paths, cargo_env)
+    generate_candid_file_or_exit(paths, cargo_env)
 
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
 
@@ -166,16 +166,16 @@ def bundle_python_code(paths):
 
     create_file(paths['py_file_names_file'], ','.join(py_file_names))
 
-def compile_python(paths, cargo_env):
+def compile_python_or_exit(paths, cargo_env):
     print('[1/3] 🔨 Compiling Python...')
     bundle_python_code(paths)
-    add_wasm_compilation_target()
-    install_ic_ckd_optimizer()
-    generated_rust_code = run_kybra_generate(paths, cargo_env)
-    formatted_lib_file = run_rustfmt(generated_rust_code)
+    add_wasm_compilation_target_or_exit()
+    install_ic_ckd_optimizer_or_exit()
+    generated_rust_code = run_kybra_generate_or_exit(paths, cargo_env)
+    formatted_lib_file = run_rustfmt_or_exit(generated_rust_code)
     create_file(paths['lib'], formatted_lib_file)
 
-def add_wasm_compilation_target():
+def add_wasm_compilation_target_or_exit():
     add_wasm_target_result = subprocess.run(['rustup', 'target', 'add', 'wasm32-unknown-unknown'], capture_output=True)
 
     if add_wasm_target_result.returncode != 0:
@@ -184,7 +184,7 @@ def add_wasm_compilation_target():
         print('💀 Build failed')
         sys.exit(1)
 
-def install_ic_ckd_optimizer():
+def install_ic_ckd_optimizer_or_exit():
     # TODO: Figure out why this fails and how we want to handle it. Previously, we chained on an `||  true`.
     # TODO: We might also be able to do `--force`
 
@@ -198,7 +198,7 @@ def install_ic_ckd_optimizer():
         print('💀 Build failed')
         sys.exit(1)
 
-def run_kybra_generate(paths, cargo_env):
+def run_kybra_generate_or_exit(paths, cargo_env):
     # Generate the Rust code
     kybra_generate_result = subprocess.run(
         [
@@ -223,7 +223,7 @@ def run_kybra_generate(paths, cargo_env):
 
     return kybra_generate_result.stdout
 
-def run_rustfmt(generated_rust_code):
+def run_rustfmt_or_exit(generated_rust_code):
     rustfmt_result = subprocess.run(['rustfmt', '--edition=2018'], capture_output=True, input=generated_rust_code)
 
     if rustfmt_result.returncode != 0:
@@ -234,7 +234,7 @@ def run_rustfmt(generated_rust_code):
 
     return rustfmt_result.stdout.decode('utf-8')
 
-def build_wasm_binary(paths, cargo_env):
+def build_wasm_binary_or_exit(paths, cargo_env):
     # Compile the generated Rust code
     print('[2/3] 🚧 Building Wasm binary...')
     cargo_build_result = subprocess.run(
@@ -292,7 +292,7 @@ def build_wasm_binary(paths, cargo_env):
     # gzip the Wasm binary
     os.system(f"gzip -f -k {paths['wasm']}")
 
-def generate_candid_file(paths, cargo_env):
+def generate_candid_file_or_exit(paths, cargo_env):
     # Generate the Candid file
     print('[3/3] 📝 Generating Candid file...')
     generate_candid_result = subprocess.run(
