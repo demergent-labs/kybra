@@ -6,7 +6,7 @@ impl KybraExpr<'_> {
     pub(super) fn invalid_subscript_value_error(&self) -> ErrorMessage {
         ErrorMessage {
             message: Message {
-                title: "Only Async, list, opt, or tuple are allowed subscripts for candid values"
+                title: "Only Async, list, manual, opt, or tuple are allowed subscripts for candid values"
                     .to_string(),
                 origin: self.source_map.get_origin(self.located_expr.location),
                 line_number: self.source_map.get_line_number(self.located_expr.location),

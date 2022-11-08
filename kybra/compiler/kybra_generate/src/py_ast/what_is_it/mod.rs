@@ -227,7 +227,21 @@ impl ToDisplayString for Located<StmtKind> {
             StmtKind::Delete { .. } => "delete".to_string(),
             StmtKind::Assign { .. } => "assign".to_string(),
             StmtKind::AugAssign { .. } => "aug assign".to_string(),
-            StmtKind::AnnAssign { .. } => "ann assign".to_string(),
+            StmtKind::AnnAssign {
+                target,
+                annotation,
+                value,
+                simple,
+            } => format!(
+                "target({}), annotation({}), value({}), simple({})",
+                target.to_display_string(),
+                annotation.to_display_string(),
+                match value {
+                    Some(value) => value.to_display_string(),
+                    None => "None".to_string(),
+                },
+                simple
+            ),
             StmtKind::For { .. } => "for".to_string(),
             StmtKind::AsyncFor { .. } => "async for".to_string(),
             StmtKind::While { .. } => "while".to_string(),

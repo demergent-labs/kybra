@@ -1,0 +1,19 @@
+{
+    "canisters": {
+        "manual_reply": {
+            "type": "custom",
+            "build": "python -m kybra manual_reply src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/manual_reply/target/wasm32-unknown-unknown/release/manual_reply.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/manual_reply"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}
