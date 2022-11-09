@@ -24,7 +24,10 @@ impl KybraProgram<'_> {
                         stmt_kind,
                         source_map: self.source_map,
                     };
-                    kybra_stmt.is_record() || kybra_stmt.is_tuple() || kybra_stmt.is_variant()
+                    kybra_stmt.is_record()
+                        || kybra_stmt.is_tuple()
+                        || kybra_stmt.is_variant()
+                        || kybra_stmt.is_func()
                 })
                 .fold(HashMap::new(), |mut acc, stmt_kind| {
                     let kybra_stmt = KybraStmt {
@@ -149,6 +152,7 @@ impl KybraProgram<'_> {
                                 kybra_stmt.is_record()
                                     || kybra_stmt.is_tuple()
                                     || kybra_stmt.is_variant()
+                                    || kybra_stmt.is_func()
                             } else {
                                 false
                             }

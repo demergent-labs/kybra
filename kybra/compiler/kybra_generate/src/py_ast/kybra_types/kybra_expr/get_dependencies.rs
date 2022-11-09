@@ -57,7 +57,7 @@ impl GetDependencies for KybraExpr<'_> {
                     if found_type_names.contains(&name) {
                         return HashSet::new();
                     }
-                    match type_alias_lookup.clone().get(&name) {
+                    match type_alias_lookup.get(&name) {
                         Some(decl) => {
                             let new_type: HashSet<String> =
                                 HashSet::from_iter(vec![name].iter().cloned());
