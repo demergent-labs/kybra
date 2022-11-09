@@ -14,6 +14,7 @@ def main():
     args = parse_args_or_exit(sys.argv)
     paths = create_paths(args)
     is_verbose = args['flags']['verbose']
+    is_initial_compile = detect_initial_compile(paths['gzipped_wasm'])
 
     # This is the name of the canister passed into python -m kybra from the dfx.json build command
     canister_name = args['canister_name']
@@ -22,6 +23,9 @@ def main():
 
     print(f'\nBuilding canister {green(canister_name)}{verbose_mode_qualifier}\n')
 
+    if is_initial_compile:
+        print(yellow("Initial build takes a few minutes. Don't panic. Subsequent builds will be faster.\n"))
+
     # Copy all of the Rust project structure from the pip package to an area designed for Rust compiling
     shutil.copytree(paths['compiler'], paths['canister'], dirs_exist_ok=True)
 
@@ -29,8 +33,8 @@ def main():
     cargo_env = { **os.environ.copy(), 'CARGO_TARGET_DIR': paths['target'] }
 
     inline_timed('[1/3] 🔨 Compiling Python...', compile_python_or_exit, paths, cargo_env, verbose=is_verbose)
-    inline_timed('[2/3] 🚧 Building Wasm binary...', build_wasm_binary_or_exit, paths, cargo_env, verbose=is_verbose)
-    inline_timed('[3/3] 📝 Generating Candid file...', generate_candid_file_or_exit, paths, cargo_env, verbose=is_verbose)
+    inline_timed(f'[2/3] 🚧 Building Wasm binary...{encourage_patience(is_initial_compile)}', build_wasm_binary_or_exit, paths, cargo_env, verbose=is_verbose)
+    inline_timed(f'[3/3] 📝 Generating Candid file...{show_empathy(is_initial_compile)}', generate_candid_file_or_exit, paths, cargo_env, verbose=is_verbose)
 
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
 
@@ -120,12 +124,18 @@ def create_paths(args):
         'custom_modules': custom_modules_path,
     }
 
+def detect_initial_compile(gzipped_wasm_path):
+    return not os.path.exists(gzipped_wasm_path)
+
 def compile_python_or_exit(paths, cargo_env, verbose = False):
     bundle_python_code(paths)
     add_wasm_compilation_target_or_exit(verbose)
     install_ic_ckd_optimizer_or_exit(verbose)
     run_kybra_generate_or_exit(paths, cargo_env, verbose)
     run_rustfmt_or_exit(paths, verbose)
+
+def encourage_patience(is_initial_compile):
+    return ' (be patient, this will take a while)' if is_initial_compile else ''
 
 def bundle_python_code(paths):
     # Begin module bundling/gathering process
@@ -298,6 +308,9 @@ def build_wasm_binary_or_exit(paths, cargo_env, verbose = False):
     # gzip the Wasm binary
     os.system(f"gzip -f -k {paths['wasm']}")
 
+def show_empathy(is_initial_compile):
+    return ' (❤ hang in there, this will be faster next time)' if is_initial_compile else ''
+
 def generate_candid_file_or_exit(paths, cargo_env, verbose = False):
     generate_candid_result = subprocess.run(
         [
@@ -362,7 +375,7 @@ def inline_timed(label, body, *args, verbose = False, **kwargs):
         print(f'{label} finished in {round(duration, 2)}s')
     else:
         move_cursor_up_one_line = "\x1b[1A";
-        print(f'{move_cursor_up_one_line}{label}{dim(f"{round(duration, 2)}s")}')
+        print(f'{move_cursor_up_one_line}{label} {dim(f"{round(duration, 2)}s")}')
 
     return end_time - start_time
 
