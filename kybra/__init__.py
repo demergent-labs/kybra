@@ -115,7 +115,7 @@ class Stable64GrowResultTemp(Variant, total=False):
     err: StableMemoryErrorTemp
 
 # TODO we might want to just make this a dict[int, str] to keep the derive simple, or maybe a class with a principal and method name field
-def Func(callable: Callable) -> Type[tuple[Principal, str]]: # type: ignore
+def Func(callable: Callable[..., Any]) -> Type[tuple[Principal, str]]:
     return type((Principal.from_str('aaaaa-aa'), ''))
 
 # TODO make sure call_raw with notify works
@@ -262,8 +262,11 @@ class AsyncInfo:
         return AsyncInfo('call_with_payment128', [*self.args, cycles])
 
     def notify(self) -> NotifyResult:
-        # TODO calculate the notify function name here...actually, maybe we should just do this in the same way as the other calls? Just to keep it simple?
-        return _kybra_ic['notify_function_name'] # type: ignore
+        qualname: str = self.args[1]
+        with_payment = 'with_payment128_' if self.name == 'call_with_payment' or self.name == 'call_with_payment128' else ''
+        notify_function_name = f'_azle_notify_{with_payment}{qualname.replace(".", "_")}_wrapper'
+
+        return getattr(_kybra_ic, notify_function_name)(self.args) # type: ignore
 
 # TODO this decorator is removing the static type checking of the self parameter for instance methods
 # TODO watch out for *kwargs

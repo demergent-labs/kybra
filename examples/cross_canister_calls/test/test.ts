@@ -34,10 +34,7 @@ const tests: Test[] = [
             });
         }
     },
-    // TODO add this back in once notify is supported
-    ...get_tests(canister1, canister2).filter(
-        (test) => !test.name.includes('notification')
-    )
+    ...get_tests(canister1, canister2)
 ];
 
 run_tests(tests);

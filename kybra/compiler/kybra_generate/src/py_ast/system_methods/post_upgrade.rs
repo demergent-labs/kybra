@@ -1,11 +1,17 @@
 use quote::quote;
 
 use crate::{generators::ic_object, py_ast::PyAst};
-use cdk_framework::{nodes::ActPostUpgradeMethod, CanisterMethodType};
+use cdk_framework::{
+    nodes::{ActExternalCanister, ActPostUpgradeMethod},
+    CanisterMethodType,
+};
 
 impl PyAst<'_> {
-    pub fn build_post_upgrade_method(&self) -> ActPostUpgradeMethod {
-        let ic_object = ic_object::generate_ic_object();
+    pub fn build_post_upgrade_method(
+        &self,
+        external_canisters: &Vec<ActExternalCanister>,
+    ) -> ActPostUpgradeMethod {
+        let ic_object = ic_object::generate_ic_object(external_canisters);
 
         let post_upgrade_function_defs =
             self.get_function_def_of_type(CanisterMethodType::PreUpgrade);
