@@ -228,12 +228,9 @@ def add_wasm_compilation_target_or_exit(verbose: bool=False):
 
 
 def install_ic_cdk_optimizer_or_exit(verbose: bool=False):
-    # TODO: Figure out why this fails and how we want to handle it. Previously, we chained on an `||  true`.
-    # TODO: We might also be able to do `--force`
-
     # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/43?u=lastmjs
     install_cdk_optimizer_result = subprocess.run(
-        ["cargo", "install", "ic-cdk-optimizer", "--version=0.3.4"],
+        ["cargo", "install", "ic-cdk-optimizer", "--version=0.3.4", "--force"],
         capture_output=not verbose,
     )
     # install_ic_wasm_result = subprocess.run(
