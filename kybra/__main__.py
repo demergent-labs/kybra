@@ -1,16 +1,19 @@
-# type: ignore
-
-import kybra
 import modulegraph.modulegraph
 import os
+from pathlib import Path
 import re
 import shutil
 import subprocess
 import sys
 import time
-from pathlib import Path
+from typing import Any, Callable
 
+import kybra
+from kybra.colors import red, yellow, green, dim
+from kybra.timed import timed, timed_inline
+from kybra.types import Args, Paths
 
+@timed
 def main():
     args = parse_args_or_exit(sys.argv)
     paths = create_paths(args)
@@ -37,32 +40,16 @@ def main():
     # Add CARGO_TARGET_DIR to env for all cargo commands
     cargo_env = {**os.environ.copy(), "CARGO_TARGET_DIR": paths["target"]}
 
-    inline_timed(
-        "[1/3] 🔨 Compiling Python...",
-        compile_python_or_exit,
-        paths,
-        cargo_env,
-        verbose=is_verbose,
-    )
-    inline_timed(
-        f"[2/3] 🚧 Building Wasm binary...{encourage_patience(is_initial_compile)}",
-        build_wasm_binary_or_exit,
-        paths,
-        cargo_env,
-        verbose=is_verbose,
-    )
-    inline_timed(
-        f"[3/3] 📝 Generating Candid file...{show_empathy(is_initial_compile)}",
-        generate_candid_file_or_exit,
-        paths,
-        cargo_env,
-        verbose=is_verbose,
-    )
+    compile_python_or_exit(paths, cargo_env, verbose=is_verbose, label="[1/3] 🔨 Compiling Python...")
+
+    build_wasm_binary_or_exit(paths, cargo_env, verbose=is_verbose, label=f"[2/3] 🚧 Building Wasm binary...{encourage_patience(is_initial_compile)}")
+
+    generate_candid_file_or_exit(paths, cargo_env, verbose=is_verbose, label=f"[3/3] 📝 Generating Candid file...{show_empathy(is_initial_compile)}")
 
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
 
 
-def parse_args_or_exit(args: list[str]):
+def parse_args_or_exit(args: list[str]) -> Args:
     args = args[1:]  # Discard the path to kybra
 
     flags = [arg for arg in args if (arg.startswith("-") or arg.startswith("--"))]
@@ -88,7 +75,7 @@ def parse_args_or_exit(args: list[str]):
     }
 
 
-def create_paths(args):
+def create_paths(args: Args) -> Paths:
     canister_name = args["canister_name"]
 
     # This is the path to the developer's entry point Python file passed into python -m kybra from the dfx.json build command
@@ -148,30 +135,30 @@ def create_paths(args):
     }
 
 
-def detect_initial_compile(gzipped_wasm_path):
+def detect_initial_compile(gzipped_wasm_path: str) -> bool:
     return not os.path.exists(gzipped_wasm_path)
 
-
-def compile_python_or_exit(paths, cargo_env, verbose=False):
+@timed_inline
+def compile_python_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool=False):
     bundle_python_code(paths)
     add_wasm_compilation_target_or_exit(verbose)
-    install_ic_ckd_optimizer_or_exit(verbose)
+    install_ic_cdk_optimizer_or_exit(verbose)
     run_kybra_generate_or_exit(paths, cargo_env, verbose)
     run_rustfmt_or_exit(paths, verbose)
 
 
-def encourage_patience(is_initial_compile):
+def encourage_patience(is_initial_compile: bool) -> str:
     return " (be patient, this will take a while)" if is_initial_compile else ""
 
 
-def bundle_python_code(paths):
+def bundle_python_code(paths: Paths):
     # Begin module bundling/gathering process
     path = list(filter(lambda x: x.startswith(os.getcwd()), sys.path)) + [
         os.path.dirname(paths["py_entry_file"])
     ]
 
     graph = modulegraph.modulegraph.ModuleGraph(path)
-    entry_point = graph.run_script(paths["py_entry_file"])
+    entry_point = graph.run_script(paths["py_entry_file"]) # type: ignore
 
     python_source_path = paths["python_source"]
 
@@ -183,51 +170,51 @@ def bundle_python_code(paths):
     # Copy our custom Python modules into the python_source directory
     shutil.copytree(paths["custom_modules"], python_source_path, dirs_exist_ok=True)
 
-    flattened_graph = list(graph.flatten(start=entry_point))
+    flattened_graph = list(graph.flatten(start=entry_point)) # type: ignore
 
-    for node in flattened_graph:
-        if type(node) == modulegraph.modulegraph.Script:
+    for node in flattened_graph: # type: ignore
+        if type(node) == modulegraph.modulegraph.Script: # type: ignore
             shutil.copy(
-                node.filename, f"{python_source_path}/{os.path.basename(node.filename)}"
+                node.filename, f"{python_source_path}/{os.path.basename(node.filename)}" # type: ignore
             )
 
-        if type(node) == modulegraph.modulegraph.SourceModule:
+        if type(node) == modulegraph.modulegraph.SourceModule: # type: ignore
             shutil.copy(
-                node.filename, f"{python_source_path}/{os.path.basename(node.filename)}"
+                node.filename, f"{python_source_path}/{os.path.basename(node.filename)}" # type: ignore
             )
 
-        if type(node) == modulegraph.modulegraph.Package:
+        if type(node) == modulegraph.modulegraph.Package: # type: ignore
             shutil.copytree(
-                node.packagepath[0],
-                f"{python_source_path}/{node.identifier}",
+                node.packagepath[0], # type: ignore
+                f"{python_source_path}/{node.identifier}", # type: ignore
                 dirs_exist_ok=True,
             )
 
-        if type(node) == modulegraph.modulegraph.NamespacePackage:
+        if type(node) == modulegraph.modulegraph.NamespacePackage: # type: ignore
             shutil.copytree(
-                node.packagepath[0],
-                f"{python_source_path}/{node.identifier}",
+                node.packagepath[0], # type: ignore
+                f"{python_source_path}/{node.identifier}", # type: ignore
                 dirs_exist_ok=True,
             )
 
-    py_file_names = list(
+    py_file_names = list( # type: ignore
         filter(
-            lambda filename: filename is not None,
+            lambda filename: filename is not None, # type: ignore
             map(
-                lambda node: node.filename,
+                lambda node: node.filename, # type: ignore
                 filter(
-                    lambda node: node.filename
+                    lambda node: node.filename # type: ignore
                     is not "-",  # This filters out namespace packages
-                    flattened_graph,
-                ),
-            ),
-        )
+                    flattened_graph, # type: ignore
+                ), # type: ignore
+            ), # type: ignore
+        ) # type: ignore
     )
 
-    create_file(paths["py_file_names_file"], ",".join(py_file_names))
+    create_file(paths["py_file_names_file"], ",".join(py_file_names)) # type: ignore
 
 
-def add_wasm_compilation_target_or_exit(verbose=False):
+def add_wasm_compilation_target_or_exit(verbose: bool=False):
     add_wasm_target_result = subprocess.run(
         ["rustup", "target", "add", "wasm32-unknown-unknown"],
         capture_output=not verbose,
@@ -240,7 +227,7 @@ def add_wasm_compilation_target_or_exit(verbose=False):
         sys.exit(1)
 
 
-def install_ic_ckd_optimizer_or_exit(verbose=False):
+def install_ic_cdk_optimizer_or_exit(verbose: bool=False):
     # TODO: Figure out why this fails and how we want to handle it. Previously, we chained on an `||  true`.
     # TODO: We might also be able to do `--force`
 
@@ -260,7 +247,7 @@ def install_ic_ckd_optimizer_or_exit(verbose=False):
         sys.exit(1)
 
 
-def run_kybra_generate_or_exit(paths, cargo_env, verbose):
+def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool):
     # Generate the Rust code
     kybra_generate_result = subprocess.run(
         [
@@ -289,7 +276,7 @@ def run_kybra_generate_or_exit(paths, cargo_env, verbose):
         sys.exit(1)
 
 
-def parse_kybra_generate_error(stdout: bytes):
+def parse_kybra_generate_error(stdout: bytes) -> str:
     err = stdout.decode("utf-8")
     std_err_lines = err.splitlines()
     try:
@@ -311,12 +298,12 @@ def parse_kybra_generate_error(stdout: bytes):
         line_where_error_message_starts : line_where_error_message_ends + 1
     ]
     err_lines[0] = err_lines[0].replace("thread 'main' panicked at '", "")
-    err_lines[-1] = re.sub("', src\/.*", "", err_lines[-1])
+    err_lines[-1] = re.sub("', src/.*", "", err_lines[-1])
 
     return red("\n".join(err_lines))
 
 
-def run_rustfmt_or_exit(paths, verbose=False):
+def run_rustfmt_or_exit(paths: Paths, verbose: bool=False):
     rustfmt_result = subprocess.run(
         ["rustfmt", "--edition=2018", paths["lib"]], capture_output=not verbose
     )
@@ -334,7 +321,8 @@ def run_rustfmt_or_exit(paths, verbose=False):
         sys.exit(1)
 
 
-def build_wasm_binary_or_exit(paths, cargo_env, verbose=False):
+@timed_inline
+def build_wasm_binary_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool=False):
     # Compile the generated Rust code
     cargo_build_result = subprocess.run(
         [
@@ -391,15 +379,15 @@ def build_wasm_binary_or_exit(paths, cargo_env, verbose=False):
     os.system(f"gzip -f -k {paths['wasm']}")
 
 
-def show_empathy(is_initial_compile):
+def show_empathy(is_initial_compile: bool) -> str:
     return (
         " (❤ hang in there, this will be faster next time)"
         if is_initial_compile
         else ""
     )
 
-
-def generate_candid_file_or_exit(paths, cargo_env, verbose=False):
+@timed_inline
+def generate_candid_file_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool=False):
     generate_candid_result = subprocess.run(
         [
             "cargo",
@@ -420,50 +408,13 @@ def generate_candid_file_or_exit(paths, cargo_env, verbose=False):
     os.system(f"cp {paths['generated_did']} {paths['did']}")
 
 
-# region Colors
-def red(text):
-    return f"\x1b[31m{text}\x1b[0m"
-
-
-def yellow(text):
-    return f"\x1b[33m{text}\x1b[0m"
-
-
-def green(text):
-    return f"\x1b[32m{text}\x1b[0m"
-
-
-def blue(text):
-    return f"\x1b[34m{text}\x1b[0m"
-
-
-def purple(text):
-    return f"\x1b[35m{text}\x1b[0m"
-
-
-def dim(text):
-    return f"\x1b[2m{text}\x1b[0m"
-
-
-# endregion Colors
-
-
 def create_file(file_path: str, contents: str):
     file = open(file_path, "w")
     file.write(contents)
     file.close()
 
 
-def timed(body):
-    start_time = time.time()
-    body()
-    end_time = time.time()
-    duration = end_time - start_time
-    print(f"\nDone in {round(duration, 2)}s.")
-    return end_time - start_time
-
-
-def inline_timed(label, body, *args, verbose=False, **kwargs):
+def inline_timed(label: str, body: Callable[..., Any], *args: Any, verbose: bool=False, **kwargs: Any) -> float:
     print(label)
     start_time = time.time()
     body(*args, verbose=verbose, **kwargs)
@@ -479,4 +430,4 @@ def inline_timed(label, body, *args, verbose=False, **kwargs):
     return end_time - start_time
 
 
-timed(main)
+main()
