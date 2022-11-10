@@ -1,3 +1,4 @@
+import sys
 from typing import Any, Callable, Generator, Generic, NoReturn, Optional, ParamSpec, TypedDict, TypeVar, Type, TypeAlias
 
 # TODO I think we can simplify this just like we're doing with canisters
@@ -118,6 +119,18 @@ class Stable64GrowResultTemp(Variant, total=False):
 def Func(callable: Callable[..., Any]) -> Type[tuple[Principal, str]]:
     return type((Principal.from_str('aaaaa-aa'), ''))
 
+def get_first_called_function_name() -> str:
+    first_frame = get_first_frame(sys._getframe()) # type: ignore
+    return first_frame.f_code.co_name
+
+def get_first_frame(current_frame: Any) -> Any:
+    previous_frame = current_frame.f_back
+
+    if previous_frame is None:
+        return current_frame
+
+    return get_first_frame(previous_frame)
+
 # TODO make sure call_raw with notify works
 class ic(Generic[T]):
     @staticmethod
@@ -198,6 +211,11 @@ class ic(Generic[T]):
     @staticmethod
     def print(x: Any):
         _kybra_ic.print(str(x)) # type: ignore
+
+    @staticmethod
+    def reply(value: Any):
+        first_called_function_name = get_first_called_function_name()
+        _kybra_ic.reply(first_called_function_name, value) # type: ignore
 
     @staticmethod
     def stable_bytes() -> blob:

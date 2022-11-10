@@ -42,7 +42,7 @@ You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.micr
 
 -   [Python 3.10.7](#python-3.10.7)
 -   [Rust](#rust)
--   [dfx 0.12.0-beta.4](#dfx)
+-   [dfx 0.12.0](#dfx)
 -   [Python VS Code Extension](#python-vs-code-extension)
 
 #### Python 3.10.7
@@ -79,10 +79,10 @@ The following are some common Rust installation issues:
 
 #### dfx
 
-Run the following command to install dfx 0.12.0-beta.3:
+Run the following command to install dfx 0.12.0:
 
 ```bash
-DFX_VERSION=0.12.0-beta.4 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+DFX_VERSION=0.12.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
 ```
 
 #### Python VS Code Extension
