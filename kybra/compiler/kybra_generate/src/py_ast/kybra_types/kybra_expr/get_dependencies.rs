@@ -75,6 +75,14 @@ impl GetDependencies for KybraExpr<'_> {
                     }
                 }
             },
+            ExprKind::List { elts, .. } => elts.iter().fold(HashSet::new(), |acc, elt| {
+                let dependencies = KybraExpr {
+                    located_expr: elt,
+                    source_map: self.source_map,
+                }
+                .get_dependent_types(type_alias_lookup, found_type_names);
+                acc.union(&dependencies).cloned().collect()
+            }),
             _ => HashSet::new(),
         }
     }

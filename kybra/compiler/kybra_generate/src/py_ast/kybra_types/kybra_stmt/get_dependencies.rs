@@ -56,11 +56,27 @@ impl GetDependencies for KybraStmt<'_> {
                 source_map: self.source_map,
             }
             .get_dependent_types(type_alias_lookup, found_type_names),
-            StmtKind::AnnAssign { annotation, .. } => KybraExpr {
-                located_expr: annotation,
-                source_map: self.source_map,
+            StmtKind::AnnAssign { annotation, .. } => {
+                if self.is_func() {
+                    match self.get_func_args() {
+                        Some(args) => args.iter().fold(found_type_names.clone(), |acc, arg| {
+                            let dependencies = KybraExpr {
+                                located_expr: arg,
+                                source_map: self.source_map,
+                            }
+                            .get_dependent_types(type_alias_lookup, found_type_names);
+                            acc.union(&dependencies).cloned().collect()
+                        }),
+                        None => found_type_names.clone(),
+                    }
+                } else {
+                    KybraExpr {
+                        located_expr: annotation,
+                        source_map: self.source_map,
+                    }
+                    .get_dependent_types(type_alias_lookup, found_type_names)
+                }
             }
-            .get_dependent_types(type_alias_lookup, found_type_names),
             _ => HashSet::new(),
         }
     }
