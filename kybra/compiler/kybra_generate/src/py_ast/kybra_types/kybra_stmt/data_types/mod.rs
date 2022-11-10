@@ -1,3 +1,4 @@
+mod func;
 mod records;
 mod tuples;
 mod variants;
@@ -19,13 +20,13 @@ impl KybraStmt<'_> {
                 }
                 todo!();
             }
+            StmtKind::Assign { .. } => self.as_tuple(),
+            StmtKind::AnnAssign { .. } => self.as_func(),
             StmtKind::FunctionDef { .. } => todo!(),
             StmtKind::AsyncFunctionDef { .. } => todo!(),
             StmtKind::Return { .. } => todo!(),
             StmtKind::Delete { .. } => todo!(),
-            StmtKind::Assign { .. } => self.as_tuple(),
             StmtKind::AugAssign { .. } => todo!(),
-            StmtKind::AnnAssign { .. } => todo!(),
             StmtKind::For { .. } => todo!(),
             StmtKind::AsyncFor { .. } => todo!(),
             StmtKind::While { .. } => todo!(),

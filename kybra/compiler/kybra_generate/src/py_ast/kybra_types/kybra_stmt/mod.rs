@@ -18,6 +18,7 @@ pub struct KybraStmt<'a> {
     pub source_map: &'a SourceMap,
 }
 
+// TODO what is the difference if any to get_alias_name and get_name?
 impl KybraStmt<'_> {
     pub fn get_name(&self) -> Option<String> {
         match &self.stmt_kind.node {
@@ -36,7 +37,11 @@ impl KybraStmt<'_> {
                 }
             }
             StmtKind::AugAssign { .. } => todo!(),
-            StmtKind::AnnAssign { .. } => todo!(),
+            StmtKind::AnnAssign { target, .. } => KybraExpr {
+                located_expr: target,
+                source_map: self.source_map,
+            }
+            .get_name(),
             _ => None,
         }
     }

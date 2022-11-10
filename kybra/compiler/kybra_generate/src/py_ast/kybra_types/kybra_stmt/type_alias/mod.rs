@@ -2,6 +2,7 @@ use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use super::KybraStmt;
 
+// TODO what is the difference if any to get_alias_name and get_name?
 impl KybraStmt<'_> {
     pub fn get_alias_name(&self) -> Option<String> {
         match &self.stmt_kind.node {
@@ -15,6 +16,10 @@ impl KybraStmt<'_> {
                     _ => None,
                 }
             }
+            StmtKind::AnnAssign { target, .. } => match &target.node {
+                ExprKind::Name { id, .. } => Some(id.clone()),
+                _ => None,
+            },
             _ => None,
         }
     }

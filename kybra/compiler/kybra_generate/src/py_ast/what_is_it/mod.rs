@@ -273,52 +273,7 @@ impl WhatIsIt for Located<ArgData> {
 
 impl WhatIsIt for Located<ExprKind> {
     fn what_is_it(&self) -> () {
-        let expr_kind_type = match &self.node {
-            ExprKind::BoolOp { .. } => "bool op".to_string(),
-            ExprKind::NamedExpr { .. } => "named expr".to_string(),
-            ExprKind::BinOp { .. } => "bin op".to_string(),
-            ExprKind::UnaryOp { .. } => "unary op".to_string(),
-            ExprKind::Lambda { .. } => "lambda".to_string(),
-            ExprKind::IfExp { .. } => "if exp".to_string(),
-            ExprKind::Dict { .. } => "dict".to_string(),
-            ExprKind::Set { .. } => "set".to_string(),
-            ExprKind::ListComp { .. } => "list comp".to_string(),
-            ExprKind::SetComp { .. } => "set comp".to_string(),
-            ExprKind::DictComp { .. } => "dict comp".to_string(),
-            ExprKind::GeneratorExp { .. } => "generator exp".to_string(),
-            ExprKind::Await { .. } => "await".to_string(),
-            ExprKind::Yield { .. } => "yield".to_string(),
-            ExprKind::YieldFrom { .. } => "yield from".to_string(),
-            ExprKind::Compare { .. } => "compare".to_string(),
-            ExprKind::Call { .. } => "call".to_string(),
-            ExprKind::FormattedValue { .. } => "formatted value".to_string(),
-            ExprKind::JoinedStr { .. } => "joined str".to_string(),
-            ExprKind::Constant { value, kind } => {
-                let value = value.to_display_string();
-                let kind = match kind {
-                    Some(kind) => kind,
-                    None => "None",
-                };
-                format!("constant: value({}) kind({})", value, kind)
-            }
-            ExprKind::Attribute { .. } => "attribute".to_string(),
-            ExprKind::Subscript { value, slice, .. } => {
-                format!(
-                    "subscript: value({}), slice({})",
-                    value.to_display_string(),
-                    slice.to_display_string()
-                )
-            }
-            ExprKind::Starred { .. } => "starred".to_string(),
-            ExprKind::Name { id, .. } => format!("name: {}", id),
-            ExprKind::List { .. } => "list".to_string(),
-            ExprKind::Tuple { elts, .. } => {
-                let types: Vec<String> = elts.iter().map(|elt| elt.to_display_string()).collect();
-                format!("tuple: {:?}", types)
-            }
-            ExprKind::Slice { .. } => "slice".to_string(),
-        };
-        eprintln!("This Expr Kind is a {}", expr_kind_type);
+        eprintln!("This Expr Kind is a {}", self.to_display_string());
     }
 }
 
@@ -371,12 +326,38 @@ impl ToDisplayString for Located<ExprKind> {
             ExprKind::Yield { .. } => "yield".to_string(),
             ExprKind::YieldFrom { .. } => "yield from".to_string(),
             ExprKind::Compare { .. } => "compare".to_string(),
-            ExprKind::Call { .. } => "call".to_string(),
+            ExprKind::Call {
+                func,
+                args,
+                keywords,
+            } => {
+                let func = func.to_display_string();
+                let args: Vec<String> = args.iter().map(|arg| arg.to_display_string()).collect();
+                let keywords: Vec<String> =
+                    keywords.iter().map(|arg| arg.to_display_string()).collect();
+                format!(
+                    "call: func({}), args({:?}), keywords({:?})",
+                    func, args, keywords
+                )
+            }
             ExprKind::FormattedValue { .. } => "formatted value".to_string(),
             ExprKind::JoinedStr { .. } => "joined str".to_string(),
-            ExprKind::Constant { .. } => "constant".to_string(),
+            ExprKind::Constant { value, kind } => {
+                let value = value.to_display_string();
+                let kind = match kind {
+                    Some(kind) => kind,
+                    None => "None",
+                };
+                format!("constant: value({}) kind({})", value, kind)
+            }
             ExprKind::Attribute { .. } => "attribute".to_string(),
-            ExprKind::Subscript { .. } => "subscript".to_string(),
+            ExprKind::Subscript { value, slice, .. } => {
+                format!(
+                    "subscript: value({}), slice({})",
+                    value.to_display_string(),
+                    slice.to_display_string()
+                )
+            }
             ExprKind::Starred { .. } => "starred".to_string(),
             ExprKind::Name { id, .. } => format!("name: {}", id),
             ExprKind::List { .. } => "list".to_string(),
