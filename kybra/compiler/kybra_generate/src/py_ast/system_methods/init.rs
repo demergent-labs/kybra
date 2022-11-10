@@ -3,15 +3,16 @@ use quote::quote;
 use crate::{generators::ic_object, py_ast::PyAst};
 use cdk_framework::{
     nodes::{ActExternalCanister, ActInitMethod},
-    CanisterMethodType,
+    ActCanisterMethod, CanisterMethodType,
 };
 
 impl PyAst<'_> {
     pub fn build_init_method(
         &self,
+        canister_methods: &Vec<ActCanisterMethod>,
         external_canisters: &Vec<ActExternalCanister>,
     ) -> ActInitMethod {
-        let ic_object = ic_object::generate_ic_object(external_canisters);
+        let ic_object = ic_object::generate_ic_object(canister_methods, external_canisters);
 
         let init_function_defs = self.get_function_def_of_type(CanisterMethodType::Init);
 

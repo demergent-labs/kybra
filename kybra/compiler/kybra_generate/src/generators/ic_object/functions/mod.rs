@@ -14,6 +14,7 @@ pub mod notify_functions;
 pub mod notify_raw;
 pub mod notify_with_payment128_functions;
 pub mod print;
+pub mod reply;
 pub mod stable64_grow;
 pub mod stable64_read;
 pub mod stable64_size;
