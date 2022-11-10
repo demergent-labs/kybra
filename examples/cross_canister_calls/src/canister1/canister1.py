@@ -92,16 +92,6 @@ def trap() -> Async[TrapResult]:
         'ok': result.ok
     }
 
-# TODO we need to figure out some kind of type guard/assertion thing for variants
 @update
 def send_notification() -> NotifyResult:
-    result = canister2.receive_notification('This is the notification').notify()
-
-    if 'err' in result:
-        return {
-            'err': result['err']
-        }
-
-    return {
-        'ok': result['ok']
-    }
+    return canister2.receive_notification('This is the notification').notify()
