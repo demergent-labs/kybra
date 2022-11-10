@@ -17,6 +17,11 @@ export type ComplexFunc = ActorMethod<
     ],
     bigint
 >;
+export type GetNotifierFromNotifiersCanisterResult =
+    | {
+          ok: [Principal, string];
+      }
+    | { err: string };
 export interface _SERVICE {
     basic_func_param: ActorMethod<[[Principal, string]], [Principal, string]>;
     basic_func_param_array: ActorMethod<
@@ -27,4 +32,9 @@ export interface _SERVICE {
     basic_func_return_type_array: ActorMethod<[], Array<[Principal, string]>>;
     complex_func_param: ActorMethod<[[Principal, string]], [Principal, string]>;
     complex_func_return_type: ActorMethod<[], [Principal, string]>;
+    get_notifier_from_notifiers_canister: ActorMethod<
+        [],
+        GetNotifierFromNotifiersCanisterResult
+    >;
+    get_stable_func: ActorMethod<[], [Principal, string]>;
 }

@@ -1,14 +1,9 @@
 from typing import TypeAlias
 from kybra import (
     Async,
-    blob,
     Func,
-    Canister,
     CanisterResult,
-    canisters,
-    method,
     nat64,
-    Oneway,
     Principal,
     Query,
     query,
@@ -18,6 +13,8 @@ from kybra import (
     Variant,
 )
 
+from src.notifiers.types import Notifier, NotifierFunc
+
 
 class User(Record):
     id: str
@@ -25,27 +22,26 @@ class User(Record):
     complex_func: "ComplexFunc"
 
 
-class Reaction(Variant, total=False):  # TODO Make sure I got all variants
+class Reaction(Variant, total=False):
     Good: None
     Bad: None
     BasicFunc: "BasicFunc"
     ComplexFunc: "ComplexFunc"
 
 
-# class GetNotifierFromNotifiersCanisterResult(Variant, total=False):
-#     ok: "NotifierFunc"
-#     err: str
+class GetNotifierFromNotifiersCanisterResult(Variant, total=False):
+    ok: "NotifierFunc"
+    err: str
 
 
 BasicFunc: TypeAlias = Func(Query[[str], str])
 ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])
-# NotifierFunc: TypeAlias = Func(Oneway[[blob], None])
 
 
-# class Canister2(Canister):
-#     @method
-#     def get_notifier() -> NotifierFunc:
-#         ...
+@query
+def get_stable_func() -> BasicFunc:
+    # TODO Pull this from stable storage instead
+    return (Principal.from_str("aaaaa-aa"), "start_canister")
 
 
 @query
@@ -67,7 +63,7 @@ def basic_func_return_type() -> BasicFunc:
 def basic_func_return_type_array() -> list[BasicFunc]:
     return [
         (Principal.from_str("aaaaa-aa"), "create_canister"),
-        (Principal.from_str("aaaaa-aa"), "update_setttings"),
+        (Principal.from_str("aaaaa-aa"), "update_settings"),
         (Principal.from_str("aaaaa-aa"), "install_code"),
     ]
 
@@ -82,15 +78,15 @@ def complex_func_return_type() -> ComplexFunc:
     return (Principal.from_str("aaaaa-aa"), "stop_canister")
 
 
-# @update
-# def get_notifier_from_notifiers_canister() -> Async[
-#     GetNotifierFromNotifiersCanisterResult
-# ]:
-#     notifiers_canister = Canister2(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
+@update
+def get_notifier_from_notifiers_canister() -> Async[
+    GetNotifierFromNotifiersCanisterResult
+]:
+    notifiers_canister = Notifier(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
 
-#     result: CanisterResult[NotifierFunc] = yield notifiers_canister.get_notifier()
+    result: CanisterResult[NotifierFunc] = yield notifiers_canister.get_notifier()
 
-#     if result.err is not None:
-#         return {"err": result.err}
+    if result.err is not None:
+        return {"err": result.err}
 
-#     return {"ok": result.ok}
+    return {"ok": result.ok}

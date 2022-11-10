@@ -19,6 +19,10 @@ export const idlFactory = ({ IDL }) => {
             []
         )
     );
+    const GetNotifierFromNotifiersCanisterResult = IDL.Variant({
+        ok: IDL.Func([IDL.Vec(IDL.Nat8)], [], ['oneway']),
+        err: IDL.Text
+    });
     return IDL.Service({
         basic_func_param: IDL.Func(
             [IDL.Func([IDL.Text], [IDL.Text], ['query'])],
@@ -126,6 +130,16 @@ export const idlFactory = ({ IDL }) => {
                     []
                 )
             ],
+            ['query']
+        ),
+        get_notifier_from_notifiers_canister: IDL.Func(
+            [],
+            [GetNotifierFromNotifiersCanisterResult],
+            []
+        ),
+        get_stable_func: IDL.Func(
+            [],
+            [IDL.Func([IDL.Text], [IDL.Text], ['query'])],
             ['query']
         )
     });

@@ -9,14 +9,6 @@ const func_types_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-const allTests = get_tests(func_types_canister);
-const pythonCompatibleTests = allTests.filter((test: Test) => {
-    return (
-        test.name != 'get_stable_func' &&
-        test.name != 'get_notifier_from_notifiers_canister'
-    );
-});
-
 const tests: Test[] = [
     {
         name: 'deploy func_types',
@@ -46,7 +38,7 @@ const tests: Test[] = [
             });
         }
     },
-    ...pythonCompatibleTests
+    ...get_tests(func_types_canister)
 ];
 
 run_tests(tests);

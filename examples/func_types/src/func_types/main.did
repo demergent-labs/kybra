@@ -11,6 +11,10 @@ type ComplexFunc = func (
       BasicFunc : func (text) -> (text) query;
     },
   ) -> (nat64);
+type GetNotifierFromNotifiersCanisterResult = variant {
+  ok : func (vec nat8) -> () oneway;
+  err : text;
+};
 service : () -> {
   basic_func_param : (func (text) -> (text) query) -> (
       func (text) -> (text) query,
@@ -64,4 +68,8 @@ service : () -> {
           },
         ) -> (nat64),
     ) query;
+  get_notifier_from_notifiers_canister : () -> (
+      GetNotifierFromNotifiersCanisterResult,
+    );
+  get_stable_func : () -> (func (text) -> (text) query) query;
 }

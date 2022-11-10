@@ -13,7 +13,7 @@
             "type": "custom",
             "build": "python -m kybra notifiers src/notifiers/main.py src/notifiers/main.did",
             "candid": "src/notifiers/main.did",
-            "wasm": ".dfx/kybra/notifiers/target/wasm32-unknown-unknown/release/notifiers.wasm",
+            "wasm": ".dfx/kybra/notifiers/target/wasm32-unknown-unknown/release/notifiers.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/notifiers"
             }
