@@ -38,7 +38,7 @@ const tests: Test[] = [
             });
         }
     },
-    ...get_tests(func_types_canister)
+    ...get_tests(func_types_canister as any)
 ];
 
 run_tests(tests);
