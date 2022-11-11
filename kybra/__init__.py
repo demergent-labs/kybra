@@ -254,6 +254,10 @@ class ic(Generic[T]):
         _kybra_ic.stable64_write(offset, buf) # type: ignore
 
     @staticmethod
+    def stable_storage() -> Any:
+        return _kybra_stable_storage # type: ignore
+
+    @staticmethod
     def trap(message: str) -> NoReturn: # type: ignore
         _kybra_ic.trap(message) # type: ignore
 

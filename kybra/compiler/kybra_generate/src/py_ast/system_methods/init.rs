@@ -36,6 +36,8 @@ impl PyAst<'_> {
         let body = quote::quote! {
             unsafe {
                 let _kybra_interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
+                    // TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
+                    // vm.add_frozen(rustpython_pylib::frozen_stdlib());
                     vm.add_native_modules(rustpython_stdlib::get_module_inits());
                     vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
                 });
@@ -43,7 +45,9 @@ impl PyAst<'_> {
 
                 _kybra_interpreter.enter(|vm| {
                     Ic::make_class(&vm.ctx);
-                    vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm);
+                    vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm).unwrap();
+
+                    vm.builtins.set_attr("_kybra_stable_storage", vm.ctx.new_dict(), vm).unwrap();
 
                     let result = vm.run_code_string(
                         _kybra_scope.clone(),
