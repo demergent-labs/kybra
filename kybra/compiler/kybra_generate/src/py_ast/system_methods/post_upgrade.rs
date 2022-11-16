@@ -15,7 +15,7 @@ impl PyAst<'_> {
         let ic_object = ic_object::generate_ic_object(canister_methods, external_canisters);
 
         let post_upgrade_function_defs =
-            self.get_function_def_of_type(CanisterMethodType::PreUpgrade);
+            self.get_function_def_of_type(CanisterMethodType::PostUpgrade);
 
         if post_upgrade_function_defs.len() > 1 {
             todo!();
@@ -39,6 +39,8 @@ impl PyAst<'_> {
         let body = quote::quote! {
             unsafe {
                 let _kybra_interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
+                    // TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
+                    // vm.add_frozen(rustpython_pylib::frozen_stdlib());
                     vm.add_native_modules(rustpython_stdlib::get_module_inits());
                     vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
                 });
@@ -46,7 +48,12 @@ impl PyAst<'_> {
 
                 _kybra_interpreter.enter(|vm| {
                     Ic::make_class(&vm.ctx);
-                    vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm);
+                    vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm).unwrap();
+
+                    let _kybra_stable_storage_serialized_tuple: (Vec<u8>,) = ic_cdk::storage::stable_restore().unwrap();
+                    let _kybra_stable_storage = deserialize(vm, &mut serde_json::Deserializer::from_slice(&_kybra_stable_storage_serialized_tuple.0)).unwrap();
+
+                    vm.builtins.set_attr("_kybra_stable_storage", _kybra_stable_storage, vm).unwrap();
 
                     let result = vm.run_code_string(
                         _kybra_scope.clone(),

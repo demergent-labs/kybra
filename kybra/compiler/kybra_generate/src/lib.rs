@@ -41,7 +41,7 @@ pub fn kybra_generate(
     eprintln!("-------------------------------------------");
 
     quote! {
-        use rustpython_vm::{AsObject, builtins::{PyBaseException, PyGenerator, PyListRef, PyTupleRef, PyIntRef}, class::PyClassImpl, convert::ToPyObject, function::IntoFuncArgs, PyObjectRef, PyRef, VirtualMachine, protocol::{PyIter, PyIterReturn}};
+        use rustpython_vm::{AsObject, builtins::{PyBaseException, PyGenerator, PyListRef, PyTupleRef, PyIntRef}, class::PyClassImpl, convert::ToPyObject, function::IntoFuncArgs, PyObjectRef, PyRef, VirtualMachine, protocol::{PyIter, PyIterReturn}, py_serde::{deserialize, serialize}};
         use rustpython_derive::{pyclass, PyPayload};
         use kybra_vm_value_derive::{CdkActTryIntoVmValue, CdkActTryFromVmValue};
         use std::str::FromStr;

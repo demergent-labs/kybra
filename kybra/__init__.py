@@ -153,7 +153,11 @@ class ic(Generic[T]):
 
     @staticmethod
     def accept_message():
-        _kybra_ic.accept_message() #type:ignore
+        _kybra_ic.accept_message() #type: ignore
+
+    @staticmethod
+    def caller() -> Principal:
+        return _kybra_ic.caller() # type: ignore
 
     @staticmethod
     def candid_encode(candid_string: str) -> blob:
@@ -252,6 +256,10 @@ class ic(Generic[T]):
     @staticmethod
     def stable64_write(offset: nat64, buf: blob):
         _kybra_ic.stable64_write(offset, buf) # type: ignore
+
+    @staticmethod
+    def stable_storage() -> Any:
+        return _kybra_stable_storage # type: ignore
 
     @staticmethod
     def trap(message: str) -> NoReturn: # type: ignore
