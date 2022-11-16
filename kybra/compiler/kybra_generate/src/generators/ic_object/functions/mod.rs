@@ -1,4 +1,5 @@
 pub mod accept_message;
+pub mod caller;
 pub mod candid_decode;
 pub mod candid_encode;
 pub mod canister_balance;

@@ -1,0 +1,19 @@
+{
+    "canisters": {
+        "ic_api": {
+            "type": "custom",
+            "build": "python -m kybra ic_api src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/ic_api/target/wasm32-unknown-unknown/release/ic_api.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/ic_api"
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}

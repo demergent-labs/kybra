@@ -153,7 +153,11 @@ class ic(Generic[T]):
 
     @staticmethod
     def accept_message():
-        _kybra_ic.accept_message() #type:ignore
+        _kybra_ic.accept_message() #type: ignore
+
+    @staticmethod
+    def caller() -> Principal:
+        return _kybra_ic.caller() # type: ignore
 
     @staticmethod
     def candid_encode(candid_string: str) -> blob:

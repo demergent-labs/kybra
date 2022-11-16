@@ -3,6 +3,7 @@ use cdk_framework::ActCanisterMethod;
 use quote::quote;
 
 use crate::generators::ic_object::functions::accept_message::generate_accept_message;
+use crate::generators::ic_object::functions::caller::generate_caller;
 use crate::generators::ic_object::functions::candid_decode::generate_candid_decode;
 use crate::generators::ic_object::functions::candid_encode::generate_candid_encode;
 use crate::generators::ic_object::functions::canister_balance::generate_canister_balance;
@@ -37,6 +38,7 @@ pub fn generate_ic_object(
     external_canisters: &Vec<ActExternalCanister>,
 ) -> proc_macro2::TokenStream {
     let accept_message = generate_accept_message();
+    let caller = generate_caller();
     let candid_decode = generate_candid_decode();
     let candid_encode = generate_candid_encode();
     let canister_balance = generate_canister_balance();
@@ -73,6 +75,7 @@ pub fn generate_ic_object(
         #[pyclass]
         impl Ic {
             #accept_message
+            #caller
             #candid_decode
             #candid_encode
             #canister_balance
