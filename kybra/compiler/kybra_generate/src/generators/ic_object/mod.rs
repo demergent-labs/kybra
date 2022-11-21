@@ -18,6 +18,7 @@ use crate::generators::ic_object::functions::msg_cycles_refunded128::generate_ms
 use crate::generators::ic_object::functions::notify_functions::generate_notify_functions;
 use crate::generators::ic_object::functions::notify_raw::generate_notify_raw;
 use crate::generators::ic_object::functions::notify_with_payment128_functions::generate_notify_with_payment128_functions;
+use crate::generators::ic_object::functions::performance_counter::generate_performance_counter;
 use crate::generators::ic_object::functions::print::generate_print;
 use crate::generators::ic_object::functions::reply::generate_reply;
 use crate::generators::ic_object::functions::stable64_grow::generate_stable64_grow;
@@ -54,6 +55,7 @@ pub fn generate_ic_object(
     let notify_raw = generate_notify_raw();
     let notify_with_payment128_functions =
         generate_notify_with_payment128_functions(external_canisters);
+    let performance_counter = generate_performance_counter();
     let print = generate_print();
     let reply = generate_reply(canister_methods);
     let stable_bytes = generate_stable_bytes();
@@ -90,6 +92,7 @@ pub fn generate_ic_object(
             #(#notify_functions)*
             #notify_raw
             #(#notify_with_payment128_functions)*
+            #performance_counter
             #print
             #reply
             #stable_bytes
