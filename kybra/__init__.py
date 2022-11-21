@@ -213,6 +213,10 @@ class ic(Generic[T]):
         return _kybra_ic.notify_raw(canister_id, method, args_raw, payment) # type: ignore
 
     @staticmethod
+    def performance_counter(counter_type: nat32) -> nat64:
+        return _kybra_ic.performance_counter(counter_type) # type: ignore
+
+    @staticmethod
     def print(x: Any):
         _kybra_ic.print(str(x)) # type: ignore
 

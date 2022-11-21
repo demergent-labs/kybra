@@ -1,1 +1,4 @@
-service : () -> { caller : () -> (principal) query }
+service : () -> {
+  caller : () -> (principal) query;
+  performance_counter : () -> (nat64) query;
+}
