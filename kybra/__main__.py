@@ -158,7 +158,7 @@ def compile_python_or_exit(
 ):
     bundle_python_code(paths)
     add_wasm_compilation_target_or_exit(verbose)
-    install_ic_cdk_optimizer(verbose)
+    install_ic_cdk_optimizer_or_exit(verbose)
     run_kybra_generate_or_exit(paths, cargo_env, verbose)
     run_rustfmt_or_exit(paths, verbose)
 
