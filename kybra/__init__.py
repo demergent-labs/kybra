@@ -24,6 +24,7 @@ text = str
 
 T = TypeVar('T')
 opt = Optional[T]
+manual = Optional[T]
 
 Record = TypedDict
 Variant = TypedDict
@@ -153,7 +154,11 @@ class ic(Generic[T]):
 
     @staticmethod
     def accept_message():
-        _kybra_ic.accept_message() #type:ignore
+        _kybra_ic.accept_message() #type: ignore
+
+    @staticmethod
+    def caller() -> Principal:
+        return _kybra_ic.caller() # type: ignore
 
     @staticmethod
     def candid_encode(candid_string: str) -> blob:
@@ -209,13 +214,25 @@ class ic(Generic[T]):
         return _kybra_ic.notify_raw(canister_id, method, args_raw, payment) # type: ignore
 
     @staticmethod
+    def performance_counter(counter_type: nat32) -> nat64:
+        return _kybra_ic.performance_counter(counter_type) # type: ignore
+
+    @staticmethod
     def print(x: Any):
         _kybra_ic.print(str(x)) # type: ignore
+
+    @staticmethod
+    def reject(x: Any):
+        _kybra_ic.reject(x) # type: ignore
 
     @staticmethod
     def reply(value: Any):
         first_called_function_name = get_first_called_function_name()
         _kybra_ic.reply(first_called_function_name, value) # type: ignore
+
+    @staticmethod
+    def reply_raw(x: Any):
+        _kybra_ic.reply_raw(x) # type: ignore
 
     @staticmethod
     def stable_bytes() -> blob:
@@ -252,6 +269,14 @@ class ic(Generic[T]):
     @staticmethod
     def stable64_write(offset: nat64, buf: blob):
         _kybra_ic.stable64_write(offset, buf) # type: ignore
+
+    @staticmethod
+    def stable_storage() -> Any:
+        return _kybra_stable_storage # type: ignore
+
+    @staticmethod
+    def time() -> nat64:
+        return _kybra_ic.time() # type: ignore
 
     @staticmethod
     def trap(message: str) -> NoReturn: # type: ignore

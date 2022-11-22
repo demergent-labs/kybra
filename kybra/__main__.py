@@ -242,10 +242,10 @@ def add_wasm_compilation_target_or_exit(verbose: bool = False):
         print("💀 Build failed")
         sys.exit(1)
 
-
-def install_ic_cdk_optimizer(verbose: bool = False):
+# TODO reconcile this with Dan's code
+def install_ic_cdk_optimizer_or_exit(verbose: bool = False):
     # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/43?u=lastmjs
-    install_cdk_optimizer_result = subprocess.run(
+    subprocess.run(
         ["cargo", "install", "ic-cdk-optimizer", "--version=0.3.4"],
         capture_output=not verbose,
     )
@@ -253,11 +253,11 @@ def install_ic_cdk_optimizer(verbose: bool = False):
     #     ["cargo", "install", "ic-wasm", "--version=0.3.0"], capture_output=not verbose
     # )
 
-    # Assume that a failure means it's already installed
-    if install_cdk_optimizer_result.returncode != 0:
-        print(red('\n Warning: unable to install dependency "ic-cdk-optimizer"\n'))
-        print(install_cdk_optimizer_result.stderr.decode("utf-8"))
-        print("proceeding anyway...")
+    # if install_cdk_optimizer_result.returncode != 0:
+    #     print(red('\n💣 Unable to install dependency "ic-cdk-optimizer"\n'))
+    #     print(install_cdk_optimizer_result.stderr.decode("utf-8"))
+    #     print("💀 Build failed")
+    #     sys.exit(1)
 
 
 def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool):

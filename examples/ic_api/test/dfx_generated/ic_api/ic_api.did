@@ -1,0 +1,5 @@
+service : () -> {
+  caller : () -> (principal) query;
+  performance_counter : () -> (nat64) query;
+  time : () -> (nat64) query;
+}
