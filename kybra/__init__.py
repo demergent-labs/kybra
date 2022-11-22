@@ -275,6 +275,10 @@ class ic(Generic[T]):
         return _kybra_stable_storage # type: ignore
 
     @staticmethod
+    def time() -> nat64:
+        return _kybra_ic.time() # type: ignore
+
+    @staticmethod
     def trap(message: str) -> NoReturn: # type: ignore
         _kybra_ic.trap(message) # type: ignore
 

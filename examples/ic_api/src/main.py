@@ -8,3 +8,8 @@ def caller() -> Principal:
 @query
 def performance_counter() -> nat64:
     return ic.performance_counter(0)
+
+# returns the current timestamp
+@query
+def time() -> nat64:
+    return ic.time()

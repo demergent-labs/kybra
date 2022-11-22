@@ -32,6 +32,7 @@ use crate::generators::ic_object::functions::stable_grow::generate_stable_grow;
 use crate::generators::ic_object::functions::stable_read::generate_stable_read;
 use crate::generators::ic_object::functions::stable_size::generate_stable_size;
 use crate::generators::ic_object::functions::stable_write::generate_stable_write;
+use crate::generators::ic_object::functions::time::generate_time;
 use crate::generators::ic_object::functions::trap::generate_trap;
 
 mod functions;
@@ -71,6 +72,7 @@ pub fn generate_ic_object(
     let stable64_read = generate_stable64_read();
     let stable64_size = generate_stable64_size();
     let stable64_write = generate_stable64_write();
+    let time = generate_time();
     let trap = generate_trap();
 
     quote! {
@@ -110,6 +112,7 @@ pub fn generate_ic_object(
             #stable64_read
             #stable64_size
             #stable64_write
+            #time
             #trap
         }
 
