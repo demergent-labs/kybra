@@ -14,6 +14,7 @@ pub mod msg_cycles_refunded128;
 pub mod notify_functions;
 pub mod notify_raw;
 pub mod notify_with_payment128_functions;
+pub mod performance_counter;
 pub mod print;
 pub mod reply;
 pub mod stable64_grow;
