@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='kybra',
-    version='0.0.8',
+    version='0.0.9',
     package_data={
         'kybra': ['compiler/**', 'canisters/**']
     },
