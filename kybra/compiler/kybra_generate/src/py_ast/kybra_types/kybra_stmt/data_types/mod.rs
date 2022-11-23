@@ -1,6 +1,7 @@
 mod func;
 mod records;
 mod tuples;
+mod type_alias;
 mod variants;
 
 use rustpython_parser::ast::StmtKind;
@@ -20,8 +21,22 @@ impl KybraStmt<'_> {
                 }
                 todo!();
             }
-            StmtKind::Assign { .. } => self.as_tuple(),
-            StmtKind::AnnAssign { .. } => self.as_func(),
+            StmtKind::Assign { .. } => {
+                if self.is_tuple() {
+                    return self.as_tuple();
+                } else if self.is_type_alias() {
+                    return self.as_type_alias();
+                }
+                todo!();
+            }
+            StmtKind::AnnAssign { .. } => {
+                if self.is_func() {
+                    return self.as_func();
+                } else if self.is_type_alias() {
+                    return self.as_type_alias();
+                }
+                todo!()
+            }
             StmtKind::FunctionDef { .. } => todo!(),
             StmtKind::AsyncFunctionDef { .. } => todo!(),
             StmtKind::Return { .. } => todo!(),

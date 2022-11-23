@@ -1,4 +1,6 @@
-use rustpython_parser::ast::{ArgData, Constant, ExprKind, KeywordData, Located, StmtKind};
+use rustpython_parser::ast::{
+    ArgData, Arguments, Constant, ExprKind, KeywordData, Located, StmtKind,
+};
 
 use super::kybra_types::KybraStmt;
 
@@ -76,10 +78,22 @@ impl WhatIsIt for Located<StmtKind> {
                 eprintln!("--------------------------------------");
                 eprintln!("This is a function def");
                 eprintln!("The name is: {}", name);
-                eprintln!("The args are: {:?}", args);
-                eprintln!("The body is: {:?}", body);
-                eprintln!("The decorators are: {:?}", decorator_list);
-                eprintln!("The returns are: {:?}", returns);
+                eprintln!("The args are: {:?}", args.to_display_string());
+                let body_strings: Vec<String> =
+                    body.iter().map(|stmt| stmt.to_display_string()).collect();
+                eprintln!("The body is: {:?}", body_strings);
+                let decorator_string: Vec<String> = decorator_list
+                    .iter()
+                    .map(|decorator| decorator.to_display_string())
+                    .collect();
+                eprintln!("The decorators are: {:?}", decorator_string);
+                eprintln!(
+                    "The returns are: {:?}",
+                    match returns {
+                        Some(returns) => returns.to_display_string(),
+                        None => "None".to_string(),
+                    }
+                );
                 eprintln!("The type_comment is: {:?}", type_comment);
                 eprintln!("--------------------------------------");
             }
@@ -214,6 +228,61 @@ impl WhatIsIt for Located<StmtKind> {
                 eprintln!("--------------------------------------");
             }
         }
+    }
+}
+
+impl ToDisplayString for Arguments {
+    fn to_display_string(&self) -> String {
+        let pos_only_args: Vec<String> = self
+            .posonlyargs
+            .iter()
+            .map(|arg| arg.to_display_string())
+            .collect();
+        let args: Vec<String> = self
+            .args
+            .iter()
+            .map(|arg| arg.to_display_string())
+            .collect();
+        let var_arg = match &self.vararg {
+            Some(var_arg) => var_arg.to_display_string(),
+            None => "None".to_string(),
+        };
+        let kw_only_args: Vec<String> = self
+            .kwonlyargs
+            .iter()
+            .map(|arg| arg.to_display_string())
+            .collect();
+        let kw_defaults: Vec<String> = self
+            .kw_defaults
+            .iter()
+            .map(|arg| arg.to_display_string())
+            .collect();
+        let kw_arg = match &self.kwarg {
+            Some(var_arg) => var_arg.to_display_string(),
+            None => "None".to_string(),
+        };
+        let defaults = self.defaults.iter().map(|arg| arg.to_display_string());
+        format!(
+            "Arguments: pos_only_args({:?}) args({:?}) var_arg({var_arg}) kw_only_args({:?}) kw_defaults({:?}) kw_arg({kw_arg}) defaults({:?})",
+            pos_only_args, args, kw_only_args, kw_defaults, defaults
+        )
+    }
+}
+
+impl ToDisplayString for Located<ArgData> {
+    fn to_display_string(&self) -> String {
+        let type_annotation = match &self.node.annotation {
+            Some(annotation) => annotation.to_display_string(),
+            None => "None".to_string(),
+        };
+        let type_comment = match &self.node.type_comment {
+            Some(type_comment) => type_comment.clone(),
+            None => "None".to_string(),
+        };
+        format!(
+            "ArgData: arg({}) type_annotation({}) type_comment({})",
+            self.node.arg, type_annotation, type_comment,
+        )
     }
 }
 
