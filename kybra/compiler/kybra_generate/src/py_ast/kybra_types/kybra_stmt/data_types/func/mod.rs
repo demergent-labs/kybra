@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use rustpython_parser::ast::{ExprKind, StmtKind};
+use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::py_ast::kybra_types::{KybraExpr, KybraStmt};
 use cdk_framework::{
@@ -130,6 +130,23 @@ impl KybraStmt<'_> {
                 is_type_alias && is_func
             }
             _ => false,
+        }
+    }
+
+    pub fn get_func_args(&self) -> Option<&Vec<Located<ExprKind>>> {
+        if !self.is_func() {
+            return None;
+        }
+
+        match &self.stmt_kind.node {
+            StmtKind::AnnAssign { value, .. } => match &value {
+                Some(value) => match &value.node {
+                    ExprKind::Call { args, .. } => Some(args),
+                    _ => None,
+                },
+                None => None,
+            },
+            _ => None,
         }
     }
 }
