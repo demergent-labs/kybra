@@ -31,7 +31,7 @@ impl PyAst<'_> {
 
                     let mut _kybra_stable_storage_serialized = vec![];
 
-                    let serialized_result = serialize(
+                    let serialized_result = kybra_serialize(
                         vm,
                         &_kybra_stable_storage,
                         &mut serde_json::Serializer::new(&mut _kybra_stable_storage_serialized),

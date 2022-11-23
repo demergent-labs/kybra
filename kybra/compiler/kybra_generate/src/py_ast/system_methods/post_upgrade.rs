@@ -51,7 +51,7 @@ impl PyAst<'_> {
                     vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm).unwrap();
 
                     let _kybra_stable_storage_serialized_tuple: (Vec<u8>,) = ic_cdk::storage::stable_restore().unwrap();
-                    let _kybra_stable_storage = deserialize(vm, &mut serde_json::Deserializer::from_slice(&_kybra_stable_storage_serialized_tuple.0)).unwrap();
+                    let _kybra_stable_storage = kybra_deserialize(vm, &mut serde_json::Deserializer::from_slice(&_kybra_stable_storage_serialized_tuple.0)).unwrap();
 
                     vm.builtins.set_attr("_kybra_stable_storage", _kybra_stable_storage, vm).unwrap();
 
