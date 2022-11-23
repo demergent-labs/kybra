@@ -19,21 +19,11 @@ const tests: Test[] = [
                 stdio: 'inherit'
             });
 
-            execSync(`dfx deploy func_types`, {
-                stdio: 'inherit'
-            });
-        }
-    },
-    {
-        name: 'deploy notifiers',
-        prep: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-
             execSync(`dfx canister uninstall-code notifiers || true`, {
                 stdio: 'inherit'
             });
 
-            execSync(`dfx deploy notifiers`, {
+            execSync(`dfx deploy`, {
                 stdio: 'inherit'
             });
         }
