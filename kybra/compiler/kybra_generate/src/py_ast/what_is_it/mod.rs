@@ -287,7 +287,12 @@ impl WhatIsIt for Located<ArgData> {
 
 impl WhatIsIt for Located<ExprKind> {
     fn what_is_it(&self) -> () {
-        eprintln!("This Expr Kind is a {}", self.to_display_string());
+        eprintln!(
+            "This Expr Kind is a {}. It's located at {}:{}",
+            self.to_display_string(),
+            self.location.row(),
+            self.location.column()
+        );
     }
 }
 
