@@ -37,12 +37,17 @@ impl ToActDataType for KybraExpr<'_> {
                     }),
                 }),
             },
-            ExprKind::Subscript { value, .. } => match &value.node {
+            ExprKind::Subscript { value, slice, .. } => match &value.node {
                 ExprKind::Name { id, .. } => match &id[..] {
                     "Async" => self.to_async(alias_name),
                     "opt" => self.to_opt(alias_name),
                     "list" => self.to_array(alias_name),
                     "tuple" => self.to_tuple(alias_name),
+                    "manual" => KybraExpr {
+                        located_expr: slice,
+                        source_map: self.source_map,
+                    }
+                    .to_act_data_type(alias_name),
                     _ => panic!("{}", self.invalid_subscript_value_error()),
                 },
                 _ => panic!("{}", self.invalid_subscript_value_error()),

@@ -30,7 +30,7 @@ fn generate_match_arm(canister_method: &ActCanisterMethod) -> proc_macro2::Token
     quote!(
         #name => {
             let reply_value: #return_type = reply_value_py_object_ref.try_from_vm_value(vm).unwrap();
-            ic_cdk::api::call::reply((reply_value,)).try_into_vm_value(_context).unwrap()
+            ic_cdk::api::call::reply((reply_value,)).try_into_vm_value(vm).unwrap()
         }
     )
 }

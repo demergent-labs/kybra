@@ -56,8 +56,8 @@ impl PyAst<'_> {
     pub fn generate_type_alias_lookup(&self) -> HashMap<String, KybraStmt> {
         self.kybra_programs
             .iter()
-            .fold(HashMap::new(), |mut acc, kybra_type_alias| {
-                acc.extend(kybra_type_alias.generate_type_alias_lookup());
+            .fold(HashMap::new(), |mut acc, kybra_program| {
+                acc.extend(kybra_program.generate_type_alias_lookup());
                 acc
             })
     }

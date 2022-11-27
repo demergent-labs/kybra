@@ -1,4 +1,4 @@
-use rustpython_parser::ast::{ExprKind, StmtKind};
+use rustpython_parser::ast::{Constant, ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::KybraStmt;
 use cdk_framework::{
@@ -18,6 +18,17 @@ impl KybraStmt<'_> {
             StmtKind::ClassDef { name, body, .. } => {
                 let members: Vec<ActRecordMember> = body
                     .iter()
+                    .filter(|stmt| match &stmt.node {
+                        StmtKind::Expr { value } => match &value.node {
+                            ExprKind::Constant { value, .. } => match value {
+                                // Remove ellipses since they are parsed as nothing.
+                                Constant::Ellipsis => false,
+                                _ => true,
+                            },
+                            _ => true,
+                        },
+                        _ => true,
+                    })
                     .map(|stmt| {
                         KybraStmt {
                             stmt_kind: stmt,
