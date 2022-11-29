@@ -177,6 +177,10 @@ class ic(Generic[T]):
         return _kybra_ic.canister_balance128() # type: ignore
 
     @staticmethod
+    def id() -> Principal:
+        return _kybra_ic.id() #type:ignore
+
+    @staticmethod
     def method_name() -> str:
         return _kybra_ic.method_name() #type:ignore
 

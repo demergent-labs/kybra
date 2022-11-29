@@ -8,6 +8,7 @@ use crate::generators::ic_object::functions::candid_decode::generate_candid_deco
 use crate::generators::ic_object::functions::candid_encode::generate_candid_encode;
 use crate::generators::ic_object::functions::canister_balance::generate_canister_balance;
 use crate::generators::ic_object::functions::canister_balance128::generate_canister_balance128;
+use crate::generators::ic_object::functions::id::generate_id;
 use crate::generators::ic_object::functions::method_name::generate_method_name;
 use crate::generators::ic_object::functions::msg_cycles_accept::generate_msg_cycles_accept;
 use crate::generators::ic_object::functions::msg_cycles_accept128::generate_msg_cycles_accept128;
@@ -47,6 +48,7 @@ pub fn generate_ic_object(
     let candid_encode = generate_candid_encode();
     let canister_balance = generate_canister_balance();
     let canister_balance128 = generate_canister_balance128();
+    let id = generate_id();
     let method_name = generate_method_name();
     let msg_cycles_accept = generate_msg_cycles_accept();
     let msg_cycles_accept128 = generate_msg_cycles_accept128();
@@ -88,6 +90,7 @@ pub fn generate_ic_object(
             #candid_encode
             #canister_balance
             #canister_balance128
+            #id
             #method_name
             #msg_cycles_accept
             #msg_cycles_accept128

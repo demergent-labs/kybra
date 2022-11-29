@@ -4,6 +4,7 @@ pub mod candid_decode;
 pub mod candid_encode;
 pub mod canister_balance;
 pub mod canister_balance128;
+pub mod id;
 pub mod method_name;
 pub mod msg_cycles_accept;
 pub mod msg_cycles_accept128;
