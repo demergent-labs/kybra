@@ -26,7 +26,7 @@ fn generate_match_arms(canister_methods: &Vec<ActCanisterMethod>) -> Vec<proc_ma
 
 fn generate_match_arm(canister_method: &ActCanisterMethod) -> proc_macro2::TokenStream {
     let name = &canister_method.get_name();
-    let return_type = &canister_method.get_return_type().to_token_stream();
+    let return_type = &canister_method.get_return_type().to_token_stream(&vec![]);
     quote!(
         #name => {
             let reply_value: #return_type = reply_value_py_object_ref.try_from_vm_value(vm).unwrap();

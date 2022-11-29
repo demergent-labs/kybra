@@ -51,7 +51,7 @@ pub fn generate_notify_with_payment128_functions(
 fn generate_param_variables(method: &ActExternalCanisterMethod) -> Vec<TokenStream> {
     method.params.iter().enumerate().map(|(index, act_fn_param)| {
         let variable_name = format_ident!("_kybra_{}", act_fn_param.name);
-        let variable_type = act_fn_param.data_type.to_token_stream();
+        let variable_type = act_fn_param.data_type.to_token_stream(&vec![]);
         let actual_index = index + 2;
 
         quote! {

@@ -110,6 +110,44 @@ impl ToAct for KybraAst {
 
         let rust_code = self.rust_code.clone();
 
+        let python_keywords = [
+            "False".to_string(),
+            "None".to_string(),
+            "True".to_string(),
+            "and".to_string(),
+            "as".to_string(),
+            "assert".to_string(),
+            "async".to_string(),
+            "await".to_string(),
+            "break".to_string(),
+            "class".to_string(),
+            "continue".to_string(),
+            "def".to_string(),
+            "del".to_string(),
+            "elif".to_string(),
+            "else".to_string(),
+            "except".to_string(),
+            "finally".to_string(),
+            "for".to_string(),
+            "from".to_string(),
+            "global".to_string(),
+            "if".to_string(),
+            "import".to_string(),
+            "in".to_string(),
+            "is".to_string(),
+            "lambda".to_string(),
+            "nonlocal".to_string(),
+            "not".to_string(),
+            "or".to_string(),
+            "pass".to_string(),
+            "raise".to_string(),
+            "return".to_string(),
+            "try".to_string(),
+            "while".to_string(),
+            "with".to_string(),
+            "yield".to_string(),
+        ];
+
         AbstractCanisterTree {
             update_methods,
             query_methods,
@@ -130,6 +168,7 @@ impl ToAct for KybraAst {
             type_refs,
             variants,
             external_canisters,
+            keywords: python_keywords.to_vec(),
         }
     }
 }
