@@ -74,29 +74,79 @@ pub fn generate_kybra_serde() -> proc_macro2::TokenStream {
             where
                 S: serde::Serializer,
             {
-                if self.pyobject.fast_isinstance(self.vm.ctx.types.dict_type) {
+                let serialize_seq_elements =
+                    |serializer: S, elements: &[PyObjectRef]| -> Result<S::Ok, S::Error> {
+                        let mut seq = serializer.serialize_seq(Some(elements.len()))?;
+
+                        seq.serialize_element(&"LIST")?;
+
+                        for e in elements {
+                            seq.serialize_element(&self.clone_with_object(e))?;
+                        }
+                        seq.end()
+                    };
+                let serialize_tuple_elements =
+                    |serializer: S, elements: &[PyObjectRef]| -> Result<S::Ok, S::Error> {
+                        let mut tup = serializer.serialize_tuple(elements.len())?;
+
+                        tup.serialize_element(&"TUPLE")?;
+
+                        for e in elements {
+                            tup.serialize_element(&self.clone_with_object(e))?;
+                        }
+                        tup.end()
+                    };
+                let serialize_bytes_elements =
+                    |serializer: S, elements: &[u8]| -> Result<S::Ok, S::Error> {
+                        let mut seq = serializer.serialize_seq(Some(elements.len()))?;
+
+                        seq.serialize_element(&"BYTES")?;
+
+                        for e in elements {
+                            seq.serialize_element(e.into())?;
+                        }
+                        seq.end()
+                    };
+                if let Some(s) = self.pyobject.payload::<PyStr>() {
+                    serialize(self.vm, self.pyobject, serializer)
+                } else if self.pyobject.fast_isinstance(self.vm.ctx.types.float_type) {
+                    serialize(self.vm, self.pyobject, serializer)
+                } else if self.pyobject.fast_isinstance(self.vm.ctx.types.bool_type) {
+                    serialize(self.vm, self.pyobject, serializer)
+                } else if self.pyobject.fast_isinstance(self.vm.ctx.types.int_type) {
+                    serialize(self.vm, self.pyobject, serializer)
+                } else if let Some(list) = self.pyobject.payload_if_subclass::<PyList>(self.vm) {
+                    serialize_seq_elements(serializer, &list.borrow_vec())
+                } else if let Some(tuple) = self.pyobject.payload_if_subclass::<PyTuple>(self.vm) {
+                    serialize_tuple_elements(serializer, tuple)
+                } else if let Some(bytes) = self.pyobject.payload_if_subclass::<PyBytes>(self.vm) {
+                    serialize_bytes_elements(serializer, bytes.as_bytes())
+                } else if self.pyobject.fast_isinstance(self.vm.ctx.types.dict_type) {
                     let dict: PyRef<PyDict> = self.pyobject.to_owned().downcast().unwrap();
                     let pairs: Vec<_> = dict.into_iter().collect();
                     let mut map = serializer.serialize_map(Some(pairs.len()))?;
                     for (key, e) in &pairs {
-                        let class = e.class();
-                        let class_name = class.name();
-
-                        if class_name.to_string() == "Principal" {
-                            let to_str = e.get_attr("to_str", self.vm).unwrap();
-                            let to_str_invoke_result = self.vm.invoke(&to_str, ()).unwrap();
-                            let to_str_invoke_string: String = to_str_invoke_result.try_into_value(self.vm).unwrap();
-
-                            map.serialize_entry(&self.clone_with_object(key), &format!("KYBRA::Principal::{}", to_str_invoke_string))?;
-                        }
-                        else {
-                            map.serialize_entry(&self.clone_with_object(key), &self.clone_with_object(e))?;
-                        }
+                        map.serialize_entry(&self.clone_with_object(key), &self.clone_with_object(e))?;
                     }
                     map.end()
-                }
-                else {
+                } else if self.vm.is_none(self.pyobject) {
                     serialize(self.vm, self.pyobject, serializer)
+                } else {
+                    let class = self.pyobject.class();
+                    let class_name = class.name();
+
+                    if class_name.to_string() == "Principal" {
+                        let to_str = self.pyobject.get_attr("to_str", self.vm).unwrap();
+                        let to_str_invoke_result = self.vm.invoke(&to_str, ()).unwrap();
+                        let to_str_invoke_string: String = to_str_invoke_result.try_into_value(self.vm).unwrap();
+
+                        return serializer.serialize_str(&format!("KYBRA::Principal::{}", to_str_invoke_string));
+                    }
+
+                    Err(serde::ser::Error::custom(format!(
+                        "Object of type '{}' is not serializable",
+                        self.pyobject.class()
+                    )))
                 }
             }
         }
@@ -125,7 +175,6 @@ pub fn generate_kybra_serde() -> proc_macro2::TokenStream {
             }
         }
 
-        // TODO let's figure out if we can just call into the PyObjectDeserializer
         impl<'de> Visitor<'de> for KybraPyObjectDeserializer<'de> {
             type Value = PyObjectRef;
 
@@ -207,11 +256,37 @@ Principal
             where
                 A: serde::de::SeqAccess<'de>,
             {
-                let mut seq = Vec::with_capacity(access.size_hint().unwrap_or(0));
-                while let Some(value) = access.next_element_seed(self.clone())? {
-                    seq.push(value);
+                let mut seq_type = "".to_string();
+
+                if let Some(first_value) = access.next_element_seed(self.clone())? {
+                    let first_value_string: String = first_value.try_into_value(self.vm).unwrap();
+                    seq_type = first_value_string;
                 }
-                Ok(self.vm.ctx.new_list(seq).into())
+
+                if seq_type == "BYTES" {
+                    let mut seq = Vec::with_capacity(access.size_hint().unwrap_or(0));
+
+                    while let Some(value) = access.next_element_seed(self.clone())? {
+                        let value_u8: u8 = value.try_from_vm_value(self.vm).unwrap();
+                        seq.push(value_u8);
+                    }
+
+                    Ok(self.vm.ctx.new_bytes(seq).into())
+                }
+                else {
+                    let mut seq = Vec::with_capacity(access.size_hint().unwrap_or(0));
+
+                    while let Some(value) = access.next_element_seed(self.clone())? {
+                        seq.push(value);
+                    }
+
+                    if seq_type == "TUPLE" {
+                        Ok(self.vm.ctx.new_tuple(seq).into())
+                    }
+                    else {
+                        Ok(self.vm.ctx.new_list(seq).into())
+                    }
+                }
             }
 
             fn visit_map<M>(self, mut access: M) -> Result<Self::Value, M::Error>
