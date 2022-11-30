@@ -3,11 +3,15 @@ use cdk_framework::ActCanisterMethod;
 use quote::quote;
 
 use crate::generators::ic_object::functions::accept_message::generate_accept_message;
+use crate::generators::ic_object::functions::arg_data_raw::generate_arg_data_raw;
+use crate::generators::ic_object::functions::arg_data_raw_size::generate_arg_data_raw_size;
 use crate::generators::ic_object::functions::caller::generate_caller;
 use crate::generators::ic_object::functions::candid_decode::generate_candid_decode;
 use crate::generators::ic_object::functions::candid_encode::generate_candid_encode;
 use crate::generators::ic_object::functions::canister_balance::generate_canister_balance;
 use crate::generators::ic_object::functions::canister_balance128::generate_canister_balance128;
+use crate::generators::ic_object::functions::data_certificate::generate_data_certificate;
+use crate::generators::ic_object::functions::id::generate_id;
 use crate::generators::ic_object::functions::method_name::generate_method_name;
 use crate::generators::ic_object::functions::msg_cycles_accept::generate_msg_cycles_accept;
 use crate::generators::ic_object::functions::msg_cycles_accept128::generate_msg_cycles_accept128;
@@ -23,6 +27,7 @@ use crate::generators::ic_object::functions::print::generate_print;
 use crate::generators::ic_object::functions::reject::generate_reject;
 use crate::generators::ic_object::functions::reply::generate_reply;
 use crate::generators::ic_object::functions::reply_raw::generate_reply_raw;
+use crate::generators::ic_object::functions::set_certified_data::generate_set_certified_data;
 use crate::generators::ic_object::functions::stable64_grow::generate_stable64_grow;
 use crate::generators::ic_object::functions::stable64_read::generate_stable64_read;
 use crate::generators::ic_object::functions::stable64_size::generate_stable64_size;
@@ -42,11 +47,15 @@ pub fn generate_ic_object(
     external_canisters: &Vec<ActExternalCanister>,
 ) -> proc_macro2::TokenStream {
     let accept_message = generate_accept_message();
+    let arg_data_raw = generate_arg_data_raw();
+    let arg_data_raw_size = generate_arg_data_raw_size();
     let caller = generate_caller();
     let candid_decode = generate_candid_decode();
     let candid_encode = generate_candid_encode();
     let canister_balance = generate_canister_balance();
     let canister_balance128 = generate_canister_balance128();
+    let data_certificate = generate_data_certificate();
+    let id = generate_id();
     let method_name = generate_method_name();
     let msg_cycles_accept = generate_msg_cycles_accept();
     let msg_cycles_accept128 = generate_msg_cycles_accept128();
@@ -63,6 +72,7 @@ pub fn generate_ic_object(
     let reject = generate_reject();
     let reply = generate_reply(canister_methods);
     let reply_raw = generate_reply_raw();
+    let set_certified_data = generate_set_certified_data();
     let stable_bytes = generate_stable_bytes();
     let stable_grow = generate_stable_grow();
     let stable_read = generate_stable_read();
@@ -83,11 +93,15 @@ pub fn generate_ic_object(
         #[pyclass]
         impl Ic {
             #accept_message
+            #arg_data_raw
+            #arg_data_raw_size
             #caller
             #candid_decode
             #candid_encode
             #canister_balance
             #canister_balance128
+            #data_certificate
+            #id
             #method_name
             #msg_cycles_accept
             #msg_cycles_accept128
@@ -103,6 +117,7 @@ pub fn generate_ic_object(
             #reject
             #reply
             #reply_raw
+            #set_certified_data
             #stable_bytes
             #stable_grow
             #stable_read
