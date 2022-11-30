@@ -2,7 +2,9 @@ use std::collections::{HashMap, HashSet};
 
 use quote::quote;
 
-use crate::generators::async_result_handler::generate_async_result_handler;
+use crate::generators::{
+    async_result_handler::generate_async_result_handler, kybra_serde::generate_kybra_serde,
+};
 use cdk_framework::{
     nodes::{act_canister_method, data_type_nodes, ActExternalCanister},
     ActCanisterMethod, ActDataType, CanisterMethodType,
@@ -80,6 +82,8 @@ impl PyAst<'_> {
 
         let async_result_handler = generate_async_result_handler(&external_canisters);
 
+        let kybra_serde = generate_kybra_serde();
+
         let rust_code = quote! {
             pub fn unwrap_rust_python_result<T>(
                 rust_python_result: Result<T, PyRef<PyBaseException>>,
@@ -96,6 +100,8 @@ impl PyAst<'_> {
             }
 
             #async_result_handler
+
+            #kybra_serde
         };
 
         KybraAst {
