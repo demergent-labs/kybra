@@ -25,7 +25,7 @@ const tests: Test[] = [
         }
     },
     ...get_tests(ic_api_canister as any).filter(
-        (test) => test.name !== 'arg_data_raw'
+        (test) => test.name !== 'performance_counter'
     ),
     {
         name: 'performance_counter',
