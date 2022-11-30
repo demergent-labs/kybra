@@ -2,40 +2,40 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 
 export interface KeywordRecord {
-    as: boolean;
+    as: null;
     if: boolean;
     in: boolean;
-    is: boolean;
-    or: boolean;
-    and: boolean;
-    def: boolean;
-    del: boolean;
+    is: number;
+    or: WithRecord;
+    and: bigint;
+    def: number;
+    del: bigint;
     for: boolean;
-    not: boolean;
+    not: SimpleRecord;
     try: boolean;
-    import: boolean;
+    import: number;
     return: boolean;
-    nonlocal: boolean;
-    finally: boolean;
-    async: boolean;
-    await: boolean;
-    continue: boolean;
-    None: boolean;
-    True: boolean;
-    elif: boolean;
-    else: boolean;
-    from: boolean;
-    class: boolean;
-    pass: boolean;
-    assert: boolean;
-    with: boolean;
-    lambda: boolean;
+    nonlocal: string;
+    finally: number;
+    async: any;
+    await: Array<bigint>;
+    continue: Int16Array;
+    None: [boolean, boolean];
+    True: string;
+    elif: bigint;
+    else: [] | [boolean];
+    from: number;
+    class: number;
+    pass: KeywordVariant;
+    assert: number;
+    with: Principal;
+    lambda: [] | [string];
     False: boolean;
-    global: boolean;
-    break: boolean;
-    except: boolean;
+    global: bigint;
+    break: [] | [Uint8Array];
+    except: number;
     while: boolean;
-    raise: boolean;
+    raise: Uint8Array;
     yield: boolean;
 }
 export type KeywordVariant =
@@ -72,9 +72,6 @@ export interface WithRecord {
 }
 export interface _SERVICE {
     complex_keyword: ActorMethod<[], KeywordRecord>;
-    keyword_method: ActorMethod<
-        [KeywordRecord, KeywordVariant, WithRecord],
-        [KeywordRecord, KeywordVariant, WithRecord]
-    >;
+    keyword_variant: ActorMethod<[KeywordVariant], KeywordVariant>;
     simple_keyword: ActorMethod<[SimpleRecord], SimpleRecord>;
 }

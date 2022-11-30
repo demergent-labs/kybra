@@ -1,38 +1,42 @@
-from kybra import ic, query, Record, Variant
+from kybra import blob, float32, float64, ic, int8, int16, int32, int64, nat, nat8, nat16, nat32, nat64, null, opt, Principal, query, Record, reserved, text, Variant
+# from typing import TypeAlias
+
+# MyTypeAlias: TypeAlias = opt[blob]
+# MyAlias = list[int16]
 
 class SimpleRecord(Record):
     from_: str
 
 class KeywordRecord(Record):
     False_: bool
-    True_: bool
-    and_: bool
-    assert_: bool
-    class_: bool
-    def_: bool
-    del_: bool
-    elif_: bool
-    except_: bool
-    finally_: bool
-    from_: bool
-    global_: bool
-    import_: bool
-    is_: bool
-    lambda_: bool
-    nonlocal_: bool
-    not_: bool
-    or_: bool
-    pass_: bool
-    raise_: bool
-    with_: bool
-    # The below python keywords are also
-    None_: bool
-    as_: bool
-    async_: bool
-    await_: bool
-    break_: bool
-    continue_: bool
-    else_: bool
+    True_: str
+    and_: int
+    assert_: int8
+    class_: int16
+    def_: int32
+    del_: int64
+    elif_: nat
+    except_: nat8
+    finally_: nat16
+    from_: nat32
+    global_: nat64
+    import_: float32
+    is_: float64
+    lambda_: opt[str]
+    nonlocal_: text
+    not_: SimpleRecord
+    or_: 'WithRecord'
+    pass_: 'KeywordVariant'
+    raise_: blob
+    with_: Principal
+    # # The below python keywords are also
+    None_: tuple[bool, bool]
+    as_: null
+    async_: reserved
+    await_: list[nat]
+    break_: opt[blob]
+    continue_: list[int16]
+    else_: opt[bool]
     for_: bool
     if_: bool
     in_: bool
@@ -48,7 +52,7 @@ class WithRecord(Record):
     with________________________________________________________________________: bool
     with______1: bool
 
-class KeywordVariant(Variant):
+class KeywordVariant(Variant, total=False):
     False_: None
     True_: None
     and_: None
@@ -72,8 +76,9 @@ class KeywordVariant(Variant):
     with_: None
 
 @query
-def keyword_method(record_keyword: KeywordRecord, variant_keyword: KeywordVariant, with_keyword: WithRecord) -> tuple[KeywordRecord, KeywordVariant, WithRecord]:
-    return (record_keyword, variant_keyword, with_keyword)
+def keyword_variant(variant_keyword: KeywordVariant) -> KeywordVariant:
+    ic.print(variant_keyword)
+    return variant_keyword
 
 @query
 def simple_keyword(simple_record: SimpleRecord) -> SimpleRecord:
@@ -84,32 +89,38 @@ def simple_keyword(simple_record: SimpleRecord) -> SimpleRecord:
 def complex_keyword() -> KeywordRecord:
     return {
         'False_': False,
-        'True_': False,
-        'and_': False,
-        'assert_': False,
-        'class_': False,
-        'def_': False,
-        'del_': False,
-        'elif_': False,
-        'except_': False,
-        'finally_': False,
-        'from_': False,
-        'global_': False,
-        'import_': False,
-        'is_': False,
-        'lambda_': False,
-        'nonlocal_': False,
-        'not_': False,
-        'or_': False,
-        'pass_': False,
-        'raise_': False,
-        'with_': False,
-        'None_': False,
-        'as_': False,
+        'True_': 'False',
+        'and_': 1,
+        'assert_': 2,
+        'class_': 3,
+        'def_': 4,
+        'del_': 5,
+        'elif_': 6,
+        'except_': 7,
+        'finally_': 8,
+        'from_': 9,
+        'global_': 10,
+        'import_': 11.12,
+        'is_': 13.14,
+        'lambda_': 'False',
+        'nonlocal_': 'False',
+        'not_': {'from_': 'False'},
+        'or_': {
+            'with__': False,
+            'with___': False,
+            'with____': False,
+            'with________________________________________________________________________': False,
+            'with______1': False
+        },
+        'pass_': {'raise_': None},
+        'raise_': 'false'.encode('utf-8'),
+        'with_': Principal.from_str('aaaaa-aa'),
+        'None_': (False, True),
+        'as_': None,
         'async_': False,
-        'await_': False,
-        'break_': False,
-        'continue_': False,
+        'await_': [18, 19, 20],
+        'break_': None,
+        'continue_': [21, 22, 23],
         'else_': False,
         'for_': False,
         'if_': False,

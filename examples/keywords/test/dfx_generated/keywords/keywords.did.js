@@ -1,41 +1,13 @@
 export const idlFactory = ({ IDL }) => {
-    const KeywordRecord = IDL.Record({
-        as: IDL.Bool,
-        if: IDL.Bool,
-        in: IDL.Bool,
-        is: IDL.Bool,
-        or: IDL.Bool,
-        and: IDL.Bool,
-        def: IDL.Bool,
-        del: IDL.Bool,
-        for: IDL.Bool,
-        not: IDL.Bool,
-        try: IDL.Bool,
-        import: IDL.Bool,
-        return: IDL.Bool,
-        nonlocal: IDL.Bool,
-        finally: IDL.Bool,
-        async: IDL.Bool,
-        await: IDL.Bool,
-        continue: IDL.Bool,
-        None: IDL.Bool,
-        True: IDL.Bool,
-        elif: IDL.Bool,
-        else: IDL.Bool,
-        from: IDL.Bool,
-        class: IDL.Bool,
-        pass: IDL.Bool,
-        assert: IDL.Bool,
-        with: IDL.Bool,
-        lambda: IDL.Bool,
-        False: IDL.Bool,
-        global: IDL.Bool,
-        break: IDL.Bool,
-        except: IDL.Bool,
-        while: IDL.Bool,
-        raise: IDL.Bool,
-        yield: IDL.Bool
+    const WithRecord = IDL.Record({
+        with__: IDL.Bool,
+        with___: IDL.Bool,
+        with_______________________________________________________________________:
+            IDL.Bool,
+        with_: IDL.Bool,
+        with______1: IDL.Bool
     });
+    const SimpleRecord = IDL.Record({ from: IDL.Text });
     const KeywordVariant = IDL.Variant({
         is: IDL.Null,
         or: IDL.Null,
@@ -59,20 +31,48 @@ export const idlFactory = ({ IDL }) => {
         except: IDL.Null,
         raise: IDL.Null
     });
-    const WithRecord = IDL.Record({
-        with__: IDL.Bool,
-        with___: IDL.Bool,
-        with_______________________________________________________________________:
-            IDL.Bool,
-        with_: IDL.Bool,
-        with______1: IDL.Bool
+    const KeywordRecord = IDL.Record({
+        as: IDL.Null,
+        if: IDL.Bool,
+        in: IDL.Bool,
+        is: IDL.Float64,
+        or: WithRecord,
+        and: IDL.Int,
+        def: IDL.Int32,
+        del: IDL.Int64,
+        for: IDL.Bool,
+        not: SimpleRecord,
+        try: IDL.Bool,
+        import: IDL.Float32,
+        return: IDL.Bool,
+        nonlocal: IDL.Text,
+        finally: IDL.Nat16,
+        async: IDL.Reserved,
+        await: IDL.Vec(IDL.Nat),
+        continue: IDL.Vec(IDL.Int16),
+        None: IDL.Tuple(IDL.Bool, IDL.Bool),
+        True: IDL.Text,
+        elif: IDL.Nat,
+        else: IDL.Opt(IDL.Bool),
+        from: IDL.Nat32,
+        class: IDL.Int16,
+        pass: KeywordVariant,
+        assert: IDL.Int8,
+        with: IDL.Principal,
+        lambda: IDL.Opt(IDL.Text),
+        False: IDL.Bool,
+        global: IDL.Nat64,
+        break: IDL.Opt(IDL.Vec(IDL.Nat8)),
+        except: IDL.Nat8,
+        while: IDL.Bool,
+        raise: IDL.Vec(IDL.Nat8),
+        yield: IDL.Bool
     });
-    const SimpleRecord = IDL.Record({ from: IDL.Text });
     return IDL.Service({
         complex_keyword: IDL.Func([], [KeywordRecord], ['query']),
-        keyword_method: IDL.Func(
-            [KeywordRecord, KeywordVariant, WithRecord],
-            [IDL.Tuple(KeywordRecord, KeywordVariant, WithRecord)],
+        keyword_variant: IDL.Func(
+            [KeywordVariant],
+            [KeywordVariant],
             ['query']
         ),
         simple_keyword: IDL.Func([SimpleRecord], [SimpleRecord], ['query'])

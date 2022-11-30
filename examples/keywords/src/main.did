@@ -1,38 +1,38 @@
 type KeywordRecord = record {
-  as : bool;
+  as : null;
   if : bool;
   in : bool;
-  is : bool;
-  or : bool;
-  and : bool;
-  def : bool;
-  del : bool;
+  is : float64;
+  or : WithRecord;
+  and : int;
+  def : int32;
+  del : int64;
   for : bool;
-  not : bool;
+  not : SimpleRecord;
   try : bool;
-  "import" : bool;
+  "import" : float32;
   return : bool;
-  nonlocal : bool;
-  finally : bool;
-  async : bool;
-  await : bool;
-  continue : bool;
-  None : bool;
-  True : bool;
-  elif : bool;
-  else : bool;
-  from : bool;
-  class : bool;
-  pass : bool;
-  assert : bool;
-  with : bool;
-  lambda : bool;
+  nonlocal : text;
+  finally : nat16;
+  async : reserved;
+  await : vec nat;
+  continue : vec int16;
+  None : record { bool; bool };
+  True : text;
+  elif : nat;
+  else : opt bool;
+  from : nat32;
+  class : int16;
+  pass : KeywordVariant;
+  assert : int8;
+  with : principal;
+  lambda : opt text;
   False : bool;
-  global : bool;
-  break : bool;
-  except : bool;
+  global : nat64;
+  break : opt vec nat8;
+  except : nat8;
   while : bool;
-  raise : bool;
+  raise : vec nat8;
   yield : bool;
 };
 type KeywordVariant = variant {
@@ -68,8 +68,6 @@ type WithRecord = record {
 };
 service : () -> {
   complex_keyword : () -> (KeywordRecord) query;
-  keyword_method : (KeywordRecord, KeywordVariant, WithRecord) -> (
-      record { KeywordRecord; KeywordVariant; WithRecord },
-    ) query;
+  keyword_variant : (KeywordVariant) -> (KeywordVariant) query;
   simple_keyword : (SimpleRecord) -> (SimpleRecord) query;
 }
