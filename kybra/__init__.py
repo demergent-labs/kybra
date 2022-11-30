@@ -132,8 +132,19 @@ def get_first_frame(current_frame: Any) -> Any:
 
     return get_first_frame(previous_frame)
 
-# TODO make sure call_raw with notify works
 class ic(Generic[T]):
+    @staticmethod
+    def accept_message():
+        _kybra_ic.accept_message() # type: ignore
+
+    @staticmethod
+    def arg_data_raw() -> blob:
+        return _kybra_ic._kybra_arg_data_raw() # type: ignore
+
+    @staticmethod
+    def arg_data_raw_size() -> nat32:
+        return _kybra_ic._kybra_arg_data_raw_size() # type: ignore
+
     @staticmethod
     def call_raw(canister_id: Principal, method: str, args_raw: blob, payment: nat64) -> CanisterResult[T]:
         return AsyncInfo('call_raw', [
@@ -151,10 +162,6 @@ class ic(Generic[T]):
             args_raw,
             payment
         ]) # type: ignore
-
-    @staticmethod
-    def accept_message():
-        _kybra_ic.accept_message() #type: ignore
 
     @staticmethod
     def caller() -> Principal:
@@ -175,6 +182,10 @@ class ic(Generic[T]):
     @staticmethod
     def canister_balance128() -> nat:
         return _kybra_ic.canister_balance128() # type: ignore
+
+    @staticmethod
+    def data_certificate() -> opt[blob]:
+        return _kybra_ic._kybra_data_certificate() # type: ignore
 
     @staticmethod
     def id() -> Principal:
@@ -237,6 +248,10 @@ class ic(Generic[T]):
     @staticmethod
     def reply_raw(x: Any):
         _kybra_ic.reply_raw(x) # type: ignore
+
+    @staticmethod
+    def set_certified_data(data: blob):
+        _kybra_ic._kybra_set_certified_data(data) # type: ignore
 
     @staticmethod
     def stable_bytes() -> blob:

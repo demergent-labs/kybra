@@ -18,7 +18,7 @@ def arg_data_raw_size(
     arg3: bool,
     arg4: str
 ) -> nat32:
-    return ic.arg_data_raw_size();
+    return ic.arg_data_raw_size()
 
 # returns the principal of the identity that called this function
 @query
@@ -76,6 +76,7 @@ def time() -> nat64:
     return ic.time()
 
 # traps with a message, stopping execution and discarding all state within the call
+@query
 def trap(message: str) -> bool:
     ic.trap(message)
 
