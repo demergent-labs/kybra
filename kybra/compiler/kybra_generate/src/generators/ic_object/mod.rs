@@ -25,6 +25,8 @@ use crate::generators::ic_object::functions::notify_with_payment128_functions::g
 use crate::generators::ic_object::functions::performance_counter::generate_performance_counter;
 use crate::generators::ic_object::functions::print::generate_print;
 use crate::generators::ic_object::functions::reject::generate_reject;
+use crate::generators::ic_object::functions::reject_code::generate_reject_code;
+use crate::generators::ic_object::functions::reject_message::generate_reject_message;
 use crate::generators::ic_object::functions::reply::generate_reply;
 use crate::generators::ic_object::functions::reply_raw::generate_reply_raw;
 use crate::generators::ic_object::functions::set_certified_data::generate_set_certified_data;
@@ -70,6 +72,8 @@ pub fn generate_ic_object(
     let performance_counter = generate_performance_counter();
     let print = generate_print();
     let reject = generate_reject();
+    let reject_code = generate_reject_code();
+    let reject_message = generate_reject_message();
     let reply = generate_reply(canister_methods);
     let reply_raw = generate_reply_raw();
     let set_certified_data = generate_set_certified_data();
@@ -115,6 +119,8 @@ pub fn generate_ic_object(
             #performance_counter
             #print
             #reject
+            #reject_code
+            #reject_message
             #reply
             #reply_raw
             #set_certified_data

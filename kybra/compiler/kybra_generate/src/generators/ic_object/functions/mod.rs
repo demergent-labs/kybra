@@ -21,6 +21,8 @@ pub mod notify_with_payment128_functions;
 pub mod performance_counter;
 pub mod print;
 pub mod reject;
+pub mod reject_code;
+pub mod reject_message;
 pub mod reply;
 pub mod reply_raw;
 pub mod set_certified_data;
