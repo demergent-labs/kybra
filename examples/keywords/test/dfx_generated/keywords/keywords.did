@@ -1,0 +1,75 @@
+type KeywordRecord = record {
+  as : bool;
+  if : bool;
+  in : bool;
+  is : bool;
+  or : bool;
+  and : bool;
+  def : bool;
+  del : bool;
+  for : bool;
+  not : bool;
+  try : bool;
+  "import" : bool;
+  return : bool;
+  nonlocal : bool;
+  finally : bool;
+  async : bool;
+  await : bool;
+  continue : bool;
+  None : bool;
+  True : bool;
+  elif : bool;
+  else : bool;
+  from : bool;
+  class : bool;
+  pass : bool;
+  assert : bool;
+  with : bool;
+  lambda : bool;
+  False : bool;
+  global : bool;
+  break : bool;
+  except : bool;
+  while : bool;
+  raise : bool;
+  yield : bool;
+};
+type KeywordVariant = variant {
+  is;
+  or;
+  and;
+  def;
+  del;
+  not;
+  "import";
+  nonlocal;
+  finally;
+  True;
+  elif;
+  from;
+  class;
+  pass;
+  assert;
+  with;
+  lambda;
+  False;
+  global;
+  except;
+  raise;
+};
+type SimpleRecord = record { from : text };
+type WithRecord = record {
+  with__ : bool;
+  with___ : bool;
+  with_______________________________________________________________________ : bool;
+  with_ : bool;
+  with______1 : bool;
+};
+service : () -> {
+  complex_keyword : () -> (KeywordRecord) query;
+  keyword_method : (KeywordRecord, KeywordVariant, WithRecord) -> (
+      record { KeywordRecord; KeywordVariant; WithRecord },
+    ) query;
+  simple_keyword : (SimpleRecord) -> (SimpleRecord) query;
+}
