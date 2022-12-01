@@ -9,31 +9,27 @@ class Tokens(Record):
 class TimeStamp(Record):
     timestamp_nanos: nat64
 
-# TODO aliases do not work yet
 # AccountIdentifier is a 32-byte array.
 # The first 4 bytes is big-endian encoding of a CRC32 checksum of the last 28 bytes.
-# AccountIdentifier = blob
+AccountIdentifier = blob
 
-# TODO aliases do not work yet
 # Subaccount is an arbitrary 32-byte byte array.
 # Ledger uses subaccounts to compute the source address, which enables one
 # principal to control multiple ledger accounts.
-# SubAccount = blob
+SubAccount = blob
 
-# TODO aliases do not work yet
 # Sequence number of a block produced by the ledger.
-# BlockIndex = nat64
+BlockIndex = nat64
 
-# TODO aliases do not work yet
 # An arbitrary number associated with a transaction.
 # The caller can set it in a `transfer` call as a correlation identifier.
-# Memo = nat64
+Memo = nat64
 
 # Arguments for the `transfer` call.
 class TransferArgs(Record):
     # Transaction memo.
     # See comments for the `Memo` type.
-    memo: nat64
+    memo: Memo
     # The amount that the caller wants to transfer to the destination address.
     amount: Tokens
     # The amount that the caller pays for the transaction.
@@ -42,10 +38,10 @@ class TransferArgs(Record):
     # The subaccount from which the caller wants to transfer funds.
     # If null, the ledger uses the default (all zeros) subaccount to compute the source address.
     # See comments for the `SubAccount` type.
-    from_subaccount: opt[blob]
+    from_subaccount: opt[SubAccount]
     # The destination account.
     # If the transfer is successful, the balance of this address increases by `amount`.
-    to: blob
+    to: AccountIdentifier
     # The point in time when the caller created this request.
     # If null, the ledger uses current IC time as the timestamp.
     created_at_time: opt[TimeStamp]
@@ -60,14 +56,14 @@ class TransferError_TxTooOld(Record):
     allowed_window_nanos: nat64
 
 class TransferError_TxDuplicate(Record):
-    duplicate_of: nat64
+    duplicate_of: BlockIndex
 
-class TransferError(Variant):
+class TransferError(Variant, total=False):
     # The fee that the caller specified in the transfer request was not the one that ledger expects.
     # The caller can change the transfer fee to the `expected_fee` and retry the request.
     BadFee: TransferError_BadFee
     # The account specified by the caller doesn't have enough funds.
-    InsufficentFunds: TransferError_InsufficientFunds
+    InsufficientFunds: TransferError_InsufficientFunds
     # The request is too old.
     # The ledger only accepts requests created within 24 hours window.
     # This is a non-recoverable error.
@@ -79,13 +75,13 @@ class TransferError(Variant):
     # `duplicate_of` field is equal to the index of the block containing the original transaction.
     TxDuplicate: TransferError_TxDuplicate
 
-class TransferResult(Variant):
+class TransferResult(Variant, total=False):
     Ok: nat64
     Err: TransferError
 
 # Arguments for the `account_balance` call.
 class AccountBalanceArgs(Record):
-    account: blob
+    account: AccountIdentifier
 
 class TransferFeeArg(Record): ...
 
@@ -95,32 +91,31 @@ class TransferFee(Record):
 
 class GetBlocksArgs(Record):
     # The index of the first block to fetch.
-    start: nat64
+    start: BlockIndex
     # Max number of blocks to fetch.
     length: nat64
 
 class Operation_Mint(Record):
-    to: blob
+    to: AccountIdentifier
     amount: Tokens
 
-# TODO Azle/Kybra CDK framework need to handle language keywords
 class Operation_Burn(Record):
-    from_: blob
+    from_: AccountIdentifier
     amount: Tokens
 
 class Operation_Transfer(Record):
-    from_: blob
-    to: blob
+    from_: AccountIdentifier
+    to: AccountIdentifier
     amount: Tokens
     fee: Tokens
 
-class Operation(Variant):
+class Operation(Variant, total=False):
     Mint: Operation_Mint
     Burn: Operation_Burn
     Transfer: Operation_Transfer
 
 class Transaction(Record):
-    memo: blob
+    memo: Memo
     operation: opt[Operation]
     created_at_time: TimeStamp
 
@@ -147,22 +142,22 @@ class BlockRange(Record):
     blocks: list[Block]
 
 class QueryArchiveError_BadFirstBlockIndex(Record):
-    requested_index: nat64
-    first_valid_index: nat64
+    requested_index: BlockIndex
+    first_valid_index: BlockIndex
 
 class QueryArchiveError_Other(Record):
     error_code: nat64
     error_message: str
 
 # An error indicating that the arguments passed to [QueryArchiveFn] were invalid.
-class QueryArchiveError(Variant):
+class QueryArchiveError(Variant, total=False):
     # [GetBlocksArgs.from] argument was smaller than the first block
     # served by the canister that received the request.
     BadFirstBlockIndex: QueryArchiveError_BadFirstBlockIndex
     # Reserved for future use.
     Other: QueryArchiveError_Other
 
-class QueryArchiveResult(Variant):
+class QueryArchiveResult(Variant, total=False):
     # Successfully fetched zero or more blocks.
     Ok: BlockRange
     # The [GetBlocksArgs] request was invalid.
@@ -173,7 +168,7 @@ QueryArchiveFn: TypeAlias = Func(Query[[GetBlocksArgs], QueryArchiveResult])
 
 class QueryBlocksResponse_archived_blocks(Record):
     # The index of the first archived block that can be fetched using the callback.
-    start: nat64
+    start: BlockIndex
 
     # The number of blocks that can be fetch using the callback.
     length: nat64
@@ -194,7 +189,7 @@ class QueryBlocksResponse_archived_blocks(Record):
 class QueryBlocksResponse(Record):
     # The total number of blocks in the chain.
     # If the chain length is positive, the index of the last block is `chain_len - 1`.
-    chain_length: opt[blob]
+    chain_length: nat64
 
     # System certificate for the hash of the latest block in the chain.
     # Only present if `query_blocks` is called in a non-replicated query context.
@@ -211,7 +206,7 @@ class QueryBlocksResponse(Record):
 
     # The index of the first block in "blocks".
     # If the blocks vector is empty, the exact value of this field is not specified.
-    first_block_index: nat64
+    first_block_index: BlockIndex
 
     # Encoding of instructions for fetching archived blocks whose indices fall into the
     # requested range.
@@ -235,8 +230,7 @@ class NameResult(Record):
 class DecimalsResult(Record):
     decimals: nat32
 
-# TODO aliases do not work yet
-# Address = str
+Address = str
 
 class Ledger(Canister):
     # Transfers tokens from a subaccount of the caller to the destination address.
