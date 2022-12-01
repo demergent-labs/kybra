@@ -14,6 +14,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "aho-corasick"
+version = "0.7.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc936419f96fa211c1b9166887b38e5e40b19958e5b895be7c1f93adec7071ac"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "annotate-snippets"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -63,10 +72,11 @@ dependencies = [
 [[package]]
 name = "cdk_framework"
 version = "0.0.0"
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=8d63e723b70ec659d99f0199349649b772ac9645#8d63e723b70ec659d99f0199349649b772ac9645"
+source = "git+https://github.com/demergent-labs/cdk_framework?rev=142f9c34a04a7f1702137e914af542f7bc6dbb9a#142f9c34a04a7f1702137e914af542f7bc6dbb9a"
 dependencies = [
  "proc-macro2",
  "quote",
+ "regex",
 ]
 
 [[package]]
@@ -310,10 +320,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "regex"
+version = "1.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e076559ef8e241f2ae3479e36f97bd5741c0330689e217ad51ce2c76808b868a"
+dependencies = [
+ "aho-corasick",
+ "memchr",
+ "regex-syntax",
+]
+
+[[package]]
 name = "regex-automata"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c230d73fb8d8c1b9c0b3135c5142a8acee3a0558fb8db5cf1cb65f8d7862132"
+
+[[package]]
+name = "regex-syntax"
+version = "0.6.28"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "456c603be3e8d448b072f410900c09faf164fbce2d480456f50eea6e25f9c848"
 
 [[package]]
 name = "rustpython-ast"
