@@ -241,6 +241,14 @@ class ic(Generic[T]):
         _kybra_ic.reject(x) # type: ignore
 
     @staticmethod
+    def reject_code() -> RejectionCode:
+        return _kybra_ic._kybra_reject_code() # type: ignore
+
+    @staticmethod
+    def reject_message() -> str:
+        return _kybra_ic._kybra_reject_message() # type: ignore
+
+    @staticmethod
     def reply(value: Any):
         first_called_function_name = get_first_called_function_name()
         _kybra_ic.reply(first_called_function_name, value) # type: ignore
