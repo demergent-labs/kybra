@@ -41,7 +41,10 @@ pub fn generate_async_result_handler(
                         _ => panic!("async operation not supported")
                     }
                 },
-                PyIterReturn::StopIteration(returned_py_object_ref) => returned_py_object_ref.unwrap() // TODO when would this return an option?
+                PyIterReturn::StopIteration(returned_py_object_ref_option) => match returned_py_object_ref_option {
+                    Some(returned_py_object_ref) => returned_py_object_ref,
+                    None => vm.ctx.none()
+                }
             }
         }
 
