@@ -1,0 +1,86 @@
+type Archive = record { canister_id : principal };
+type Archives = record { archives : vec Archive };
+type Block = record {
+  transaction : Transaction;
+  timestamp : TimeStamp;
+  parent_hash : opt vec nat8;
+};
+type BlockRange = record { blocks : vec Block };
+type ExecuteTransferResult = variant { ok : TransferResult; err : text };
+type GetAccountBalanceResult = variant { ok : Tokens; err : text };
+type GetArchivesResult = variant { ok : Archives; err : text };
+type GetBlocksArgs = record { start : nat64; length : nat64 };
+type GetBlocksResult = variant { ok : QueryBlocksResponse; err : text };
+type GetDecimalsResult = variant { ok : nat32; err : text };
+type GetNameResult = variant { ok : text; err : text };
+type GetTransferFeeResult = variant { ok : TransferFee; err : text };
+type Operation = variant {
+  Burn : Operation_Burn;
+  Mint : Operation_Mint;
+  Transfer : Operation_Transfer;
+};
+type Operation_Burn = record { from : vec nat8; amount : Tokens };
+type Operation_Mint = record { to : vec nat8; amount : Tokens };
+type Operation_Transfer = record {
+  to : vec nat8;
+  fee : Tokens;
+  from : vec nat8;
+  amount : Tokens;
+};
+type QueryArchiveError = variant {
+  BadFirstBlockIndex : QueryArchiveError_BadFirstBlockIndex;
+  Other : QueryArchiveError_Other;
+};
+type QueryArchiveError_BadFirstBlockIndex = record {
+  requested_index : nat64;
+  first_valid_index : nat64;
+};
+type QueryArchiveError_Other = record {
+  error_message : text;
+  error_code : nat64;
+};
+type QueryBlocksResponse = record {
+  certificate : opt vec nat8;
+  blocks : vec Block;
+  chain_length : nat64;
+  first_block_index : nat64;
+  archived_blocks : vec QueryBlocksResponse_archived_blocks;
+};
+type QueryBlocksResponse_archived_blocks = record {
+  callback : func (GetBlocksArgs) -> (
+      variant { Ok : BlockRange; Err : QueryArchiveError },
+    ) query;
+  start : nat64;
+  length : nat64;
+};
+type TimeStamp = record { timestamp_nanos : nat64 };
+type Tokens = record { e8s : nat64 };
+type Transaction = record {
+  memo : nat64;
+  operation : opt Operation;
+  created_at_time : TimeStamp;
+};
+type TransferError = variant {
+  TxTooOld : TransferError_TxTooOld;
+  BadFee : TransferError_BadFee;
+  TxDuplicate : TransferError_TxDuplicate;
+  TxCreatedInFuture;
+  InsufficientFunds : TransferError_InsufficientFunds;
+};
+type TransferError_BadFee = record { expected_fee : Tokens };
+type TransferError_InsufficientFunds = record { balance : Tokens };
+type TransferError_TxDuplicate = record { duplicate_of : nat64 };
+type TransferError_TxTooOld = record { allowed_window_nanos : nat64 };
+type TransferFee = record { transfer_fee : Tokens };
+type TransferResult = variant { Ok : nat64; Err : TransferError };
+service : () -> {
+  execute_transfer : (text, nat64, nat64, opt nat64) -> (ExecuteTransferResult);
+  get_account_balance : (text) -> (GetAccountBalanceResult);
+  get_address_from_principal : (principal) -> (text) query;
+  get_archives : () -> (GetArchivesResult);
+  get_blocks : (GetBlocksArgs) -> (GetBlocksResult);
+  get_decimals : () -> (GetDecimalsResult);
+  get_name : () -> (GetNameResult);
+  get_symbol : () -> (GetNameResult);
+  get_transfer_fee : () -> (GetTransferFeeResult);
+}

@@ -1,0 +1,20 @@
+{
+    "canisters": {
+        "ledger_canister": {
+            "type": "custom",
+            "build": "python -m kybra ledger_canister src/ledger_canister/ledger_canister.py src/ledger_canister/ledger_canister.did",
+            "candid": "src/ledger_canister/ledger_canister.did",
+            "wasm": ".dfx/kybra/ledger_canister/target/wasm32-unknown-unknown/release/ledger_canister.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/ledger_canister",
+                "node_compatibility": true
+            }
+        },
+        "icp_ledger": {
+            "type": "custom",
+            "build": "",
+            "candid": "src/icp_ledger/ledger.private.did",
+            "wasm": "src/icp_ledger/ledger.wasm"
+        }
+    }
+}

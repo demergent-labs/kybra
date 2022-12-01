@@ -1,7 +1,7 @@
 from kybra import Async, CanisterResult, nat32, nat64, opt, Principal, query, update, Variant
-from kybra.canisters.ledger import Archives, DecimalsResult, GetBlocksArgs, Ledger, NameResult, QueryBlocksResponse, SymbolResult, Tokens, TransferFee, TransferResult
+from kybra.canisters.ledger import Address, Archives, DecimalsResult, GetBlocksArgs, Ledger, NameResult, QueryBlocksResponse, SymbolResult, Tokens, TransferFee, TransferResult
 
-icp_canister = Ledger(Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'))
+icp_canister = Ledger(Principal.from_str('r7inp-6aaaa-aaaaa-aaabq-cai'))
 
 class ExecuteTransferResult(Variant, total=False):
     ok: TransferResult
@@ -9,7 +9,7 @@ class ExecuteTransferResult(Variant, total=False):
 
 @update
 def execute_transfer(
-    to: str,
+    to: Address,
     amount: nat64,
     fee: nat64,
     created_at_time: opt[nat64]
@@ -23,7 +23,7 @@ def execute_transfer(
             'e8s': fee
         },
         'from_subaccount': None,
-        'to': to.encode('utf-8'), # TODO not sure the best way to do this
+        'to': bytes.fromhex(to),
         'created_at_time': None if created_at_time is None else {
             'timestamp_nanos': created_at_time
         }
@@ -45,9 +45,9 @@ class GetAccountBalanceResult(Variant, total=False):
     err: str
 
 @update
-def get_account_balance(address: str) -> Async[GetAccountBalanceResult]:
+def get_account_balance(address: Address) -> Async[GetAccountBalanceResult]:
     tokens_canister_result: CanisterResult[Tokens] = yield icp_canister.account_balance({
-        'account': address.encode('utf-8')
+        'account': bytes.fromhex(address)
     })
 
     if tokens_canister_result.err is not None:
@@ -177,4 +177,4 @@ def get_archives() -> Async[GetArchivesResult]:
 
 @query
 def get_address_from_principal(principal: Principal) -> str:
-    return principal.to_account_id().to_str()
+    return principal.to_account_id().to_str()[2:]
