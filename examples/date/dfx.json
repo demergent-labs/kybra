@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "date": {
+            "type": "custom",
+            "build": "python -m kybra date src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/date/target/wasm32-unknown-unknown/release/date.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/date",
+                "node_compatibility": true
+            }
+        }
+    }
+}
