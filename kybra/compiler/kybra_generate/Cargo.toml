@@ -10,6 +10,6 @@ proc-macro2 = "1.0.43"
 rustpython-parser = { git = "https://github.com/demergent-labs/RustPython", branch = "kybra_initial", default-features = false, features = [] }
 annotate-snippets = "0.9.1"
 # rustpython = { path = "../../../../RustPython", default-features = false, features = [] }
-cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "142f9c34a04a7f1702137e914af542f7bc6dbb9a" }
+cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "0b65480b5b15d87a3cd5e8d45a363652008d4c94" }
 # cdk_framework = { path = "../../../../cdk_framework" } # For local rust-analyzer
 # cdk_framework = { path = "../../../../../../../cdk_framework" } # For local deployment in kybra/examples
