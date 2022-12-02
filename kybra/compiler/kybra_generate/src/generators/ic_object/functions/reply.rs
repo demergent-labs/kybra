@@ -5,7 +5,7 @@ pub fn generate_reply(canister_methods: &Vec<ActCanisterMethod>) -> proc_macro2:
     let match_arms = generate_match_arms(canister_methods);
     quote! {
         #[pymethod]
-        fn reply(&self, first_called_function_name_py_object_ref: PyObjectRef, reply_value_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {
+        fn _kybra_reply(&self, first_called_function_name_py_object_ref: PyObjectRef, reply_value_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {
             let first_called_function_name: String = first_called_function_name_py_object_ref.try_from_vm_value(vm).unwrap();
 
             match &first_called_function_name[..] {

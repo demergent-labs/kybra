@@ -135,7 +135,7 @@ def get_first_frame(current_frame: Any) -> Any:
 class ic(Generic[T]):
     @staticmethod
     def accept_message():
-        _kybra_ic.accept_message() # type: ignore
+        _kybra_ic._kybra_accept_message() # type: ignore
 
     @staticmethod
     def arg_data_raw() -> blob:
@@ -165,23 +165,23 @@ class ic(Generic[T]):
 
     @staticmethod
     def caller() -> Principal:
-        return _kybra_ic.caller() # type: ignore
+        return _kybra_ic._kybra_caller() # type: ignore
 
     @staticmethod
     def candid_encode(candid_string: str) -> blob:
-        return _kybra_ic.candid_encode(candid_string) # type: ignore
+        return _kybra_ic._kybra_candid_encode(candid_string) # type: ignore
 
     @staticmethod
     def candid_decode(candid_encoded: blob) -> str:
-        return _kybra_ic.candid_decode(candid_encoded) # type: ignore
+        return _kybra_ic._kybra_candid_decode(candid_encoded) # type: ignore
 
     @staticmethod
     def canister_balance() -> nat64:
-        return _kybra_ic.canister_balance() # type: ignore
+        return _kybra_ic._kybra_canister_balance() # type: ignore
 
     @staticmethod
     def canister_balance128() -> nat:
-        return _kybra_ic.canister_balance128() # type: ignore
+        return _kybra_ic._kybra_canister_balance128() # type: ignore
 
     @staticmethod
     def data_certificate() -> opt[blob]:
@@ -189,35 +189,35 @@ class ic(Generic[T]):
 
     @staticmethod
     def id() -> Principal:
-        return _kybra_ic.id() #type:ignore
+        return _kybra_ic._kybra_id() #type:ignore
 
     @staticmethod
     def method_name() -> str:
-        return _kybra_ic.method_name() #type:ignore
+        return _kybra_ic._kybra_method_name() #type:ignore
 
     @staticmethod
     def msg_cycles_accept(max_amount: nat64) -> nat64:
-        return _kybra_ic.msg_cycles_accept(max_amount) # type: ignore
+        return _kybra_ic._kybra_msg_cycles_accept(max_amount) # type: ignore
 
     @staticmethod
     def msg_cycles_accept128(max_amount: nat) -> nat:
-        return _kybra_ic.msg_cycles_accept128(max_amount) # type: ignore
+        return _kybra_ic._kybra_msg_cycles_accept128(max_amount) # type: ignore
 
     @staticmethod
     def msg_cycles_available() -> nat64:
-        return _kybra_ic.msg_cycles_available() # type: ignore
+        return _kybra_ic._kybra_msg_cycles_available() # type: ignore
 
     @staticmethod
     def msg_cycles_available128() -> nat:
-        return _kybra_ic.msg_cycles_available128() # type: ignore
+        return _kybra_ic._kybra_msg_cycles_available128() # type: ignore
 
     @staticmethod
     def msg_cycles_refunded() -> nat64:
-        return _kybra_ic.msg_cycles_refunded() # type: ignore
+        return _kybra_ic._kybra_msg_cycles_refunded() # type: ignore
 
     @staticmethod
     def msg_cycles_refunded128() -> nat:
-        return _kybra_ic.msg_cycles_refunded128() # type: ignore
+        return _kybra_ic._kybra_msg_cycles_refunded128() # type: ignore
 
     @staticmethod
     def notify_raw(
@@ -226,19 +226,19 @@ class ic(Generic[T]):
         args_raw: blob,
         payment: nat
     ) -> NotifyResult:
-        return _kybra_ic.notify_raw(canister_id, method, args_raw, payment) # type: ignore
+        return _kybra_ic._kybra_notify_raw(canister_id, method, args_raw, payment) # type: ignore
 
     @staticmethod
     def performance_counter(counter_type: nat32) -> nat64:
-        return _kybra_ic.performance_counter(counter_type) # type: ignore
+        return _kybra_ic._kybra_performance_counter(counter_type) # type: ignore
 
     @staticmethod
     def print(x: Any):
-        _kybra_ic.print(str(x)) # type: ignore
+        _kybra_ic._kybra_print(str(x)) # type: ignore
 
     @staticmethod
     def reject(x: Any):
-        _kybra_ic.reject(x) # type: ignore
+        _kybra_ic._kybra_reject(x) # type: ignore
 
     @staticmethod
     def reject_code() -> RejectionCode:
@@ -251,11 +251,11 @@ class ic(Generic[T]):
     @staticmethod
     def reply(value: Any):
         first_called_function_name = get_first_called_function_name()
-        _kybra_ic.reply(first_called_function_name, value) # type: ignore
+        _kybra_ic._kybra_reply(first_called_function_name, value) # type: ignore
 
     @staticmethod
     def reply_raw(x: Any):
-        _kybra_ic.reply_raw(x) # type: ignore
+        _kybra_ic._kybra_reply_raw(x) # type: ignore
 
     @staticmethod
     def set_certified_data(data: blob):
@@ -263,39 +263,39 @@ class ic(Generic[T]):
 
     @staticmethod
     def stable_bytes() -> blob:
-        return _kybra_ic.stable_bytes() # type: ignore
+        return _kybra_ic._kybra_stable_bytes() # type: ignore
 
     @staticmethod
     def stable_grow(new_pages: nat32) -> StableGrowResultTemp:
-        return _kybra_ic.stable_grow(new_pages) # type: ignore
+        return _kybra_ic._kybra_stable_grow(new_pages) # type: ignore
 
     @staticmethod
     def stable_read(offset: nat32, length: nat32) -> blob:
-        return _kybra_ic.stable_read(offset, length) # type: ignore
+        return _kybra_ic._kybra_stable_read(offset, length) # type: ignore
 
     @staticmethod
     def stable_size() -> nat32:
-        return _kybra_ic.stable_size() # type: ignore
+        return _kybra_ic._kybra_stable_size() # type: ignore
 
     @staticmethod
     def stable_write(offset: nat32, buf: blob):
-        _kybra_ic.stable_write(offset, buf) # type: ignore
+        _kybra_ic._kybra_stable_write(offset, buf) # type: ignore
 
     @staticmethod
     def stable64_grow(new_pages: nat64) -> Stable64GrowResultTemp:
-        return _kybra_ic.stable64_grow(new_pages) # type: ignore
+        return _kybra_ic._kybra_stable64_grow(new_pages) # type: ignore
 
     @staticmethod
     def stable64_read(offset: nat64, length: nat64) -> blob:
-        return _kybra_ic.stable64_read(offset, length) # type: ignore
+        return _kybra_ic._kybra_stable64_read(offset, length) # type: ignore
 
     @staticmethod
     def stable64_size() -> nat64:
-        return _kybra_ic.stable64_size() # type: ignore
+        return _kybra_ic._kybra_stable64_size() # type: ignore
 
     @staticmethod
     def stable64_write(offset: nat64, buf: blob):
-        _kybra_ic.stable64_write(offset, buf) # type: ignore
+        _kybra_ic._kybra_stable64_write(offset, buf) # type: ignore
 
     @staticmethod
     def stable_storage() -> Any:
@@ -303,11 +303,11 @@ class ic(Generic[T]):
 
     @staticmethod
     def time() -> nat64:
-        return _kybra_ic.time() # type: ignore
+        return _kybra_ic._kybra_time() # type: ignore
 
     @staticmethod
     def trap(message: str) -> NoReturn: # type: ignore
-        _kybra_ic.trap(message) # type: ignore
+        _kybra_ic._kybra_trap(message) # type: ignore
 
 class Canister:
     canister_id: Principal
