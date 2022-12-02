@@ -1,4 +1,4 @@
-import { Principal } from 'azle';
+import { Principal } from '@dfinity/principal';
 import { run_tests, Test } from 'azle/test';
 import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/keywords';
@@ -32,7 +32,7 @@ const tests: Test[] = [
     {
         name: 'keyword_variant',
         test: async () => {
-            let keyword_variant: KeywordVariant = { raise: null };
+            const keyword_variant: KeywordVariant = { raise: null };
             const result = await keywords_canister.keyword_variant(
                 keyword_variant
             );
@@ -45,7 +45,7 @@ const tests: Test[] = [
     {
         name: 'simple_keyword',
         test: async () => {
-            let simple_record: SimpleRecord = {
+            const simple_record: SimpleRecord = {
                 from: 'testing'
             };
             const result = await keywords_canister.simple_keyword(
@@ -62,7 +62,7 @@ const tests: Test[] = [
         test: async () => {
             const result = await keywords_canister.complex_keyword();
 
-            let expected_output: KeywordRecord = {
+            const expected_output: KeywordRecord = {
                 False: false,
                 True: 'False',
                 and: 1n,
@@ -90,7 +90,7 @@ const tests: Test[] = [
                 },
                 pass: { raise: null },
                 raise: new Uint8Array([102, 97, 108, 115, 101]),
-                with: Principal.fromText('aaaaa-aa') as any,
+                with: Principal.fromText('aaaaa-aa'),
                 None: [false, true],
                 as: null,
                 async: false,

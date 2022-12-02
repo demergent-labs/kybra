@@ -3,10 +3,11 @@
         "test": "cd .. && ts-node --transpile-only --ignore=false test/test.ts"
     },
     "dependencies": {
-        "azle": "github:demergent-labs/azle#kybra_test_reuse"
+        "azle": "github:demergent-labs/azle"
     },
     "devDependencies": {
         "@dfinity/agent": "0.14.1",
+        "@dfinity/principal": "0.14.1",
         "ts-node": "10.7.0",
         "typescript": "4.6.3"
     }

@@ -1,11 +1,13 @@
 from kybra import blob, float32, float64, ic, int8, int16, int32, int64, nat, nat8, nat16, nat32, nat64, null, opt, Principal, query, Record, reserved, text, Variant
-# from typing import TypeAlias
+from typing import TypeAlias
 
-# MyTypeAlias: TypeAlias = opt[blob]
-# MyAlias = list[int16]
+MyTypeAlias: TypeAlias = opt[blob]
+MyAlias = list[int16]
+
 
 class SimpleRecord(Record):
     from_: str
+
 
 class KeywordRecord(Record):
     False_: bool
@@ -34,8 +36,8 @@ class KeywordRecord(Record):
     as_: null
     async_: reserved
     await_: list[nat]
-    break_: opt[blob]
-    continue_: list[int16]
+    break_: MyTypeAlias
+    continue_: MyAlias
     else_: opt[bool]
     for_: bool
     if_: bool
@@ -45,12 +47,14 @@ class KeywordRecord(Record):
     while_: bool
     yield_: bool
 
+
 class WithRecord(Record):
     with__: bool
     with___: bool
     with____: bool
     with________________________________________________________________________: bool
     with______1: bool
+
 
 class KeywordVariant(Variant, total=False):
     False_: None
@@ -75,15 +79,18 @@ class KeywordVariant(Variant, total=False):
     raise_: None
     with_: None
 
+
 @query
 def keyword_variant(variant_keyword: KeywordVariant) -> KeywordVariant:
     ic.print(variant_keyword)
     return variant_keyword
 
+
 @query
 def simple_keyword(simple_record: SimpleRecord) -> SimpleRecord:
     ic.print(simple_record["from_"])
     return simple_record
+
 
 @query
 def complex_keyword() -> KeywordRecord:
