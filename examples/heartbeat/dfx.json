@@ -6,14 +6,9 @@
             "candid": "src/main.did",
             "wasm": ".dfx/kybra/heartbeat/target/wasm32-unknown-unknown/release/heartbeat.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/heartbeat"
+                "output": "test/dfx_generated/heartbeat",
+                "node_compatibility": true
             }
-        }
-    },
-    "networks": {
-        "local": {
-            "bind": "127.0.0.1:8000",
-            "type": "ephemeral"
         }
     }
 }
