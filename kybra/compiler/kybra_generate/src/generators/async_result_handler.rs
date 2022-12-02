@@ -29,8 +29,8 @@ pub fn generate_async_result_handler(
                         return _kybra_async_result_handler(vm, py_object_ref, recursed_py_object_ref).await;
                     }
 
-                    let name: String = returned_py_object_ref.get_attr("name", vm).unwrap().try_from_vm_value(vm).unwrap();
-                    let args: Vec<PyObjectRef> = returned_py_object_ref.get_attr("args", vm).unwrap().try_into_value(vm).unwrap();
+                    let name: String = unwrap_rust_python_result(returned_py_object_ref.get_attr("name", vm), vm).try_from_vm_value(vm).unwrap();
+                    let args: Vec<PyObjectRef> = unwrap_rust_python_result(unwrap_rust_python_result(returned_py_object_ref.get_attr("args", vm), vm).try_into_value(vm), vm);
 
                     match &name[..] {
                         "call" => _kybra_async_result_handler_call(vm, py_object_ref, &args).await,
@@ -138,14 +138,14 @@ pub fn generate_async_result_handler(
         fn create_call_result_instance<T>(vm: &rustpython::vm::VirtualMachine, call_result: CallResult<T>) -> PyObjectRef
             where T: for<'a> CdkActTryIntoVmValue<&'a rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef>
         {
-            let canister_result_class = vm.run_block_expr(
+            let canister_result_class = unwrap_rust_python_result(vm.run_block_expr(
                 vm.new_scope_with_builtins(),
                 r#"
 from kybra import CanisterResult
 
 CanisterResult
                 "#
-            ).unwrap();
+            ), vm);
 
             match call_result {
                 Ok(ok) => {

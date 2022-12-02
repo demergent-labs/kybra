@@ -150,7 +150,7 @@ impl KybraStmt<'_> {
 
                 let vm = &_kybra_interpreter.vm;
 
-                let method_py_object_ref = _kybra_scope.globals.get_item(#name, vm).unwrap();
+                let method_py_object_ref = unwrap_rust_python_result(_kybra_scope.globals.get_item(#name, vm), vm);
 
                 let invoke_result = vm.invoke(&method_py_object_ref, (#(#param_conversions),*#params_comma));
 

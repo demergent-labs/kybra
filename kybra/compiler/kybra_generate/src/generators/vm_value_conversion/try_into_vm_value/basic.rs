@@ -26,17 +26,17 @@ pub fn generate_basic_impls() -> proc_macro2::TokenStream {
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::Principal {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                let principal_class = vm.run_block_expr(
+                let principal_class = unwrap_rust_python_result(vm.run_block_expr(
                     vm.new_scope_with_builtins(),
                     r#"
 from kybra import Principal
 
 Principal
                     "#
-                ).unwrap();
+                ), vm);
 
-                let from_str = principal_class.get_attr("from_str", vm).unwrap();
-                let principal_instance = vm.invoke(&from_str, (self.to_text(),)).unwrap();
+                let from_str = unwrap_rust_python_result(principal_class.get_attr("from_str", vm), vm);
+                let principal_instance = unwrap_rust_python_result(vm.invoke(&from_str, (self.to_text(),)), vm);
 
                 Ok(principal_instance)
             }
