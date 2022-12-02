@@ -1,8 +1,6 @@
 use cdk_framework::{nodes::act_external_canister::ActExternalCanister, ToTokenStream};
 use quote::{format_ident, quote};
 
-// TODO remember that cdk_framework needs a way to define the _azle or _kybra or whatever prefix
-
 pub fn generate_async_result_handler(
     external_canisters: &Vec<ActExternalCanister>,
 ) -> proc_macro2::TokenStream {
@@ -58,12 +56,11 @@ pub fn generate_async_result_handler(
             }
         }
 
-        // TODO some _azle prefixes need to be changed once the cdk_framework is updated
         async fn _kybra_async_result_handler_call(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
             let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
             let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
 
-            let cross_canister_call_function_name = format!("_azle_call_{}", qualname.replace(".", "_"));
+            let cross_canister_call_function_name = format!("_kybra_call_{}", qualname.replace(".", "_"));
 
             let call_result_instance = match &cross_canister_call_function_name[..] {
                 #(#call_match_arms),*
@@ -73,12 +70,11 @@ pub fn generate_async_result_handler(
             _kybra_async_result_handler(vm, py_object_ref, call_result_instance).await
         }
 
-        // TODO some _azle prefixes need to be changed once the cdk_framework is updated
         async fn _kybra_async_result_handler_call_with_payment(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
             let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
             let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
 
-            let cross_canister_call_with_payment_function_name = format!("_azle_call_with_payment_{}", qualname.replace(".", "_"));
+            let cross_canister_call_with_payment_function_name = format!("_kybra_call_with_payment_{}", qualname.replace(".", "_"));
 
             let call_result_instance = match &cross_canister_call_with_payment_function_name[..] {
                 #(#call_with_payment_match_arms),*
@@ -88,12 +84,11 @@ pub fn generate_async_result_handler(
             _kybra_async_result_handler(vm, py_object_ref, call_result_instance).await
         }
 
-        // TODO some _azle prefixes need to be changed once the cdk_framework is updated
         async fn _kybra_async_result_handler_call_with_payment128(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
             let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
             let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
 
-            let cross_canister_call_with_payment128_function_name = format!("_azle_call_with_payment128_{}", qualname.replace(".", "_"));
+            let cross_canister_call_with_payment128_function_name = format!("_kybra_call_with_payment128_{}", qualname.replace(".", "_"));
 
             let call_result_instance = match &cross_canister_call_with_payment128_function_name[..] {
                 #(#call_with_payment128_match_arms),*
@@ -192,7 +187,7 @@ fn generate_call_match_arms(
             .iter()
             .map(|act_external_canister_method| {
                 let cross_canister_function_call_name = format!(
-                    "_azle_call_{}_{}",
+                    "_kybra_call_{}_{}",
                     canister_name, act_external_canister_method.name
                 );
 
@@ -246,7 +241,7 @@ fn generate_call_with_payment_match_arms(
             .iter()
             .map(|act_external_canister_method| {
                 let cross_canister_function_call_with_payment_name = format!(
-                    "_azle_call_with_payment_{}_{}",
+                    "_kybra_call_with_payment_{}_{}",
                     canister_name, act_external_canister_method.name
                 );
 
@@ -305,7 +300,7 @@ fn generate_call_with_payment128_match_arms(
             .iter()
             .map(|act_external_canister_method| {
                 let cross_canister_function_call_with_payment128_name = format!(
-                    "_azle_call_with_payment128_{}_{}",
+                    "_kybra_call_with_payment128_{}_{}",
                     canister_name, act_external_canister_method.name
                 );
 

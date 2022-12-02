@@ -11,7 +11,7 @@ pub fn generate_notify_functions(
 ) -> Vec<TokenStream> {
     external_canisters.iter().map(|canister| {
         canister.methods.iter().map(|method| {
-            let function_name_string = format!("_azle_notify_{}_{}", canister.name, method.name);
+            let function_name_string = format!("_kybra_notify_{}_{}", canister.name, method.name);
             let real_function_name = format_ident!("{}", function_name_string);
             let wrapper_fn_name = format_ident!("{}_wrapper", function_name_string);
             let param_variable_definitions = generate_param_variables(method);
