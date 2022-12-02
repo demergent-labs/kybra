@@ -136,9 +136,9 @@ pub fn generate_kybra_serde() -> proc_macro2::TokenStream {
                     let class_name = class.name();
 
                     if class_name.to_string() == "Principal" {
-                        let to_str = self.pyobject.get_attr("to_str", self.vm).unwrap();
-                        let to_str_invoke_result = self.vm.invoke(&to_str, ()).unwrap();
-                        let to_str_invoke_string: String = to_str_invoke_result.try_into_value(self.vm).unwrap();
+                        let to_str = unwrap_rust_python_result(self.pyobject.get_attr("to_str", self.vm), self.vm);
+                        let to_str_invoke_result = unwrap_rust_python_result(self.vm.invoke(&to_str, ()), self.vm);
+                        let to_str_invoke_string: String = unwrap_rust_python_result(to_str_invoke_result.try_into_value(self.vm), self.vm);
 
                         return serializer.serialize_str(&format!("KYBRA::Principal::{}", to_str_invoke_string));
                     }
@@ -217,18 +217,18 @@ pub fn generate_kybra_serde() -> proc_macro2::TokenStream {
                 E: serde::de::Error,
             {
                 if value.starts_with("KYBRA::Principal::") {
-                    let principal_class = self.vm.run_block_expr(
+                    let principal_class = unwrap_rust_python_result(self.vm.run_block_expr(
                         self.vm.new_scope_with_builtins(),
                         r#"
 from kybra import Principal
 
 Principal
                         "#
-                    ).unwrap();
+                    ), self.vm);
 
-                    let from_str = principal_class.get_attr("from_str", self.vm).unwrap();
+                    let from_str = unwrap_rust_python_result(principal_class.get_attr("from_str", self.vm), self.vm);
                     let principal_string = value.to_string().replace("KYBRA::Principal::", "");
-                    let principal_instance = self.vm.invoke(&from_str, (principal_string,)).unwrap();
+                    let principal_instance = unwrap_rust_python_result(self.vm.invoke(&from_str, (principal_string,)), self.vm);
 
                     Ok(principal_instance)
                 }
@@ -259,7 +259,7 @@ Principal
                 let mut seq_type = "".to_string();
 
                 if let Some(first_value) = access.next_element_seed(self.clone())? {
-                    let first_value_string: String = first_value.try_into_value(self.vm).unwrap();
+                    let first_value_string: String = unwrap_rust_python_result(first_value.try_into_value(self.vm), self.vm);
                     seq_type = first_value_string;
                 }
 
@@ -297,7 +297,7 @@ Principal
                 // Although JSON keys must be strings, implementation accepts any keys
                 // and can be reused by other deserializers without such limit
                 while let Some((key_obj, value)) = access.next_entry_seed(self.clone(), self.clone())? {
-                    dict.set_item(&*key_obj, value, self.vm).unwrap();
+                    unwrap_rust_python_result(dict.set_item(&*key_obj, value, self.vm), self.vm);
                 }
                 Ok(dict.into())
             }

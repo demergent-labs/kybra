@@ -8,13 +8,13 @@ pub fn generate_vec_impls() -> proc_macro2::TokenStream {
 
         impl CdkActTryFromVmValue<Vec<bool>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<bool>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
         impl CdkActTryFromVmValue<Vec<String>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<String>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
@@ -44,13 +44,13 @@ pub fn generate_vec_impls() -> proc_macro2::TokenStream {
 
         impl CdkActTryFromVmValue<Vec<f64>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<f64>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
         impl CdkActTryFromVmValue<Vec<f32>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<f32>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
@@ -62,31 +62,31 @@ pub fn generate_vec_impls() -> proc_macro2::TokenStream {
 
         impl CdkActTryFromVmValue<Vec<i128>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<i128>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
         impl CdkActTryFromVmValue<Vec<i64>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<i64>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
         impl CdkActTryFromVmValue<Vec<i32>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<i32>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
         impl CdkActTryFromVmValue<Vec<i16>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<i16>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
         impl CdkActTryFromVmValue<Vec<i8>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<i8>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
@@ -98,31 +98,31 @@ pub fn generate_vec_impls() -> proc_macro2::TokenStream {
 
         impl CdkActTryFromVmValue<Vec<u128>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<u128>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
         impl CdkActTryFromVmValue<Vec<u64>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<u64>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
         impl CdkActTryFromVmValue<Vec<u32>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<u32>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
         impl CdkActTryFromVmValue<Vec<u16>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<u16>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
         impl CdkActTryFromVmValue<Vec<u8>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<u8>, CdkActTryFromVmValueError> {
-                Ok(self.try_into_value(vm).unwrap())
+                Ok(unwrap_rust_python_result(self.try_into_value(vm), vm))
             }
         }
 
@@ -155,7 +155,7 @@ pub fn generate_vec_impls() -> proc_macro2::TokenStream {
         where
             rustpython::vm::PyObjectRef: for<'a> CdkActTryFromVmValue<T, &'a rustpython::vm::VirtualMachine>
         {
-            let py_list: PyListRef = py_object_ref.try_into_value(vm).unwrap();
+            let py_list: PyListRef = unwrap_rust_python_result(py_object_ref.try_into_value(vm), vm);
             let vec = py_list.borrow_vec();
 
             Ok(vec.iter().map(|item| {
