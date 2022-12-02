@@ -3,18 +3,44 @@
         <img height="150" src="https://raw.githubusercontent.com/demergent-labs/kybra/main/logo/logo.svg" alt="kybra logo">
     </a>
 </div>
+</br>
+<div align="center">
+    <a href="https://github.com/demergent-labs/kybra/actions/workflows/test.yml?query=branch%3Amain">
+        <img src="https://github.com/demergent-labs/kybra/actions/workflows/test.yml/badge.svg" alt="Coverage Status">
+    </a>
+    <a href="https://badge.fury.io/py/kybra"><img src="https://badge.fury.io/py/kybra.svg" alt="PyPI version"></a>
+</div>
 
-# Kybra (Alpha)
+# Kybra (Beta)
 
 Python CDK for the [Internet Computer](https://internetcomputer.org/).
 
 ## Disclaimer
 
-Please exercise caution when using Kybra. It is alpha software that you use at your own risk and according to the terms of this [MIT license](/LICENSE).
+Kybra is beta software. Please review the [security section](#security) for more information.
+
+## Security
+
+Things to keep in mind when analyzing Kybra's security risks:
+
+-   Kybra has many example-based unit/integration tests
+-   Kybra does not yet have many live continuously operating successful applications on the IC
+-   Kybra does not yet have extensive automated property tests
+-   Kybra does not yet have multiple independent security reviews/audits
+-   Kybra relies on RustPython which is [self-proclaimed to not be totally production-ready](https://github.com/RustPython/RustPython#disclaimer)
+
+We wish to disclose the major security concerns that every team should take into account before using Kybra.
+Before Demergent Labs feels confident recommending Kybra for virtually all production use cases, we would like to see:
+
+-   [x] Many example-based unit/integration tests
+-   [ ] Extensive automated property testing
+-   [ ] Kybra does not yet have multiple independent security reviews/audits
+
+It would be wise to exercise caution when using Kybra. It is alpha software that you use at your own risk and according to the terms of this [MIT license](/LICENSE).
 
 Demergent Labs may officially recommend Kybra for production use when at least the following have occurred:
 
--   [ ] Many example-based unit/integration tests
+-   [x] Many example-based unit/integration tests
 -   [ ] Feature parity with the Azle, Motoko, and Rust CDKs
 -   [ ] Extensive automated benchmarking
 -   [ ] Extensive automated property testing
