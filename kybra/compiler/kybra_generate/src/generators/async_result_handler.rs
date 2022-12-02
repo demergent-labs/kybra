@@ -19,7 +19,7 @@ pub fn generate_async_result_handler(
             }
 
             let send_result = vm.call_method(&py_object_ref, "send", (arg.clone(),));
-            let py_iter_return = unwrap_rust_python_result(PyIterReturn::from_pyresult(send_result, vm), vm);
+            let py_iter_return = _kybra_unwrap_rust_python_result(PyIterReturn::from_pyresult(send_result, vm), vm);
 
             match py_iter_return {
                 PyIterReturn::Return(returned_py_object_ref) => {
@@ -116,7 +116,7 @@ pub fn generate_async_result_handler(
                 payment
             ).await;
 
-            _kybra_async_result_handler(vm, py_object_ref, create_call_result_instance(vm, call_raw_result)).await
+            _kybra_async_result_handler(vm, py_object_ref, _kybra_create_call_result_instance(vm, call_raw_result)).await
         }
 
         async fn _kybra_async_result_handler_call_raw128(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
@@ -132,10 +132,10 @@ pub fn generate_async_result_handler(
                 payment
             ).await;
 
-            _kybra_async_result_handler(vm, py_object_ref, create_call_result_instance(vm, call_raw_result)).await
+            _kybra_async_result_handler(vm, py_object_ref, _kybra_create_call_result_instance(vm, call_raw_result)).await
         }
 
-        fn create_call_result_instance<T>(vm: &rustpython::vm::VirtualMachine, call_result: CallResult<T>) -> PyObjectRef
+        fn _kybra_create_call_result_instance<T>(vm: &rustpython::vm::VirtualMachine, call_result: CallResult<T>) -> PyObjectRef
             where T: for<'a> CdkActTryIntoVmValue<&'a rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef>
         {
             let canister_result_class = unwrap_rust_python_result(vm.run_block_expr(
@@ -151,7 +151,7 @@ CanisterResult
                 Ok(ok) => {
                     let method_result = vm.invoke(&canister_result_class, (ok.try_into_vm_value(vm).unwrap(), vm.ctx.none()));
 
-                    unwrap_rust_python_result(method_result, vm)
+                    _kybra_unwrap_rust_python_result(method_result, vm)
 
                     // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
                     // let dict = vm.ctx.new_dict();
@@ -165,7 +165,7 @@ CanisterResult
 
                     let method_result = vm.invoke(&canister_result_class, (vm.ctx.none(), err_string.try_into_vm_value(vm).unwrap()));
 
-                    unwrap_rust_python_result(method_result, vm)
+                    _kybra_unwrap_rust_python_result(method_result, vm)
 
                     // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
                     // let dict = vm.ctx.new_dict();
@@ -220,7 +220,7 @@ fn generate_call_match_arms(
 
                         #(#param_variable_definitions)*
 
-                        create_call_result_instance(vm, #cross_canister_function_call_name_ident(canister_id_principal, #(#param_names),*).await)
+                        _kybra_create_call_result_instance(vm, #cross_canister_function_call_name_ident(canister_id_principal, #(#param_names),*).await)
                     }
                 }
             })
@@ -279,7 +279,7 @@ fn generate_call_with_payment_match_arms(
                         #(#param_variable_definitions)*
                         #payment_variable_definition
 
-                        create_call_result_instance(vm, #cross_canister_function_call_with_payment_name_ident(canister_id_principal, #(#param_names),* #payment_comma payment).await)
+                        _kybra_create_call_result_instance(vm, #cross_canister_function_call_with_payment_name_ident(canister_id_principal, #(#param_names),* #payment_comma payment).await)
                     }
                 }
             })
@@ -338,7 +338,7 @@ fn generate_call_with_payment128_match_arms(
                         #(#param_variable_definitions)*
                         #payment_variable_definition
 
-                        create_call_result_instance(vm, #cross_canister_function_call_with_payment128_name_ident(canister_id_principal, #(#param_names),* #payment_comma payment).await)
+                        _kybra_create_call_result_instance(vm, #cross_canister_function_call_with_payment128_name_ident(canister_id_principal, #(#param_names),* #payment_comma payment).await)
                     }
                 }
             })
