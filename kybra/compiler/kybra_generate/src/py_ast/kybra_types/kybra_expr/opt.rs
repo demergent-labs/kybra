@@ -26,9 +26,7 @@ impl KybraExpr<'_> {
                 match alias_name {
                     Some(alias_name) => ActDataType::Option(ActOption {
                         act_type: LiteralOrTypeAlias::TypeAlias(ActOptionTypeAlias {
-                            enclosed_type: Box::from(
-                                kybra_expr.to_act_data_type(&Some(&alias_name)),
-                            ),
+                            enclosed_type: Box::from(kybra_expr.to_act_data_type(&None)),
                             name: alias_name.clone().clone(),
                         }),
                     }),

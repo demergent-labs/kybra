@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "keywords": {
+            "type": "custom",
+            "build": "python -m kybra keywords src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/keywords/target/wasm32-unknown-unknown/release/keywords.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/keywords",
+                "node_compatibility": true
+            }
+        }
+    }
+}
