@@ -67,13 +67,11 @@ impl KybraStmt<'_> {
     fn is_manual(&self) -> bool {
         match &self.stmt_kind.node {
             StmtKind::FunctionDef { returns, .. } => match returns {
-                Some(returns) => match &returns.node {
-                    ExprKind::Subscript { value, .. } => match &value.node {
-                        ExprKind::Name { id, .. } => id == "manual",
-                        _ => false,
-                    },
-                    _ => false,
-                },
+                Some(returns) => KybraExpr {
+                    located_expr: returns,
+                    source_map: self.source_map,
+                }
+                .is_manual(),
                 None => false,
             },
             _ => false,

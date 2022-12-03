@@ -25,3 +25,25 @@ impl KybraExpr<'_> {
         }
     }
 }
+
+impl KybraExpr<'_> {
+    pub fn is_manual(&self) -> bool {
+        match &self.located_expr.node {
+            ExprKind::Subscript { value, slice, .. } => match &value.node {
+                ExprKind::Name { id, .. } => {
+                    if id == "manual" {
+                        return true;
+                    } else {
+                        return KybraExpr {
+                            located_expr: slice,
+                            source_map: self.source_map,
+                        }
+                        .is_manual();
+                    }
+                }
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+}

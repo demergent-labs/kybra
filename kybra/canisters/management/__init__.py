@@ -1,5 +1,6 @@
 from kybra import blob, Canister, method, Principal
 from kybra.canisters.management.basic import CanisterStatusResult, DepositCyclesArgs, DeleteCanisterArgs, CreateCanisterArgs, CreateCanisterResult, InstallCodeArgs, UninstallCodeArgs, UpdateSettingsArgs, StartCanisterArgs, StopCanisterArgs, CanisterStatusArgs, ProvisionalCreateCanisterWithCyclesArgs, ProvisionalCreateCanisterWithCyclesResult, ProvisionalTopUpCanisterArgs
+from kybra.canisters.management.http import HttpRequestArgs, HttpResponse
 
 # TODO change the return types to void
 
@@ -39,5 +40,8 @@ class ManagementCanister(Canister):
 
     @method
     def provisional_top_up_canister(self, args: ProvisionalTopUpCanisterArgs) -> None: ...
+
+    @method
+    def http_request(self, args: HttpRequestArgs) -> HttpResponse: ...
 
 management_canister = ManagementCanister(Principal.from_str('aaaaa-aa'))
