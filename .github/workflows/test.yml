@@ -81,6 +81,7 @@ jobs:
                     "examples/motoko_examples/calc",
                     "examples/motoko_examples/echo",
                     "examples/motoko_examples/hello",
+                    "examples/motoko_examples/hello-world",
                     "examples/notify_raw",
                     "examples/null_example",
                     "examples/optional_types",
