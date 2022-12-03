@@ -19,7 +19,7 @@ def xkcd() -> Async[HttpResponse]:
         'headers': [],
         'body': None,
         'transform': {
-            'function': ((ic.id()), 'xkcd_transform'),
+            'function': (ic.id(), 'xkcd_transform'),
             'context': bytes()
         },
     }).with_cycles(cycle_cost_total)
@@ -41,25 +41,26 @@ def xkcd_raw() -> Async[manual[HttpResponse]]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    candid = """
-    (
-        record {{
-            url = "https://xkcd.com/642/info.0.json";
-            max_response_bytes = {max_response_bytes} : nat64;
-            method = variant {{ get }};
-            headers = vec {{}};
-            body = null;
-            transform = opt record {{
-                function = record {{ principal "{principal_id}"; "xkcd_transform" }};
-                context = vec {{}}
-            }};
-        }}
-    )""".format(max_response_bytes=max_response_bytes, principal_id=ic.id())
-
     http_result: CanisterResult[blob] = yield ic.call_raw(
         Principal.from_str('aaaaa-aa'),
         'http_request',
-        ic.candid_encode(candid),
+        ic.candid_encode(
+            f"""
+                (
+                    record {{
+                        url = "https://xkcd.com/642/info.0.json";
+                        max_response_bytes = {max_response_bytes} : nat64;
+                        method = variant {{ get }};
+                        headers = vec {{}};
+                        body = null;
+                        transform = opt record {{
+                            function = record {{ principal "{ic.id()}"; "xkcd_transform" }};
+                            context = vec {{}}
+                        }};
+                    }}
+                )
+            """
+        ),
         cycle_cost_total
     )
 
