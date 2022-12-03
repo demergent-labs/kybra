@@ -53,7 +53,7 @@ impl KybraStmt<'_> {
                 }
             }
             // We filter out any non classDefs in KybraProgram.get_external_canister_declarations
-            _ => panic!("Oops! Looks like we introduced a bug while refactoring. Please open a ticket at https://github.com/demergent-labs/azle/issues/new"),
+            _ => panic!("Oops! Looks like we introduced a bug while refactoring. Please open a ticket at https://github.com/demergent-labs/kybra/issues/new"),
         }
     }
 

@@ -85,7 +85,7 @@ impl PyAst<'_> {
         let kybra_serde = generate_kybra_serde();
 
         let rust_code = quote! {
-            pub fn unwrap_rust_python_result<T>(
+            pub fn _kybra_unwrap_rust_python_result<T>(
                 rust_python_result: Result<T, PyRef<PyBaseException>>,
                 vm: &rustpython::vm::VirtualMachine
             ) -> T {

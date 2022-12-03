@@ -37,7 +37,7 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<proc_mac
                 let field_name = &field.ident;
 
                 quote! {
-                    let #field_name = unwrap_rust_python_result(self.get_item(stringify!(#field_name), vm), vm);
+                    let #field_name = _kybra_unwrap_rust_python_result(self.get_item(stringify!(#field_name), vm), vm);
                 }
             })
             .collect(),
@@ -51,7 +51,7 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<proc_mac
 
                 quote! {
                     // TODO tuple_self is being repeated more times than necessary
-                    let tuple_self: PyTupleRef = unwrap_rust_python_result(self.clone().try_into_value(vm), vm);
+                    let tuple_self: PyTupleRef = _kybra_unwrap_rust_python_result(self.clone().try_into_value(vm), vm);
                     let #field_name = tuple_self.get(#syn_index).unwrap();
                 }
             })

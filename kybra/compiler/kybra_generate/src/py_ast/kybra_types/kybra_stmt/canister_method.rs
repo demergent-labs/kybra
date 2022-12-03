@@ -49,7 +49,7 @@ impl KybraStmt<'_> {
                     .iter()
                     .fold(vec![], |acc, arg| match &arg.node.annotation {
                         Some(annotation) => {
-                            let name = arg.node.arg.clone();
+                            let name = format!("_kybra_user_defined_var_{}", arg.node.arg.clone());
                             let kybra_annotation = KybraExpr {
                                 located_expr: &annotation,
                                 source_map: &self.source_map,
@@ -127,7 +127,7 @@ impl KybraStmt<'_> {
         };
 
         let param_conversions = args.args.iter().map(|arg| {
-            let param_name = format_ident!("{}", arg.node.arg);
+            let param_name = format_ident!("_kybra_user_defined_var_{}", arg.node.arg);
             quote! {
                 #param_name.try_into_vm_value(vm).unwrap()
             }
@@ -148,7 +148,7 @@ impl KybraStmt<'_> {
 
                 let vm = &_kybra_interpreter.vm;
 
-                let method_py_object_ref = unwrap_rust_python_result(_kybra_scope.globals.get_item(#name, vm), vm);
+                let method_py_object_ref = _kybra_unwrap_rust_python_result(_kybra_scope.globals.get_item(#name, vm), vm);
 
                 let invoke_result = vm.invoke(&method_py_object_ref, (#(#param_conversions),*#params_comma));
 
