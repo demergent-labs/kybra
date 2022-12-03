@@ -15,9 +15,8 @@ pub fn generate_notify_functions(
             let real_function_name = format_ident!("{}", function_name_string);
             let wrapper_fn_name = format_ident!("{}_wrapper", function_name_string);
             let param_variable_definitions = generate_param_variables(method);
-            let param_names: Vec<TokenStream> = method.params.iter().map(|param| {
-                let name = format_ident!("_kybra_{}", param.name);
-                quote! { #name }
+            let param_names: Vec<proc_macro2::Ident> = method.params.iter().map(|param| {
+                format_ident!("_kybra_user_defined_var_{}", param.name)
             }).collect();
 
             quote!{
@@ -41,7 +40,7 @@ pub fn generate_notify_functions(
 
 fn generate_param_variables(method: &ActExternalCanisterMethod) -> Vec<TokenStream> {
     method.params.iter().enumerate().map(|(index, act_fn_param)| {
-        let variable_name = format_ident!("_kybra_{}", act_fn_param.name);
+        let variable_name = format_ident!("_kybra_user_defined_var_{}", act_fn_param.name);
         let variable_type = act_fn_param.data_type.to_token_stream(&vec![]);
         let actual_index = index + 2;
 

@@ -27,7 +27,7 @@ impl KybraStmt<'_> {
                             None => panic!("{}", self.missing_type_annotation_error()),
                         };
                         ActFnParam {
-                            name: arg.node.arg.clone(),
+                            name: format!("_kybra_user_defined_var_{}", arg.node.arg.clone()),
                             data_type,
                         }
                     })
@@ -43,7 +43,7 @@ impl KybraStmt<'_> {
             rustpython_parser::ast::StmtKind::FunctionDef { args, .. } => args
                 .args
                 .iter()
-                .map(|arg| format_ident!("{}", arg.node.arg))
+                .map(|arg| format_ident!("_kybra_user_defined_var_{}", arg.node.arg))
                 .collect(),
             _ => panic!("{}", self.not_a_function_def_error()),
         }
