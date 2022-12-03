@@ -24,7 +24,7 @@ impl PyAst<'_> {
 
                         let vm = &_kybra_interpreter.vm;
 
-                        let method_py_object_ref = unwrap_rust_python_result(_kybra_scope.globals.get_item(#function_name, vm), vm);
+                        let method_py_object_ref = _kybra_unwrap_rust_python_result(_kybra_scope.globals.get_item(#function_name, vm), vm);
 
                         let result_py_object_ref = vm.invoke(&method_py_object_ref, ());
 

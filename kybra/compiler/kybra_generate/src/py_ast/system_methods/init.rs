@@ -45,9 +45,9 @@ impl PyAst<'_> {
 
                 _kybra_interpreter.enter(|vm| {
                     Ic::make_class(&vm.ctx);
-                    unwrap_rust_python_result(vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm), vm);
+                    _kybra_unwrap_rust_python_result(vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm), vm);
 
-                    unwrap_rust_python_result(vm.builtins.set_attr("_kybra_stable_storage", vm.ctx.new_dict(), vm), vm);
+                    _kybra_unwrap_rust_python_result(vm.builtins.set_attr("_kybra_stable_storage", vm.ctx.new_dict(), vm), vm);
 
                     let result = vm.run_code_string(
                         _kybra_scope.clone(),
