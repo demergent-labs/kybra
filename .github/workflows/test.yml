@@ -172,10 +172,14 @@ jobs:
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               working-directory: ${{ matrix.example_directories }}
               run: dfx start --clean --background --host 127.0.0.1:8000
-            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests && matrix.kybra_source == 'repo' }}
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests && matrix.kybra_source == 'repo' && !startsWith(matrix.example_directories, 'examples/motoko_examples') }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}
               run: source .dfx/kybra/venv/bin/activate && pip install ../..
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests && matrix.kybra_source == 'repo' && startsWith(matrix.example_directories, 'examples/motoko_examples') }}
+              shell: bash -l {0}
+              working-directory: ${{ matrix.example_directories }}
+              run: source .dfx/kybra/venv/bin/activate && pip install ../../..
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests && matrix.kybra_source == 'pypi' }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}
