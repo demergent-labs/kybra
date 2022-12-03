@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "hello": {
+            "type": "custom",
+            "build": "python -m kybra hello src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/hello/target/wasm32-unknown-unknown/release/hello.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/hello",
+                "node_compatibility": true
+            }
+        }
+    }
+}
