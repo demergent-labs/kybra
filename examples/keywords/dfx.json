@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".dfx/kybra/keywords/target/wasm32-unknown-unknown/release/keywords.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/keywords"
+                "output": "test/dfx_generated/keywords",
+                "node_compatibility": true
             }
         }
     }
