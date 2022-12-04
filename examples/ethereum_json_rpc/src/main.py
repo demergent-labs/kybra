@@ -1,9 +1,9 @@
 from kybra import Async, CanisterResult, ic, init, nat32, query, update
 from kybra.canisters.management import management_canister
 from kybra.canisters.management.http import HttpResponse, HttpTransformArgs
-from typing import TypeAlias, TypedDict
+from typing import TypedDict
 
-JSON: TypeAlias = str
+JSON = str
 
 
 class StableStorage(TypedDict):
@@ -20,7 +20,7 @@ def init_(ethereum_url: str):
 
 @update
 def eth_get_balance(ethereum_address: str) -> Async[JSON]:
-    max_response_bytes = 1_000
+    max_response_bytes = 200
 
     # TODO this is just a heuristic for cost, might change when the feature is officially released: https://forum.dfinity.org/t/enable-canisters-to-make-http-s-requests/9670/130
     cycle_cost_base = 400_000_000
@@ -32,9 +32,9 @@ def eth_get_balance(ethereum_address: str) -> Async[JSON]:
         'max_response_bytes': max_response_bytes,
         'method': {'post': None},
         'headers': [],
-        'body': '{{"jsonrpc":"2.0","method":"eth_getBalance","params":["{address}","earliest"],"id":1}}'.format(address=ethereum_address).encode('utf-8'),
+        'body': f'{{"jsonrpc":"2.0","method":"eth_getBalance","params":["{ethereum_address}","earliest"],"id":1}}'.encode('utf-8'),
         'transform': {
-            'function': ((ic.id()), 'eth_transform'),
+            'function': (ic.id(), 'eth_transform'),
             'context': bytes()
         },
     }).with_cycles(cycle_cost_total)
@@ -44,7 +44,7 @@ def eth_get_balance(ethereum_address: str) -> Async[JSON]:
             ic.trap(http_result.err)
         ic.trap('http_result had an error')
 
-    return http_result.ok['body'].decode('utf-8', 'strict')
+    return http_result.ok['body'].decode('utf-8')
 
 
 @update
@@ -61,9 +61,9 @@ def eth_get_block_by_number(number: nat32) -> Async[JSON]:
         'max_response_bytes': max_response_bytes,
         'method': {'post': None},
         'headers': [],
-        'body': '{{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["{block_number}", false],"id":1}}'.format(block_number=hex(number)).encode('utf-8'),
+        'body': f'{{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["{hex(number)}", false],"id":1}}'.encode('utf-8'),
         'transform': {
-            'function': ((ic.id()), 'eth_transform'),
+            'function': (ic.id(), 'eth_transform'),
             'context': bytes()
         },
     }).with_cycles(cycle_cost_total)
@@ -73,7 +73,7 @@ def eth_get_block_by_number(number: nat32) -> Async[JSON]:
             ic.trap(http_result.err)
         ic.trap('http_result had an error')
 
-    return http_result.ok['body'].decode('utf-8', 'strict')
+    return http_result.ok['body'].decode('utf-8')
 
 
 @query
