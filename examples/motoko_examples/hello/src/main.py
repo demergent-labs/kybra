@@ -3,4 +3,4 @@ from kybra import query
 
 @query
 def greet(name: str) -> str:
-    return "Hello, {}!".format(name)
+    return f'Hello, {name}!'
