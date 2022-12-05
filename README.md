@@ -15,6 +15,10 @@
 
 Python CDK for the [Internet Computer](https://internetcomputer.org/).
 
+## Disclaimer
+
+Please consider the [security section](#security).
+
 ## Security
 
 Things to keep in mind:
@@ -540,7 +544,7 @@ Data types:
 
 #### text
 
-The Python type `str` corresponds to the [Candid type text](https://internetcomputer.org/docs/current/references/candid-ref#type-text) and will become a [Python str](https://docs.python.org/3/library/stdtypes.html#textseq) at runtime.
+The Python type `str` and the Kybra type `text` both correspond to the [Candid type text](https://internetcomputer.org/docs/current/references/candid-ref#type-text) and will become a [Python str](https://docs.python.org/3/library/stdtypes.html#textseq) at runtime.
 
 Python:
 
@@ -568,26 +572,26 @@ service: {
 
 #### blob
 
-The Kybra type `blob` corresponds to the [Candid type blob](https://internetcomputer.org/docs/current/references/candid-ref#type-blob) and will become a [JavaScript Uint8Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array) at runtime.
+The Kybra type `blob` corresponds to the [Candid type blob](https://internetcomputer.org/docs/current/references/candid-ref#type-blob) and will become a [Python bytes](https://docs.python.org/3/library/stdtypes.html#bytes) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { blob, Query } from 'azle';
+```Python
+from kybra import blob, ic, query
 
-export function get_blob(): Query<blob> {
-    return Uint8Array.from([68, 73, 68, 76, 0, 0]);
-}
+@query
+def get_blob() -> blob:
+    return bytes([68, 73, 68, 76, 0, 0])
 
-export function print_blob(blob: blob): Query<blob> {
-    console.log(typeof blob);
-    return blob;
-}
+@query
+def print_blob(blob: blob) -> blob:
+    ic.print(type(blob))
+    return blob
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_blob": () -> (blob) query;
     "print_blob": (blob) -> (blob) query;
@@ -596,26 +600,26 @@ service: {
 
 #### nat
 
-The Azle type `nat` corresponds to the [Candid type nat](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-nat) and will become a [JavaScript BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) at runtime.
+The Kybra type `nat` corresponds to the [Candid type nat](https://internetcomputer.org/docs/current/references/candid-ref#type-nat) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { nat, Query } from 'azle';
+```python
+from kybra import ic, nat, query
 
-export function get_nat(): Query<nat> {
-    return 340_282_366_920_938_463_463_374_607_431_768_211_455n;
-}
+@query
+def get_nat() -> nat:
+    return 340_282_366_920_938_463_463_374_607_431_768_211_455
 
-export function print_nat(nat: nat): Query<nat> {
-    console.log(typeof nat);
-    return nat;
-}
+@query
+def print_nat(nat: nat) -> nat:
+    ic.print(type(nat))
+    return nat
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_nat": () -> (nat) query;
     "print_nat": (nat) -> (nat) query;
@@ -624,26 +628,26 @@ service: {
 
 #### nat64
 
-The Azle type `nat64` corresponds to the [Candid type nat64](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-intN) and will become a [JavaScript BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) at runtime.
+The Kybra type `nat64` corresponds to the [Candid type nat64](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { nat64, Query } from 'azle';
+```python
+from kybra import ic, nat64, query
 
-export function get_nat64(): Query<nat64> {
-    return 18_446_744_073_709_551_615n;
-}
+@query
+def get_nat64() -> nat64:
+    return 18_446_744_073_709_551_615
 
-export function print_nat64(nat64: nat64): Query<nat64> {
-    console.log(typeof nat64);
-    return nat64;
-}
+@query
+def print_nat64(nat64: nat64) -> nat64:
+    ic.print(type(nat64))
+    return nat64
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_nat64": () -> (nat64) query;
     "print_nat64": (nat64) -> (nat64) query;
@@ -652,26 +656,26 @@ service: {
 
 #### nat32
 
-The Azle type `nat32` corresponds to the [Candid type nat32](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-intN) and will become a [JavaScript Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) at runtime.
+The Kybra type `nat32` corresponds to the [Candid type nat32](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { nat32, Query } from 'azle';
+```python
+from kybra import ic, nat32, query
 
-export function get_nat32(): Query<nat32> {
-    return 4_294_967_295;
-}
+@query
+def get_nat32() -> nat32:
+    return 4_294_967_295
 
-export function print_nat32(nat32: nat32): Query<nat32> {
-    console.log(typeof nat32);
-    return nat32;
-}
+@query
+def print_nat32(nat32: nat32) -> nat32:
+    ic.print(type(nat32))
+    return nat32
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_nat32": () -> (nat32) query;
     "print_nat32": (nat32) -> (nat32) query;
@@ -680,26 +684,26 @@ service: {
 
 #### nat16
 
-The Azle type `nat16` corresponds to the [Candid type nat16](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-intN) and will become a [JavaScript Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) at runtime.
+The Kybra type `nat16` corresponds to the [Candid type nat16](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { nat16, Query } from 'azle';
+```python
+from kybra import ic, nat16, query
 
-export function get_nat16(): Query<nat16> {
-    return 65_535;
-}
+@query
+def get_nat16() -> nat16:
+    return 65_535
 
-export function print_nat16(nat16: nat16): Query<nat16> {
-    console.log(typeof nat16);
-    return nat16;
-}
+@query
+def print_nat16(nat16: nat16) -> nat16:
+    ic.print(type(nat16))
+    return nat16
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_nat16": () -> (nat16) query;
     "print_nat16": (nat16) -> (nat16) query;
@@ -708,26 +712,26 @@ service: {
 
 #### nat8
 
-The Azle type `nat8` corresponds to the [Candid type nat8](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-intN) and will become a [JavaScript Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) at runtime.
+The Kybra type `nat8` corresponds to the [Candid type nat8](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { nat8, Query } from 'azle';
+```python
+from kybra import ic, nat8, query
 
-export function get_nat8(): Query<nat8> {
-    return 255;
-}
+@query
+def get_nat8() -> nat8:
+    return 255
 
-export function print_nat8(nat8: nat8): Query<nat8> {
-    console.log(typeof nat8);
-    return nat8;
-}
+@query
+def print_nat8(nat8: nat8) -> nat8:
+    ic.print(type(nat8))
+    return nat8
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_nat8": () -> (nat8) query;
     "print_nat8": (nat8) -> (nat8) query;
@@ -736,26 +740,26 @@ service: {
 
 #### int
 
-The Azle type `int` corresponds to the [Candid type int](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-int) and will become a [JavaScript BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) at runtime.
+The Kybra type `int` corresponds to the [Candid type int](https://internetcomputer.org/docs/current/references/candid-ref#type-int) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { int, Query } from 'azle';
+```python
+from kybra import ic, int, query
 
-export function get_int(): Query<int> {
-    return 170_141_183_460_469_231_731_687_303_715_884_105_727n;
-}
+@query
+def get_int() -> int:
+    return 170_141_183_460_469_231_731_687_303_715_884_105_727
 
-export function print_int(int: int): Query<int> {
-    console.log(typeof int);
-    return int;
-}
+@query
+def print_int(int: int) -> int:
+    ic.print(type(int))
+    return int
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_int": () -> (int) query;
     "print_int": (int) -> (int) query;
@@ -764,26 +768,26 @@ service: {
 
 #### int64
 
-The Azle type `int64` corresponds to the [Candid type int64](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-intN) and will become a [JavaScript BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) at runtime.
+The Kybra type `int64` corresponds to the [Candid type int64](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { int64, Query } from 'azle';
+```python
+from kybra import ic, inat64, query
 
-export function get_int64(): Query<int64> {
-    return 9_223_372_036_854_775_807n;
-}
+@query
+def get_int64() -> int64:
+    return 9_223_372_036_854_775_807
 
-export function print_int64(int64: int64): Query<int64> {
-    console.log(typeof int64);
-    return int64;
-}
+@query
+def print_int64(int64: int64) -> int64:
+    ic.print(type(int64))
+    return int64
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_int64": () -> (int64) query;
     "print_int64": (int64) -> (int64) query;
@@ -792,26 +796,26 @@ service: {
 
 #### int32
 
-The Azle type `int32` corresponds to the [Candid type int32](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-intN) and will become a [JavaScript Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) at runtime.
+The Kybra type `int32` corresponds to the [Candid type int32](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { int32, Query } from 'azle';
+```python
+from kybra import ic, int32, query
 
-export function get_int32(): Query<int32> {
-    return 2_147_483_647;
-}
+@query
+def get_int32() -> int32:
+    return 2_147_483_647
 
-export function print_int32(int32: int32): Query<int32> {
-    console.log(typeof int32);
-    return int32;
-}
+@query
+def print_int32(int32: int32) -> int32:
+    ic.print(type(int32))
+    return int32
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_int32": () -> (int32) query;
     "print_int32": (int32) -> (int32) query;
@@ -820,26 +824,26 @@ service: {
 
 #### int16
 
-The Azle type `int16` corresponds to the [Candid type int16](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-intN) and will become a [JavaScript Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) at runtime.
+The Kybra type `int16` corresponds to the [Candid type int16](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { int16, Query } from 'azle';
+```python
+from kybra import ic, int16, query
 
-export function get_int16(): Query<int16> {
-    return 32_767;
-}
+@query
+def get_int16() -> int16:
+    return 32_767
 
-export function print_int16(int16: int16): Query<int16> {
-    console.log(typeof int16);
-    return int16;
-}
+@query
+def print_int16(int16: int16) -> int16:
+    ic.print(type(int16))
+    return int16
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_int16": () -> (int16) query;
     "print_int16": (int16) -> (int16) query;
@@ -848,26 +852,26 @@ service: {
 
 #### int8
 
-The Azle type `int8` corresponds to the [Candid type int8](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-intN) and will become a [JavaScript Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) at runtime.
+The Kybra type `int8` corresponds to the [Candid type int8](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { int8, Query } from 'azle';
+```python
+from kybra import ic, int8, query
 
-export function get_int8(): Query<int8> {
-    return 127;
-}
+@query
+def get_int8() -> int8:
+    return 127
 
-export function print_int8(int8: int8): Query<int8> {
-    console.log(typeof int8);
-    return int8;
-}
+@query
+def print_int8(int8: int8) -> int8:
+    ic.print(type(int8))
+    return int8
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_int8": () -> (int8) query;
     "print_int8": (int8) -> (int8) query;
@@ -876,26 +880,28 @@ service: {
 
 #### float64
 
-The Azle type `float64` corresponds to the [Candid type float64](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-floatN) and will become a [JavaScript Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) at runtime.
+The Kybra type `float64` corresponds to the [Candid type float64](https://internetcomputer.org/docs/current/references/candid-ref#type-float32-and-float64) and will become a [Python float](https://docs.python.org/3/library/functions.html#float) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { float64, Query } from 'azle';
+```python
+from kybra import float64, ic, query
 
-export function get_float64(): Query<float64> {
-    return Math.E;
-}
+import math
 
-export function print_float64(float64: float64): Query<float64> {
-    console.log(typeof float64);
-    return float64;
-}
+@query
+def get_float64() -> float64:
+    return math.e
+
+@query
+def print_float64(float64: float64) -> float64:
+    ic.print(type(float64))
+    return float64
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_float64": () -> (float64) query;
     "print_float64": (float64) -> (float64) query;
@@ -904,26 +910,24 @@ service: {
 
 #### float32
 
-The Azle type `float32` corresponds to the [Candid type float32](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-floatN) and will become a [JavaScript Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) at runtime.
+The Kybra type `float32` corresponds to the [Candid type float32](https://internetcomputer.org/docs/current/references/candid-ref#type-float32-and-float64) and will become a [Python float](https://docs.python.org/3/library/functions.html#float) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { float32, Query } from 'azle';
+```python
+from kybra import float32, ic, query
 
-export function get_float32(): Query<float32> {
-    return Math.PI;
-}
+def get_float32() -> float32:
+    return math.pi
 
-export function print_float32(float32: float32): Query<float32> {
-    console.log(typeof float32);
-    return float32;
-}
+def print_float32(float32: float32) -> float32:
+    ic.print(type(float32))
+    return float32
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_float32": () -> (float32) query;
     "print_float32": (float32) -> (float32) query;
@@ -932,26 +936,26 @@ service: {
 
 #### bool
 
-The TypeScript type `boolean` corresponds to the [Candid type bool](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-bool) and will become a [JavaScript Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) at runtime.
+The Python type `bool` corresponds to the [Candid type bool](https://internetcomputer.org/docs/current/references/candid-ref#type-bool) and will become a [Python Boolean Value](https://docs.python.org/3/library/stdtypes.html#boolean-values) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { Query } from 'azle';
+```Python
+from kybra import ic, query
 
-export function get_bool(): Query<boolean> {
-    return true;
-}
+@query
+def get_bool() -> bool:
+    return True
 
-export function print_bool(bool: boolean): Query<boolean> {
-    console.log(typeof bool);
-    return bool;
-}
+@query
+def print_bool(bool: bool) -> bool:
+    ic.print(type(bool))
+    return bool
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_bool": () -> (bool) query;
     "print_bool": (bool) -> (bool) query;
@@ -960,26 +964,26 @@ service: {
 
 #### null
 
-The TypeScript type `null` corresponds to the [Candid type null](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-null) and will become a [JavaScript null](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/null) at runtime.
+The Python type `None` and the Kybra type `null` both correspond to the [Candid type null](https://internetcomputer.org/docs/current/references/candid-ref#type-null) and will become the [Python Null Object](https://docs.python.org/3/library/stdtypes.html#the-null-object) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { Query } from 'azle';
+```python
+from kybra import ic, query
 
-export function get_null(): Query<null> {
-    return null;
-}
+@query
+def get_null() -> None:
+    return None
 
-export function print_null(_null: null): Query<null> {
-    console.log(typeof _null);
-    return _null;
-}
+@query
+def print_null(none: None) -> None:
+    ic.print(type(none))
+    return none
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_null": () -> (null) query;
     "print_null": (null) -> (null) query;
@@ -988,21 +992,21 @@ service: {
 
 #### vec
 
-TypeScript `[]` array syntax corresponds to the [Candid type vec](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-vec) and will become an array of the specified type at runtime (except for `nat8[]` which will become a `Uint8Array`, thus it is recommended to use the `blob` type instead of `nat8[]`). Only the `[]` array syntax is supported at this time (i.e. not `Array` or `ReadonlyArray` etc).
+The Python type `list` corresponds to the [Candid type vec](https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t) and will become an array of the specified type at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { int32, Query } from 'azle';
+```python
+from kybra import int32, query
 
-export function get_numbers(): Query<int32[]> {
-    return [0, 1, 2, 3];
-}
+@query
+def get_numbers() -> list[int32]:
+    return [0, 1, 2, 3]
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_numbers": () -> (vec int32) query;
 }
@@ -1010,25 +1014,25 @@ service: {
 
 #### opt
 
-The Azle type `Opt` corresponds to the [Candid type opt](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-opt) and will become the enclosed JavaScript type or null at runtime.
+The Kybra type `opt` corresponds to the [Candid type opt](https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t) and will become the enclosed Python type or None at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { Opt, Query } from 'azle';
+```python
+from kybra import opt, query
 
-export function get_opt_some(): Query<Opt<boolean>> {
-    return true;
-}
+@query
+def get_opt_some() -> opt[bool]:
+    return True
 
-export function get_opt_none(): Query<Opt<boolean>> {
-    return null;
-}
+@query
+def get_opt_none() -> opt[bool]:
+    return None
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_opt_some": () -> (opt bool) query;
     "get_opt_none": () -> (opt bool) query;
@@ -1037,36 +1041,35 @@ service: {
 
 #### record
 
-TypeScript type aliases referring to object literals correspond to the [Candid record type](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-record) and will become [JavaScript Objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) at runtime.
+Python classes that inherit from the Kybra type `Record` correspond to the [Candid record type](https://internetcomputer.org/docs/current/references/candid-ref#type-record--n--t--) and will become [Python TypedDicts](https://docs.python.org/3/library/typing.html#typing.TypedDict) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-type Post = {
-    id: string;
-    author: User;
-    text: string;
-    thread: Thread;
-};
+```python
+from kybra import Record
 
-type Thread = {
-    id: string;
-    author: User;
-    posts: Post[];
-    title: string;
-};
+class Post(Record):
+    id: str
+    author: 'User'
+    text: str
+    thread: 'Thread'
 
-type User = {
-    id: string;
-    posts: Post[];
-    threads: Thread[];
-    username: string;
-};
+class Thread(Record):
+    id: str
+    author: 'User'
+    posts: list[Post]
+    title: str
+
+class User(Record):
+    id: str
+    posts: list[Post]
+    thread: list[Thread]
+    username: str
 ```
 
 Candid:
 
-```typescript
+```python
 type Post = record {
     "id": text;
     "author": User;
@@ -1091,35 +1094,32 @@ type User = record {
 
 #### variant
 
-TypeScript type aliases referring to object literals wrapped in the `Variant` Azle type correspond to the [Candid variant type](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-variant) and will become [JavaScript Objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) at runtime.
+Python classes that inherit from the Kybra type `Variant` correspond to the [Candid variant type](https://internetcomputer.org/docs/current/references/candid-ref#type-variant--n--t--) and will become [Python TypedDicts](https://docs.python.org/3/library/typing.html#typing.TypedDict) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { nat32, Variant } from 'azle';
+```python
+from kybra import nat32, Variant
 
-type ReactionType = Variant<{
-    Fire: null;
-    ThumbsUp: null;
-    ThumbsDown: null;
-    Emotion: Emotion;
-    Firework: Firework;
-}>;
+class ReactionType(Variant, total=False):
+    Fire: None
+    ThumbsUp: None
+    ThumbsDown: None
+    Emotion: 'Emotion'
+    Firework: 'Firework'
 
-type Emotion = Variant<{
-    Happy: null;
-    Sad: null;
-}>;
+class Emotion(Variant, total=False):
+    Happy: None
+    Sad: None
 
-type Firework = {
-    Color: string;
-    NumStreaks: nat32;
-};
+class Firework(Variant, total=False):
+    Color: str
+    NumStreaks: nat32
 ```
 
 Candid:
 
-```typescript
+```python
 type ReactionType = variant {
     "Fire": null;
     "ThumbsUp": null;
@@ -1141,47 +1141,47 @@ type Firework = record {
 
 #### func
 
-The Azle type `func` corresponds to the [Candid type func](https://internetcomputer.org/docs/current/references/candid-ref/#type-func---) and at runtime will become a JavaScript array with two elements, the first being an [@dfinity/principal](https://www.npmjs.com/package/@dfinity/principal) and the second being a [JavaScript string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String). The `@dfinity/principal` represents the `principal` of the canister/service where the function exists, and the `string` represents the function's name.
+The Kybra type `Func` corresponds to the [Candid type func](https://internetcomputer.org/docs/current/references/candid-ref#type-func---) and at runtime will become a Python tuple with two elements, the first being an [ic-py Principal](https://github.com/rocklabs-io/ic-py) and the second being a [Python str](https://docs.python.org/3/library/stdtypes.html#textseq). The `ic-py Principal` represents the `principal` of the canister/service where the function exists, and the `str` represents the function's name.
 
-TypeScript:
+Note that an explicit `TypeAlias` must be used when defining a `func`.
 
-```typescript
-import { Func, nat64, Principal, Query, Update, Variant } from 'azle';
+Python:
 
-type User = {
-    id: string;
-    basic_func: BasicFunc;
-    complex_func: ComplexFunc;
-};
+```python
+from kybra import Func, nat64, Principal, query, Query, Record, update, Update, Variant
 
-type Reaction = Variant<{
-    Good: null;
-    Bad: null;
-    BasicFunc: BasicFunc;
-    ComplexFunc: ComplexFunc;
-}>;
+class User(Record):
+    id: str
+    basic_func: 'BasicFunc'
+    complex_func: 'ComplexFunc'
 
-type BasicFunc = Func<(param1: string) => Query<string>>;
-type ComplexFunc = Func<(user: User, reaction: Reaction) => Update<nat64>>;
+class Reaction(Variant, total=False):
+    Good: None
+    Bad: None
+    BasicFunc: 'BasicFunc'
+    ComplexFunc: 'ComplexFunc'
 
-export function get_basic_func(): Query<BasicFunc> {
+BasicFunc: TypeAlias = Func(Query[[str], str])
+ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])
+
+@query
+def get_basic_func() -> BasicFunc:
     return [
-        Principal.fromText('rrkah-fqaaa-aaaaa-aaaaq-cai'),
+        Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'),
         'simple_function_name'
-    ];
-}
+    ]
 
-export function get_complex_func(): Query<ComplexFunc> {
+@query
+def get_complex_func() -> ComplexFunc:
     return [
-        Principal.fromText('ryjl3-tyaaa-aaaaa-aaaba-cai'),
+        Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'),
         'complex_function_name'
-    ];
-}
+    ]
 ```
 
 Candid:
 
-```typescript
+```python
 type User = record {
     "id": text;
     "basic_func": BasicFunc;
@@ -1201,60 +1201,58 @@ service: () -> {
 
 #### service
 
-[Not yet implemented.](https://github.com/demergent-labs/azle/issues/445)
+[Not yet implemented.](https://github.com/demergent-labs/kybra/issues/124)
 
 #### principal
 
-The Azle type `Principal` corresponds to the [Candid type principal](https://smartcontracts.org/docs/candid-guide/candid-types.html#type-principal) and will become an [@dfinity/principal](https://www.npmjs.com/package/@dfinity/principal) at runtime.
+The Kybra type `Principal` corresponds to the [Candid type principal](https://internetcomputer.org/docs/current/references/candid-ref#type-principal) and will become an [ic-py Principal](https://github.com/rocklabs-io/ic-py) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { Principal, Query } from 'azle';
+```python
+from kybra import ic, Principal, query
 
-export function get_principal(): Query<Principal> {
-    return Principal.fromText('rrkah-fqaaa-aaaaa-aaaaq-cai');
-}
+@query
+def get_principal() -> Principal:
+    return Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai')
 
-export function print_principal(principal: Principal): Query<Principal> {
-    console.log(typeof principal);
-    return principal;
-}
+@query
+def print_principal(principal: Principal) -> Principal:
+    ic.print(type(principal))
+    return principal
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_principal": () -> (principal) query;
     "print_principal": (principal) -> (principal) query;
 }
 ```
 
--   Note that `Principal.selfAuthenticating` will not function properly until [this issue is resolved](https://github.com/boa-dev/boa/issues/1917)
-
 #### reserved
 
-The Azle type `reserved` corresponds to the [Candid type reserved](https://internetcomputer.org/docs/current/references/candid-ref/#type-reserved) and will become a [JavaScript null](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/null) at runtime.
+The Kybra type `reserved` corresponds to the [Candid type reserved](https://internetcomputer.org/docs/current/references/candid-ref#type-reserved) and will become the [Python Null Object](https://docs.python.org/3/library/stdtypes.html#the-null-object) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { Query, reserved } from 'azle';
+```python
+from kybra import ic, query, reserved
 
-export function get_reserved(): Query<reserved> {
-    return 'anything';
-}
+@query
+def get_reserved() -> reserved:
+    return 'anything'
 
-export function print_reserved(reserved: reserved): Query<reserved> {
-    console.log(typeof reserved);
-    return reserved;
-}
+@query
+def print_reserved(reserved: reserved) -> reserved:
+    ic.print(type(reserved))
+    return reserved
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_reserved": () -> (reserved) query;
     "print_reserved": (reserved) -> (reserved) query;
@@ -1263,35 +1261,880 @@ service: {
 
 #### empty
 
-The Azle type `empty` corresponds to the [Candid type empty](https://internetcomputer.org/docs/current/references/candid-ref/#type-empty) and has no JavaScript value at runtime.
+The Kybra type `empty` corresponds to the [Candid type empty](https://internetcomputer.org/docs/current/references/candid-ref#type-empty) and has no Python value at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { empty, Query } from 'azle';
+```python
+from kybra import empty, ic, query
 
-export function get_empty(): Query<empty> {
-    throw 'Anything you want';
-}
+def get_empty() -> empty:
+    raise Exception('Anything you want')
 
-// Note: It is impossible to call this function because it requires an argument
-// but there is no way to pass an "empty" value as an argument.
-export function print_empty(empty: empty): Query<empty> {
-    console.log(typeof empty);
-    throw 'Anything you want';
-}
+# Note: It is impossible to call this function because it requires an argument
+# but there is no way to pass an "empty" value as an argument.
+@query
+def print_empty(empty: empty) -> empty:
+    ic.print(type(empty))
+    raise Exception('Anything you want')
 ```
 
 Candid:
 
-```typescript
+```python
 service: {
     "get_empty": () -> (empty) query;
     "print_empty": (empty) -> (empty) query;
 }
 ```
 
-#### stdlib
+### Canister APIs
+
+-   [Candid decode](#candid-decode)
+-   [Candid encode](#candid-encode)
+-   [canister balance](#canister-balance)
+-   [canister balance 128](#canister-balance-128)
+-   [data certificate](#data-certificate)
+-   [canister id](#canister-id)
+-   [print](#print)
+-   [set certified data](#set-certified-data)
+-   [time](#time)
+-   [trap](#trap)
+
+#### Candid decode
+
+Examples:
+
+-   [call_raw](/examples/call_raw)
+-   [candid_encoding](/examples/candid_encoding)
+
+```python
+from kybra import blob, ic, query
+
+@query
+def candid_decode(candid_encoded: blob) -> str:
+    return ic.candid_decode(candid_encoded)
+```
+
+#### Candid encode
+
+Examples:
+
+-   [candid_encoding](/examples/candid_encoding)
+-   [manual_reply](/examples/manual_reply)
+-   [notify_raw](/examples/notify_raw)
+
+```python
+from kybra import blob, ic, query
+
+# encodes a Candid string to Candid bytes
+@query
+def candid_encode(candid_string: str) -> blob:
+    return ic.candid_encode(candid_string)
+```
+
+#### canister balance
+
+Examples:
+
+-   [cycles](/examples/cycles)
+-   [ic_api](/examples/ic_api)
+
+```python
+from kybra import ic, nat64, query
+
+# returns the amount of cycles available in the canister
+@query
+def canister_balance() -> nat64:
+    return ic.canister_balance()
+```
+
+#### canister balance 128
+
+Examples:
+
+-   [cycles](/examples/cycles)
+-   [ic_api](/examples/ic_api)
+
+```python
+from kybra import ic, nat, query
+
+# returns the amount of cycles available in the canister
+@query
+def canister_balance128() -> nat:
+    return ic.canister_balance128()
+```
+
+#### data certificate
+
+Examples:
+
+-   [ic_api](/examples/ic_api)
+
+```python
+from kybra import blob, ic, opt, query
+
+# When called from a query call, returns the data certificate authenticating certified_data set by this canister. Returns None if called not from a query call.
+@query
+def data_certificate() -> opt[blob]:
+    return ic.data_certificate()
+```
+
+#### canister id
+
+Examples:
+
+-   [basic-dao](/examples/motoko_examples/basic-dao)
+-   [http_counter](/examples/motoko_examples/http_counter)
+-   [ic_api](/examples/ic_api)
+-   [whoami](/examples/motoko_examples/whoami)
+
+```python
+from kybra import ic, Principal, query
+
+# returns this canister's id
+@query
+def id() -> Principal:
+    return ic.id()
+```
+
+#### print
+
+Examples:
+
+-   [ic_api](/examples/ic_api)
+
+```python
+from kybra import ic, query
+
+# prints a message through the local replica's output
+@query
+def print(message: str) -> bool:
+    ic.print(message)
+
+    return true
+```
+
+#### set certified data
+
+Examples:
+
+-   [ic_api](/examples/ic_api)
+
+```python
+from kybra import blob, ic, update
+
+# sets up to 32 bytes of certified data
+@update
+def set_certified_data(data: blob):
+    ic.set_certified_data(data)
+```
+
+#### time
+
+Examples:
+
+-   [basic-dao](/examples/motoko_examples/basic-dao)
+-   [ic_api](/examples/ic_api)
+
+```python
+from kybra import ic, nat64, query
+
+# returns the current timestamp
+@query
+def time() -> nat64:
+    return ic.time()
+```
+
+#### trap
+
+Examples:
+
+-   [cross_canister_calls](/examples/cross_canister_calls)
+-   [http_counter](/examples/motoko_examples/http_counter)
+-   [ic_api](/examples/ic_api)
+
+```python
+from kybra import ic, query
+
+# traps with a message, stopping execution and discarding all state within the call
+@query
+def trap(message: str) -> bool:
+    ic.trap(message)
+
+    return true
+```
+
+### Call APIs
+
+-   [caller](#caller)
+-   [accept message](#accept-message)
+-   [arg data](#arg-data)
+-   [arg data raw](#arg-data-raw)
+-   [arg data raw size](#arg-data-raw-size)
+-   [call](#call)
+-   [call raw](#call-raw)
+-   [call raw 128](#call-raw-128)
+-   [call with payment](#call-with-payment)
+-   [call with payment 128](#call-with-payment-128)
+-   [method name](#method-name)
+-   [msg cycles accept](#msg-cycles-accept)
+-   [msg cycles accept 128](#msg-cycles-accept-128)
+-   [msg cycles available](#msg-cycles-available)
+-   [msg cycles available 128](#msg-cycles-available-128)
+-   [msg cycles refunded](#msg-cycles-refunded)
+-   [msg cycles refunded 128](#msg-cycles-refunded-128)
+-   [notify](#notify)
+-   [notify raw](#notify-raw)
+-   [notify with payment 128](#notify-with-payment-128)
+-   [performance counter](#performance-counter)
+-   [reject](#reject)
+-   [reject code](#reject-code)
+-   [reject message](#reject-message)
+-   [reply](#reply)
+-   [reply raw](#reply-raw)
+-   [result](#result)
+
+#### caller
+
+Examples:
+
+-   [basic-dao](/examples/motoko_examples/basic-dao)
+-   [defi](/examples/motoko_examples/defi)
+-   [ic_api](/examples/ic_api)
+-   [whoami](/examples/motoko_examples/whoami)
+
+```python
+from kybra import ic, Principal, query
+
+# returns the principal of the identity that called this function
+@query
+def caller() -> Principal:
+    return ic.caller()
+```
+
+#### accept message
+
+Examples:
+
+-   [inspect_message](/examples/inspect_message)
+
+```python
+from kybra import ic, inspect_message, update
+
+@inspect_message
+def inspect_message_():
+    ic.print('this runs before executing update calls')
+
+    if ic.method_name() == 'accessible':
+        ic.accept_message()
+        return
+
+    if ic.method_name() == 'inaccessible':
+        return
+
+    raise Exception(f'Method "{ic.method_name()}" not allowed')
+
+@update
+def accessible() -> bool:
+    return True
+
+@update
+def inaccessible() -> bool:
+    return False
+
+@update
+def also_inaccessible() -> bool:
+    return False
+```
+
+#### arg data
+
+[Not yet implemented.](https://github.com/demergent-labs/azle/issues/496)
+
+#### arg data raw
+
+Examples:
+
+-   [ic_api](/examples/ic_api)
+
+```python
+from kybra import blob, ic, int8, query
+
+# returns the argument data as bytes.
+@query
+def arg_data_raw(
+    arg1: blob,
+    arg2: int8,
+    arg3: bool,
+    arg4: str
+) -> blob:
+    return ic.arg_data_raw()
+```
+
+#### arg data raw size
+
+Examples:
+
+-   [ic_api](/examples/ic_api)
+
+```python
+from kybra import blob, ic, int8, nat32, query
+
+# returns the length of the argument data in bytes
+@query
+def arg_data_raw_size(
+    arg1: blob,
+    arg2: int8,
+    arg3: bool,
+    arg4: str
+) -> nat32:
+    return ic.arg_data_raw_size()
+```
+
+#### call
+
+Examples:
+
+-   [cross_canister_calls](/examples/cross_canister_calls)
+-   [cycles](/examples/cycles)
+-   [defi](/examples/motoko_examples/defi)
+-   [func_types](/examples/func_types)
+-   [rejections](/examples/rejections)
+-   [tuple_types](/examples/tuple_types)
+-   [whoami](/examples/motoko_examples/whoami)
+
+```python
+from kybra import Async, Canister, CanisterResult, ic, method, Principal, update, Variant
+
+class Canister1(Canister):
+    @method
+    def example_method(self) -> bool: ...
+
+canister1 = Canister1(Principal.from_str('rkp4c-7iaaa-aaaaa-aaaca-cai'))
+
+class CallCanister1ExampleMethodResult(Variant, total=False):
+    ok: bool
+    err: str
+
+@update
+def call_canister1_example_method() -> Async[CallCanister1ExampleMethodResult]:
+    canister_result: CanisterResult[bool] = yield canister1.example_method()
+
+    if canister_result.err is not None:
+        return {
+            'err': canister_result.err
+        }
+
+    return {
+        'ok': canister_result.ok
+    }
+```
+
+#### call raw
+
+Examples:
+
+-   [basic-dao](/examples/motoko_examples/basic-dao)
+-   [call_raw](/examples/call_raw)
+
+```python
+from kybra import Async, blob, CanisterResult, ic, Principal, update
+
+@update
+def get_randomness() -> Async[blob]:
+    canister_result: CanisterResult[blob] = yield ic.call_raw(
+        Principal.from_str('aaaaa-aa'),
+        'raw_rand',
+        ic.candid_encode('()'),
+        0 # this is a nat64
+    )
+
+    if canister_result.err is not None:
+        return bytes
+
+    return canister_result.ok
+```
+
+#### call raw 128
+
+Examples:
+
+-   [call_raw](/examples/call_raw)
+
+```python
+from kybra import Async, blob, CanisterResult, ic, Principal, update
+
+@update
+def get_randomness() -> Async[blob]:
+    canister_result: CanisterResult[blob] = yield ic.call_raw128(
+        Principal.from_str('aaaaa-aa'),
+        'raw_rand',
+        ic.candid_encode('()'),
+        0 # this is a nat
+    )
+
+    if canister_result.err is not None:
+        return bytes()
+
+    return canister_result.ok
+```
+
+#### call with payment
+
+Examples:
+
+-   [cycles](/examples/cycles)
+-   [management_canister](/examples/management_canister)
+
+```typescript
+import { Canister, CanisterResult, ic, ok, Update, Variant } from 'azle';
+
+type Canister1 = Canister<{
+    method(): CanisterResult<boolean>;
+}>;
+
+const canister1 = ic.canisters.Canister1<Canister1>(
+    Principal.fromText('rkp4c-7iaaa-aaaaa-aaaca-cai')
+);
+
+type CallCanister1MethodResult = Variant<{
+    ok: boolean;
+    err: string;
+}>;
+
+export function* call_canister1_method(): Update<CallCanister1MethodResult> {
+    const canister_result: CanisterResult<boolean> = yield canister1
+        .method()
+        .with_cycles(100_000_000_000n);
+
+    if (!ok(canister_result)) {
+        return {
+            err: canister_result.err
+        };
+    }
+
+    return {
+        ok: canister_result.ok
+    };
+}
+```
+
+#### call with payment 128
+
+Examples:
+
+-   [cycles](/examples/cycles)
+
+```typescript
+import { Canister, CanisterResult, ic, ok, Update, Variant } from 'azle';
+
+type Canister1 = Canister<{
+    method(): CanisterResult<boolean>;
+}>;
+
+const canister1 = ic.canisters.Canister1<Canister1>(
+    Principal.fromText('rkp4c-7iaaa-aaaaa-aaaca-cai')
+);
+
+type CallCanister1MethodResult = Variant<{
+    ok: boolean;
+    err: string;
+}>;
+
+export function* call_canister1_method(): Update<CallCanister1MethodResult> {
+    const canister_result: CanisterResult<boolean> = yield canister1
+        .method()
+        .with_cycles128(100_000_000_000n);
+
+    if (!ok(canister_result)) {
+        return {
+            err: canister_result.err
+        };
+    }
+
+    return {
+        ok: canister_result.ok
+    };
+}
+```
+
+#### method name
+
+Examples:
+
+-   [inspect_message](/examples/inspect_message)
+
+```typescript
+import { ic, InspectMessage, Update } from 'azle';
+
+export function inspect_message(): InspectMessage {
+    console.log('this runs before executing update calls');
+
+    if (ic.method_name() === 'accessible') {
+        ic.accept_message();
+        return;
+    }
+
+    if (ic.method_name() === 'inaccessible') {
+        return;
+    }
+
+    throw `Method "${ic.method_name()}" not allowed`;
+}
+
+export function accessible(): Update<boolean> {
+    return true;
+}
+
+export function inaccessible(): Update<boolean> {
+    return false;
+}
+
+export function also_inaccessible(): Update<boolean> {
+    return false;
+}
+```
+
+#### msg cycles accept
+
+Examples:
+
+-   [cycles](/examples/cycles)
+
+```typescript
+import { ic, nat64, Update } from 'azle';
+
+// Moves all transferred cycles to the canister
+export function receive_cycles(): Update<nat64> {
+    return ic.msg_cycles_accept(ic.msg_cycles_available());
+}
+```
+
+#### msg cycles accept 128
+
+Examples:
+
+-   [cycles](/examples/cycles)
+
+```typescript
+import { ic, nat, Update } from 'azle';
+
+// Moves all transferred cycles to the canister
+export function receive_cycles128(): Update<nat> {
+    return ic.msg_cycles_accept128(ic.msg_cycles_available128());
+}
+```
+
+#### msg cycles available
+
+Examples:
+
+-   [cycles](/examples/cycles)
+
+```typescript
+import { ic, nat64, Update } from 'azle';
+
+// Moves all transferred cycles to the canister
+export function receive_cycles(): Update<nat64> {
+    return ic.msg_cycles_accept(ic.msg_cycles_available());
+}
+```
+
+#### msg cycles available 128
+
+Examples:
+
+-   [cycles](/examples/cycles)
+
+```typescript
+import { ic, nat64, Update } from 'azle';
+
+// Moves all transferred cycles to the canister
+export function receive_cycles128(): Update<nat64> {
+    return ic.msg_cycles_accept128(ic.msg_cycles_available128());
+}
+```
+
+#### msg cycles refunded
+
+Examples:
+
+-   [cycles](/examples/cycles)
+
+```typescript
+import { Canister, CanisterResult, ic, nat64, ok, Update, Variant } from 'azle';
+
+type Canister1 = Canister<{
+    method(): CanisterResult<boolean>;
+}>;
+
+const canister1 = ic.canisters.Canister1<Canister1>(
+    Principal.fromText('rkp4c-7iaaa-aaaaa-aaaca-cai')
+);
+
+type CallCanister1MethodResult = Variant<{
+    ok: nat64;
+    err: string;
+}>;
+
+export function* call_canister1_method(): Update<CallCanister1MethodResult> {
+    const canister_result: CanisterResult<boolean> = yield canister1
+        .method()
+        .with_cycles(100_000_000_000n);
+
+    if (!ok(canister_result)) {
+        return {
+            err: canister_result.err
+        };
+    }
+
+    return {
+        ok: ic.msg_cycles_refunded()
+    };
+}
+```
+
+#### msg cycles refunded 128
+
+Examples:
+
+-   [cycles](/examples/cycles)
+
+```python
+from kybra import Async, Canister, CanisterResult, ic, nat, update, Variant
+
+class Canister1(Canister):
+    @method
+    def example_method(self): bool: ...
+
+canister1 = Canister1(
+    Principal.from_str('rkp4c-7iaaa-aaaaa-aaaca-cai')
+)
+
+class CallCanister1MethodResult(Variant, total=False):
+    ok: nat
+    err: str
+
+@update
+def call_canister1_method() -> Async[CallCanister1MethodResult]:
+    canister_result: CanisterResult[bool] = yield canister1.example_method().with_cycles128(100_000_000_000)
+
+    if canister_result.err is not None:
+        return {
+            'err': canister_result.err
+        }
+
+    return {
+        'ok': ic.msg_cycles_refunded128()
+    }
+```
+
+#### notify
+
+Examples:
+
+-   [cross_canister_calls](/examples/cross_canister_calls)
+-   [cycles](/examples/cycles)
+
+```python
+from kybra import Canister, CanisterResult, ic, method, Update
+
+class Canister1(Canister):
+    @method
+    def example_method(self) -> bool: ...
+
+canister1 = Canister1(
+    Principal.from_str('rkp4c-7iaaa-aaaaa-aaaca-cai')
+)
+
+def call_canister1_method() -> bool:
+    canister_result: CanisterResult[None] = canister1.example_method().notify();
+
+    if 'err' in canister_result:
+        return False
+
+    return True
+```
+
+#### notify raw
+
+Examples:
+
+-   [notify_raw](/examples/notify_raw)
+
+```python
+from kybra import ic, Principal, update
+
+@update
+def send_notification() -> bool:
+    result = ic.notify_raw(
+        Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'),
+        'receive_notification',
+        ic.candid_encode('()'),
+        0
+    )
+
+    if 'err' in result:
+        return False
+
+    return True
+```
+
+#### notify with payment 128
+
+Examples:
+
+-   [cycles](/examples/cycles)
+
+```python
+from kybra import Async, Canister, CanisterResult, ic, method, Principal, update
+
+class Canister1(Canister):
+    @method
+    def example_method(self) -> bool: ...
+
+canister1 = Canister1(
+    Principal.from_str('rkp4c-7iaaa-aaaaa-aaaca-cai')
+)
+
+@update
+def call_canister1_method() -> Async[bool]:
+    canister_result: CanisterResult[None] = canister1.example_method().with_cycles128(100_000_000_000).notify()
+
+    if canister_result.err is not None:
+        return False
+
+    return True
+```
+
+#### performance counter
+
+Examples:
+
+-   [ic_api](/examples/ic_api)
+
+```python
+from kybra import ic, nat64, query
+
+@query
+def performance_counter() -> nat64:
+    return ic.performance_counter(0)
+```
+
+#### reject
+
+Examples:
+
+-   [ic_api](/examples/ic_api)
+-   [manual_reply](/examples/manual_reply)
+-   [rejections](/examples/rejections)
+
+```python
+from kybra import empty, ic, manual
+
+def reject(message: str) -> manual[empty]:
+    ic.reject(message)
+```
+
+#### reject code
+
+Examples:
+
+-   [rejections](/examples/rejections)
+
+```python
+from kybra import Async, Canister, CanisterResult, ic, Principal, RejectionCode, update
+
+class Canister1(Canister):
+    @method
+    def example_method(self) -> bool: ...
+
+canister1 = Canister1(
+    Principal.from_str('rkp4c-7iaaa-aaaaa-aaaca-cai')
+)
+
+@update
+def get_rejection_code() -> Async[RejectionCode]:
+    yield canister1.example_method()
+    return ic.reject_code()
+```
+
+#### reject message
+
+Examples:
+
+-   [rejections](/examples/rejections)
+
+```python
+from kybra import Async, Canister, CanisterResult, ic, method, Principal, update
+
+class Canister1(Canister):
+    @method
+    def example_method(self) -> bool: ...
+
+canister1 = Canister1(
+    Principal.from_str('rkp4c-7iaaa-aaaaa-aaaca-cai')
+)
+
+@update
+def get_rejection_message() -> Async[str]:
+    yield canister1.example_method()
+    return ic.reject_message()
+```
+
+#### reply
+
+Examples:
+
+-   [manual_reply](/examples/manual_reply)
+
+```python
+from kybra import ic, manual, update
+
+def manual_update(message: str) -> manual[str]:
+    if message == 'reject':
+        ic.reject(message)
+        return
+
+    ic.reply(message)
+```
+
+#### reply raw
+
+Examples:
+
+-   [manual_reply](/examples/manual_reply)
+
+```python
+from kybra import blob, ic, int, manual, Record, Variant
+
+class RawReply(Record):
+    int: int
+    text: str
+    bool: bool
+    blob: blob
+    variant: 'Options'
+
+class Options(Variant, total=False):
+    Small: None
+    Medium: None
+    Large: None
+
+@update
+def reply_raw() -> manual[RawReply]:
+    ic.reply_raw(
+        ic.candid_encode(
+            '(record { "int" = 42; "text" = "text"; "bool" = true; "blob" = blob "Surprise!"; "variant" = variant { Medium } })'
+        )
+    )
+```
+
+#### result
+
+[Not yet implemented.](https://github.com/demergent-labs/azle/issues/496)
+
+### stdlib
 
 There is limited support for the `stdlib`. The following modules may be supported as far as [RustPython](https://github.com/RustPython/RustPython) or the IC support them:
 
