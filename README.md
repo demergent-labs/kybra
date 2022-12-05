@@ -1862,16 +1862,16 @@ Examples:
 
 -   [cycles](/examples/cycles)
 
-```typescript
-import { Canister, CanisterResult, ic, nat64, ok, Update, Variant } from 'azle';
+```python
+from kybra import Canister, CanisterResult, ic, method, nat64, Principal, update, Variant
 
-type Canister1 = Canister<{
-    method(): CanisterResult<boolean>;
-}>;
+class Canister1(Canister):
+    @method
+    def example_method(self) -> bool: ...
 
-const canister1 = ic.canisters.Canister1<Canister1>(
-    Principal.fromText('rkp4c-7iaaa-aaaaa-aaaca-cai')
-);
+canister1 = Canister1(
+    Principal.from_str('rkp4c-7iaaa-aaaaa-aaaca-cai')
+)
 
 type CallCanister1MethodResult = Variant<{
     ok: nat64;
@@ -1902,7 +1902,7 @@ Examples:
 -   [cycles](/examples/cycles)
 
 ```python
-from kybra import Async, Canister, CanisterResult, ic, nat, update, Variant
+from kybra import Async, Canister, CanisterResult, ic, nat, Principal, update, Variant
 
 class Canister1(Canister):
     @method
@@ -1938,7 +1938,7 @@ Examples:
 -   [cycles](/examples/cycles)
 
 ```python
-from kybra import Canister, CanisterResult, ic, method, Update
+from kybra import Canister, CanisterResult, ic, method, Principal, Update
 
 class Canister1(Canister):
     @method
