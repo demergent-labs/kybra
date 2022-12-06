@@ -2349,6 +2349,11 @@ The following are the major blockers to 1.0/production-readiness:
 -   Performance improvements if necessary (~2023)
 -   RustPython production-ready or risks accepted (~2023)
 
+### Gotchas and Caveats
+
+-   Most of the stdlib doesn't work yet
+-   Most PyPI packages will not work yet
+
 ### Contributing
 
 Not currently taking contributions, but definitely taking issues and questions. Please allow time for initial code architecture and governance/legal/token work to be put in place. Kybra will most likely have a license extension [similar to Azle's](https://github.com/demergent-labs/azle/blob/main/LICENSE_EXTENSION.md).
