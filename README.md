@@ -2278,28 +2278,20 @@ There is limited support for the `stdlib`. The following modules may be supporte
 
 -   array
 -   binascii
--   bisect (??)
--   bz2
+-   \_bisect
 -   cmath
--   contextvars
--   csv
--   dis
--   faulthandler
--   fcntl
+-   \_contextvars
+-   \_csv
+-   \_dis
 -   gc
--   grp
 -   hashlib
 -   \_json
 -   math
--   mmap
 -   pyexpat
--   struct
--   random (??)
--   re
--   statistics
--   termios
+-   \_struct
+-   \_random (May not work yet: https://github.com/demergent-labs/kybra/issues/169)
+-   \_statistics
 -   unicodedata
--   uuid
 -   zlib
 
 ### Python External Packages
