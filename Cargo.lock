@@ -72,7 +72,7 @@ dependencies = [
 [[package]]
 name = "cdk_framework"
 version = "0.0.0"
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=0ad949d010150f509e4395dcf377313be026eaf2#0ad949d010150f509e4395dcf377313be026eaf2"
+source = "git+https://github.com/demergent-labs/cdk_framework?rev=1147dd7dac981676b0b65b8e40f9a56fabb9bca2#1147dd7dac981676b0b65b8e40f9a56fabb9bca2"
 dependencies = [
  "proc-macro2",
  "quote",
