@@ -36,8 +36,8 @@ Most of Kybra's documentation is currently found in this README. The Kybra Book,
 -   [Canister APIs](#canister-apis)
 -   [Call APIs](#call-apis)
 -   [Stable Memory](#stable-memory)
--   [Special APIs](#special-apis)
--   [stdlib](#stdlib)
+-   [Python stdlib](#python-stdlib)
+-   [Python External Packages](#python-external-packages)
 -   [Security](#security)
 -   [Roadmap](#roadmap)
 -   [Gotchas and Caveats](#gotchas-and-caveats)
@@ -2272,13 +2272,13 @@ def stable_write(offset: nat32, buf: blob):
     ic.stable_write(offset, buf)
 ```
 
-### stdlib
+### Python stdlib
 
 There is limited support for the `stdlib`. The following modules may be supported as far as [RustPython](https://github.com/RustPython/RustPython) or the IC support them:
 
 -   array
 -   binascii
--   bisect
+-   bisect (??)
 -   bz2
 -   cmath
 -   contextvars
@@ -2289,26 +2289,26 @@ There is limited support for the `stdlib`. The following modules may be supporte
 -   gc
 -   grp
 -   hashlib
--   json
+-   \_json
 -   math
 -   mmap
--   multiprocessing
--   \_posixsubprocess
 -   pyexpat
 -   struct
--   random
+-   random (??)
 -   re
--   resource
--   \_scproxy
--   select
--   socket
--   ssl
 -   statistics
--   syslog
 -   termios
 -   unicodedata
 -   uuid
 -   zlib
+
+### Python External Packages
+
+Installing external packages, such as from [PyPI](https://pypi.org/), will probably not work. The biggest problem you are most likely to run into is lack of support for most of the Python stdlib. Once the Wasm binary limit is increased on the IC, much more of the stdlib should be supported which should open up many external packages.
+
+Once the majority of the stdlib is supported, you are likely to run into issues with the environment that the Python code is running in. It is a Rust `wasm32-unknown-unknown` environment that has access to the IC APIs. Any external packages that can't compile or run in this environment with the supported APIs will not work.
+
+Much of the future work for enabling external packages will be forking and patching packages to support IC APIs.
 
 ### Security
 
@@ -2323,6 +2323,7 @@ Things to keep in mind:
 
 The following are the major blockers to 1.0/production-readiness:
 
+-   Majority stdlib support (~Q4 2022/Q1 2023)
 -   Extensive automated property testing (~Q1 2023)
 -   Multiple independent security reviews/audits (~Q1/Q2 2023)
 -   Performance improvements if necessary (~2023)
