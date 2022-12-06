@@ -284,7 +284,7 @@ In many ways developing canisters with Kybra is similar to any other Python proj
 
 A canister is the fundamental application unit on the Internet Computer. It contains the code and state of your application. When deployed to the Internet Computer, your canister essentially becomes an everlasting process.
 
-Users of your canister interact with it through RPC calls performed using HTTP requests. These calls will hit your canister's `Query` and `Update` methods. These methods, with their parameter and return types, are the interface to your canister.
+Users of your canister interact with it through RPC calls performed using HTTP requests. These calls will hit your canister's `@query` and `@update` methods. These methods, with their parameter and return types, are the interface to your canister.
 
 Kybra allows you to write canisters while embracing much of what the Python ecosystem has to offer.
 
@@ -303,7 +303,6 @@ Kybra allows you to write canisters while embracing much of what the Python ecos
 
 Examples:
 
--   [basic-dao](/examples/motoko_examples/basic-dao)
 -   [func_types](/examples/func_types)
 -   [init](/examples/init)
 -   [persistent-storage](/examples/motoko_examples/persistent-storage)
@@ -322,7 +321,6 @@ def init_():
 
 Examples:
 
--   [basic-dao](/examples/motoko_examples/basic-dao)
 -   [pre_and_post_upgrade](/examples/pre_and_post_upgrade)
 -   [stable_storage](/examples/stable_storage)
 
@@ -338,7 +336,6 @@ def pre_upgrade_():
 
 Examples:
 
--   [basic-dao](/examples/motoko_examples/basic-dao)
 -   [pre_and_post_upgrade](/examples/pre_and_post_upgrade)
 -   [stable_storage](/examples/stable_storage)
 -   [whoami](/examples/motoko_examples/whoami)
@@ -390,7 +387,6 @@ def also_inaccessible() -> bool:
 
 Examples:
 
--   [basic-dao](/examples/motoko_examples/basic-dao)
 -   [heartbeat](/examples/heartbeat)
 
 ```python
@@ -1407,7 +1403,6 @@ def data_certificate() -> opt[blob]:
 
 Examples:
 
--   [basic-dao](/examples/motoko_examples/basic-dao)
 -   [http_counter](/examples/motoko_examples/http_counter)
 -   [ic_api](/examples/ic_api)
 -   [whoami](/examples/motoko_examples/whoami)
@@ -1457,7 +1452,6 @@ def set_certified_data(data: blob):
 
 Examples:
 
--   [basic-dao](/examples/motoko_examples/basic-dao)
 -   [ic_api](/examples/ic_api)
 
 ```python
@@ -1522,7 +1516,6 @@ def trap(message: str) -> bool:
 
 Examples:
 
--   [basic-dao](/examples/motoko_examples/basic-dao)
 -   [defi](/examples/motoko_examples/defi)
 -   [ic_api](/examples/ic_api)
 -   [whoami](/examples/motoko_examples/whoami)
@@ -1658,7 +1651,6 @@ def call_canister1_example_method() -> Async[CallCanister1ExampleMethodResult]:
 
 Examples:
 
--   [basic-dao](/examples/motoko_examples/basic-dao)
 -   [call_raw](/examples/call_raw)
 
 ```python
