@@ -1777,7 +1777,7 @@ from kybra import ic, inspect_message, update
 
 @inspect_message
 def inspect_message_():
-    ic.print('this runs before executing update calls');
+    ic.print('this runs before executing update calls')
 
     if ic.method_name() === 'accessible':
         ic.accept_message()
@@ -1950,7 +1950,7 @@ canister1 = Canister1(
 )
 
 def call_canister1_method() -> bool:
-    canister_result: CanisterResult[None] = canister1.example_method().notify();
+    canister_result: CanisterResult[None] = canister1.example_method().notify()
 
     if 'err' in canister_result:
         return False
