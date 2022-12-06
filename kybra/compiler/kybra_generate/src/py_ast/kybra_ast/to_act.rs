@@ -121,6 +121,7 @@ impl ToAct for KybraAst {
         .collect();
 
         AbstractCanisterTree {
+            cdk_name: "kybra".to_string(),
             update_methods,
             query_methods,
             heartbeat_method,

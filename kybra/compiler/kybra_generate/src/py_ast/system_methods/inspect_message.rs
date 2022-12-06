@@ -15,8 +15,6 @@ impl PyAst<'_> {
         let inspect_message_function_def_option = inspect_message_function_defs.get(0);
 
         if let Some(inspect_method_function_def) = inspect_message_function_def_option {
-            let name = inspect_method_function_def.get_function_name();
-
             let call_to_inspect_message_py_function =
                 inspect_method_function_def.generate_call_to_py_function();
 
@@ -30,7 +28,7 @@ impl PyAst<'_> {
                     });
                 }
             };
-            Some(ActInspectMessageMethod { name, body })
+            Some(ActInspectMessageMethod { body })
         } else {
             None
         }

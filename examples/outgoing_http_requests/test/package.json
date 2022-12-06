@@ -1,0 +1,14 @@
+{
+    "scripts": {
+        "test": "cd .. && ts-node --transpile-only --ignore=false test/test.ts"
+    },
+    "devDependencies": {
+        "@dfinity/agent": "0.14.1",
+        "ts-node": "10.7.0",
+        "typescript": "4.6.3"
+    },
+    "dependencies": {
+        "azle": "github:demergent-labs/azle",
+        "decode-utf8": "1.0.1"
+    }
+}

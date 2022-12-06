@@ -31,7 +31,7 @@ const tests: Test[] = [
             const seconds = new Date().getTime() / 1_000;
 
             return {
-                ok: seconds - result < 5
+                ok: seconds - result < 10
             };
         }
     },

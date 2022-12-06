@@ -11,12 +11,12 @@ pub fn generate_notify_with_payment128_functions(
 ) -> Vec<TokenStream> {
     external_canisters.iter().map(|canister| {
         canister.methods.iter().map(|method| {
-            let function_name_string = format!("_azle_notify_with_payment128_{}_{}", canister.name, method.name);
+            let function_name_string = format!("_kybra_notify_with_payment128_{}_{}", canister.name, method.name);
             let real_function_name = format_ident!("{}", function_name_string);
             let wrapper_fn_name = format_ident!("{}_wrapper", function_name_string);
             let param_variable_definitions = generate_param_variables(method);
             let param_names: Vec<TokenStream> = method.params.iter().map(|param| {
-                let name = format_ident!("_kybra_{}", param.name);
+                let name = format_ident!("_kybra_user_defined_var_{}", param.name);
                 quote! { #name }
             }).collect();
             let comma = if param_names.len() == 0 {
@@ -50,7 +50,7 @@ pub fn generate_notify_with_payment128_functions(
 
 fn generate_param_variables(method: &ActExternalCanisterMethod) -> Vec<TokenStream> {
     method.params.iter().enumerate().map(|(index, act_fn_param)| {
-        let variable_name = format_ident!("_kybra_{}", act_fn_param.name);
+        let variable_name = format_ident!("_kybra_user_defined_var_{}", act_fn_param.name);
         let variable_type = act_fn_param.data_type.to_token_stream(&vec![]);
         let actual_index = index + 2;
 

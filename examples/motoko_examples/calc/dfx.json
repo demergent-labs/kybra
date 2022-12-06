@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "calc": {
+            "type": "custom",
+            "build": "python -m kybra calc src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/calc/target/wasm32-unknown-unknown/release/calc.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/calc",
+                "node_compatibility": true
+            }
+        }
+    }
+}

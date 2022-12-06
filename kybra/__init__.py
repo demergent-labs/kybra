@@ -333,7 +333,7 @@ class AsyncInfo:
     def notify(self) -> NotifyResult:
         qualname: str = self.args[1]
         with_payment = 'with_payment128_' if self.name == 'call_with_payment' or self.name == 'call_with_payment128' else ''
-        notify_function_name = f'_azle_notify_{with_payment}{qualname.replace(".", "_")}_wrapper'
+        notify_function_name = f'_kybra_notify_{with_payment}{qualname.replace(".", "_")}_wrapper'
 
         return getattr(_kybra_ic, notify_function_name)(self.args) # type: ignore
 
