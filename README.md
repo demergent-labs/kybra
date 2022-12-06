@@ -1666,7 +1666,7 @@ def get_randomness() -> Async[blob]:
     )
 
     if canister_result.err is not None:
-        return bytes
+        return bytes()
 
     return canister_result.ok
 ```
