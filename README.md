@@ -53,6 +53,7 @@ You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.micr
 -   [Rust](#rust)
 -   [dfx 0.12.0](#dfx)
 -   [Python VS Code Extension](#python-vs-code-extension)
+-   [Common Errors](#common-errors)
 
 #### Python 3.10.7
 
@@ -79,13 +80,6 @@ If you already have Rust installed, make sure you are up to date:
 ```bash
 rustup update
 ```
-
-The following are some common Rust installation issues:
-
--   You may need to manually install `ic-cdk-optimizer`: `cargo install ic-cdk-optimizer`
--   Ubuntu
-    -   error: linker cc not found (sudo apt install build-essential)
-    -   is cmake not installed? (sudo apt install cmake)
 
 #### dfx
 
@@ -167,6 +161,48 @@ def hello_world() -> str:
 ```
 
 You are now ready to [deploy your application](#deployment).
+
+#### Common Errors
+
+These are common errors or problems that you might run into while getting everything installed.
+
+Error:
+
+```
+No such file or directory: '.../.cargo/.bin/ic-cdk-optimizer'
+```
+
+Resolution:
+
+-   You may need to manually install `ic-cdk-optimizer`:
+
+```
+cargo install ic-cdk-optimizer
+```
+
+Error (Ubuntu):
+
+```
+linker cc not found
+```
+
+Resolution:
+
+```
+sudo apt install build-essential
+```
+
+Error (Ubuntu):
+
+```
+is cmake not installed?
+```
+
+Resolution:
+
+```
+sudo apt install cmake
+```
 
 ### Deployment
 
