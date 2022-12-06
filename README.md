@@ -19,15 +19,6 @@ Python CDK for the [Internet Computer](https://internetcomputer.org/).
 
 Please consider the [security section](#security).
 
-## Security
-
-Things to keep in mind:
-
--   Kybra does not yet have many live, successful, continuously operating applications deployed to the IC
--   Kybra does not yet have extensive automated property tests
--   Kybra does not yet have multiple independent security reviews/audits
--   Kybra heavily relies on RustPython which is [self-proclaimed to not be totally production-ready](https://github.com/RustPython/RustPython#disclaimer)
-
 ## Discussion
 
 Feel free to open issues or join us in the [Discord channel](https://discord.com/channels/748416164832608337/1019372359775440988).
@@ -46,15 +37,11 @@ Most of Kybra's documentation is currently found in this README. The Kybra Book,
 -   [Call APIs](#call-apis)
 -   [Stable Memory](#stable-memory)
 -   [Special APIs](#special-apis)
--   [JS APIs](#js-apis)
--   [Feature Parity](#feature-parity)
+-   [stdlib](#stdlib)
 -   [Security](#security)
--   [Benchmarks](#benchmarks)
 -   [Roadmap](#roadmap)
 -   [Gotchas and Caveats](#gotchas-and-caveats)
--   [Decentralization](#decentralization)
 -   [Contributing](#contributing)
--   [License](#license)
 
 ### Installation
 
@@ -205,7 +192,7 @@ source .dfx/kybra/venv/bin/activate
 dfx deploy
 ```
 
-You can then interact with your canister like any other canister written with Azle, Motoko, or Rust. For more information about calling your canister using `dfx`, see [here](https://smartcontracts.org/docs/developers-guide/cli-reference/dfx-canister.html#_dfx_canister_call).
+You can then interact with your canister like any other canister written with Motoko, Rust, or Azle. For more information about calling your canister using `dfx`, see [here](https://internetcomputer.org/docs/current/references/cli-reference/dfx-canister#dfx-canister-call).
 
 dfx commands for the [query example](/examples/query):
 
@@ -391,7 +378,7 @@ More information:
 
 Update methods expose public callable functions that are writable. All state changes will be persisted after the function call completes.
 
-Update calls go through consensus and thus return very slowly (a few seconds) relative to query calls. This also means they are more secure than query calls unless [certified data](https://smartcontracts.org/docs/base-libraries/certifieddata) is used in conjunction with the query call.
+Update calls go through consensus and thus return very slowly (a few seconds) relative to query calls. This also means they are more secure than query calls unless [certified variables](https://internetcomputer.org/how-it-works/response-certification/) are used in conjunction with the query call.
 
 To create an update method, simply add the `update` decorator to your function.
 
@@ -424,7 +411,7 @@ More information:
 
 Query methods expose public callable functions that are read-only. All state changes will be discarded after the function call completes.
 
-Query calls do not go through consensus and thus return very quickly relative to update calls. This also means they are less secure than update calls unless [certified data](https://smartcontracts.org/docs/base-libraries/certifieddata) is used in conjunction with the query call.
+Query calls do not go through consensus and thus return very quickly relative to update calls. This also means they are less secure than update calls unless [certified variables](https://internetcomputer.org/how-it-works/response-certification/) are used in conjunction with the query call.
 
 To create a query method, simply add the `query` decorator to your function.
 
@@ -1687,37 +1674,33 @@ Examples:
 -   [cycles](/examples/cycles)
 -   [management_canister](/examples/management_canister)
 
-```typescript
-import { Canister, CanisterResult, ic, ok, Update, Variant } from 'azle';
+```python
+from kybra import Async, Canister, CanisterResult, ic, method, Principal, update, Variant
 
-type Canister1 = Canister<{
-    method(): CanisterResult<boolean>;
-}>;
+class Canister1(Canister):
+    @method
+    def example_method(self) -> bool: ...
 
-const canister1 = ic.canisters.Canister1<Canister1>(
-    Principal.fromText('rkp4c-7iaaa-aaaaa-aaaca-cai')
-);
+canister1 = Canister1(
+    Principal.from_str('rkp4c-7iaaa-aaaaa-aaaca-cai')
+)
 
-type CallCanister1MethodResult = Variant<{
-    ok: boolean;
-    err: string;
-}>;
+class CallCanister1MethodResult(Variant, total=False):
+    ok: bool
+    err: str
 
-export function* call_canister1_method(): Update<CallCanister1MethodResult> {
-    const canister_result: CanisterResult<boolean> = yield canister1
-        .method()
-        .with_cycles(100_000_000_000n);
+@update
+def call_canister1_method() -> Async[CallCanister1MethodResult]:
+    canister_result: CanisterResult[bool] = yield canister1.example_method().with_cycles(100_000_000_000)
 
-    if (!ok(canister_result)) {
+    if canister_result.err is not None:
         return {
-            err: canister_result.err
-        };
-    }
+            'err': canister_result.err
+        }
 
     return {
-        ok: canister_result.ok
-    };
-}
+        'ok': canister_result.ok
+    }
 ```
 
 #### call with payment 128
@@ -1726,37 +1709,33 @@ Examples:
 
 -   [cycles](/examples/cycles)
 
-```typescript
-import { Canister, CanisterResult, ic, ok, Update, Variant } from 'azle';
+```python
+from kybra import Async, Canister, CanisterResult, ic, method, Principal, update, Variant
 
-type Canister1 = Canister<{
-    method(): CanisterResult<boolean>;
-}>;
+class Canister1(Canister):
+    @method
+    def example_method(self) -> bool: ...
 
-const canister1 = ic.canisters.Canister1<Canister1>(
-    Principal.fromText('rkp4c-7iaaa-aaaaa-aaaca-cai')
-);
+canister1 = Canister1(
+    Principal.from_str('rkp4c-7iaaa-aaaaa-aaaca-cai')
+)
 
-type CallCanister1MethodResult = Variant<{
-    ok: boolean;
-    err: string;
-}>;
+class CallCanister1MethodResult(Variant, total=False):
+    ok: bool
+    err: str
 
-export function* call_canister1_method(): Update<CallCanister1MethodResult> {
-    const canister_result: CanisterResult<boolean> = yield canister1
-        .method()
-        .with_cycles128(100_000_000_000n);
+@update
+def call_canister1_method() -> Async[CallCanister1MethodResult]:
+    canister_result: CanisterResult[bool] = yield canister1.example_method().with_cycles128(100_000_000_000)
 
-    if (!ok(canister_result)) {
+    if canister_result.err is not None:
         return {
-            err: canister_result.err
-        };
-    }
+            'err': canister_result.err
+        }
 
     return {
-        ok: canister_result.ok
-    };
-}
+        'ok': canister_result.ok
+    }
 ```
 
 #### method name
@@ -1765,35 +1744,33 @@ Examples:
 
 -   [inspect_message](/examples/inspect_message)
 
-```typescript
-import { ic, InspectMessage, Update } from 'azle';
+```python
+from kybra import ic, inspect_message, update
 
-export function inspect_message(): InspectMessage {
-    console.log('this runs before executing update calls');
+@inspect_message
+def inspect_message_():
+    ic.print('this runs before executing update calls');
 
-    if (ic.method_name() === 'accessible') {
-        ic.accept_message();
-        return;
-    }
+    if ic.method_name() === 'accessible':
+        ic.accept_message()
+        return
 
-    if (ic.method_name() === 'inaccessible') {
-        return;
-    }
+    if ic.method_name() === 'inaccessible':
+        return
 
-    throw `Method "${ic.method_name()}" not allowed`;
-}
+    raise Exception(f'Method "{ic.method_name()}" not allowed')
 
-export function accessible(): Update<boolean> {
-    return true;
-}
+@update
+def accessible() -> bool:
+    return True
 
-export function inaccessible(): Update<boolean> {
-    return false;
-}
+@update
+def inaccessible() -> bool:
+    return False
 
-export function also_inaccessible(): Update<boolean> {
-    return false;
-}
+@update
+def also_inaccessible() -> bool:
+    return False
 ```
 
 #### msg cycles accept
@@ -1802,13 +1779,13 @@ Examples:
 
 -   [cycles](/examples/cycles)
 
-```typescript
-import { ic, nat64, Update } from 'azle';
+```python
+from kybra import ic, nat64, update
 
-// Moves all transferred cycles to the canister
-export function receive_cycles(): Update<nat64> {
-    return ic.msg_cycles_accept(ic.msg_cycles_available());
-}
+# Moves all transferred cycles to the canister
+@update
+def receive_cycles() -> nat64:
+    return ic.msg_cycles_accept(ic.msg_cycles_available())
 ```
 
 #### msg cycles accept 128
@@ -1817,13 +1794,13 @@ Examples:
 
 -   [cycles](/examples/cycles)
 
-```typescript
-import { ic, nat, Update } from 'azle';
+```python
+from kybra import ic, nat, update
 
-// Moves all transferred cycles to the canister
-export function receive_cycles128(): Update<nat> {
-    return ic.msg_cycles_accept128(ic.msg_cycles_available128());
-}
+# Moves all transferred cycles to the canister
+@update
+def receive_cycles128() -> nat:
+    return ic.msg_cycles_accept128(ic.msg_cycles_available128())
 ```
 
 #### msg cycles available
@@ -1832,13 +1809,13 @@ Examples:
 
 -   [cycles](/examples/cycles)
 
-```typescript
-import { ic, nat64, Update } from 'azle';
+```python
+from kybra import ic, nat64, update
 
-// Moves all transferred cycles to the canister
-export function receive_cycles(): Update<nat64> {
-    return ic.msg_cycles_accept(ic.msg_cycles_available());
-}
+# Moves all transferred cycles to the canister
+@update
+def receive_cycles() -> nat64:
+    return ic.msg_cycles_accept(ic.msg_cycles_available())
 ```
 
 #### msg cycles available 128
@@ -1847,13 +1824,13 @@ Examples:
 
 -   [cycles](/examples/cycles)
 
-```typescript
-import { ic, nat64, Update } from 'azle';
+```python
+from kybra import ic, nat64, update
 
-// Moves all transferred cycles to the canister
-export function receive_cycles128(): Update<nat64> {
-    return ic.msg_cycles_accept128(ic.msg_cycles_available128());
-}
+# Moves all transferred cycles to the canister
+@update
+def receive_cycles128() -> nat64:
+    return ic.msg_cycles_accept128(ic.msg_cycles_available128())
 ```
 
 #### msg cycles refunded
@@ -1873,26 +1850,22 @@ canister1 = Canister1(
     Principal.from_str('rkp4c-7iaaa-aaaaa-aaaca-cai')
 )
 
-type CallCanister1MethodResult = Variant<{
-    ok: nat64;
-    err: string;
-}>;
+class CallCanister1MethodResult(Variant, total=False):
+    ok: nat64
+    err: str
 
-export function* call_canister1_method(): Update<CallCanister1MethodResult> {
-    const canister_result: CanisterResult<boolean> = yield canister1
-        .method()
-        .with_cycles(100_000_000_000n);
+@update
+def call_canister1_method() -> CallCanister1MethodResult:
+    canister_result: CanisterResult[bool] = yield canister1.example_method().with_cycles(100_000_000_000)
 
-    if (!ok(canister_result)) {
+    if canister_result.err is not None:
         return {
-            err: canister_result.err
-        };
-    }
+            'err': canister_result.err
+        }
 
     return {
-        ok: ic.msg_cycles_refunded()
-    };
-}
+        'ok': ic.msg_cycles_refunded()
+    }
 ```
 
 #### msg cycles refunded 128
@@ -2134,6 +2107,171 @@ def reply_raw() -> manual[RawReply]:
 
 [Not yet implemented.](https://github.com/demergent-labs/azle/issues/496)
 
+### Stable Memory
+
+-   [stable storage](#stable-storage)
+-   [stable64 grow](#stable64-grow)
+-   [stable64 read](#stable64-read)
+-   [stable64 size](#stable64-size)
+-   [stable64 write](#stable64-write)
+-   [stable bytes](#stable-bytes)
+-   [stable grow](#stable-grow)
+-   [stable read](#stable-read)
+-   [stable size](#stable-size)
+-   [stable write](#stable-write)
+
+#### stable storage
+
+Examples:
+
+-   [func_types](/examples/func_types)
+-   [http_counter](/examples/motoko_examples/http_counter)
+-   [persistent_storage](/examples/motoko_examples/persistent-storage)
+-   [pre_and_post_upgrade](/examples/pre_and_post_upgrade)
+-   [stable_storage](/examples/stable_storage)
+-   [tuple_types](/examples/tuple_types)
+
+```python
+from kybra import init, nat, update
+
+from typing import TypedDict
+
+class StableStorage(TypedDict):
+    stable_nat: nat
+
+stable_storage: StableStorage = ic.stable_storage()
+
+@init
+def init_(stable_nat: nat):
+    stable_storage['stable_nat'] = stable_nat
+```
+
+#### stable64 grow
+
+Examples:
+
+-   [stable_memory](/examples/stable_memory)
+
+```python
+from kybra import ic, nat64, Stable64GrowResult, update
+
+@update
+def stable64_grow(new_pages: nat64) -> Stable64GrowResult:
+    return ic.stable64_grow(new_pages)
+```
+
+#### stable64 read
+
+Examples:
+
+-   [stable_memory](/examples/stable_memory)
+
+```python
+from kybra import blob, ic, nat64, query
+
+@query
+def stable64_read(offset: nat64, length: nat64) -> blob:
+    return ic.stable64_read(offset, length)
+```
+
+#### stable64 size
+
+Examples:
+
+-   [stable_memory](/examples/stable_memory)
+
+```python
+from kybra import ic, nat64, query
+
+@query
+def stable64_size() -> nat64:
+    return ic.stable64_size()
+```
+
+#### stable64 write
+
+Examples:
+
+-   [stable_memory](/examples/stable_memory)
+
+```python
+from kybra import blob, ic, nat64, update
+
+@update
+def stable64_write(offset: nat64, buf: blob):
+    ic.stable64_write(offset, buf)
+```
+
+#### stable bytes
+
+Examples:
+
+-   [stable_memory](/examples/stable_memory)
+
+```python
+from kybra import blob, ic, query
+
+@query
+def stable_bytes() -> blob:
+    return ic.stable_bytes()
+```
+
+#### stable grow
+
+Examples:
+
+-   [stable_memory](/examples/stable_memory)
+
+```python
+from kybra import ic, nat32, StableGrowResult, update
+
+@update
+def stable_grow(new_pages: nat32) -> StableGrowResult:
+    return ic.stable_grow(new_pages)
+```
+
+#### stable read
+
+Examples:
+
+-   [stable_memory](/examples/stable_memory)
+
+```python
+from kybra import blob, ic, nat32, query
+
+@query
+def stable_read(offset: nat32, length: nat32) -> blob:
+    return ic.stable_read(offset, length)
+```
+
+#### stable size
+
+Examples:
+
+-   [stable_memory](/examples/stable_memory)
+
+```python
+from kybra import ic, nat32, query
+
+@query
+def stable_size() -> nat32:
+    return ic.stable_size()
+```
+
+#### stable write
+
+Examples:
+
+-   [stable_memory](/examples/stable_memory)
+
+```python
+from kybra import blob, ic, nat32, update
+
+@update
+def stable_write(offset: nat32, buf: blob):
+    ic.stable_write(offset, buf)
+```
+
 ### stdlib
 
 There is limited support for the `stdlib`. The following modules may be supported as far as [RustPython](https://github.com/RustPython/RustPython) or the IC support them:
@@ -2171,6 +2309,24 @@ There is limited support for the `stdlib`. The following modules may be supporte
 -   unicodedata
 -   uuid
 -   zlib
+
+### Security
+
+Things to keep in mind:
+
+-   Kybra does not yet have many live, successful, continuously operating applications deployed to the IC
+-   Kybra does not yet have extensive automated property tests
+-   Kybra does not yet have multiple independent security reviews/audits
+-   Kybra heavily relies on RustPython which is [self-proclaimed to not be totally production-ready](https://github.com/RustPython/RustPython#disclaimer)
+
+### Roadmap
+
+The following are the major blockers to 1.0/production-readiness:
+
+-   Extensive automated property testing (~Q1 2023)
+-   Multiple independent security reviews/audits (~Q1/Q2 2023)
+-   Performance improvements if necessary (~2023)
+-   RustPython production-ready or risks accepted (~2023)
 
 ### Contributing
 

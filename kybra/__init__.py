@@ -103,18 +103,17 @@ class NotifyResult(Variant, total=False):
     ok: None
     err: RejectionCode
 
-# TODO remove temp on StableMemoryError, StableGrowResult, Stable64GrowResult once multiple file analysis works
-class StableMemoryErrorTemp(Variant, total=False):
+class StableMemoryError(Variant, total=False):
     OutOfMemory: None
     OutOfBounds: None
 
-class StableGrowResultTemp(Variant, total=False):
+class StableGrowResult(Variant, total=False):
     ok: nat32
-    err: StableMemoryErrorTemp
+    err: StableMemoryError
 
-class Stable64GrowResultTemp(Variant, total=False):
+class Stable64GrowResult(Variant, total=False):
     ok: nat64
-    err: StableMemoryErrorTemp
+    err: StableMemoryError
 
 # TODO we might want to just make this a dict[int, str] to keep the derive simple, or maybe a class with a principal and method name field
 def Func(callable: Callable[..., Any]) -> Type[tuple[Principal, str]]:
@@ -266,7 +265,7 @@ class ic(Generic[T]):
         return _kybra_ic._kybra_stable_bytes() # type: ignore
 
     @staticmethod
-    def stable_grow(new_pages: nat32) -> StableGrowResultTemp:
+    def stable_grow(new_pages: nat32) -> StableGrowResult:
         return _kybra_ic._kybra_stable_grow(new_pages) # type: ignore
 
     @staticmethod
@@ -282,7 +281,7 @@ class ic(Generic[T]):
         _kybra_ic._kybra_stable_write(offset, buf) # type: ignore
 
     @staticmethod
-    def stable64_grow(new_pages: nat64) -> Stable64GrowResultTemp:
+    def stable64_grow(new_pages: nat64) -> Stable64GrowResult:
         return _kybra_ic._kybra_stable64_grow(new_pages) # type: ignore
 
     @staticmethod

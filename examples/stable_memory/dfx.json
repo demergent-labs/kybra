@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".dfx/kybra/stable_memory/target/wasm32-unknown-unknown/release/stable_memory.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/stable_memory"
+                "output": "test/dfx_generated/stable_memory",
+                "node_compatibility": true
             }
         }
     }
