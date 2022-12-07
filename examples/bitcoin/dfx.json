@@ -1,0 +1,27 @@
+{
+    "canisters": {
+        "bitcoin": {
+            "type": "custom",
+            "build": "python -m kybra bitcoin src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/bitcoin/target/wasm32-unknown-unknown/release/bitcoin.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/bitcoin",
+                "node_compatibility": true
+            }
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    },
+    "defaults": {
+        "bitcoin": {
+            "enabled": true,
+            "nodes": ["127.0.0.1:18444"],
+            "log_level": "info"
+        }
+    }
+}

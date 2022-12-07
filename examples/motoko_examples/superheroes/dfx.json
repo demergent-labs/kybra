@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "superheroes": {
+            "type": "custom",
+            "build": "python -m kybra superheroes src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/superheroes/target/wasm32-unknown-unknown/release/superheroes.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/superheroes",
+                "node_compatibility": true
+            }
+        }
+    }
+}
