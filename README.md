@@ -2341,7 +2341,6 @@ Things to keep in mind:
 -   Kybra does not yet have many live, successful, continuously operating applications deployed to the IC
 -   Kybra does not yet have extensive automated property tests
 -   Kybra does not yet have multiple independent security reviews/audits
--   Kybra heavily relies on RustPython which is [self-proclaimed to not be totally production-ready](https://github.com/RustPython/RustPython#disclaimer)
 
 ### Roadmap
 
@@ -2351,7 +2350,6 @@ The following are the major blockers to 1.0/production-readiness:
 -   Extensive automated property testing (~Q1 2023)
 -   Multiple independent security reviews/audits (~Q1/Q2 2023)
 -   Performance improvements if necessary (~2023)
--   RustPython production-ready or risks accepted (~2023)
 
 ### Gotchas and Caveats
 
