@@ -23,7 +23,7 @@ sed -E -i "s/(version=')(.*)(')/\1$VERSION\3/" setup.py
 ~/.pyenv/versions/3.10.7/bin/python -m twine upload -u __token__ -p "$PYPI_TOKEN" --skip-existing dist/*
 
 # TODO loop through checking for the status instead of sleeping
-echo -e "sleeping for 30 seconds to ensure kybra@$VERSION is fully registered on PyPI"
+echo -e "sleeping for 30 seconds to ensure kybra==$VERSION is fully registered on PyPI"
 
 sleep 30
 
