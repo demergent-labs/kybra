@@ -1185,17 +1185,11 @@ ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])
 
 @query
 def get_basic_func() -> BasicFunc:
-    return [
-        Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'),
-        'simple_function_name'
-    ]
+    return (Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'), 'simple_function_name')
 
 @query
 def get_complex_func() -> ComplexFunc:
-    return [
-        Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'),
-        'complex_function_name'
-    ]
+    return (Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'), 'complex_function_name')
 ```
 
 Candid:
