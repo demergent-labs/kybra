@@ -1516,7 +1516,6 @@ def trap(message: str) -> bool:
 
 Examples:
 
--   [defi](/examples/motoko_examples/defi)
 -   [ic_api](/examples/ic_api)
 -   [whoami](/examples/motoko_examples/whoami)
 
@@ -1614,7 +1613,6 @@ Examples:
 
 -   [cross_canister_calls](/examples/cross_canister_calls)
 -   [cycles](/examples/cycles)
--   [defi](/examples/motoko_examples/defi)
 -   [func_types](/examples/func_types)
 -   [rejections](/examples/rejections)
 -   [tuple_types](/examples/tuple_types)
