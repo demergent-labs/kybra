@@ -1,10 +1,11 @@
-use proc_macro2::TokenStream;
-use quote::{format_ident, quote};
-
 use cdk_framework::{
     nodes::{ActExternalCanister, ActExternalCanisterMethod},
     ToTokenStream,
 };
+use proc_macro2::TokenStream;
+use quote::{format_ident, quote};
+
+use crate::generators::tuple;
 
 pub fn generate_notify_functions(
     external_canisters: &Vec<ActExternalCanister>,
@@ -16,8 +17,9 @@ pub fn generate_notify_functions(
             let wrapper_fn_name = format_ident!("{}_wrapper", function_name_string);
             let param_variable_definitions = generate_param_variables(method);
             let param_names: Vec<proc_macro2::Ident> = method.params.iter().map(|param| {
-                format_ident!("_kybra_user_defined_var_{}", param.name)
+                format_ident!("{}", param.prefixed_name())
             }).collect();
+            let params = tuple::generate_tuple(&param_names);
 
             quote!{
                 #[pymethod]
@@ -28,7 +30,7 @@ pub fn generate_notify_functions(
 
                     let notify_result = #real_function_name(
                         canister_id_principal,
-                        #(#param_names),*
+                        #params
                     );
 
                     notify_result.try_into_vm_value(vm).unwrap()
@@ -40,7 +42,7 @@ pub fn generate_notify_functions(
 
 fn generate_param_variables(method: &ActExternalCanisterMethod) -> Vec<TokenStream> {
     method.params.iter().enumerate().map(|(index, act_fn_param)| {
-        let variable_name = format_ident!("_kybra_user_defined_var_{}", act_fn_param.name);
+        let variable_name = format_ident!("{}", act_fn_param.prefixed_name());
         let variable_type = act_fn_param.data_type.to_token_stream(&vec![]);
         let actual_index = index + 2;
 

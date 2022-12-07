@@ -49,7 +49,7 @@ impl KybraStmt<'_> {
                     .iter()
                     .fold(vec![], |acc, arg| match &arg.node.annotation {
                         Some(annotation) => {
-                            let name = format!("_kybra_user_defined_var_{}", arg.node.arg.clone());
+                            let name = arg.node.arg.clone();
                             let kybra_annotation = KybraExpr {
                                 located_expr: &annotation,
                                 source_map: &self.source_map,
@@ -116,18 +116,15 @@ impl KybraStmt<'_> {
     }
 
     fn generate_body(&self) -> TokenStream {
-        let args = match &self.stmt_kind.node {
-            StmtKind::FunctionDef { args, .. } => args,
-            _ => panic!("Unreachable"),
-        };
+        let params = self.build_act_params();
 
         let name = match self.get_name() {
             Some(name) => name,
             None => todo!(),
         };
 
-        let param_conversions = args.args.iter().map(|arg| {
-            let param_name = format_ident!("_kybra_user_defined_var_{}", arg.node.arg);
+        let param_conversions = params.iter().map(|param| {
+            let param_name = format_ident!("{}", param.prefixed_name());
             quote! {
                 #param_name.try_into_vm_value(vm).unwrap()
             }
