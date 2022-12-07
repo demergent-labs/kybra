@@ -32,7 +32,6 @@ do
     cd $directory
 
     sed -E -i "s/(kybra==)(.*)()/\1$VERSION\3/" requirements.txt
-    #pip install -r requirements.txt
 
     cd $root_dir
 done

@@ -35,12 +35,6 @@ jobs:
               with:
                   ref: ${{ contains(github.head_ref, 'release--') && github.event.pull_request.head.ref || github.ref }} # This is necessary for this job to be able to commit and push to the origin remote properly
                   token: ${{ secrets.LASTMJS_GITHUB_TOKEN || github.token }} # A personal GitHub token is setup as a secret so that committing and pushing to GitHub from the Action will trigger another workflow
-            # - uses: actions/setup-node@v3
-            #   with:
-            #       node-version: 18
-            #       registry-url: https://registry.npmjs.org
-            #   env:
-            #       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # TODO this will need to be the PyPI auth token
             # TODO we should use some Action-specific bot account
             - if: contains(github.head_ref, 'release--')
               run: git config --global user.name 'Jordan Last'
@@ -203,7 +197,7 @@ jobs:
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests && matrix.kybra_source == 'pypi' }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}
-              run: source .dfx/kybra/venv/bin/activate && pip install kybra # TODO this should really be a locked-down version...we probably need requirements.txt or something
+              run: source .dfx/kybra/venv/bin/activate && pip install -r requirements.txt
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}/test
