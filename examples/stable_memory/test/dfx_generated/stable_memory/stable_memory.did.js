@@ -28,7 +28,7 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'stable_size' : IDL.Func([], [IDL.Nat32], ['query']),
-    'stable_write' : IDL.Func([IDL.Nat32, IDL.Vec(IDL.Nat8)], [IDL.Bool], []),
+    'stable_write' : IDL.Func([IDL.Nat32, IDL.Vec(IDL.Nat8)], [], []),
   });
 };
 export const init = ({ IDL }) => { return []; };

@@ -16,5 +16,5 @@ export interface _SERVICE {
   'stable_grow' : ActorMethod<[number], StableGrowResult>,
   'stable_read' : ActorMethod<[number, number], Uint8Array>,
   'stable_size' : ActorMethod<[], number>,
-  'stable_write' : ActorMethod<[number, Uint8Array], boolean>,
+  'stable_write' : ActorMethod<[number, Uint8Array], undefined>,
 }

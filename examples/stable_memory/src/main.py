@@ -1,18 +1,4 @@
-from kybra import blob, ic, nat32, nat64, query, update, Variant
-
-# TODO get rid of StableMemoryError, StableGrowResult, Stable64GrowResult once multiple file analysis works
-
-class StableMemoryError(Variant, total=False):
-    OutOfMemory: None
-    OutOfBounds: None
-
-class StableGrowResult(Variant, total=False):
-    ok: nat32
-    err: StableMemoryError
-
-class Stable64GrowResult(Variant, total=False):
-    ok: nat64
-    err: StableMemoryError
+from kybra import blob, ic, nat32, nat64, query, StableGrowResult, Stable64GrowResult, update
 
 @query
 def stable_size() -> nat32:
@@ -30,9 +16,8 @@ def stable_grow(new_pages: nat32) -> StableGrowResult:
 def stable64_grow(new_pages: nat64) -> Stable64GrowResult:
     return ic.stable64_grow(new_pages)
 
-# TODO remove bool once void is allowed
 @update
-def stable_write(offset: nat32, buf: blob) -> bool:
+def stable_write(offset: nat32, buf: blob):
     ic.stable_write(offset, buf)
     return True
 
