@@ -2150,6 +2150,12 @@ def reply_raw() -> manual[RawReply]:
 
 #### stable storage
 
+The current stable storage implementation is limited in how much data can be serialized/deserialized in the pre_upgrade/post_upgrade step before the cycle limit is reached. It's unclear exactly what the serialization/deserialization limits are, but consider that they will most likely be significantly less than 4GiB.
+
+This applies to stable storage only, not the more primitive stable memory operations.
+
+To resolve these issues, we plan to release a Kybra-specific stable structure similar to what can be found [here](https://github.com/dfinity/stable-structures).
+
 Examples:
 
 -   [func_types](/examples/func_types)
