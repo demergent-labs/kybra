@@ -53,3 +53,7 @@ def principal_to_text(principal: Principal) -> str:
 @query
 def principal_to_blob(principal: Principal) -> blob:
     return principal.bytes
+
+@query
+def principal_self_authenticating(public_key: blob) -> Principal:
+    return Principal.self_authenticating(public_key)

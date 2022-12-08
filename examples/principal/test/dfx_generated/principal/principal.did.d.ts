@@ -13,6 +13,7 @@ export interface _SERVICE {
   'principal_in_variant' : ActorMethod<[], Status>,
   'principal_param' : ActorMethod<[Principal], Principal>,
   'principal_return_type' : ActorMethod<[], Principal>,
+  'principal_self_authenticating' : ActorMethod<[Uint8Array], Principal>,
   'principal_to_blob' : ActorMethod<[Principal], Uint8Array>,
   'principal_to_hex' : ActorMethod<[Principal], string>,
   'principal_to_text' : ActorMethod<[Principal], string>,

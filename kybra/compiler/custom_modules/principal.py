@@ -30,6 +30,7 @@ import math
 # import base64 # TODO we probably need to remove this
 import binascii
 import hashlib
+from typing import Union
 # from enum import Enum # TODO we probably need to remove this
 
 CRC_LENGTH_IN_BYTES = 4
@@ -55,7 +56,7 @@ class Principal:
         return Principal()
 
     @staticmethod
-    def self_authenticating(pubkey):
+    def self_authenticating(pubkey: Union[str, bytes]):
         if isinstance(pubkey, str):
             pubkey = bytes.fromhex(pubkey)
         hash_ = hashlib.sha224(pubkey).digest()
