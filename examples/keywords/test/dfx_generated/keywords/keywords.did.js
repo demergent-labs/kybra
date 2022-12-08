@@ -68,6 +68,21 @@ export const idlFactory = ({ IDL }) => {
         raise: IDL.Vec(IDL.Nat8),
         yield: IDL.Bool
     });
+    const RustKeywordRecord = IDL.Record({
+        fn: IDL.Text,
+        mut: IDL.Reserved,
+        pub: IDL.Null,
+        const: IDL.Int,
+        crate: IDL.Nat,
+        type: IDL.Vec(IDL.Nat8),
+        become: IDL.Text,
+        abstract: IDL.Bool
+    });
+    const RustKeywordVariant = IDL.Variant({
+        fn: IDL.Null,
+        pub: IDL.Null,
+        type: IDL.Null
+    });
     return IDL.Service({
         complex_keyword: IDL.Func([], [KeywordRecord], ['query']),
         keyword_variant: IDL.Func(
@@ -75,6 +90,8 @@ export const idlFactory = ({ IDL }) => {
             [KeywordVariant],
             ['query']
         ),
+        rust_keyword: IDL.Func([], [RustKeywordRecord], ['query']),
+        rust_keyword_variant: IDL.Func([], [RustKeywordVariant], ['query']),
         simple_keyword: IDL.Func([SimpleRecord], [SimpleRecord], ['query'])
     });
 };

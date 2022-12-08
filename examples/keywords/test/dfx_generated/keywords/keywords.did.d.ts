@@ -60,6 +60,17 @@ export type KeywordVariant =
     | { global: null }
     | { except: null }
     | { raise: null };
+export interface RustKeywordRecord {
+    fn: string;
+    mut: any;
+    pub: null;
+    const: bigint;
+    crate: bigint;
+    type: Uint8Array;
+    become: string;
+    abstract: boolean;
+}
+export type RustKeywordVariant = { fn: null } | { pub: null } | { type: null };
 export interface SimpleRecord {
     from: string;
 }
@@ -73,5 +84,7 @@ export interface WithRecord {
 export interface _SERVICE {
     complex_keyword: ActorMethod<[], KeywordRecord>;
     keyword_variant: ActorMethod<[KeywordVariant], KeywordVariant>;
+    rust_keyword: ActorMethod<[], RustKeywordRecord>;
+    rust_keyword_variant: ActorMethod<[], RustKeywordVariant>;
     simple_keyword: ActorMethod<[SimpleRecord], SimpleRecord>;
 }

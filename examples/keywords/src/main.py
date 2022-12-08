@@ -80,6 +80,23 @@ class KeywordVariant(Variant, total=False):
     with_: None
 
 
+class RustKeywordRecord(Record):
+    abstract: bool
+    become: str
+    const: int
+    crate: nat
+    fn: text
+    mut: reserved
+    pub: null
+    type: blob
+
+
+class RustKeywordVariant(Variant, total=False):
+    type: None
+    pub: None
+    fn: None
+
+
 @query
 def keyword_variant(variant_keyword: KeywordVariant) -> KeywordVariant:
     ic.print(variant_keyword)
@@ -90,6 +107,25 @@ def keyword_variant(variant_keyword: KeywordVariant) -> KeywordVariant:
 def simple_keyword(simple_record: SimpleRecord) -> SimpleRecord:
     ic.print(simple_record["from_"])
     return simple_record
+
+
+@query
+def rust_keyword() -> RustKeywordRecord:
+    return {
+        'abstract': False,
+        'become': 'Become',
+        'const': 3,
+        'crate': 7,
+        'fn': 'Function',
+        'mut': False,
+        'pub': None,
+        'type': 'Type'.encode('utf-8')
+    }
+
+
+@query
+def rust_keyword_variant() -> RustKeywordVariant:
+    return {'type': None}
 
 
 @query

@@ -72,7 +72,17 @@ dependencies = [
 [[package]]
 name = "cdk_framework"
 version = "0.0.0"
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=1147dd7dac981676b0b65b8e40f9a56fabb9bca2#1147dd7dac981676b0b65b8e40f9a56fabb9bca2"
+source = "git+https://github.com/demergent-labs/cdk_framework?rev=65fdb1d0f6cf86b180d2786bd57f6dc96cbe6e4f#65fdb1d0f6cf86b180d2786bd57f6dc96cbe6e4f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "regex",
+]
+
+[[package]]
+name = "cdk_framework"
+version = "0.0.0"
+source = "git+https://github.com/demergent-labs/cdk_framework?rev=b384c9a020c6466c5949fd3039c4b3b50959c4a3#b384c9a020c6466c5949fd3039c4b3b50959c4a3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -121,6 +131,7 @@ dependencies = [
 name = "kybra-vm-value-derive"
 version = "0.0.0"
 dependencies = [
+ "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=65fdb1d0f6cf86b180d2786bd57f6dc96cbe6e4f)",
  "proc-macro2",
  "quote",
  "syn",
@@ -131,7 +142,7 @@ name = "kybra_generate"
 version = "0.0.0"
 dependencies = [
  "annotate-snippets",
- "cdk_framework",
+ "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=b384c9a020c6466c5949fd3039c4b3b50959c4a3)",
  "proc-macro2",
  "quote",
  "rustpython-parser",

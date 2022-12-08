@@ -1,3 +1,4 @@
+use cdk_framework::nodes::data_type_nodes::ToIdent;
 use proc_macro2::Ident;
 use quote::quote;
 use syn::{DataEnum, Fields};
@@ -50,8 +51,13 @@ fn derive_item_initializers_for_unnamed_fields(
     enum_name: &Ident,
     variant_name: &Ident,
 ) -> proc_macro2::TokenStream {
+    let restored_variant_name = cdk_framework::keyword::restore_for_vm(
+        &variant_name.to_string(),
+        &crate::get_python_keywords(),
+    )
+    .to_identifier();
     quote! {
-        let get_item_result = self.get_item(stringify!(#variant_name), vm);
+        let get_item_result = self.get_item(stringify!(#restored_variant_name), vm);
 
         if let Ok(item) = get_item_result {
             return Ok(#enum_name::#variant_name(item.try_from_vm_value(vm).unwrap()));
@@ -63,8 +69,13 @@ fn derive_item_initializers_for_unit(
     enum_name: &Ident,
     variant_name: &Ident,
 ) -> proc_macro2::TokenStream {
+    let restored_variant_name = cdk_framework::keyword::restore_for_vm(
+        &variant_name.to_string(),
+        &crate::get_python_keywords(),
+    )
+    .to_identifier();
     quote! {
-        let get_item_result = self.get_item(stringify!(#variant_name), vm);
+        let get_item_result = self.get_item(stringify!(#restored_variant_name), vm);
 
         if let Ok(_) = get_item_result {
             return Ok(#enum_name::#variant_name);

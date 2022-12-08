@@ -1,3 +1,4 @@
+use cdk_framework::nodes::data_type_nodes::ToIdent;
 use proc_macro2::Ident;
 use quote::{format_ident, quote};
 use syn::{DataStruct, Fields, Index};
@@ -94,9 +95,20 @@ fn derive_struct_fields_property_definitions(
             .map(|field| {
                 let field_name = &field.ident;
 
+                let restored_field_name = match field_name {
+                    Some(field_name) => Some(
+                        cdk_framework::keyword::restore_for_vm(
+                            &field_name.to_string(),
+                            &crate::get_python_keywords(),
+                        )
+                        .to_identifier(),
+                    ),
+                    None => field_name.clone(),
+                };
+
                 quote! {
                     py_data_structure.set_item(
-                        stringify!(#field_name),
+                        stringify!(#restored_field_name),
                         #field_name,
                         vm
                     );

@@ -10,3 +10,4 @@ proc_macro = true
 quote = "1.0.17"
 syn = "1.0.90"
 proc-macro2 = "1.0.36"
+cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "65fdb1d0f6cf86b180d2786bd57f6dc96cbe6e4f" }

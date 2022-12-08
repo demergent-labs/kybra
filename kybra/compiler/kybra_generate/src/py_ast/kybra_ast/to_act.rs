@@ -110,16 +110,6 @@ impl ToAct for KybraAst {
 
         let rust_code = self.rust_code.clone();
 
-        let python_keywords = vec![
-            "False", "None", "True", "and", "as", "assert", "async", "await", "break", "class",
-            "continue", "def", "del", "elif", "else", "except", "finally", "for", "from", "global",
-            "if", "import", "in", "is", "lambda", "nonlocal", "not", "or", "pass", "raise",
-            "return", "try", "while", "with", "yield",
-        ]
-        .iter()
-        .map(|keyword| keyword.to_string())
-        .collect();
-
         AbstractCanisterTree {
             cdk_name: "kybra".to_string(),
             update_methods,
@@ -141,7 +131,7 @@ impl ToAct for KybraAst {
             type_refs,
             variants,
             external_canisters,
-            keywords: python_keywords,
+            keywords: crate::get_python_keywords(),
         }
     }
 }
