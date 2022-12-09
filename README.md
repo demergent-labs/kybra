@@ -204,6 +204,20 @@ Resolution:
 sudo apt install cmake
 ```
 
+Error (Ubuntu):
+
+```
+ERROR: The Python ssl extension was not compiled. Missing the OpenSSL lib
+```
+
+Resolution:
+
+You may have the right version of open ssl but you might be missing libssl-dev
+
+```
+sudo apt-get install libssl-dev
+```
+
 ### Deployment
 
 Please keep in mind that you must deploy from within the `virtualenv` that you set up earlier: `source .dfx/kybra/venv/bin/activate`.
