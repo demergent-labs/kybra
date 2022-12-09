@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
-use crate::py_ast::kybra_types::KybraExpr;
+use crate::{generators::tuple, py_ast::kybra_types::KybraExpr};
 use cdk_framework::{
     nodes::{data_type_nodes::ActPrimitiveLit, ActFnParam},
     ActDataType, CanisterMethod, CanisterMethodType, ToActDataType,
@@ -49,7 +49,7 @@ impl KybraStmt<'_> {
                     .iter()
                     .fold(vec![], |acc, arg| match &arg.node.annotation {
                         Some(annotation) => {
-                            let name = format!("_kybra_user_defined_var_{}", arg.node.arg.clone());
+                            let name = arg.node.arg.clone();
                             let kybra_annotation = KybraExpr {
                                 located_expr: &annotation,
                                 source_map: &self.source_map,
@@ -116,28 +116,24 @@ impl KybraStmt<'_> {
     }
 
     fn generate_body(&self) -> TokenStream {
-        let args = match &self.stmt_kind.node {
-            StmtKind::FunctionDef { args, .. } => args,
-            _ => panic!("Unreachable"),
-        };
+        let act_params = self.build_act_params();
 
         let name = match self.get_name() {
             Some(name) => name,
             None => todo!(),
         };
 
-        let param_conversions = args.args.iter().map(|arg| {
-            let param_name = format_ident!("_kybra_user_defined_var_{}", arg.node.arg);
-            quote! {
-                #param_name.try_into_vm_value(vm).unwrap()
-            }
-        });
+        let param_conversions = act_params
+            .iter()
+            .map(|param| {
+                let name = format_ident!("{}", param.prefixed_name());
+                quote! {
+                    #name.try_into_vm_value(vm).unwrap()
+                }
+            })
+            .collect();
 
-        let params_comma = if param_conversions.len() == 1 {
-            quote!(,)
-        } else {
-            quote!()
-        };
+        let params = tuple::generate_tuple(&param_conversions);
 
         let return_expression = self.generate_return_expression();
 
@@ -150,7 +146,7 @@ impl KybraStmt<'_> {
 
                 let method_py_object_ref = _kybra_unwrap_rust_python_result(_kybra_scope.globals.get_item(#name, vm), vm);
 
-                let invoke_result = vm.invoke(&method_py_object_ref, (#(#param_conversions),*#params_comma));
+                let invoke_result = vm.invoke(&method_py_object_ref, #params);
 
                 match invoke_result {
                     Ok(py_object_ref) => {

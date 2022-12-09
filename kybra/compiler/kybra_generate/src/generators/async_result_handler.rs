@@ -1,9 +1,10 @@
 use cdk_framework::{nodes::act_external_canister::ActExternalCanister, ToTokenStream};
+use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
-pub fn generate_async_result_handler(
-    external_canisters: &Vec<ActExternalCanister>,
-) -> proc_macro2::TokenStream {
+use crate::generators::tuple;
+
+pub fn generate_async_result_handler(external_canisters: &Vec<ActExternalCanister>) -> TokenStream {
     let call_match_arms = generate_call_match_arms(external_canisters);
     let call_with_payment_match_arms = generate_call_with_payment_match_arms(external_canisters);
     let call_with_payment128_match_arms =
@@ -174,15 +175,13 @@ CanisterResult
     }
 }
 
-fn generate_call_match_arms(
-    external_canisters: &Vec<ActExternalCanister>,
-) -> Vec<proc_macro2::TokenStream> {
+fn generate_call_match_arms(external_canisters: &Vec<ActExternalCanister>) -> Vec<TokenStream> {
     external_canisters
     .iter()
     .map(|act_external_canister| {
         let canister_name = &act_external_canister.name;
 
-        let arms: Vec<proc_macro2::TokenStream> = act_external_canister
+        let arms: Vec<TokenStream> = act_external_canister
             .methods
             .iter()
             .map(|act_external_canister_method| {
@@ -193,8 +192,8 @@ fn generate_call_match_arms(
 
                 let cross_canister_function_call_name_ident = format_ident!("{}", cross_canister_function_call_name);
 
-                let param_variable_definitions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
-                    let variable_name = format_ident!("_kybra_user_defined_var_{}", act_fn_param.name);
+                let param_variable_definitions: Vec<TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
+                    let variable_name = format_ident!("{}", act_fn_param.prefixed_name());
                     let variable_type = act_fn_param.data_type.to_token_stream(&vec![]);
                     let actual_index = index + 2;
 
@@ -203,9 +202,11 @@ fn generate_call_match_arms(
                     }
                 }).collect();
 
-                let param_names: Vec<proc_macro2::Ident> = act_external_canister_method.params.iter().map(|act_fn_param| {
-                    format_ident!("_kybra_user_defined_var_{}", act_fn_param.name)
+                let param_names = act_external_canister_method.params.iter().map(|act_fn_param| {
+                    let name = format_ident!("{}", act_fn_param.prefixed_name());
+                    quote! {#name}
                 }).collect();
+                let params = tuple::generate_tuple(&param_names);
 
                 quote! {
                     #cross_canister_function_call_name => {
@@ -213,7 +214,7 @@ fn generate_call_match_arms(
 
                         #(#param_variable_definitions)*
 
-                        _kybra_create_call_result_instance(vm, #cross_canister_function_call_name_ident(canister_id_principal, #(#param_names),*).await)
+                        _kybra_create_call_result_instance(vm, #cross_canister_function_call_name_ident(canister_id_principal, #params).await)
                     }
                 }
             })
@@ -228,13 +229,13 @@ fn generate_call_match_arms(
 
 fn generate_call_with_payment_match_arms(
     external_canisters: &Vec<ActExternalCanister>,
-) -> Vec<proc_macro2::TokenStream> {
+) -> Vec<TokenStream> {
     external_canisters
     .iter()
     .map(|act_external_canister| {
         let canister_name = &act_external_canister.name;
 
-        let arms: Vec<proc_macro2::TokenStream> = act_external_canister
+        let arms: Vec<TokenStream> = act_external_canister
             .methods
             .iter()
             .map(|act_external_canister_method| {
@@ -245,8 +246,8 @@ fn generate_call_with_payment_match_arms(
 
                 let cross_canister_function_call_with_payment_name_ident = format_ident!("{}", cross_canister_function_call_with_payment_name);
 
-                let param_variable_definitions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
-                    let variable_name = format_ident!("_kybra_user_defined_var_{}", act_fn_param.name);
+                let param_variable_definitions: Vec<TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
+                    let variable_name = format_ident!("{}", act_fn_param.prefixed_name());
                     let variable_type = act_fn_param.data_type.to_token_stream(&vec![]);
                     let actual_index = index + 2;
 
@@ -255,11 +256,12 @@ fn generate_call_with_payment_match_arms(
                     }
                 }).collect();
 
-                let param_names: Vec<proc_macro2::Ident> = act_external_canister_method.params.iter().map(|act_fn_param| {
-                    format_ident!("_kybra_user_defined_var_{}", act_fn_param.name)
+                let param_names: Vec<TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
+                    let name = format_ident!("{}", act_fn_param.prefixed_name());
+                    quote! {#name}
                 }).collect();
+                let params = tuple::generate_tuple(&param_names);
 
-                let payment_comma = if act_external_canister_method.params.len() == 0 { quote! {} } else { quote! { , } };
                 let payment_index = act_external_canister_method.params.len() + 2;
                 let payment_variable_definition = quote!(let payment: u64 = args[#payment_index].clone().try_from_vm_value(vm).unwrap(););
 
@@ -270,7 +272,7 @@ fn generate_call_with_payment_match_arms(
                         #(#param_variable_definitions)*
                         #payment_variable_definition
 
-                        _kybra_create_call_result_instance(vm, #cross_canister_function_call_with_payment_name_ident(canister_id_principal, #(#param_names),* #payment_comma payment).await)
+                        _kybra_create_call_result_instance(vm, #cross_canister_function_call_with_payment_name_ident(canister_id_principal, #params, payment).await)
                     }
                 }
             })
@@ -285,13 +287,13 @@ fn generate_call_with_payment_match_arms(
 
 fn generate_call_with_payment128_match_arms(
     external_canisters: &Vec<ActExternalCanister>,
-) -> Vec<proc_macro2::TokenStream> {
+) -> Vec<TokenStream> {
     external_canisters
     .iter()
     .map(|act_external_canister| {
         let canister_name = &act_external_canister.name;
 
-        let arms: Vec<proc_macro2::TokenStream> = act_external_canister
+        let arms: Vec<TokenStream> = act_external_canister
             .methods
             .iter()
             .map(|act_external_canister_method| {
@@ -302,8 +304,8 @@ fn generate_call_with_payment128_match_arms(
 
                 let cross_canister_function_call_with_payment128_name_ident = format_ident!("{}", cross_canister_function_call_with_payment128_name);
 
-                let param_variable_definitions: Vec<proc_macro2::TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
-                    let variable_name = format_ident!("_kybra_user_defined_var_{}", act_fn_param.name);
+                let param_variable_definitions: Vec<TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
+                    let variable_name = format_ident!("{}", act_fn_param.prefixed_name());
                     let variable_type = act_fn_param.data_type.to_token_stream(&vec![]);
                     let actual_index = index + 2;
 
@@ -312,11 +314,12 @@ fn generate_call_with_payment128_match_arms(
                     }
                 }).collect();
 
-                let param_names: Vec<proc_macro2::Ident> = act_external_canister_method.params.iter().map(|act_fn_param| {
-                    format_ident!("_kybra_user_defined_var_{}", act_fn_param.name)
+                let param_names: Vec<TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
+                    let name = format_ident!("{}", act_fn_param.prefixed_name());
+                    quote! {#name}
                 }).collect();
+                let params = tuple::generate_tuple(&param_names);
 
-                let payment_comma = if act_external_canister_method.params.len() == 0 { quote! {} } else { quote! { , } };
                 let payment_index = act_external_canister_method.params.len() + 2;
                 let payment_variable_definition = quote!(let payment: u128 = args[#payment_index].clone().try_from_vm_value(vm).unwrap(););
 
@@ -327,7 +330,7 @@ fn generate_call_with_payment128_match_arms(
                         #(#param_variable_definitions)*
                         #payment_variable_definition
 
-                        _kybra_create_call_result_instance(vm, #cross_canister_function_call_with_payment128_name_ident(canister_id_principal, #(#param_names),* #payment_comma payment).await)
+                        _kybra_create_call_result_instance(vm, #cross_canister_function_call_with_payment128_name_ident(canister_id_principal, #params, payment).await)
                     }
                 }
             })
