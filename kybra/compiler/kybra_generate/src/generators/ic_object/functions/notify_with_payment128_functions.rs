@@ -2,7 +2,7 @@ use cdk_framework::{
     nodes::{ActExternalCanister, ActExternalCanisterMethod},
     ToTokenStream,
 };
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 use crate::generators::tuple;
@@ -16,8 +16,9 @@ pub fn generate_notify_with_payment128_functions(
             let real_function_name = format_ident!("{}", function_name_string);
             let wrapper_fn_name = format_ident!("{}_wrapper", function_name_string);
             let param_variable_definitions = generate_param_variables(method);
-            let param_names: Vec<Ident> = method.params.iter().map(|param| {
-                format_ident!("{}", param.prefixed_name())
+            let param_names = method.params.iter().map(|param| {
+                let name = format_ident!("{}", param.prefixed_name());
+                quote!{ #name }
             }).collect();
             let params = tuple::generate_tuple(&param_names);
 

@@ -1,5 +1,5 @@
 use cdk_framework::{nodes::act_external_canister::ActExternalCanister, ToTokenStream};
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 use crate::generators::tuple;
@@ -202,8 +202,9 @@ fn generate_call_match_arms(external_canisters: &Vec<ActExternalCanister>) -> Ve
                     }
                 }).collect();
 
-                let param_names: Vec<Ident> = act_external_canister_method.params.iter().map(|act_fn_param| {
-                    format_ident!("{}", act_fn_param.prefixed_name())
+                let param_names = act_external_canister_method.params.iter().map(|act_fn_param| {
+                    let name = format_ident!("{}", act_fn_param.prefixed_name());
+                    quote! {#name}
                 }).collect();
                 let params = tuple::generate_tuple(&param_names);
 
@@ -255,8 +256,9 @@ fn generate_call_with_payment_match_arms(
                     }
                 }).collect();
 
-                let param_names: Vec<Ident> = act_external_canister_method.params.iter().map(|act_fn_param| {
-                    format_ident!("{}", act_fn_param.prefixed_name())
+                let param_names: Vec<TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
+                    let name = format_ident!("{}", act_fn_param.prefixed_name());
+                    quote! {#name}
                 }).collect();
                 let params = tuple::generate_tuple(&param_names);
 
@@ -312,8 +314,9 @@ fn generate_call_with_payment128_match_arms(
                     }
                 }).collect();
 
-                let param_names: Vec<Ident> = act_external_canister_method.params.iter().map(|act_fn_param| {
-                    format_ident!("{}", act_fn_param.prefixed_name())
+                let param_names: Vec<TokenStream> = act_external_canister_method.params.iter().map(|act_fn_param| {
+                    let name = format_ident!("{}", act_fn_param.prefixed_name());
+                    quote! {#name}
                 }).collect();
                 let params = tuple::generate_tuple(&param_names);
 
