@@ -21,7 +21,7 @@ Please consider the [security section](#security).
 
 ## Discussion
 
-Feel free to open issues or join us in the [Discord channel](https://discord.com/channels/748416164832608337/1019372359775440988).
+Feel free to open issues or join us in the [Discord channel](https://discord.gg/ux2Jc7psjd).
 
 ## Documentation
 

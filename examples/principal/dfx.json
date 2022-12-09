@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".dfx/kybra/principal/target/wasm32-unknown-unknown/release/principal.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/principal"
+                "output": "test/dfx_generated/principal",
+                "node_compatibility": true
             }
         }
     }
