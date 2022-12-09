@@ -37,18 +37,6 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub fn get_param_name_idents(&self) -> Vec<Ident> {
-        self.stmt_kind.what_is_it();
-        match &self.stmt_kind.node {
-            rustpython_parser::ast::StmtKind::FunctionDef { args, .. } => args
-                .args
-                .iter()
-                .map(|arg| format_ident!("{}", arg.node.arg))
-                .collect(),
-            _ => panic!("{}", self.not_a_function_def_error()),
-        }
-    }
-
     pub fn get_function_name(&self) -> String {
         match &self.stmt_kind.node {
             rustpython_parser::ast::StmtKind::FunctionDef { name, .. } => name.clone(),
@@ -60,11 +48,12 @@ impl KybraStmt<'_> {
         match &self.stmt_kind.node {
             rustpython_parser::ast::StmtKind::FunctionDef { .. } => {
                 let function_name = self.get_function_name();
-                let param_name_idents = self.get_param_name_idents();
+                let params = self.build_params();
 
-                let param_conversions = param_name_idents.iter().map(|arg| {
+                let param_conversions = params.iter().map(|act_fn_param| {
+                    let var = format_ident!("{}", act_fn_param.prefixed_name());
                     quote! {
-                        #arg.try_into_vm_value(vm).unwrap()
+                        #var.try_into_vm_value(vm).unwrap()
                     }
                 });
                 let params_comma = if param_conversions.len() == 1 {
