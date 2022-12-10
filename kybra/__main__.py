@@ -69,7 +69,7 @@ def parse_args_or_exit(args: list[str]) -> Args:
     args = [arg for arg in args if not (arg.startswith("-") or arg.startswith("--"))]
 
     if len(args) == 0:
-        print("\nkybra v0.0.4")
+        print(f"\nkybra {kybra.__version__}")
         print("\nUsage: kybra [-v|--verbose] <canister_name> <entry_point> <did_path>")
         sys.exit(0)
 
