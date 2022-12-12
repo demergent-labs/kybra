@@ -45,18 +45,18 @@ def main():
         paths, cargo_env, verbose=is_verbose, label="[1/3] 🔨 Compiling Python..."
     )
 
-    build_wasm_binary_or_exit(
-        paths,
-        cargo_env,
-        verbose=is_verbose,
-        label=f"[2/3] 🚧 Building Wasm binary...{encourage_patience(is_initial_compile)}",
-    )
-
     generate_candid_file_or_exit(
         paths,
         cargo_env,
         verbose=is_verbose,
-        label=f"[3/3] 📝 Generating Candid file...{show_empathy(is_initial_compile)}",
+        label=f"[2/3] 📝 Generating Candid file...{encourage_patience(is_initial_compile)}",
+    )
+
+    build_wasm_binary_or_exit(
+        paths,
+        cargo_env,
+        verbose=is_verbose,
+        label=f"[3/3] 🚧 Building Wasm binary...{show_empathy(is_initial_compile)}",
     )
 
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
@@ -69,7 +69,7 @@ def parse_args_or_exit(args: list[str]) -> Args:
     args = [arg for arg in args if not (arg.startswith("-") or arg.startswith("--"))]
 
     if len(args) == 0:
-        print("\nkybra v0.0.4")
+        print(f"\nkybra {kybra.__version__}")
         print("\nUsage: kybra [-v|--verbose] <canister_name> <entry_point> <did_path>")
         sys.exit(0)
 
@@ -242,6 +242,7 @@ def add_wasm_compilation_target_or_exit(verbose: bool = False):
         print("💀 Build failed")
         sys.exit(1)
 
+
 # TODO reconcile this with Dan's code
 def install_ic_cdk_optimizer_or_exit(verbose: bool = False):
     # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/43?u=lastmjs
@@ -249,9 +250,9 @@ def install_ic_cdk_optimizer_or_exit(verbose: bool = False):
         ["cargo", "install", "ic-cdk-optimizer", "--version=0.3.4"],
         capture_output=not verbose,
     )
-    # install_ic_wasm_result = subprocess.run(
-    #     ["cargo", "install", "ic-wasm", "--version=0.3.0"], capture_output=not verbose
-    # )
+    subprocess.run(
+        ["cargo", "install", "ic-wasm", "--version=0.3.0"], capture_output=not verbose
+    )
 
     # if install_cdk_optimizer_result.returncode != 0:
     #     print(red('\n💣 Unable to install dependency "ic-cdk-optimizer"\n'))
@@ -390,8 +391,56 @@ def build_wasm_binary_or_exit(
         print("💀 Build failed")
         sys.exit(1)
 
+    add_metadata_to_wasm_or_exit(paths, verbose=verbose)
+
     # gzip the Wasm binary
     os.system(f"gzip -f -k {paths['wasm']}")
+
+
+def add_metadata_to_wasm_or_exit(paths: Paths, verbose: bool = False):
+    add_candid_to_wasm_result = subprocess.run(
+        [
+            "ic-wasm",
+            paths["wasm"],
+            "-o",
+            paths["wasm"],
+            "metadata",
+            "candid:service",
+            "-f",
+            paths["did"],
+            "-v",
+            "public",
+        ],
+        capture_output=not verbose,
+    )
+
+    if add_candid_to_wasm_result.returncode != 0:
+        print(red("\n💣 Error adding candid to Wasm:"))
+        print(add_candid_to_wasm_result.stderr.decode("utf-8"))
+        print("💀 Build failed")
+        sys.exit(1)
+
+    add_cdk_info_to_wasm_result = subprocess.run(
+        [
+            "ic-wasm",
+            paths["wasm"],
+            "-o",
+            paths["wasm"],
+            "metadata",
+            "cdk",
+            "-d",
+            f"kybra {kybra.__version__}",
+            "-v",
+            "public",
+        ],
+        capture_output=not verbose,
+    )
+
+    if add_cdk_info_to_wasm_result.returncode != 0:
+        print(red("\n💣 Error adding cdk name/version to Wasm:"))
+        print(add_cdk_info_to_wasm_result.stderr.decode("utf-8"))
+        print("💀 Build failed")
+        sys.exit(1)
 
 
 def show_empathy(is_initial_compile: bool) -> str:

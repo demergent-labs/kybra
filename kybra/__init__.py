@@ -4,6 +4,8 @@ from typing import Any, Callable, Generator, Generic, NoReturn, Optional, ParamS
 # TODO I think we can simplify this just like we're doing with canisters
 from .compiler.custom_modules.principal import Principal
 
+__version__ = "0.1.0"
+
 Principal = Principal
 
 int64 = int
