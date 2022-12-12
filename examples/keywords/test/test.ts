@@ -43,6 +43,16 @@ const tests: Test[] = [
         }
     },
     {
+        name: 'rust_keyword_variant',
+        test: async () => {
+            const result = await keywords_canister.rust_keyword_variant();
+
+            return {
+                ok: 'type' in result
+            };
+        }
+    },
+    {
         name: 'simple_keyword',
         test: async () => {
             const simple_record: SimpleRecord = {
@@ -54,6 +64,27 @@ const tests: Test[] = [
 
             return {
                 ok: result.from === 'testing'
+            };
+        }
+    },
+    {
+        name: 'rust_keyword',
+        test: async () => {
+            const result = await keywords_canister.rust_keyword();
+
+            return {
+                ok:
+                    result.abstract === false &&
+                    result.become === 'Become' &&
+                    result.const === 3n &&
+                    result.crate === 7n &&
+                    result.fn === 'Function' &&
+                    result.mut === null &&
+                    result.pub === null &&
+                    result.type.every(
+                        (entry, index) =>
+                            entry === new Uint8Array([84, 121, 112, 101])[index]
+                    )
             };
         }
     },

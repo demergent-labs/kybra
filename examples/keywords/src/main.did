@@ -58,6 +58,17 @@ type KeywordVariant = variant {
   except;
   raise;
 };
+type RustKeywordRecord = record {
+  fn : text;
+  mut : reserved;
+  pub : null;
+  const : int;
+  crate : nat;
+  "type" : vec nat8;
+  become : text;
+  abstract : bool;
+};
+type RustKeywordVariant = variant { fn; pub; "type" };
 type SimpleRecord = record { from : text };
 type WithRecord = record {
   with__ : bool;
@@ -69,5 +80,7 @@ type WithRecord = record {
 service : () -> {
   complex_keyword : () -> (KeywordRecord) query;
   keyword_variant : (KeywordVariant) -> (KeywordVariant) query;
+  rust_keyword : () -> (RustKeywordRecord) query;
+  rust_keyword_variant : () -> (RustKeywordVariant) query;
   simple_keyword : (SimpleRecord) -> (SimpleRecord) query;
 }

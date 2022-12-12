@@ -1,3 +1,4 @@
+use cdk_framework::nodes::data_type_nodes::ToIdent;
 use proc_macro2::Ident;
 use quote::quote;
 use syn::{DataEnum, Field, Fields};
@@ -55,12 +56,17 @@ fn derive_variant_branches_unnamed_fields(
     variant_name: &Ident,
     unnamed_fields: Vec<&Field>,
 ) -> proc_macro2::TokenStream {
+    let restored_variant_name = cdk_framework::keyword::restore_for_vm(
+        &variant_name.to_string(),
+        &crate::get_python_keywords(),
+    )
+    .to_identifier();
     if unnamed_fields.len() == 0 {
         quote! {
             #enum_name::#variant_name => {
                 let dict = vm.ctx.new_dict();
 
-                dict.set_item(stringify!(#variant_name), vm.ctx.none(), vm);
+                dict.set_item(stringify!(#restored_variant_name), vm.ctx.none(), vm);
 
                 Ok(dict.into())
             }
@@ -70,7 +76,7 @@ fn derive_variant_branches_unnamed_fields(
             #enum_name::#variant_name(value) => {
                 let dict = vm.ctx.new_dict();
 
-                dict.set_item(stringify!(#variant_name), value.try_into_vm_value(vm).unwrap(), vm);
+                dict.set_item(stringify!(#restored_variant_name), value.try_into_vm_value(vm).unwrap(), vm);
 
                 Ok(dict.into())
             }
