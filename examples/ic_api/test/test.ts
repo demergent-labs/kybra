@@ -33,7 +33,7 @@ const tests: Test[] = [
             const result = await ic_api_canister.performance_counter();
 
             return {
-                ok: result >= 50_000n && result <= 80_000n
+                ok: result >= 50_000n && result <= 90_000n
             };
         }
     }
