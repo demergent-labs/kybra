@@ -1,7 +1,13 @@
 use rustpython_parser::ast::Location;
 
 #[derive(Clone)]
-pub struct SourceMap {}
+pub struct SourceMap {
+    pub lines: Vec<String>,
+    pub file_name: String,
+}
+
+#[derive(Clone)]
+pub struct Source {}
 
 pub trait GetSourceInfo {
     fn get_text(&self) -> String;

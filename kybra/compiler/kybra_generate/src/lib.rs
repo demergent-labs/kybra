@@ -31,11 +31,16 @@ pub fn kybra_generate(
     eprintln!("--- STARTING ------------------------------");
     eprintln!("-------------------------------------------");
 
-    let source_map = SourceMap {};
     let kybra_programs: Vec<KybraProgram> = py_file_names
         .iter()
         .map(|py_file_name| {
             let source = std::fs::read_to_string(py_file_name).unwrap();
+            eprintln!("{}", source);
+
+            let source_map = SourceMap {
+                lines: vec![],
+                file_name: todo!(),
+            };
 
             KybraProgram {
                 program: parser::parse(&source, Mode::Module, "").unwrap(),
