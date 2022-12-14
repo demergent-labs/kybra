@@ -2,7 +2,7 @@ use cdk_framework::act::node::canister_method::{CanisterMethodType, PostUpgradeM
 
 use crate::{generators::canister_methods::post_upgrade, py_ast::PyAst};
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn build_post_upgrade_method(&self) -> PostUpgradeMethod {
         let post_upgrade_function_defs =
             self.get_function_def_of_type(CanisterMethodType::PostUpgrade);

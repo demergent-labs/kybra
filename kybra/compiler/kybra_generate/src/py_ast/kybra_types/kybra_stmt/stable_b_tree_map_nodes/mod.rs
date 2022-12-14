@@ -26,7 +26,7 @@ impl KybraExpr<'_> {
             ExprKind::Subscript { slice, .. } => match &slice.node {
                 ExprKind::Tuple { elts, .. } => KybraExpr {
                     located_expr: &elts[1],
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 },
                 _ => todo!(),
             },
@@ -39,7 +39,7 @@ impl KybraExpr<'_> {
             ExprKind::Subscript { slice, .. } => match &slice.node {
                 ExprKind::Tuple { elts, .. } => KybraExpr {
                     located_expr: &elts[0],
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 },
                 _ => todo!(),
             },
@@ -53,7 +53,7 @@ impl KybraStmt<'_> {
         match &self.stmt_kind.node {
             StmtKind::Assign { value, .. } => KybraExpr {
                 located_expr: value,
-                source_map: self.source_map,
+                source_map: self.source_map.clone(),
             }
             .is_stable_b_tree_map_node(),
             _ => false,
@@ -104,7 +104,7 @@ impl KybraStmt<'_> {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => KybraExpr {
                     located_expr: func,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 }
                 .get_key_type()
                 .to_data_type(),
@@ -119,7 +119,7 @@ impl KybraStmt<'_> {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => KybraExpr {
                     located_expr: func,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 }
                 .get_value_type()
                 .to_data_type(),

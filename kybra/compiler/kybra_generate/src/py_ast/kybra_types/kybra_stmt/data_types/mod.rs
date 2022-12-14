@@ -1,8 +1,9 @@
-mod func;
-mod records;
-mod tuples;
-mod type_alias;
-mod variants;
+pub mod errors;
+pub mod func;
+pub mod records;
+pub mod tuples;
+pub mod type_alias;
+pub mod variants;
 
 use cdk_framework::act::node::DataType;
 use rustpython_parser::ast::StmtKind;
@@ -18,7 +19,7 @@ impl KybraStmt<'_> {
                 } else if self.is_variant() {
                     return self.as_variant();
                 }
-                todo!();
+                panic!("{}", self.invalid_class_error())
             }
             StmtKind::Assign { .. } => {
                 if self.is_tuple() {
@@ -26,7 +27,7 @@ impl KybraStmt<'_> {
                 } else if self.is_type_alias() {
                     return self.as_type_alias();
                 }
-                todo!();
+                panic!("{}", self.invalid_assign_error());
             }
             StmtKind::AnnAssign { .. } => {
                 if self.is_func() {
@@ -34,31 +35,9 @@ impl KybraStmt<'_> {
                 } else if self.is_type_alias() {
                     return self.as_type_alias();
                 }
-                todo!()
+                panic!("{}", self.invalid_annotation_assign_error());
             }
-            StmtKind::FunctionDef { .. } => todo!(),
-            StmtKind::AsyncFunctionDef { .. } => todo!(),
-            StmtKind::Return { .. } => todo!(),
-            StmtKind::Delete { .. } => todo!(),
-            StmtKind::AugAssign { .. } => todo!(),
-            StmtKind::For { .. } => todo!(),
-            StmtKind::AsyncFor { .. } => todo!(),
-            StmtKind::While { .. } => todo!(),
-            StmtKind::If { .. } => todo!(),
-            StmtKind::With { .. } => todo!(),
-            StmtKind::AsyncWith { .. } => todo!(),
-            StmtKind::Match { .. } => todo!(),
-            StmtKind::Raise { .. } => todo!(),
-            StmtKind::Try { .. } => todo!(),
-            StmtKind::Assert { .. } => todo!(),
-            StmtKind::Import { .. } => todo!(),
-            StmtKind::ImportFrom { .. } => todo!(),
-            StmtKind::Global { .. } => todo!(),
-            StmtKind::Nonlocal { .. } => todo!(),
-            StmtKind::Expr { .. } => todo!(),
-            StmtKind::Pass => todo!(),
-            StmtKind::Break => todo!(),
-            StmtKind::Continue => todo!(),
+            _ => panic!("{}", self.unsupported_type_error()),
         }
     }
 }

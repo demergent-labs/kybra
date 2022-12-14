@@ -21,7 +21,7 @@ impl KybraExpr<'_> {
                 }
                 let kybra_expr = KybraExpr {
                     located_expr: slice,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 };
                 DataType::Array(Array {
                     enclosed_type: Box::from(kybra_expr.to_data_type()),

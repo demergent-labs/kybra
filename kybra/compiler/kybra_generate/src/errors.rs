@@ -4,10 +4,12 @@ use annotate_snippets::{
 };
 use std::fmt;
 
+use crate::source_map::GetSourceInfo;
+
 pub struct Suggestion {
     pub title: String,
-    pub source: String,
-    pub range: (usize, usize),
+    pub source: Option<String>,
+    pub range: Option<(usize, usize)>,
     pub annotation: Option<String>,
     pub import_suggestion: Option<String>,
 }
@@ -71,8 +73,9 @@ impl Message {
         match &self.suggestion {
             None => format!("{}", DisplayList::from(error_snippet)),
             Some(suggestion) => {
+                let suggestion_source = suggestion.source.clone().unwrap_or(Default::default());
                 let suggestion_slice = Slice {
-                    source: &suggestion.source,
+                    source: suggestion_source.as_str(),
                     line_start: self.line_number,
                     origin: None,
                     fold: false,
@@ -82,7 +85,7 @@ impl Message {
                             None => "",
                         },
                         annotation_type: AnnotationType::Help,
-                        range: suggestion.range,
+                        range: suggestion.range.unwrap_or(Default::default()),
                     }],
                 };
                 let slices = match &suggestion.import_suggestion {
@@ -132,5 +135,58 @@ impl fmt::Display for ErrorMessage {
 impl fmt::Display for WarningMessage {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.to_string())
+    }
+}
+
+pub trait CreateMessage {
+    fn create_message(
+        &self,
+        title: &str,
+        annotation: &str,
+        suggestion: Option<Suggestion>,
+    ) -> Message;
+
+    fn create_error_message(
+        &self,
+        title: &str,
+        annotation: &str,
+        suggestion: Option<Suggestion>,
+    ) -> ErrorMessage {
+        ErrorMessage {
+            message: self.create_message(title, annotation, suggestion),
+        }
+    }
+
+    fn create_warning_message(
+        &self,
+        title: &str,
+        annotation: &str,
+        suggestion: Option<Suggestion>,
+    ) -> WarningMessage {
+        WarningMessage {
+            message: self.create_message(title, annotation, suggestion),
+        }
+    }
+}
+
+impl<T> CreateMessage for T
+where
+    T: GetSourceInfo,
+{
+    fn create_message(
+        &self,
+        title: &str,
+        annotation: &str,
+        suggestion: Option<Suggestion>,
+    ) -> Message {
+        return Message {
+            title: title.to_string(),
+            origin: self.get_origin(),
+            line_number: self.get_line_number(),
+            source: self.get_source(),
+            range: self.get_range(),
+            annotation: annotation.to_string(),
+            suggestion,
+        };
     }
 }

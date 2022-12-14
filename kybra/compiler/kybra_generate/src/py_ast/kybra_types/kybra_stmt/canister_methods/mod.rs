@@ -14,6 +14,7 @@ use crate::{generators::canister_methods::query_and_update, py_ast::kybra_types:
 
 impl KybraStmt<'_> {
     pub fn is_canister_method_stmt(&self) -> bool {
+        // eprintln!("{}", self.test_error());
         self.is_canister_method_type(CanisterMethodType::Update)
             || self.is_canister_method_type(CanisterMethodType::Query)
     }
@@ -58,7 +59,7 @@ impl KybraStmt<'_> {
                             let name = arg.node.arg.clone();
                             let kybra_annotation = KybraExpr {
                                 located_expr: &annotation,
-                                source_map: &self.source_map,
+                                source_map: self.source_map.clone(),
                             };
                             let data_type = kybra_annotation.to_data_type();
                             vec![
@@ -82,7 +83,7 @@ impl KybraStmt<'_> {
             StmtKind::FunctionDef { returns, .. } => match returns {
                 Some(returns) => KybraExpr {
                     located_expr: returns,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 }
                 .is_manual(),
                 None => false,
@@ -169,7 +170,7 @@ impl KybraStmt<'_> {
             Some(return_type) => {
                 let kybra_return_type = KybraExpr {
                     located_expr: &return_type,
-                    source_map: &self.source_map,
+                    source_map: self.source_map.clone(),
                 };
                 kybra_return_type.to_data_type()
             }

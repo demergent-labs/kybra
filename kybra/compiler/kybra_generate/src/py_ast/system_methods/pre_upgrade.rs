@@ -2,7 +2,7 @@ use cdk_framework::act::node::canister_method::{CanisterMethodType, PreUpgradeMe
 
 use crate::{generators::canister_methods::pre_upgrade, py_ast::PyAst};
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn build_pre_upgrade_method(&self) -> PreUpgradeMethod {
         let pre_upgrade_function_defs =
             self.get_function_def_of_type(CanisterMethodType::PreUpgrade);

@@ -146,6 +146,7 @@ dependencies = [
  "num-bigint",
  "proc-macro2",
  "quote",
+ "regex",
  "rustpython-parser",
  "syn",
 ]

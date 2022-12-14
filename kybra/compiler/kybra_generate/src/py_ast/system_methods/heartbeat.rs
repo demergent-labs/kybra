@@ -1,7 +1,7 @@
 use crate::{generators::canister_methods::heartbeat, py_ast::PyAst};
 use cdk_framework::act::node::canister_method::{CanisterMethodType, HeartbeatMethod};
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn build_heartbeat_method(&self) -> Option<HeartbeatMethod> {
         let heartbeat_function_defs = self.get_function_def_of_type(CanisterMethodType::Heartbeat);
 

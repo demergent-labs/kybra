@@ -10,7 +10,7 @@ impl KybraStmt<'_> {
         match &self.stmt_kind.node {
             StmtKind::Assign { value, .. } => KybraExpr {
                 located_expr: value,
-                source_map: self.source_map,
+                source_map: self.source_map.clone(),
             }
             .is_tuple(),
             _ => false,
@@ -29,7 +29,7 @@ impl KybraStmt<'_> {
                 };
                 KybraExpr {
                     located_expr: value,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 }
                 .to_tuple(Some(tuple_name))
             }

@@ -2,7 +2,7 @@ use cdk_framework::act::node::canister_method::{CanisterMethodType, InitMethod};
 
 use crate::{generators::canister_methods::init, py_ast::PyAst};
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn build_init_method(&self) -> InitMethod {
         let init_function_defs = self.get_function_def_of_type(CanisterMethodType::Init);
 

@@ -12,7 +12,7 @@ pub struct StableBTreeMapNode {
     pub max_value_size: u32,
 }
 
-impl KybraProgram<'_> {
+impl KybraProgram {
     pub fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
         self.get_kybra_stable_b_tree_node_stmts()
             .iter()

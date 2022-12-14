@@ -12,21 +12,22 @@ use crate::{
     },
 };
 
-pub use self::{kybra_ast::KybraAst, kybra_types::KybraProgram};
+pub use self::kybra_ast::KybraAst;
+use self::kybra_types::KybraProgram;
 
+pub mod analyze;
 mod kybra_ast;
-mod system_methods;
-mod what_is_it;
-
 pub mod kybra_types;
+mod system_methods;
 pub mod traits;
+pub mod what_is_it;
 
-pub struct PyAst<'a> {
-    pub kybra_programs: Vec<KybraProgram<'a>>,
+pub struct PyAst {
+    pub kybra_programs: Vec<KybraProgram>,
     pub entry_module_name: String,
 }
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn get_dependencies(&self) -> HashSet<String> {
         let kybra_canister_method_stmts = self.get_kybra_canister_method_stmts();
         let kybra_canister_stmts = self.get_kybra_canister_stmts();
@@ -82,6 +83,7 @@ impl PyAst<'_> {
         let update_methods = self.build_update_methods();
         let query_methods = self.build_query_methods();
         let external_canisters = self.build_external_canisters();
+        let canister_types = self.build_canister_types();
         let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes();
 
         let rust_code = body::generate(
@@ -102,6 +104,7 @@ impl PyAst<'_> {
             rust_code,
             query_methods,
             update_methods,
+            canister_types,
         }
     }
 

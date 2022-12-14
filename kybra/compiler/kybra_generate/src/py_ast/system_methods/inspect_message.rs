@@ -2,7 +2,7 @@ use cdk_framework::act::node::canister_method::{CanisterMethodType, InspectMessa
 
 use crate::{generators::canister_methods::inspect_message, py_ast::PyAst};
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn build_inspect_method(&self) -> Option<InspectMessageMethod> {
         let inspect_message_function_defs =
             self.get_function_def_of_type(CanisterMethodType::InspectMessage);

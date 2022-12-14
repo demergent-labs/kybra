@@ -48,7 +48,7 @@ impl KybraStmt<'_> {
         };
         let enclosed_type = KybraExpr {
             located_expr: value,
-            source_map: self.source_map,
+            source_map: self.source_map.clone(),
         }
         .to_data_type();
         DataType::TypeAlias(TypeAlias {

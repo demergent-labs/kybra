@@ -1,5 +1,5 @@
 use cdk_framework::act::ToAct;
-use py_ast::{KybraProgram, PyAst};
+use py_ast::{kybra_types::KybraProgram, PyAst};
 use rustpython_parser::parser::{self, Mode};
 use source_map::SourceMap;
 
@@ -26,21 +26,16 @@ pub fn generate_canister(
     py_file_names: &Vec<&str>,
     entry_module_name: &str,
 ) -> proc_macro2::token_stream::TokenStream {
-    let source_maps: Vec<_> = py_file_names
-        .iter()
-        .map(|py_file_name| SourceMap {
-            file_name: py_file_name.to_string(),
-        })
-        .collect();
     let kybra_programs: Vec<KybraProgram> = py_file_names
         .iter()
         .enumerate()
-        .map(|(index, py_file_name)| {
+        .map(|(_, py_file_name)| {
             let source = std::fs::read_to_string(py_file_name).unwrap();
 
+            let source_map = SourceMap::new(source.clone(), py_file_name);
             KybraProgram {
                 program: parser::parse(&source, Mode::Module, "").unwrap(),
-                source_map: &source_maps[index],
+                source_map: source_map.clone(),
             }
         })
         .collect();
@@ -49,6 +44,7 @@ pub fn generate_canister(
         kybra_programs,
         entry_module_name: entry_module_name.to_string(),
     }
+    .analyze()
     .to_kybra_ast()
     .to_act()
     .to_token_stream()

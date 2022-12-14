@@ -3,19 +3,20 @@ mod errors;
 mod generate_inline_name;
 mod generator;
 pub mod get_dependencies;
+pub mod get_source_info;
 mod hash;
 mod opt;
 mod to_act_data_type;
 pub mod to_hash_string;
 mod tuple;
 
-use rustpython_parser::ast::{ExprKind, Located, StmtKind};
+use rustpython_parser::ast::{ExprKind, Located};
 
 use crate::source_map::SourceMap;
 
 pub struct KybraExpr<'a> {
     pub located_expr: &'a Located<ExprKind>,
-    pub source_map: &'a SourceMap,
+    pub source_map: SourceMap,
 }
 
 impl KybraExpr<'_> {
@@ -37,7 +38,7 @@ impl KybraExpr<'_> {
                     } else {
                         return KybraExpr {
                             located_expr: slice,
-                            source_map: self.source_map,
+                            source_map: self.source_map.clone(),
                         }
                         .is_manual();
                     }
