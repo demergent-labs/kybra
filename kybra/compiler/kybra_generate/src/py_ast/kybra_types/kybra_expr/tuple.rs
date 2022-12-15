@@ -38,13 +38,13 @@ impl KybraExpr<'_> {
                         .iter()
                         .map(|elt| KybraExpr {
                             located_expr: elt,
-                            source_map: self.source_map,
+                            source_map: self.source_map.clone(),
                         })
                         .collect(),
                     _ => {
                         vec![KybraExpr {
                             located_expr: slice,
-                            source_map: self.source_map,
+                            source_map: self.source_map.clone(),
                         }]
                     }
                 };

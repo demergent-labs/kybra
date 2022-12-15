@@ -42,7 +42,7 @@ impl KybraStmt<'_> {
         };
         KybraExpr {
             located_expr: value,
-            source_map: self.source_map,
+            source_map: self.source_map.clone(),
         }
         .to_act_data_type(&Some(&alias_name))
     }

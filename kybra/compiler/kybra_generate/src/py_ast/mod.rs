@@ -19,12 +19,12 @@ mod system_methods;
 pub mod traits;
 mod what_is_it;
 
-pub struct PyAst<'a> {
-    pub kybra_programs: Vec<KybraProgram<'a>>,
+pub struct PyAst {
+    pub kybra_programs: Vec<KybraProgram>,
     pub entry_module_name: String,
 }
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn get_dependencies(&self) -> HashSet<String> {
         let kybra_canister_method_stmts = self.get_kybra_canister_method_stmts();
         let kybra_canister_stmts = self.get_kybra_canister_stmts();

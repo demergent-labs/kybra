@@ -3,7 +3,7 @@ use quote::quote;
 use crate::py_ast::PyAst;
 use cdk_framework::{nodes::ActPreUpgradeMethod, CanisterMethodType};
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn build_pre_upgrade_method(&self) -> ActPreUpgradeMethod {
         let pre_upgrade_function_defs =
             self.get_function_def_of_type(CanisterMethodType::PreUpgrade);

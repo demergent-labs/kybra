@@ -3,7 +3,7 @@ use quote::quote;
 use crate::py_ast::PyAst;
 use cdk_framework::{nodes::ActInspectMessageMethod, CanisterMethodType};
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn build_inspect_method(&self) -> Option<ActInspectMessageMethod> {
         let inspect_message_function_defs =
             self.get_function_def_of_type(CanisterMethodType::InspectMessage);

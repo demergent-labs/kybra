@@ -4,7 +4,7 @@ use rustpython_parser::ast::Mod;
 use super::KybraProgram;
 use crate::py_ast::KybraStmt;
 
-impl KybraProgram<'_> {
+impl KybraProgram {
     pub fn build_external_canisters(&self) -> Vec<ActExternalCanister> {
         match &self.program {
             Mod::Module { body, .. } => body
@@ -12,14 +12,14 @@ impl KybraProgram<'_> {
                 .filter(|stmt_kind| {
                     KybraStmt {
                         stmt_kind,
-                        source_map: self.source_map,
+                        source_map: self.source_map.clone(),
                     }
                     .is_external_canister()
                 })
                 .map(|stmt_kind| {
                     KybraStmt {
                         stmt_kind,
-                        source_map: self.source_map,
+                        source_map: self.source_map.clone(),
                     }
                     .to_act_external_canister()
                 })

@@ -35,16 +35,15 @@ pub fn kybra_generate(
         .iter()
         .map(|py_file_name| {
             let source = std::fs::read_to_string(py_file_name).unwrap();
-            eprintln!("{}", source);
 
             let source_map = SourceMap {
-                lines: vec![],
-                file_name: todo!(),
+                lines: source.split("\n").map(|line| line.to_string()).collect(),
+                file_name: py_file_name.to_string(),
             };
 
             KybraProgram {
                 program: parser::parse(&source, Mode::Module, "").unwrap(),
-                source_map: &source_map,
+                source_map,
             }
         })
         .collect();

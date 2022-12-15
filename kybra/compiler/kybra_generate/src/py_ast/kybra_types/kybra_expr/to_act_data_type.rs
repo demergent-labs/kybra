@@ -45,7 +45,7 @@ impl ToActDataType for KybraExpr<'_> {
                     "tuple" => self.to_tuple(alias_name),
                     "manual" => KybraExpr {
                         located_expr: slice,
-                        source_map: self.source_map,
+                        source_map: self.source_map.clone(),
                     }
                     .to_act_data_type(alias_name),
                     _ => panic!("{}", self.invalid_subscript_value_error()),

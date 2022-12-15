@@ -21,7 +21,7 @@ impl KybraExpr<'_> {
                 }
                 let kybra_expr = KybraExpr {
                     located_expr: slice,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 };
                 match alias_name {
                     Some(alias_name) => ActDataType::Array(ActArray {

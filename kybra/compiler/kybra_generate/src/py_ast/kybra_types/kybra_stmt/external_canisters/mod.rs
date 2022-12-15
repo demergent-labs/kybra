@@ -21,7 +21,7 @@ impl KybraStmt<'_> {
 
                                 let params = KybraArguments {
                                     arguments: args.as_ref(),
-                                    source_map: self.source_map
+                                    source_map: self.source_map.clone()
                                 }.to_act_fn_params()
                                  .unwrap_or_else(|e| panic!("{}.{} violates Kybra requirements: {}", canister_name, name, e) );
 
@@ -29,7 +29,7 @@ impl KybraStmt<'_> {
 
                                 let return_type = KybraExpr {
                                     located_expr: expr_kind,
-                                    source_map: self.source_map,
+                                    source_map: self.source_map.clone(),
                                 }.to_act_data_type(&None);
 
                                 ActExternalCanisterMethod {

@@ -3,7 +3,7 @@ use quote::quote;
 use crate::py_ast::PyAst;
 use cdk_framework::{nodes::ActHeartbeatMethod, CanisterMethodType};
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn build_heartbeat_method(&self) -> Option<ActHeartbeatMethod> {
         let heartbeat_function_defs = self.get_function_def_of_type(CanisterMethodType::Heartbeat);
 

@@ -18,7 +18,7 @@ impl KybraExpr<'_> {
                 }
                 let kybra_expr = KybraExpr {
                     located_expr: slice,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 };
                 kybra_expr.to_act_data_type(alias_name)
             }

@@ -6,7 +6,7 @@ use cdk_framework::{
     ActCanisterMethod, CanisterMethodType,
 };
 
-impl PyAst<'_> {
+impl PyAst {
     pub fn build_init_method(
         &self,
         canister_methods: &Vec<ActCanisterMethod>,

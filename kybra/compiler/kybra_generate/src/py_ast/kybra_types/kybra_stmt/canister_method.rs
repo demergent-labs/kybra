@@ -52,7 +52,7 @@ impl KybraStmt<'_> {
                             let name = arg.node.arg.clone();
                             let kybra_annotation = KybraExpr {
                                 located_expr: &annotation,
-                                source_map: &self.source_map,
+                                source_map: self.source_map.clone(),
                             };
                             let data_type = kybra_annotation.to_act_data_type(&None);
                             vec![acc, vec![ActFnParam { name, data_type }]].concat()
@@ -69,7 +69,7 @@ impl KybraStmt<'_> {
             StmtKind::FunctionDef { returns, .. } => match returns {
                 Some(returns) => KybraExpr {
                     located_expr: returns,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 }
                 .is_manual(),
                 None => false,
@@ -107,7 +107,7 @@ impl KybraStmt<'_> {
             Some(return_type) => {
                 let kybra_return_type = KybraExpr {
                     located_expr: &return_type,
-                    source_map: &self.source_map,
+                    source_map: self.source_map.clone(),
                 };
                 kybra_return_type.to_act_data_type(&None)
             }

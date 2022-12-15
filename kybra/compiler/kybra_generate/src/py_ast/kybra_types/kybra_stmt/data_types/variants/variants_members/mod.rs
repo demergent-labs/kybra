@@ -25,7 +25,7 @@ impl KybraStmt<'_> {
                 };
                 let member_type = KybraExpr {
                     located_expr: &annotation,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 }
                 .to_act_data_type(&None);
                 ActVariantMember {

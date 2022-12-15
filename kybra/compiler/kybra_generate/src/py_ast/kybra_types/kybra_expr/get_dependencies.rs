@@ -47,13 +47,13 @@ impl GetDependencies for KybraExpr<'_> {
         match &self.located_expr.node {
             ExprKind::Subscript { slice, .. } => KybraExpr {
                 located_expr: slice,
-                source_map: self.source_map,
+                source_map: self.source_map.clone(),
             }
             .get_dependent_types(type_alias_lookup, found_type_names),
             ExprKind::Tuple { elts, .. } => elts.iter().fold(HashSet::new(), |acc, elt| {
                 let dependencies = KybraExpr {
                     located_expr: elt,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 }
                 .get_dependent_types(type_alias_lookup, found_type_names);
                 acc.union(&dependencies).cloned().collect()
@@ -93,7 +93,7 @@ impl GetDependencies for KybraExpr<'_> {
             ExprKind::List { elts, .. } => elts.iter().fold(HashSet::new(), |acc, elt| {
                 let dependencies = KybraExpr {
                     located_expr: elt,
-                    source_map: self.source_map,
+                    source_map: self.source_map.clone(),
                 }
                 .get_dependent_types(type_alias_lookup, found_type_names);
                 acc.union(&dependencies).cloned().collect()

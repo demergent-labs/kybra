@@ -76,8 +76,8 @@ impl SourceMap {
     fn lookup_char_pos(&self, location: Location) -> Loc {
         Loc {
             file: SourceFile {
-                file: "thing".to_string(),
-                name: "main.py".to_string(),
+                file: self.lines.clone(),
+                name: self.file_name.clone(),
             },
             line: location.row(),
             col: location.column(),
@@ -87,8 +87,8 @@ impl SourceMap {
     fn lookup_line(&self, location: Location) -> Result<SourceFileAndLine, String> {
         Ok(SourceFileAndLine {
             sf: SourceFile {
-                file: "".to_string(),
-                name: "main.py".to_string(),
+                file: self.lines.clone(),
+                name: self.file_name.clone(),
             },
             line: location.row(),
         })
@@ -126,13 +126,13 @@ pub struct Loc {
 }
 
 pub struct SourceFile {
-    pub file: String,
+    pub file: Vec<String>,
     pub name: String,
 }
 
 impl SourceFile {
-    fn get_line(self, _line_number: usize) -> Option<String> {
-        Some("def this_is_the_fake_python(we_are: going): with".to_string())
+    fn get_line(self, line_number: usize) -> Option<String> {
+        self.file.get(line_number).cloned()
     }
 }
 

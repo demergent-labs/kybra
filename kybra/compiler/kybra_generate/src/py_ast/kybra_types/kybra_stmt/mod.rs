@@ -15,7 +15,7 @@ use super::KybraExpr;
 #[derive(Clone)]
 pub struct KybraStmt<'a> {
     pub stmt_kind: &'a Located<StmtKind>,
-    pub source_map: &'a SourceMap,
+    pub source_map: SourceMap,
 }
 
 // TODO what is the difference if any to get_alias_name and get_name?
@@ -31,7 +31,7 @@ impl KybraStmt<'_> {
                 } else {
                     KybraExpr {
                         located_expr: &targets[0],
-                        source_map: self.source_map,
+                        source_map: self.source_map.clone(),
                     }
                     .get_name()
                 }
@@ -39,7 +39,7 @@ impl KybraStmt<'_> {
             StmtKind::AugAssign { .. } => todo!(),
             StmtKind::AnnAssign { target, .. } => KybraExpr {
                 located_expr: target,
-                source_map: self.source_map,
+                source_map: self.source_map.clone(),
             }
             .get_name(),
             _ => None,

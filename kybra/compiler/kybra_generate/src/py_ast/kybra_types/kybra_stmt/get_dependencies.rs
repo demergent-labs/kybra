@@ -20,7 +20,7 @@ impl GetDependencies for KybraStmt<'_> {
                             Some(annotation) => {
                                 let dependencies = KybraExpr {
                                     located_expr: &annotation,
-                                    source_map: self.source_map,
+                                    source_map: self.source_map.clone(),
                                 }
                                 .get_dependent_types(type_alias_lookup, found_type_names);
                                 acc.union(&dependencies).cloned().collect()
@@ -31,7 +31,7 @@ impl GetDependencies for KybraStmt<'_> {
                 let return_dependencies = match returns {
                     Some(returns) => KybraExpr {
                         located_expr: returns,
-                        source_map: self.source_map,
+                        source_map: self.source_map.clone(),
                     }
                     .get_dependent_types(type_alias_lookup, found_type_names),
                     None => HashSet::new(),
@@ -45,7 +45,7 @@ impl GetDependencies for KybraStmt<'_> {
                 body.iter().fold(found_type_names.clone(), |acc, member| {
                     let dependency = KybraStmt {
                         stmt_kind: member,
-                        source_map: self.source_map,
+                        source_map: self.source_map.clone(),
                     }
                     .get_dependent_types(type_alias_lookup, found_type_names);
                     acc.union(&dependency).cloned().collect()
@@ -53,7 +53,7 @@ impl GetDependencies for KybraStmt<'_> {
             }
             StmtKind::Assign { value, .. } => KybraExpr {
                 located_expr: value,
-                source_map: self.source_map,
+                source_map: self.source_map.clone(),
             }
             .get_dependent_types(type_alias_lookup, found_type_names),
             StmtKind::AnnAssign { annotation, .. } => {
@@ -62,7 +62,7 @@ impl GetDependencies for KybraStmt<'_> {
                         Some(args) => args.iter().fold(found_type_names.clone(), |acc, arg| {
                             let dependencies = KybraExpr {
                                 located_expr: arg,
-                                source_map: self.source_map,
+                                source_map: self.source_map.clone(),
                             }
                             .get_dependent_types(type_alias_lookup, found_type_names);
                             acc.union(&dependencies).cloned().collect()
@@ -72,7 +72,7 @@ impl GetDependencies for KybraStmt<'_> {
                 } else {
                     KybraExpr {
                         located_expr: annotation,
-                        source_map: self.source_map,
+                        source_map: self.source_map.clone(),
                     }
                     .get_dependent_types(type_alias_lookup, found_type_names)
                 }

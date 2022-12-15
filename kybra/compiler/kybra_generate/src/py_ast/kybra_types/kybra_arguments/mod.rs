@@ -7,7 +7,7 @@ use super::KybraExpr;
 
 pub struct KybraArguments<'a> {
     pub arguments: &'a Arguments,
-    pub source_map: &'a SourceMap,
+    pub source_map: SourceMap,
 }
 
 impl KybraArguments<'_> {
@@ -41,7 +41,7 @@ impl KybraArguments<'_> {
                     Some(annotation) => {
                         let data_type = KybraExpr {
                             located_expr: annotation.as_ref(),
-                            source_map: self.source_map,
+                            source_map: self.source_map.clone(),
                         }
                         .to_act_data_type(&None);
 
