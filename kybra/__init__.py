@@ -40,6 +40,9 @@ empty = NoReturn # TODO in Python 3.11 I believe there is a Never type
 
 Async = Generator[Any, Any, T]
 
+TimerId = nat64
+Duration = nat64
+
 def query(func: object):
     return func
 
@@ -185,6 +188,10 @@ class ic(Generic[T]):
         return _kybra_ic._kybra_canister_balance128() # type: ignore
 
     @staticmethod
+    def clear_timer(timer_id: TimerId) -> None:
+        return _kybra_ic._kybra_clear_timer(timer_id) # type: ignore
+
+    @staticmethod
     def data_certificate() -> opt[blob]:
         return _kybra_ic._kybra_data_certificate() # type: ignore
 
@@ -261,6 +268,14 @@ class ic(Generic[T]):
     @staticmethod
     def set_certified_data(data: blob):
         _kybra_ic._kybra_set_certified_data(data) # type: ignore
+
+    @staticmethod
+    def set_timer(delay: Duration, func: Callable[[], None]) -> TimerId:
+        return _kybra_ic._kybra_set_timer(delay, func) # type: ignore
+
+    @staticmethod
+    def set_timer_interval(interval: Duration, func: Callable[[], None]) -> TimerId:
+        return _kybra_ic._kybra_set_timer_interval(interval, func) # type: ignore
 
     @staticmethod
     def stable_bytes() -> blob:
