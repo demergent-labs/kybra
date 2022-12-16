@@ -3,6 +3,7 @@ mod errors;
 mod generate_inline_name;
 mod generator;
 pub mod get_dependencies;
+pub mod get_source_info;
 mod hash;
 mod opt;
 mod to_act_data_type;
