@@ -30,3 +30,4 @@ getrandom = { version = "0.2.3", features = ["custom"] }
 serde = "1.0.137"
 serde_json = "1.0.87"
 async-recursion = "1.0.0"
+slotmap = "1.0.6"

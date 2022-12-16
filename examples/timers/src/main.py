@@ -20,7 +20,7 @@ status: StatusReport = {"single": False, "inline1": 0, "inline2": 0, "repeat": 0
 
 @update
 def clear_timer(timer_id: TimerId):
-    # ic.clear_timer(timer_id)
+    ic.clear_timer(timer_id)
     ic.print(f"timer {timer_id} cancelled")
 
 

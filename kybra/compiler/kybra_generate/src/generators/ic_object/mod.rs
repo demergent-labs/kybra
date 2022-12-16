@@ -10,6 +10,7 @@ use crate::generators::ic_object::functions::candid_decode::generate_candid_deco
 use crate::generators::ic_object::functions::candid_encode::generate_candid_encode;
 use crate::generators::ic_object::functions::canister_balance::generate_canister_balance;
 use crate::generators::ic_object::functions::canister_balance128::generate_canister_balance128;
+use crate::generators::ic_object::functions::clear_timer::generate_clear_timer;
 use crate::generators::ic_object::functions::data_certificate::generate_data_certificate;
 use crate::generators::ic_object::functions::id::generate_id;
 use crate::generators::ic_object::functions::method_name::generate_method_name;
@@ -56,6 +57,7 @@ pub fn generate_ic_object(
     let candid_encode = generate_candid_encode();
     let canister_balance = generate_canister_balance();
     let canister_balance128 = generate_canister_balance128();
+    let clear_timer = generate_clear_timer();
     let data_certificate = generate_data_certificate();
     let id = generate_id();
     let method_name = generate_method_name();
@@ -104,6 +106,7 @@ pub fn generate_ic_object(
             #candid_encode
             #canister_balance
             #canister_balance128
+            #clear_timer
             #data_certificate
             #id
             #method_name

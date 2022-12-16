@@ -6,6 +6,7 @@ pub mod candid_decode;
 pub mod candid_encode;
 pub mod canister_balance;
 pub mod canister_balance128;
+pub mod clear_timer;
 pub mod data_certificate;
 pub mod id;
 pub mod method_name;
