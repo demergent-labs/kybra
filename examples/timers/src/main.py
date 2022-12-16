@@ -22,16 +22,15 @@ def clear_timer(timer_id: TimerId):
 
 @update
 def set_timers(delay: Duration, interval: Duration) -> TimerIds:
-    # Note: Lambdas aren't supported. You can only pass a function here.
     single_id = ic.set_timer(delay, one_time_timer_callback)
-
     ic.print(f"Set timer {single_id}")
 
-    # repeat_id = ic.set_timer_interval(interval, repeat_timer_callback)
+    repeat_id = ic.set_timer_interval(interval, repeat_timer_callback)
+    ic.print(f"Set timer {single_id}")
 
     return {
         "single": single_id,
-        "repeat": 0,
+        "repeat": repeat_id,
     }
 
 

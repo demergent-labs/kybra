@@ -28,6 +28,7 @@ pub mod reply;
 pub mod reply_raw;
 pub mod set_certified_data;
 pub mod set_timer;
+pub mod set_timer_interval;
 pub mod stable64_grow;
 pub mod stable64_read;
 pub mod stable64_size;
