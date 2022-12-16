@@ -51,6 +51,7 @@ pub fn kybra_generate(
         kybra_programs,
         entry_module_name: entry_module_name.to_string(),
     }
+    .analyze()
     .to_kybra_ast()
     .to_act()
     .to_token_stream(());

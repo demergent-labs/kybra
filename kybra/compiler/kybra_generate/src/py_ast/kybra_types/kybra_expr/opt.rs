@@ -9,6 +9,7 @@ use super::KybraExpr;
 
 impl KybraExpr<'_> {
     pub(super) fn to_opt(&self, alias_name: &Option<&String>) -> ActDataType {
+        self.to_array(alias_name);
         match &self.located_expr.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {

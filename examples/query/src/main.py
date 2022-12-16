@@ -1,5 +1,6 @@
-from kybra import query, text
+from kybra import query, opt, text
+
 
 @query
-def simple_query() -> text:
+def simple_query() -> opt[text]:
     return 'This is a query function'
