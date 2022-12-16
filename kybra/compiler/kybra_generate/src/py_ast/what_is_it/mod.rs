@@ -18,9 +18,9 @@ impl WhatIsIt for KybraStmt<'_> {
     }
 }
 
-impl WhatIsIt for Located<StmtKind> {
+impl WhatIsIt for StmtKind {
     fn what_is_it(&self) -> () {
-        match &self.node {
+        match &self {
             StmtKind::ClassDef {
                 name,
                 bases,
@@ -269,26 +269,26 @@ impl ToDisplayString for Arguments {
     }
 }
 
-impl ToDisplayString for Located<ArgData> {
+impl ToDisplayString for ArgData {
     fn to_display_string(&self) -> String {
-        let type_annotation = match &self.node.annotation {
+        let type_annotation = match &self.annotation {
             Some(annotation) => annotation.to_display_string(),
             None => "None".to_string(),
         };
-        let type_comment = match &self.node.type_comment {
+        let type_comment = match &self.type_comment {
             Some(type_comment) => type_comment.clone(),
             None => "None".to_string(),
         };
         format!(
             "ArgData: arg({}) type_annotation({}) type_comment({})",
-            self.node.arg, type_annotation, type_comment,
+            self.arg, type_annotation, type_comment,
         )
     }
 }
 
-impl ToDisplayString for Located<StmtKind> {
+impl ToDisplayString for StmtKind {
     fn to_display_string(&self) -> String {
-        let stmt_kind = match &self.node {
+        let stmt_kind = match &self {
             StmtKind::FunctionDef { .. } => "function def".to_string(),
             StmtKind::AsyncFunctionDef { .. } => "asyc function def".to_string(),
             StmtKind::ClassDef { .. } => "class def".to_string(),
@@ -334,34 +334,43 @@ impl ToDisplayString for Located<StmtKind> {
     }
 }
 
-impl WhatIsIt for Located<ArgData> {
+impl WhatIsIt for ArgData {
     fn what_is_it(&self) -> () {
         eprintln!("--------------------------------------");
         eprintln!("This is an arg data");
-        let annotation = match &self.node.annotation {
+        let annotation = match &self.annotation {
             Some(annotation) => annotation.to_display_string(),
             None => "None".to_string(),
         };
-        let type_comment = match &self.node.type_comment {
+        let type_comment = match &self.type_comment {
             Some(type_comment) => type_comment.clone(),
             None => "None".to_string(),
         };
         eprintln!(
             "arg({}), annotation({}), type_comment({})",
-            self.node.arg, annotation, type_comment
+            self.arg, annotation, type_comment
         );
         eprintln!("--------------------------------------");
     }
 }
 
-impl WhatIsIt for Located<ExprKind> {
+impl<T> WhatIsIt for Located<T>
+where
+    T: WhatIsIt,
+{
     fn what_is_it(&self) -> () {
+        self.node.what_is_it();
         eprintln!(
-            "This Expr Kind is a {}. It's located at {}:{}",
-            self.to_display_string(),
+            "It's located at {}:{}",
             self.location.row(),
             self.location.column()
         );
+    }
+}
+
+impl WhatIsIt for ExprKind {
+    fn what_is_it(&self) -> () {
+        eprintln!("This Expr Kind is a {}.", self.to_display_string(),);
     }
 }
 
@@ -384,20 +393,29 @@ impl ToDisplayString for Constant {
     }
 }
 
-impl ToDisplayString for Located<KeywordData> {
+impl ToDisplayString for KeywordData {
     fn to_display_string(&self) -> String {
-        let arg = match &self.node.arg {
+        let arg = match &self.arg {
             Some(arg) => arg.clone(),
             None => "no args".to_string(),
         };
-        let value = self.node.value.to_display_string();
+        let value = self.value.to_display_string();
         format!("arg: {}, value: {}", arg, value)
     }
 }
 
-impl ToDisplayString for Located<ExprKind> {
+impl<T> ToDisplayString for Located<T>
+where
+    T: ToDisplayString,
+{
     fn to_display_string(&self) -> String {
-        let expr_kind = match &self.node {
+        self.node.to_display_string()
+    }
+}
+
+impl ToDisplayString for ExprKind {
+    fn to_display_string(&self) -> String {
+        let expr_kind = match &self {
             ExprKind::BoolOp { .. } => "bool op".to_string(),
             ExprKind::NamedExpr { .. } => "named expr".to_string(),
             ExprKind::BinOp { .. } => "bin op".to_string(),
