@@ -13,6 +13,7 @@ use cdk_framework::{
 pub use self::{kybra_ast::KybraAst, kybra_types::KybraProgram};
 use self::{kybra_types::KybraStmt, traits::GetDependencies};
 
+pub mod analyze;
 mod kybra_ast;
 mod kybra_types;
 mod system_methods;
