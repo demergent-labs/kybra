@@ -1,3 +1,5 @@
+pub mod token_length;
+
 use rustpython_parser::ast::Location;
 
 #[derive(Clone)]
@@ -105,7 +107,7 @@ impl SourceMap {
 
     fn get_end_col(&self, span: Location) -> usize {
         let loc = self.lookup_char_pos(span);
-        loc.col
+        loc.col + 1
     }
 
     fn get_well_formed_line(&self, span: Location) -> String {
@@ -132,7 +134,7 @@ pub struct SourceFile {
 
 impl SourceFile {
     fn get_line(self, line_number: usize) -> Option<String> {
-        self.file.get(line_number).cloned()
+        self.file.get(line_number - 1).cloned()
     }
 }
 
