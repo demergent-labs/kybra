@@ -26,7 +26,7 @@ def clear_timer(timer_id: TimerId):
 
 @update
 def set_timers(delay: Duration, interval: Duration) -> TimerIds:
-    # single_id = ic.set_timer(delay, one_time_timer_callback)
+    single_id = ic.set_timer(delay, one_time_timer_callback)
 
     # Note: Demergent Labs does not recommend using lambdas in timers. They will
     # be called, but they are limited in functionality. Calling a defined
@@ -46,7 +46,7 @@ def set_timers(delay: Duration, interval: Duration) -> TimerIds:
     # repeat_id = ic.set_timer_interval(interval, repeat_timer_callback)
 
     return {
-        "single": 0,
+        "single": single_id,
         "inline1": 0,
         "inline2": 0,
         "repeat": 0,

@@ -31,6 +31,7 @@ use crate::generators::ic_object::functions::reject_message::generate_reject_mes
 use crate::generators::ic_object::functions::reply::generate_reply;
 use crate::generators::ic_object::functions::reply_raw::generate_reply_raw;
 use crate::generators::ic_object::functions::set_certified_data::generate_set_certified_data;
+use crate::generators::ic_object::functions::set_timer::generate_set_timer;
 use crate::generators::ic_object::functions::stable64_grow::generate_stable64_grow;
 use crate::generators::ic_object::functions::stable64_read::generate_stable64_read;
 use crate::generators::ic_object::functions::stable64_size::generate_stable64_size;
@@ -79,6 +80,7 @@ pub fn generate_ic_object(
     let reply = generate_reply(canister_methods);
     let reply_raw = generate_reply_raw();
     let set_certified_data = generate_set_certified_data();
+    let set_timer = generate_set_timer();
     let stable_bytes = generate_stable_bytes();
     let stable_grow = generate_stable_grow();
     let stable_read = generate_stable_read();
@@ -127,6 +129,7 @@ pub fn generate_ic_object(
             #reply
             #reply_raw
             #set_certified_data
+            #set_timer
             #stable_bytes
             #stable_grow
             #stable_read
