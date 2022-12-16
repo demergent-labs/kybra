@@ -4,9 +4,11 @@ use rustpython_parser::ast::{
     TypeIgnore, Unaryop, Withitem,
 };
 
+use crate::source_map::token_length::TokenLength;
+
 use super::{KybraProgram, PyAst};
 
-trait Analyze {
+pub trait Analyze {
     fn analyze(&self);
 }
 
@@ -27,7 +29,12 @@ impl Analyze for KybraProgram {
         eprintln!("#########################");
         if "/home/bdemann/code/demergent_labs/kybra/examples/query/src/main.py"
             == self.source_map.file_name
+            || false
         {
+            eprintln!(
+                "{} is the length of this program",
+                self.program.get_token_length()
+            );
             match &self.program {
                 rustpython_parser::ast::Mod::Module { body, type_ignores } => {
                     give_analysis("Module", 2);
@@ -79,6 +86,10 @@ impl Analyze for StmtKind {
         eprintln!("####################");
         give_analysis("StmtKind", 1);
         eprintln!("####################");
+        eprintln!(
+            "The length of this statement is {}",
+            self.get_token_length()
+        );
         match &self {
             StmtKind::FunctionDef {
                 name,
@@ -462,15 +473,15 @@ impl Analyze for Constant {
     fn analyze(&self) {
         give_analysis("Constant", 1);
         let constant = match self {
-            Constant::None => "None",
-            Constant::Bool(_) => "Bool",
-            Constant::Str(_) => "Str",
-            Constant::Bytes(_) => "Bytes",
-            Constant::Int(_) => "Int",
-            Constant::Tuple(_) => "Tuple",
-            Constant::Float(_) => "Float",
-            Constant::Complex { .. } => "Complex Number",
-            Constant::Ellipsis => "Ellipsis",
+            Constant::None => "None".to_string(),
+            Constant::Bool(bool) => format!("Bool: {}", bool),
+            Constant::Str(string) => format!("Str: {}", string),
+            Constant::Bytes(bytes) => format!("Bytes: {:?}", bytes),
+            Constant::Int(int) => format!("Int: {}", int),
+            Constant::Tuple(tuple) => format!("Tuple: {:?}", tuple),
+            Constant::Float(float) => format!("Float: {}", float),
+            Constant::Complex { real, imag } => format!("Complex: real({}), imag({})", real, imag),
+            Constant::Ellipsis => "Ellipsis".to_string(),
         };
         give_analysis(format!("{}", constant).as_str(), 2)
     }
@@ -493,6 +504,10 @@ impl Analyze for ExprKind {
         eprintln!("____________________");
         give_analysis("ExprKind", 1);
         eprintln!("____________________");
+        eprintln!(
+            "The length of this expr kind is {}",
+            self.get_token_length()
+        );
         match &self {
             ExprKind::BoolOp { op, values } => {
                 give_analysis("BoolOp", 2);
