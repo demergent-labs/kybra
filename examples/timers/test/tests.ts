@@ -2,7 +2,7 @@ import { ActorSubclass } from '@dfinity/agent';
 import { Test } from 'azle/test';
 import { _SERVICE, TimerIds } from './dfx_generated/timers/timers.did';
 
-let timer_ids: TimerIds = { single: 0n, inline1: 0n, inline2: 0n, repeat: 0n };
+let timer_ids: TimerIds = { single: 0n, repeat: 0n };
 
 export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
     const tests: Test[] = [
@@ -12,11 +12,7 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
                 const result = await timers_canister.status_report();
 
                 return {
-                    ok:
-                        result.single === false &&
-                        result.inline1 === 0 &&
-                        result.inline2 === 0 &&
-                        result.repeat === 0
+                    ok: result.single === false && result.repeat === 0
                 };
             }
         },
@@ -40,11 +36,7 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
                 const result = await timers_canister.status_report();
 
                 return {
-                    ok:
-                        result.single === false &&
-                        result.inline1 === 0 &&
-                        result.inline2 === 0 &&
-                        result.repeat === 1
+                    ok: result.single === false && result.repeat === 1
                 };
             }
         },
@@ -58,11 +50,7 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
                 const result = await timers_canister.status_report();
 
                 return {
-                    ok:
-                        result.single === true &&
-                        result.inline1 === 1 &&
-                        result.inline2 === 2 &&
-                        result.repeat === 2
+                    ok: result.single === true && result.repeat === 2
                 };
             }
         },
@@ -92,11 +80,7 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
                 const result = await timers_canister.status_report();
 
                 return {
-                    ok:
-                        result.single === true &&
-                        result.inline1 === 1 &&
-                        result.inline2 === 2 &&
-                        result.repeat === 2
+                    ok: result.single === true && result.repeat === 2
                 };
             }
         }
