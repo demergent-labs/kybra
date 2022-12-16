@@ -22,14 +22,14 @@ pub trait GetSourceInfo {
 }
 
 impl SourceMap {
-    pub fn get_text(&self, span: Location) -> String {
+    pub fn get_text(&self, span: Location, length: usize) -> String {
         let line = self.get_source(span);
-        line[self.get_start_col(span)..self.get_end_col(span)].to_string()
+        line[self.get_start_col(span)..self.get_end_col(span, length)].to_string()
     }
 
-    pub fn get_range(&self, span: Location) -> (usize, usize) {
+    pub fn get_range(&self, span: Location, length: usize) -> (usize, usize) {
         let start = self.get_start_col(span);
-        let end = self.get_end_col(span);
+        let end = self.get_end_col(span, length);
         (start, end)
     }
 
@@ -47,12 +47,17 @@ impl SourceMap {
         }
     }
 
-    pub fn generate_modified_source(&self, span: Location, replacement: &String) -> String {
+    pub fn generate_modified_source(
+        &self,
+        span: Location,
+        length: usize,
+        replacement: &String,
+    ) -> String {
         format!(
             "{}{}{}",
             self.get_well_formed_line(span),
             replacement,
-            self.get_well_formed_end_line(span)
+            self.get_well_formed_end_line(span, length)
         )
     }
 
@@ -105,9 +110,11 @@ impl SourceMap {
         loc.col
     }
 
-    fn get_end_col(&self, span: Location) -> usize {
+    fn get_end_col(&self, span: Location, length: usize) -> usize {
         let loc = self.lookup_char_pos(span);
-        loc.col + 1
+        let line_length = self.get_source(span).len();
+        // TODO this is the hackiest way to do this... I hope there is a better way
+        (loc.col + length).min(line_length)
     }
 
     fn get_well_formed_line(&self, span: Location) -> String {
@@ -115,9 +122,9 @@ impl SourceMap {
         line[..self.get_start_col(span)].to_string()
     }
 
-    fn get_well_formed_end_line(&self, span: Location) -> String {
+    fn get_well_formed_end_line(&self, span: Location, length: usize) -> String {
         let line = self.get_source(span);
-        line[self.get_end_col(span)..].to_string()
+        line[self.get_end_col(span, length)..].to_string()
     }
 }
 

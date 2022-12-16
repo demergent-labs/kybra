@@ -1,15 +1,20 @@
-use crate::source_map::GetSourceInfo;
+use crate::source_map::{token_length::TokenLength, GetSourceInfo};
 
 use super::KybraExpr;
 
 impl GetSourceInfo for KybraExpr<'_> {
     fn get_text(&self) -> String {
-        // self.located_expr.
-        self.source_map.get_text(self.located_expr.location)
+        self.source_map.get_text(
+            self.located_expr.location,
+            self.located_expr.get_token_length(),
+        )
     }
 
     fn get_range(&self) -> (usize, usize) {
-        self.source_map.get_range(self.located_expr.location)
+        self.source_map.get_range(
+            self.located_expr.location,
+            self.located_expr.get_token_length(),
+        )
     }
 
     fn get_source(&self) -> String {
@@ -17,8 +22,11 @@ impl GetSourceInfo for KybraExpr<'_> {
     }
 
     fn generate_modified_source(&self, replacement: &String) -> String {
-        self.source_map
-            .generate_modified_source(self.located_expr.location, replacement)
+        self.source_map.generate_modified_source(
+            self.located_expr.location,
+            self.located_expr.get_token_length(),
+            replacement,
+        )
     }
 
     fn generate_modified_range(&self, replacement: &String) -> (usize, usize) {
