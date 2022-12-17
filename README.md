@@ -35,6 +35,7 @@ Most of Kybra's documentation is currently found in this README. The Kybra Book,
 -   [Candid Types](#candid-types)
 -   [Canister APIs](#canister-apis)
 -   [Call APIs](#call-apis)
+-   [Timer APIs](#timer-apis)
 -   [Stable Memory](#stable-memory)
 -   [Python stdlib](#python-stdlib)
 -   [Python External Packages](#python-external-packages)
@@ -2140,6 +2141,92 @@ def reply_raw() -> manual[RawReply]:
 #### result
 
 [Not yet implemented.](https://github.com/demergent-labs/azle/issues/496)
+
+### Timer APIs
+
+-   [clear timer](#clear-timer)
+-   [set timer](#set-timer)
+-   [set timer interval](#set-timer-interval)
+
+#### clear timer
+
+Examples:
+
+-   [timers](/examples/timers)
+
+```python
+from kybra import ic, TimerId, update
+
+@update
+def clear_timer(timer_id: TimerId):
+    ic.clear_timer(timer_id)
+```
+
+#### set timer
+
+Examples:
+
+-   [timers](/examples/timers)
+
+```python
+from kybra import Duration, ic, TimerId, update
+
+
+@update
+def set_timers(delay: Duration) -> list[TimerId]:
+    global_function_timer_id = ic.set_timer(delay, global_function)
+
+    lambda_timer_id = ic.set_timer(
+        delay,
+        lambda: ic.print("inline lambda called"),
+    )
+
+    captured_value = "🚩"
+
+    def inner_function():
+        ic.print(f"inner function w/ captured value {captured_value} called")
+
+    inner_function_timer_id = ic.set_timer(delay, inner_function)
+
+    return [global_function_timer_id, lambda_timer_id, inner_function_timer_id]
+
+
+def global_function():
+    ic.print("global function called")
+```
+
+#### set timer interval
+
+Examples:
+
+-   [timers](/examples/timers)
+
+```python
+from kybra import Duration, ic, TimerId, update
+
+
+@update
+def set_timer_intervals(interval: Duration) -> list[TimerId]:
+    global_function_timer_id = ic.set_timer_interval(interval, global_function)
+
+    lambda_timer_id = ic.set_timer_interval(
+        interval,
+        lambda: ic.print("inline lambda called"),
+    )
+
+    captured_value = "🚩"
+
+    def inner_function():
+        ic.print(f"inner function w/ captured value {captured_value} called")
+
+    inner_function_timer_id = ic.set_timer_interval(interval, inner_function)
+
+    return [global_function_timer_id, lambda_timer_id, inner_function_timer_id]
+
+
+def global_function():
+    ic.print("global function called")
+```
 
 ### Stable Memory
 
