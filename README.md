@@ -2157,6 +2157,7 @@ Examples:
 ```python
 from kybra import ic, TimerId, update
 
+
 @update
 def clear_timer(timer_id: TimerId):
     ic.clear_timer(timer_id)
@@ -2173,26 +2174,21 @@ from kybra import Duration, ic, TimerId, update
 
 
 @update
-def set_timers(delay: Duration) -> list[TimerId]:
-    global_function_timer_id = ic.set_timer(delay, global_function)
-
-    lambda_timer_id = ic.set_timer(
-        delay,
-        lambda: ic.print("inline lambda called"),
-    )
+def set_timers(delay: Duration) -> tuple[TimerId, TimerId]:
+    function_timer_id = ic.set_timer(delay, callback)
 
     captured_value = "🚩"
 
-    def inner_function():
-        ic.print(f"inner function w/ captured value {captured_value} called")
+    closure_timer_id = ic.set_timer(
+        delay,
+        lambda: ic.print(f"closure called and captured value {captured_value}"),
+    )
 
-    inner_function_timer_id = ic.set_timer(delay, inner_function)
-
-    return [global_function_timer_id, lambda_timer_id, inner_function_timer_id]
+    return [function_timer_id, closure_timer_id]
 
 
-def global_function():
-    ic.print("global function called")
+def callback():
+    ic.print("callback called")
 ```
 
 #### set timer interval
@@ -2206,26 +2202,21 @@ from kybra import Duration, ic, TimerId, update
 
 
 @update
-def set_timer_intervals(interval: Duration) -> list[TimerId]:
-    global_function_timer_id = ic.set_timer_interval(interval, global_function)
-
-    lambda_timer_id = ic.set_timer_interval(
-        interval,
-        lambda: ic.print("inline lambda called"),
-    )
+def set_timer_intervals(interval: Duration) -> tuple[TimerId, TimerId]:
+    function_timer_id = ic.set_timer_interval(interval, callback)
 
     captured_value = "🚩"
 
-    def inner_function():
-        ic.print(f"inner function w/ captured value {captured_value} called")
+    closure_timer_id = ic.set_timer_interval(
+        interval,
+        lambda: ic.print(f"closure called and captured value {captured_value}"),
+    )
 
-    inner_function_timer_id = ic.set_timer_interval(interval, inner_function)
-
-    return [global_function_timer_id, lambda_timer_id, inner_function_timer_id]
+    return [function_timer_id, closure_timer_id]
 
 
-def global_function():
-    ic.print("global function called")
+def callback():
+    ic.print("callback called")
 ```
 
 ### Stable Memory
