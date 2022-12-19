@@ -1,3 +1,5 @@
+use rustpython_parser::ast::ExprKind;
+
 use crate::errors::{CreateMessage, ErrorMessage, Suggestion};
 
 use super::KybraExpr;
@@ -31,5 +33,38 @@ impl KybraExpr<'_> {
 
     pub fn not_opt_error(&self) -> String {
         "This is is not an opt".to_string()
+    }
+
+    pub fn unsupported_type_error(&self) -> ErrorMessage {
+        let expression_name = match &self.located_expr.node {
+            ExprKind::BoolOp { .. } => "boolean operators",
+            ExprKind::NamedExpr { .. } => "named expressions",
+            ExprKind::BinOp { .. } => "binary operators",
+            ExprKind::UnaryOp { .. } => "unary operators",
+            ExprKind::Lambda { .. } => "lambdas",
+            ExprKind::IfExp { .. } => "if expressions",
+            ExprKind::Dict { .. } => "dictionaries",
+            ExprKind::Set { .. } => "sets",
+            ExprKind::ListComp { .. } => "list comprehensions",
+            ExprKind::SetComp { .. } => "set comprehensions",
+            ExprKind::DictComp { .. } => "dict comprehensions",
+            ExprKind::GeneratorExp { .. } => "generator expressions",
+            ExprKind::Await { .. } => "await expressions",
+            ExprKind::Yield { .. } => "yield expressions",
+            ExprKind::YieldFrom { .. } => "yield from expressions",
+            ExprKind::Compare { .. } => "compare expressions",
+            ExprKind::Call { .. } => "call expressions",
+            ExprKind::FormattedValue { .. } => "formatted values expressions",
+            ExprKind::JoinedStr { .. } => "joined string expressions",
+            ExprKind::Attribute { .. } => "attribute expressions",
+            ExprKind::Starred { .. } => "starred expressions",
+            ExprKind::List { .. } => "list expressions",
+            ExprKind::Tuple { .. } => "tuple expressions",
+            ExprKind::Slice { .. } => "slice expressions",
+            _ => panic!("Unreachable: This type should be supported. I don' know how we got here."),
+        };
+        let title = format!("{} are not allowed here.", expression_name);
+        let annotation = "Illegal expression used here";
+        self.create_error_message(&title, annotation, None)
     }
 }

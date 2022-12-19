@@ -63,32 +63,9 @@ impl ToActDataType for KybraExpr<'_> {
                     todo!()
                 }
             },
-            ExprKind::BoolOp { .. } => todo!(),
-            ExprKind::NamedExpr { .. } => todo!(),
-            ExprKind::BinOp { .. } => todo!(),
-            ExprKind::UnaryOp { .. } => todo!(),
-            ExprKind::Lambda { .. } => todo!(),
-            ExprKind::IfExp { .. } => todo!(),
-            ExprKind::Dict { .. } => todo!(),
-            ExprKind::Set { .. } => todo!(),
-            ExprKind::ListComp { .. } => todo!(),
-            ExprKind::SetComp { .. } => todo!(),
-            ExprKind::DictComp { .. } => todo!(),
-            ExprKind::GeneratorExp { .. } => todo!(),
-            ExprKind::Await { .. } => todo!(),
-            ExprKind::Yield { .. } => todo!(),
-            ExprKind::YieldFrom { .. } => todo!(),
-            ExprKind::Compare { .. } => todo!(),
-            ExprKind::Call { .. } => todo!(),
-            ExprKind::FormattedValue { .. } => todo!(),
-            ExprKind::JoinedStr { .. } => todo!(),
-            ExprKind::Attribute { .. } => todo!(),
-            ExprKind::Starred { .. } => todo!(),
-            ExprKind::List { .. } => todo!(),
-            ExprKind::Tuple { .. } => {
-                todo!("I don't think we can handle all of the types at once here. But what if we have tuples inside of tuples? What do we do then?")
+            _ => {
+                panic!("{}", self.unsupported_type_error());
             }
-            ExprKind::Slice { .. } => todo!(),
         }
     }
 }
