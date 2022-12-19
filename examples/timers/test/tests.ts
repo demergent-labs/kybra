@@ -2,13 +2,7 @@ import { ActorSubclass } from '@dfinity/agent';
 import { Test } from 'azle/test';
 import { _SERVICE, TimerIds } from './dfx_generated/timers/timers.did';
 
-let timer_ids: TimerIds = {
-    single: 0n,
-    inline1: 0n,
-    inline2: 0n,
-    inner: 0n,
-    repeat: 0n
-};
+let timer_ids: TimerIds = { single: 0n, inline: 0n, capture: 0n, repeat: 0n };
 
 export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
     const tests: Test[] = [
@@ -20,9 +14,8 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
                 return {
                     ok:
                         result.single === false &&
-                        result.inline1 === 0 &&
-                        result.inline1 === 0 &&
-                        result.inner === '' &&
+                        result.inline === 0 &&
+                        result.capture === '' &&
                         result.repeat === 0
                 };
             }
@@ -30,7 +23,7 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
         {
             name: 'set timers',
             test: async () => {
-                timer_ids = await timers_canister.set_timers(9n, 5n);
+                timer_ids = await timers_canister.set_timers(5n, 3n);
 
                 return {
                     ok: true
@@ -39,7 +32,7 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
         },
         {
             name: 'wait for repeated timer to be called once',
-            wait: 6000
+            wait: 3500
         },
         {
             name: 'check that only the repeated timer was called',
@@ -49,16 +42,15 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
                 return {
                     ok:
                         result.single === false &&
-                        result.inline1 === 0 &&
-                        result.inline2 === 0 &&
-                        result.inner === '' &&
+                        result.inline === 0 &&
+                        result.capture === '' &&
                         result.repeat === 1
                 };
             }
         },
         {
             name: 'finish waiting for single timers to be called',
-            wait: 5000
+            wait: 3000
         },
         {
             name: 'check that everything got called (and the repeated one a second time)',
@@ -68,9 +60,8 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
                 return {
                     ok:
                         result.single === true &&
-                        result.inline1 === 1 &&
-                        result.inline2 === 2 &&
-                        result.inner === '🚩' &&
+                        result.inline === 1 &&
+                        result.capture === '🚩' &&
                         result.repeat === 2
                 };
             }
@@ -93,7 +84,7 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
         },
         {
             name: 'wait the repeating call interval',
-            wait: 5000
+            wait: 3000
         },
         {
             name: 'check that the repeating timer stopped',
@@ -103,9 +94,8 @@ export function get_tests(timers_canister: ActorSubclass<_SERVICE>): Test[] {
                 return {
                     ok:
                         result.single === true &&
-                        result.inline1 === 1 &&
-                        result.inline2 === 2 &&
-                        result.inner === '🚩' &&
+                        result.inline === 1 &&
+                        result.capture === '🚩' &&
                         result.repeat === 2
                 };
             }

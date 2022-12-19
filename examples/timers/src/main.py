@@ -3,25 +3,22 @@ from kybra import Duration, ic, nat8, query, Record, TimerId, update
 
 class StatusReport(Record):
     single: bool
-    inline1: nat8
-    inline2: nat8
-    inner: str
+    inline: nat8
+    capture: str
     repeat: nat8
 
 
 class TimerIds(Record):
     single: TimerId
-    inline1: TimerId
-    inline2: TimerId
-    inner: TimerId
+    inline: TimerId
+    capture: TimerId
     repeat: TimerId
 
 
 status: StatusReport = {
     "single": False,
-    "inline1": 0,
-    "inline2": 0,
-    "inner": "",
+    "inline": 0,
+    "capture": "",
     "repeat": 0,
 }
 
@@ -36,46 +33,30 @@ def clear_timer(timer_id: TimerId):
 def set_timers(delay: Duration, interval: Duration) -> TimerIds:
     captured_value = "🚩"
 
-    def inner_closure():
-        global status
-        status["inner"] = captured_value
-        ic.print(f"Inner function captured value: {captured_value}")
-
     single_id = ic.set_timer(delay, one_time_timer_callback)
-    ic.print(f"Set timer {single_id}")
-
-    # Note: Demergent Labs does not recommend using lambdas in timers. They will
-    # be called, but they are limited in functionality. Calling a defined
-    # function is preferred whenever possible.
 
     # Note: You cannot set global variables from within a lambda but you can
     # call a function that sets a global variable. So we've moved the "setting"
     # functionality out into helper functions while the printing is kept here in
     # the lambda.
 
-    inline1_id = ic.set_timer(
+    inline_id = ic.set_timer(
         delay,
-        lambda: update_status_report_inline_1() or ic.print("Inline timer 1 called"),
+        lambda: update_inline_status() or ic.print("Inline timer called"),
     )
-    ic.print(f"Set timer {inline1_id}")
 
-    inline2_id = ic.set_timer(
+    capture_id = ic.set_timer(
         delay,
-        lambda: update_status_report_inline_2() or ic.print("Inline timer 2 called"),
+        lambda: update_capture_status(captured_value)
+        or ic.print(f"Timer captured value: {captured_value}"),
     )
-    ic.print(f"Set timer {inline2_id}")
-
-    inner_id = ic.set_timer(delay, inner_closure)
-    ic.print(f"Set timer {single_id}")
 
     repeat_id = ic.set_timer_interval(interval, repeat_timer_callback)
-    ic.print(f"Set timer {repeat_id}")
 
     return {
         "single": single_id,
-        "inline1": inline1_id,
-        "inline2": inline2_id,
-        "inner": inner_id,
+        "inline": inline_id,
+        "capture": capture_id,
         "repeat": repeat_id,
     }
 
@@ -97,11 +78,11 @@ def repeat_timer_callback():
     ic.print(f"Repeating timer. Call {status['repeat']}")
 
 
-def update_status_report_inline_1():
+def update_inline_status():
     global status
-    status["inline1"] = 1
+    status["inline"] = 1
 
 
-def update_status_report_inline_2():
+def update_capture_status(value: str):
     global status
-    status["inline2"] = 2
+    status["capture"] = value

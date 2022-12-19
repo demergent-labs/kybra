@@ -1,16 +1,14 @@
 type StatusReport = record {
   repeat : nat8;
-  inline1 : nat8;
-  inline2 : nat8;
+  inline : nat8;
+  capture : text;
   single : bool;
-  inner : text;
 };
 type TimerIds = record {
   repeat : nat64;
-  inline1 : nat64;
-  inline2 : nat64;
+  inline : nat64;
+  capture : nat64;
   single : nat64;
-  inner : nat64;
 };
 service : () -> {
   clear_timer : (nat64) -> ();
