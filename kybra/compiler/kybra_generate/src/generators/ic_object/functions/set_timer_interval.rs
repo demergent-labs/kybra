@@ -18,17 +18,7 @@ pub fn generate_set_timer_interval() -> proc_macro2::TokenStream {
                     let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
                     let vm = &_kybra_interpreter.vm;
 
-                    let invoke_result = vm.invoke(
-                        &func_py_object_ref,
-                        (),
-                    );
-                    match invoke_result {
-                        Ok(py_object_ref) => (),
-                        Err(err) => {
-                            let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-                            panic!("{}", err_string);
-                        }
-                    }
+                    _kybra_unwrap_rust_python_result(vm.invoke(&func_py_object_ref, ()), vm);
                 }
             };
 
