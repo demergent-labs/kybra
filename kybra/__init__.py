@@ -188,8 +188,8 @@ class ic(Generic[T]):
         return _kybra_ic._kybra_canister_balance128() # type: ignore
 
     @staticmethod
-    def clear_timer(timer_id: TimerId) -> None:
-        return _kybra_ic._kybra_clear_timer(timer_id) # type: ignore
+    def clear_timer(id: TimerId) -> None:
+        return _kybra_ic._kybra_clear_timer(id) # type: ignore
 
     @staticmethod
     def data_certificate() -> opt[blob]:
