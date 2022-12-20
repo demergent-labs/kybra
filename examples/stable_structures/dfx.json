@@ -1,0 +1,13 @@
+{
+    "canisters": {
+        "stable_structures": {
+            "type": "custom",
+            "build": "python -m kybra stable_structures src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/stable_structures/target/wasm32-unknown-unknown/release/stable_structures.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/stable_structures"
+            }
+        }
+    }
+}

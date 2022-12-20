@@ -353,3 +353,19 @@ def method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
         ])
 
     return intermediate_func # type: ignore
+
+K = TypeVar('K')
+V = TypeVar('V')
+
+class StableBTreeMap(Generic[K, V]):
+    def __init__(self, memory_id: nat8, max_key_size: int, max_value_size: int):
+        self.memory_id = memory_id
+
+        # _kybra_ic._kybra_stable_b_tree_map_set_max_key_size(memory_id, max_key_size) # type: ignore
+        # _kybra_ic._kybra_stable_b_tree_map_set_max_value_size(memory_id, max_value_size) # type: ignore
+
+    def get(self, key: K) -> opt[V]:
+        return _kybra_ic._kybra_stable_b_tree_map_get(self.memory_id, key) # type: ignore
+
+    def insert(self, key: K, value: V) -> V:
+        return _kybra_ic._kybra_stable_b_tree_map_insert(self.memory_id, key, value) # type: ignore

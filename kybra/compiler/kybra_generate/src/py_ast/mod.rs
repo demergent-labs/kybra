@@ -3,10 +3,16 @@ use std::collections::{HashMap, HashSet};
 use quote::quote;
 
 use crate::generators::{
-    async_result_handler::generate_async_result_handler, kybra_serde::generate_kybra_serde,
+    async_result_handler::generate_async_result_handler,
+    kybra_serde::generate_kybra_serde,
+    stable_b_tree_map::{generate_stable_b_tree_map, StableBTreeMapNode},
 };
 use cdk_framework::{
-    nodes::{act_canister_method, data_type_nodes, ActExternalCanister},
+    nodes::{
+        act_canister_method,
+        data_type_nodes::{self, ActPrimitive, ActPrimitiveLit, LiteralOrTypeAlias},
+        ActExternalCanister,
+    },
     ActCanisterMethod, ActDataType, CanisterMethodType,
 };
 
@@ -84,6 +90,20 @@ impl PyAst<'_> {
 
         let kybra_serde = generate_kybra_serde();
 
+        let stable_b_tree_map_nodes = vec![StableBTreeMapNode {
+            memory_id: 0,
+            key_type: ActDataType::Primitive(ActPrimitive {
+                act_type: LiteralOrTypeAlias::Literal(ActPrimitiveLit::Nat64),
+            }),
+            value_type: ActDataType::Primitive(ActPrimitive {
+                act_type: LiteralOrTypeAlias::Literal(ActPrimitiveLit::String),
+            }),
+            max_key_size: 100,
+            max_value_size: 100,
+        }];
+
+        let stable_b_tree_map = generate_stable_b_tree_map(&stable_b_tree_map_nodes);
+
         let rust_code = quote! {
             pub fn _kybra_unwrap_rust_python_result<T>(
                 rust_python_result: Result<T, PyRef<PyBaseException>>,
@@ -102,12 +122,22 @@ impl PyAst<'_> {
             #async_result_handler
 
             #kybra_serde
+
+            #stable_b_tree_map
         };
 
         KybraAst {
-            init_method: self.build_init_method(&canister_methods, &external_canisters),
+            init_method: self.build_init_method(
+                &canister_methods,
+                &external_canisters,
+                &stable_b_tree_map_nodes,
+            ),
             pre_upgrade: self.build_pre_upgrade_method(),
-            post_upgrade: self.build_post_upgrade_method(&canister_methods, &external_canisters),
+            post_upgrade: self.build_post_upgrade_method(
+                &canister_methods,
+                &external_canisters,
+                &stable_b_tree_map_nodes,
+            ),
             inspect_method: self.build_inspect_method(),
             heartbeat: self.build_heartbeat_method(),
             canister_types: all_types,

@@ -1,6 +1,9 @@
 use quote::quote;
 
-use crate::{generators::ic_object, py_ast::PyAst};
+use crate::{
+    generators::{ic_object, stable_b_tree_map::StableBTreeMapNode},
+    py_ast::PyAst,
+};
 use cdk_framework::{
     nodes::{ActExternalCanister, ActPostUpgradeMethod},
     ActCanisterMethod, CanisterMethodType,
@@ -11,8 +14,13 @@ impl PyAst<'_> {
         &self,
         canister_methods: &Vec<ActCanisterMethod>,
         external_canisters: &Vec<ActExternalCanister>,
+        stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
     ) -> ActPostUpgradeMethod {
-        let ic_object = ic_object::generate_ic_object(canister_methods, external_canisters);
+        let ic_object = ic_object::generate_ic_object(
+            canister_methods,
+            external_canisters,
+            stable_b_tree_map_nodes,
+        );
 
         let post_upgrade_function_defs =
             self.get_function_def_of_type(CanisterMethodType::PostUpgrade);
@@ -49,11 +57,6 @@ impl PyAst<'_> {
                 _kybra_interpreter.enter(|vm| {
                     Ic::make_class(&vm.ctx);
                     _kybra_unwrap_rust_python_result(vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm), vm);
-
-                    let _kybra_stable_storage_serialized_tuple: (Vec<u8>,) = ic_cdk::storage::stable_restore().unwrap();
-                    let _kybra_stable_storage = kybra_deserialize(vm, &mut serde_json::Deserializer::from_slice(&_kybra_stable_storage_serialized_tuple.0)).unwrap();
-
-                    _kybra_unwrap_rust_python_result(vm.builtins.set_attr("_kybra_stable_storage", _kybra_stable_storage, vm), vm);
 
                     let result = vm.run_code_string(
                         _kybra_scope.clone(),

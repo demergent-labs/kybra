@@ -1,0 +1,1 @@
+service : () -> { get : (nat64) -> (opt text) query; set : (nat64, text) -> () }

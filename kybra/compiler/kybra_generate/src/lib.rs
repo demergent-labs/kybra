@@ -73,6 +73,5 @@ pub fn kybra_generate(
         // pub static NAME: [u8; 12] = *b"kybra v0.0.0";
 
         #canister_definition
-
     }
 }
