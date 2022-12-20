@@ -3,6 +3,7 @@ mod data_types;
 mod external_canisters;
 mod get_dependencies;
 mod get_source_info;
+pub mod stable_storage;
 mod system_methods;
 mod type_alias;
 

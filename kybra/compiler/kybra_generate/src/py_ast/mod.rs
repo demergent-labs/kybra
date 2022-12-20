@@ -17,7 +17,10 @@ use cdk_framework::{
 };
 
 pub use self::{kybra_ast::KybraAst, kybra_types::KybraProgram};
-use self::{kybra_types::KybraStmt, traits::GetDependencies};
+use self::{
+    kybra_types::{KybraStmt, StableBTreeMapNode},
+    traits::GetDependencies,
+};
 
 mod kybra_ast;
 mod kybra_types;
@@ -86,6 +89,8 @@ impl PyAst<'_> {
 
         let external_canisters = self.build_external_canisters();
 
+        let stable_storage_nodes = self.build_stable_storage_nodes();
+
         let async_result_handler = generate_async_result_handler(&external_canisters);
 
         let kybra_serde = generate_kybra_serde();
@@ -144,6 +149,7 @@ impl PyAst<'_> {
             canister_methods: self.build_canister_methods(),
             external_canisters,
             rust_code,
+            stable_storage_nodes,
         }
     }
 
@@ -189,11 +195,19 @@ impl PyAst<'_> {
             })
     }
 
+    fn build_stable_storage_nodes(&self) -> Vec<StableBTreeMapNode> {
+        self.kybra_programs
+            .iter()
+            .map(|program| program.build_stable_b_tree_map_nodes())
+            .collect::<Vec<_>>()
+            .concat()
+    }
+
     fn build_external_canisters(&self) -> Vec<ActExternalCanister> {
         self.kybra_programs
             .iter()
             .map(|program| program.build_external_canisters())
-            .collect::<Vec<Vec<ActExternalCanister>>>()
+            .collect::<Vec<_>>()
             .concat()
     }
 }

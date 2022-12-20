@@ -8,7 +8,6 @@ use rustpython_parser::ast::{Constant, ExprKind};
 use crate::py_ast::{
     kybra_types::{KybraExpr, KybraStmt},
     traits::GetDependencies,
-    what_is_it::WhatIsIt,
 };
 
 impl KybraExpr<'_> {
@@ -58,15 +57,12 @@ impl GetDependencies for KybraExpr<'_> {
                 .get_dependent_types(type_alias_lookup, found_type_names);
                 acc.union(&dependencies).cloned().collect()
             }),
-            ExprKind::Constant { value, .. } => {
-                self.located_expr.what_is_it();
-                match value {
-                    Constant::Str(string) => {
-                        self.add_dependency(string.clone(), type_alias_lookup, found_type_names)
-                    }
-                    _ => HashSet::new(),
+            ExprKind::Constant { value, .. } => match value {
+                Constant::Str(string) => {
+                    self.add_dependency(string.clone(), type_alias_lookup, found_type_names)
                 }
-            }
+                _ => HashSet::new(),
+            },
             ExprKind::Name { id, .. } => match &id[..] {
                 "blob" => HashSet::new(),
                 "empty" => HashSet::new(),
