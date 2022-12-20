@@ -43,8 +43,7 @@ use crate::generators::ic_object::functions::stable_size::generate_stable_size;
 use crate::generators::ic_object::functions::stable_write::generate_stable_write;
 use crate::generators::ic_object::functions::time::generate_time;
 use crate::generators::ic_object::functions::trap::generate_trap;
-
-use super::stable_b_tree_map::StableBTreeMapNode;
+use crate::py_ast::kybra_types::StableBTreeMapNode;
 
 mod functions;
 

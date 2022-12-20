@@ -1,6 +1,8 @@
 use quote::{format_ident, quote};
 
-use crate::generators::stable_b_tree_map::{generate_wrapper_type, StableBTreeMapNode};
+use crate::{
+    generators::stable_b_tree_map::generate_wrapper_type, py_ast::kybra_types::StableBTreeMapNode,
+};
 
 pub fn generate_stable_b_tree_map_insert(
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,

@@ -186,7 +186,7 @@ impl KybraStmt<'_> {
     fn get_memory_from_keywords(&self, keywords: &Vec<Located<KeywordData>>) -> Option<u8> {
         keywords.iter().fold(None, |act_key_type, keyword| {
             let result = if let Some(arg_name) = &keyword.node.arg {
-                if arg_name == "name" {
+                if arg_name == "memory_id" {
                     match &keyword.node.value.node {
                         ExprKind::Constant { value, .. } => match value {
                             Constant::Int(int) => Some(self.big_int_to_memory_id(int)),

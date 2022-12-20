@@ -2,13 +2,7 @@ use cdk_framework::{ActDataType, ToTokenStream};
 use quote::{format_ident, quote};
 use syn::Ident;
 
-pub struct StableBTreeMapNode {
-    pub memory_id: u8,
-    pub key_type: ActDataType,
-    pub value_type: ActDataType,
-    pub max_key_size: u32,
-    pub max_value_size: u32,
-}
+use crate::py_ast::kybra_types::StableBTreeMapNode;
 
 pub fn generate_stable_b_tree_map(
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,

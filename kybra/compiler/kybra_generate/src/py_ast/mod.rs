@@ -3,9 +3,8 @@ use std::collections::{HashMap, HashSet};
 use quote::quote;
 
 use crate::generators::{
-    async_result_handler::generate_async_result_handler,
-    kybra_serde::generate_kybra_serde,
-    stable_b_tree_map::{generate_stable_b_tree_map, StableBTreeMapNode},
+    async_result_handler::generate_async_result_handler, kybra_serde::generate_kybra_serde,
+    stable_b_tree_map::generate_stable_b_tree_map,
 };
 use cdk_framework::{
     nodes::{
@@ -23,7 +22,7 @@ use self::{
 };
 
 mod kybra_ast;
-mod kybra_types;
+pub mod kybra_types;
 mod system_methods;
 pub mod traits;
 mod what_is_it;
@@ -89,23 +88,11 @@ impl PyAst<'_> {
 
         let external_canisters = self.build_external_canisters();
 
-        let stable_storage_nodes = self.build_stable_storage_nodes();
+        let stable_b_tree_map_nodes = self.build_stable_storage_nodes();
 
         let async_result_handler = generate_async_result_handler(&external_canisters);
 
         let kybra_serde = generate_kybra_serde();
-
-        let stable_b_tree_map_nodes = vec![StableBTreeMapNode {
-            memory_id: 0,
-            key_type: ActDataType::Primitive(ActPrimitive {
-                act_type: LiteralOrTypeAlias::Literal(ActPrimitiveLit::Nat64),
-            }),
-            value_type: ActDataType::Primitive(ActPrimitive {
-                act_type: LiteralOrTypeAlias::Literal(ActPrimitiveLit::String),
-            }),
-            max_key_size: 100,
-            max_value_size: 100,
-        }];
 
         let stable_b_tree_map = generate_stable_b_tree_map(&stable_b_tree_map_nodes);
 
@@ -149,7 +136,7 @@ impl PyAst<'_> {
             canister_methods: self.build_canister_methods(),
             external_canisters,
             rust_code,
-            stable_storage_nodes,
+            stable_storage_nodes: stable_b_tree_map_nodes,
         }
     }
 

@@ -5,6 +5,7 @@ use rustpython_parser::ast::Mod;
 
 use super::KybraProgram;
 
+// TODO all variables should be called stable_b_tree_map_nodes
 #[derive(Clone)]
 pub struct StableBTreeMapNode {
     pub memory_id: u8,

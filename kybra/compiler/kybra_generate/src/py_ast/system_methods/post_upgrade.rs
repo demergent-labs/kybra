@@ -1,8 +1,8 @@
 use quote::quote;
 
 use crate::{
-    generators::{ic_object, stable_b_tree_map::StableBTreeMapNode},
-    py_ast::PyAst,
+    generators::ic_object,
+    py_ast::{kybra_types::StableBTreeMapNode, PyAst},
 };
 use cdk_framework::{
     nodes::{ActExternalCanister, ActPostUpgradeMethod},

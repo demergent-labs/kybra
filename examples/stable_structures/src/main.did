@@ -1,1 +1,9 @@
-service : () -> { get : (nat64) -> (opt text) query; set : (nat64, text) -> () }
+type User = record { username : text };
+service : () -> {
+  get : (nat64) -> (opt text) query;
+  get_bool : (nat64) -> (opt bool) query;
+  get_user : (nat64) -> (opt User) query;
+  set : (nat64, text) -> ();
+  set_bool : (nat64, bool) -> ();
+  set_user : (nat64, User) -> ();
+}
