@@ -8,6 +8,8 @@ use cdk_framework::{ActCanisterMethod, ActDataType, CanisterMethodType};
 use super::KybraStmt;
 
 mod build_external_canisters;
+pub mod stable_storage;
+pub use stable_storage::StableBTreeMapNode;
 
 pub struct KybraProgram<'a> {
     pub program: Mod,

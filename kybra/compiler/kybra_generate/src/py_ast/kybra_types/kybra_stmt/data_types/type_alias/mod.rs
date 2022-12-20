@@ -6,7 +6,10 @@ use crate::py_ast::kybra_types::{KybraExpr, KybraStmt};
 impl KybraStmt<'_> {
     pub fn is_type_alias(&self) -> bool {
         match &self.stmt_kind.node {
-            StmtKind::Assign { .. } => true,
+            StmtKind::Assign { value: _, .. } => {
+                // TODO we should make sure that the thing on the other end of the assign is able to be a type
+                true
+            }
             StmtKind::AnnAssign { annotation, .. } => match &annotation.node {
                 ExprKind::Name { id, .. } => id == "TypeAlias",
                 _ => false,
