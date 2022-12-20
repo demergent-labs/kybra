@@ -16,6 +16,8 @@ pub fn generate_vec_impls() -> proc_macro2::TokenStream {
 
         impl KybraTryIntoVec for ic_cdk::export::Principal {}
 
+        impl KybraTryIntoVec for ic_cdk::timer::TimerId {}
+
         impl KybraTryIntoVec for ic_cdk::api::call::RejectionCode {}
 
         impl KybraTryIntoVec for f64 {}
