@@ -15,7 +15,7 @@ pub struct StableBTreeMapNode {
 }
 
 impl KybraProgram<'_> {
-    pub fn build_stable_b_tree_map_node(&self) -> Vec<StableBTreeMapNode> {
+    pub fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
         match &self.program {
             Mod::Module { body, .. } => body
                 .iter()

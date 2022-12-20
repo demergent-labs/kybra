@@ -210,8 +210,11 @@ impl KybraStmt<'_> {
 
     fn big_int_to_max_size(&self, num: &BigInt) -> u32 {
         let digits = num.to_u32_digits();
+        if digits.0 == Sign::Minus {
+            panic!("{}", self.max_size_must_be_non_negative())
+        }
         if digits.1.len() > 1 {
-            panic!("{}", self.max_key_size_too_big_error())
+            panic!("{}", self.max_size_too_big_error())
         }
         digits.1[0]
     }

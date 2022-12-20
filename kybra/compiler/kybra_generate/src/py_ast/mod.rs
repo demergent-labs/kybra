@@ -168,7 +168,7 @@ impl PyAst<'_> {
     fn build_stable_storage_nodes(&self) -> Vec<StableBTreeMapNode> {
         self.kybra_programs
             .iter()
-            .map(|program| program.build_stable_b_tree_map_node())
+            .map(|program| program.build_stable_b_tree_map_nodes())
             .collect::<Vec<_>>()
             .concat()
     }

@@ -27,7 +27,7 @@ impl KybraStmt<'_> {
         todo!("self.create_error_message(\"\", \"\", None)")
     }
 
-    pub fn max_key_size_too_big_error(&self) -> ErrorMessage {
+    pub fn max_size_too_big_error(&self) -> ErrorMessage {
         // Max size must be less than MAX_U32 + 1
         todo!("self.create_error_message(\"\", \"\", None)")
     }
@@ -54,6 +54,10 @@ impl KybraStmt<'_> {
     }
 
     pub fn memory_id_must_be_non_negative(&self) -> ErrorMessage {
+        todo!("self.create_error_message(\"\", \"\", None)")
+    }
+
+    pub fn max_size_must_be_non_negative(&self) -> ErrorMessage {
         todo!("self.create_error_message(\"\", \"\", None)")
     }
 }
