@@ -1,6 +1,6 @@
 use quote::{format_ident, quote};
 
-use crate::generators::stable_b_tree_map::StableBTreeMapNode;
+use crate::generators::stable_b_tree_map::{generate_wrapper_type, StableBTreeMapNode};
 
 pub fn generate_stable_b_tree_map_insert(
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
@@ -30,9 +30,13 @@ fn generate_match_arms(
             let map_name_ident =
                 format_ident!("STABLE_B_TREE_MAP_{}", stable_b_tree_map_node.memory_id);
 
+            let (key_wrapper_type_name, _) = generate_wrapper_type(&stable_b_tree_map_node.key_type, memory_id, "Key");
+            let (value_wrapper_type_name, _) = generate_wrapper_type(&stable_b_tree_map_node.value_type, memory_id, "Value");
+
+            // TODO the return value here might need a little work like in get
             quote! {
                 #memory_id => #map_name_ident.with(|p| {
-                    p.borrow_mut().insert(key_py_object_ref.try_from_vm_value(vm).unwrap(), value_py_object_ref.try_from_vm_value(vm).unwrap())
+                    p.borrow_mut().insert(#key_wrapper_type_name(key_py_object_ref.try_from_vm_value(vm).unwrap()), #value_wrapper_type_name(value_py_object_ref.try_from_vm_value(vm).unwrap()))
                 }).unwrap().try_into_vm_value(vm).unwrap()
             }
         })

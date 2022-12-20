@@ -8,7 +8,11 @@ use crate::generators::{
     stable_b_tree_map::{generate_stable_b_tree_map, StableBTreeMapNode},
 };
 use cdk_framework::{
-    nodes::{act_canister_method, data_type_nodes, ActExternalCanister},
+    nodes::{
+        act_canister_method,
+        data_type_nodes::{self, ActPrimitive, ActPrimitiveLit, LiteralOrTypeAlias},
+        ActExternalCanister,
+    },
     ActCanisterMethod, ActDataType, CanisterMethodType,
 };
 
@@ -86,22 +90,17 @@ impl PyAst<'_> {
 
         let kybra_serde = generate_kybra_serde();
 
-        let stable_b_tree_map_nodes = vec![
-            StableBTreeMapNode {
-                memory_id: 0,
-                key_type: quote!(u64),
-                value_type: quote!(u64),
-                max_key_size: 10,
-                max_value_size: 100,
-            },
-            StableBTreeMapNode {
-                memory_id: 1,
-                key_type: quote!(u64),
-                value_type: quote!(u8),
-                max_key_size: 10,
-                max_value_size: 100,
-            },
-        ];
+        let stable_b_tree_map_nodes = vec![StableBTreeMapNode {
+            memory_id: 0,
+            key_type: ActDataType::Primitive(ActPrimitive {
+                act_type: LiteralOrTypeAlias::Literal(ActPrimitiveLit::Nat64),
+            }),
+            value_type: ActDataType::Primitive(ActPrimitive {
+                act_type: LiteralOrTypeAlias::Literal(ActPrimitiveLit::String),
+            }),
+            max_key_size: 100,
+            max_value_size: 100,
+        }];
 
         let stable_b_tree_map = generate_stable_b_tree_map(&stable_b_tree_map_nodes);
 
