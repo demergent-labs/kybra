@@ -69,7 +69,7 @@ def xkcd_raw() -> Async[manual[HttpResponse]]:
             ic.trap(http_result.err)
         ic.trap('http_result had an error')
 
-    return ic.reply_raw(http_result.ok)
+    ic.reply_raw(http_result.ok)
 
 
 @query

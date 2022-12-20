@@ -34,6 +34,8 @@ use crate::generators::ic_object::functions::stable64_grow::generate_stable64_gr
 use crate::generators::ic_object::functions::stable64_read::generate_stable64_read;
 use crate::generators::ic_object::functions::stable64_size::generate_stable64_size;
 use crate::generators::ic_object::functions::stable64_write::generate_stable64_write;
+use crate::generators::ic_object::functions::stable_b_tree_map::get::generate_stable_b_tree_map_get;
+use crate::generators::ic_object::functions::stable_b_tree_map::insert::generate_stable_b_tree_map_insert;
 use crate::generators::ic_object::functions::stable_bytes::generate_stable_bytes;
 use crate::generators::ic_object::functions::stable_grow::generate_stable_grow;
 use crate::generators::ic_object::functions::stable_read::generate_stable_read;
@@ -42,11 +44,14 @@ use crate::generators::ic_object::functions::stable_write::generate_stable_write
 use crate::generators::ic_object::functions::time::generate_time;
 use crate::generators::ic_object::functions::trap::generate_trap;
 
+use super::stable_b_tree_map::StableBTreeMapNode;
+
 mod functions;
 
 pub fn generate_ic_object(
     canister_methods: &Vec<ActCanisterMethod>,
     external_canisters: &Vec<ActExternalCanister>,
+    stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
 ) -> proc_macro2::TokenStream {
     let accept_message = generate_accept_message();
     let arg_data_raw = generate_arg_data_raw();
@@ -82,6 +87,8 @@ pub fn generate_ic_object(
     let stable_read = generate_stable_read();
     let stable_size = generate_stable_size();
     let stable_write = generate_stable_write();
+    let stable_b_tree_map_get = generate_stable_b_tree_map_get(stable_b_tree_map_nodes);
+    let stable_b_tree_map_insert = generate_stable_b_tree_map_insert(stable_b_tree_map_nodes);
     let stable64_grow = generate_stable64_grow();
     let stable64_read = generate_stable64_read();
     let stable64_size = generate_stable64_size();
@@ -129,6 +136,8 @@ pub fn generate_ic_object(
             #stable_read
             #stable_size
             #stable_write
+            #stable_b_tree_map_get
+            #stable_b_tree_map_insert
             #stable64_grow
             #stable64_read
             #stable64_size

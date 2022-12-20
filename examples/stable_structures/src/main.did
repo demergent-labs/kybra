@@ -1,0 +1,4 @@
+service : () -> {
+  get : (nat64) -> (opt nat64) query;
+  set : (nat64, nat64) -> ();
+}
