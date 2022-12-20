@@ -1,5 +1,5 @@
 import { run_tests, Test } from 'azle/test';
-import { get_tests } from './tests';
+import { get_tests } from 'azle/examples/timers/test/tests';
 import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/timers';
 
