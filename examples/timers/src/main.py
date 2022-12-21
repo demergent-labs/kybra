@@ -67,22 +67,18 @@ def status_report() -> StatusReport:
 
 
 def one_time_timer_callback():
-    global status
     status["single"] = True
     ic.print("one_time_timer_callback called")
 
 
 def repeat_timer_callback():
-    global status
     status["repeat"] += 1
     ic.print(f"Repeating timer. Call {status['repeat']}")
 
 
 def update_inline_status():
-    global status
     status["inline"] = 1
 
 
 def update_capture_status(value: str):
-    global status
     status["capture"] = value
