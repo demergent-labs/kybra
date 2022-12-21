@@ -10,6 +10,7 @@ use crate::generators::ic_object::functions::candid_decode::generate_candid_deco
 use crate::generators::ic_object::functions::candid_encode::generate_candid_encode;
 use crate::generators::ic_object::functions::canister_balance::generate_canister_balance;
 use crate::generators::ic_object::functions::canister_balance128::generate_canister_balance128;
+use crate::generators::ic_object::functions::clear_timer::generate_clear_timer;
 use crate::generators::ic_object::functions::data_certificate::generate_data_certificate;
 use crate::generators::ic_object::functions::id::generate_id;
 use crate::generators::ic_object::functions::method_name::generate_method_name;
@@ -30,6 +31,8 @@ use crate::generators::ic_object::functions::reject_message::generate_reject_mes
 use crate::generators::ic_object::functions::reply::generate_reply;
 use crate::generators::ic_object::functions::reply_raw::generate_reply_raw;
 use crate::generators::ic_object::functions::set_certified_data::generate_set_certified_data;
+use crate::generators::ic_object::functions::set_timer::generate_set_timer;
+use crate::generators::ic_object::functions::set_timer_interval::generate_set_timer_interval;
 use crate::generators::ic_object::functions::stable64_grow::generate_stable64_grow;
 use crate::generators::ic_object::functions::stable64_read::generate_stable64_read;
 use crate::generators::ic_object::functions::stable64_size::generate_stable64_size;
@@ -56,6 +59,7 @@ pub fn generate_ic_object(
     let candid_encode = generate_candid_encode();
     let canister_balance = generate_canister_balance();
     let canister_balance128 = generate_canister_balance128();
+    let clear_timer = generate_clear_timer();
     let data_certificate = generate_data_certificate();
     let id = generate_id();
     let method_name = generate_method_name();
@@ -77,6 +81,8 @@ pub fn generate_ic_object(
     let reply = generate_reply(canister_methods);
     let reply_raw = generate_reply_raw();
     let set_certified_data = generate_set_certified_data();
+    let set_timer = generate_set_timer();
+    let set_timer_interval = generate_set_timer_interval();
     let stable_bytes = generate_stable_bytes();
     let stable_grow = generate_stable_grow();
     let stable_read = generate_stable_read();
@@ -104,6 +110,7 @@ pub fn generate_ic_object(
             #candid_encode
             #canister_balance
             #canister_balance128
+            #clear_timer
             #data_certificate
             #id
             #method_name
@@ -124,6 +131,8 @@ pub fn generate_ic_object(
             #reply
             #reply_raw
             #set_certified_data
+            #set_timer
+            #set_timer_interval
             #stable_bytes
             #stable_grow
             #stable_read

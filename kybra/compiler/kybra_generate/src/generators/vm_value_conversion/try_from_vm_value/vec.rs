@@ -100,6 +100,8 @@ pub fn generate_vec_impls() -> proc_macro2::TokenStream {
 
         impl KybraTryFromVec for ic_cdk::export::Principal {}
 
+        impl KybraTryFromVec for ic_cdk::timer::TimerId {}
+
         impl KybraTryFromVec for ic_cdk::export::candid::Int {}
 
         impl KybraTryFromVec for ic_cdk::export::candid::Nat {}

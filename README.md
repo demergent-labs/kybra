@@ -35,6 +35,7 @@ Most of Kybra's documentation is currently found in this README. The Kybra Book,
 -   [Candid Types](#candid-types)
 -   [Canister APIs](#canister-apis)
 -   [Call APIs](#call-apis)
+-   [Timer APIs](#timer-apis)
 -   [Stable Memory](#stable-memory)
 -   [Python stdlib](#python-stdlib)
 -   [Python External Packages](#python-external-packages)
@@ -2140,6 +2141,83 @@ def reply_raw() -> manual[RawReply]:
 #### result
 
 [Not yet implemented.](https://github.com/demergent-labs/azle/issues/496)
+
+### Timer APIs
+
+-   [clear timer](#clear-timer)
+-   [set timer](#set-timer)
+-   [set timer interval](#set-timer-interval)
+
+#### clear timer
+
+Examples:
+
+-   [timers](/examples/timers)
+
+```python
+from kybra import ic, TimerId, update
+
+
+@update
+def clear_timer(timer_id: TimerId):
+    ic.clear_timer(timer_id)
+```
+
+#### set timer
+
+Examples:
+
+-   [timers](/examples/timers)
+
+```python
+from kybra import Duration, ic, TimerId, update
+
+
+@update
+def set_timers(delay: Duration) -> tuple[TimerId, TimerId]:
+    function_timer_id = ic.set_timer(delay, callback)
+
+    captured_value = "🚩"
+
+    closure_timer_id = ic.set_timer(
+        delay,
+        lambda: ic.print(f"closure called and captured value {captured_value}"),
+    )
+
+    return [function_timer_id, closure_timer_id]
+
+
+def callback():
+    ic.print("callback called")
+```
+
+#### set timer interval
+
+Examples:
+
+-   [timers](/examples/timers)
+
+```python
+from kybra import Duration, ic, TimerId, update
+
+
+@update
+def set_timer_intervals(interval: Duration) -> tuple[TimerId, TimerId]:
+    function_timer_id = ic.set_timer_interval(interval, callback)
+
+    captured_value = "🚩"
+
+    closure_timer_id = ic.set_timer_interval(
+        interval,
+        lambda: ic.print(f"closure called and captured value {captured_value}"),
+    )
+
+    return [function_timer_id, closure_timer_id]
+
+
+def callback():
+    ic.print("callback called")
+```
 
 ### Stable Memory
 
