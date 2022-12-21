@@ -10,7 +10,7 @@ directories_json_string_with_linebreaks=$2
 directories_json_string="${directories_json_string_with_linebreaks//$'\\n'/''}"
 directories=$(echo "$directories_json_string" | jq -c -r '.[]')
 
-sed -E -i "s/(version=')(.*)(')/\1$VERSION\3/" setup.py
+sed -E -i "s/(__version__ = \")(.*)(\")/\1$VERSION\3/" kybra/__init__.py
 
 # prepare on new machine
 ~/.pyenv/versions/3.10.7/bin/python -m pip install --upgrade build

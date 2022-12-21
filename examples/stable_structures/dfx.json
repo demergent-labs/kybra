@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".dfx/kybra/stable_structures/target/wasm32-unknown-unknown/release/stable_structures.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/stable_structures"
+                "output": "test/dfx_generated/stable_structures",
+                "node_compatibility": true
             }
         }
     }
