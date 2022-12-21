@@ -7,13 +7,10 @@ use cdk_framework::{
 };
 use proc_macro2::TokenStream;
 
-use super::kybra_types::StableBTreeMapNode;
-
 mod to_act;
 
 pub struct KybraAst {
     pub external_canisters: Vec<ActExternalCanister>,
-    pub stable_storage_nodes: Vec<StableBTreeMapNode>,
     pub canister_methods: Vec<ActCanisterMethod>,
     pub canister_types: Vec<ActDataType>,
     pub init_method: ActInitMethod,

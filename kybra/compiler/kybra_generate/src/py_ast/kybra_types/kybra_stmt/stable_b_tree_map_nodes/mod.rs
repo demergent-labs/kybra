@@ -1,21 +1,18 @@
 mod errors;
 
 use crate::py_ast::kybra_types::{
-    kybra_program::stable_storage::StableBTreeMapNode, KybraExpr, KybraStmt,
+    kybra_program::stable_b_tree_map_nodes::StableBTreeMapNode, KybraExpr, KybraStmt,
 };
 use cdk_framework::{ActDataType, ToActDataType};
 use num_bigint::{BigInt, Sign};
 use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
 
-impl KybraStmt<'_> {
-    pub fn is_stable_storage(&self) -> bool {
-        match &self.stmt_kind.node {
-            StmtKind::Assign { value, .. } => match &value.node {
-                ExprKind::Call { func, .. } => match &func.node {
-                    ExprKind::Subscript { value, .. } => match &value.node {
-                        ExprKind::Name { id, .. } => id == "StableBTreeMap",
-                        _ => false,
-                    },
+impl KybraExpr<'_> {
+    pub fn is_stable_b_tree_map_node(&self) -> bool {
+        match &self.located_expr.node {
+            ExprKind::Call { func, .. } => match &func.node {
+                ExprKind::Subscript { value, .. } => match &value.node {
+                    ExprKind::Name { id, .. } => id == "StableBTreeMap",
                     _ => false,
                 },
                 _ => false,
@@ -24,7 +21,46 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub fn as_stable_storage(&self) -> StableBTreeMapNode {
+    pub fn get_value_type(&self) -> KybraExpr {
+        match &self.located_expr.node {
+            ExprKind::Subscript { slice, .. } => match &slice.node {
+                ExprKind::Tuple { elts, .. } => KybraExpr {
+                    located_expr: &elts[1],
+                    source_map: self.source_map,
+                },
+                _ => todo!(),
+            },
+            _ => todo!(),
+        }
+    }
+
+    pub fn get_key_type(&self) -> KybraExpr {
+        match &self.located_expr.node {
+            ExprKind::Subscript { slice, .. } => match &slice.node {
+                ExprKind::Tuple { elts, .. } => KybraExpr {
+                    located_expr: &elts[0],
+                    source_map: self.source_map,
+                },
+                _ => todo!(),
+            },
+            _ => todo!(),
+        }
+    }
+}
+
+impl KybraStmt<'_> {
+    pub fn is_stable_b_tree_map_node(&self) -> bool {
+        match &self.stmt_kind.node {
+            StmtKind::Assign { value, .. } => KybraExpr {
+                located_expr: value,
+                source_map: self.source_map,
+            }
+            .is_stable_b_tree_map_node(),
+            _ => false,
+        }
+    }
+
+    pub fn as_stable_b_tree_map_node(&self) -> StableBTreeMapNode {
         let memory_id = self.get_memory_id();
         let key_type = self.get_key_type();
         let value_type = self.get_value_type();
@@ -66,17 +102,12 @@ impl KybraStmt<'_> {
     fn get_key_type(&self) -> ActDataType {
         match &self.stmt_kind.node {
             StmtKind::Assign { value, .. } => match &value.node {
-                ExprKind::Call { func, .. } => match &func.node {
-                    ExprKind::Subscript { slice, .. } => match &slice.node {
-                        ExprKind::Tuple { elts, .. } => KybraExpr {
-                            located_expr: &elts[0],
-                            source_map: self.source_map,
-                        }
-                        .to_act_data_type(&None),
-                        _ => panic!("{}", self.generics_must_be_expressed_as_a_tuple_error()),
-                    },
-                    _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
-                },
+                ExprKind::Call { func, .. } => KybraExpr {
+                    located_expr: func,
+                    source_map: self.source_map,
+                }
+                .get_key_type()
+                .to_act_data_type(&None),
                 _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
             },
             _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
@@ -86,17 +117,12 @@ impl KybraStmt<'_> {
     fn get_value_type(&self) -> ActDataType {
         match &self.stmt_kind.node {
             StmtKind::Assign { value, .. } => match &value.node {
-                ExprKind::Call { func, .. } => match &func.node {
-                    ExprKind::Subscript { slice, .. } => match &slice.node {
-                        ExprKind::Tuple { elts, .. } => KybraExpr {
-                            located_expr: &elts[1],
-                            source_map: self.source_map,
-                        }
-                        .to_act_data_type(&None),
-                        _ => todo!(),
-                    },
-                    _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
-                },
+                ExprKind::Call { func, .. } => KybraExpr {
+                    located_expr: func,
+                    source_map: self.source_map,
+                }
+                .get_value_type()
+                .to_act_data_type(&None),
                 _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
             },
             _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
