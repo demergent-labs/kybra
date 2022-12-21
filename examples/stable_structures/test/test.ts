@@ -1,7 +1,11 @@
 import { run_tests, Test } from 'azle/test';
 import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/stable_structures';
-import { get_tests } from './tests';
+import {
+    get_get_tests,
+    get_pre_value_tests,
+    get_set_value_tests
+} from './tests';
 
 const stable_structures_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
@@ -24,7 +28,19 @@ const tests: Test[] = [
             });
         }
     },
-    ...get_tests(stable_structures_canister)
+    ...get_pre_value_tests(stable_structures_canister),
+    ...get_set_value_tests(stable_structures_canister),
+    {
+        name: 'deploy',
+        prep: async () => {
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+
+            execSync(`dfx deploy stable_structures`, {
+                stdio: 'inherit'
+            });
+        }
+    },
+    ...get_get_tests(stable_structures_canister)
 ];
 
 run_tests(tests);
