@@ -15,7 +15,7 @@ pub fn generate_stable_b_tree_map_get(
             let memory_id: u8 = memory_id_py_object_ref.try_from_vm_value(vm).unwrap();
 
             match memory_id {
-                #(#match_arms),*,
+                #(#match_arms),*
                 _ => panic!("memory_id {} does not have an associated StableBTreeMap", memory_id)
             }
         }
