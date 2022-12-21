@@ -40,6 +40,7 @@ use crate::generators::ic_object::functions::stable64_write::generate_stable64_w
 use crate::generators::ic_object::functions::stable_b_tree_map::contains_key::generate_stable_b_tree_map_contains_key;
 use crate::generators::ic_object::functions::stable_b_tree_map::get::generate_stable_b_tree_map_get;
 use crate::generators::ic_object::functions::stable_b_tree_map::insert::generate_stable_b_tree_map_insert;
+use crate::generators::ic_object::functions::stable_b_tree_map::is_empty::generate_stable_b_tree_map_is_empty;
 use crate::generators::ic_object::functions::stable_b_tree_map::len::generate_stable_b_tree_map_len;
 use crate::generators::ic_object::functions::stable_b_tree_map::remove::generate_stable_b_tree_map_remove;
 use crate::generators::ic_object::functions::stable_bytes::generate_stable_bytes;
@@ -99,6 +100,7 @@ pub fn generate_ic_object(
         generate_stable_b_tree_map_contains_key(stable_b_tree_map_nodes);
     let stable_b_tree_map_get = generate_stable_b_tree_map_get(stable_b_tree_map_nodes);
     let stable_b_tree_map_insert = generate_stable_b_tree_map_insert(stable_b_tree_map_nodes);
+    let stable_b_tree_map_is_empty = generate_stable_b_tree_map_is_empty(stable_b_tree_map_nodes);
     let stable_b_tree_map_len = generate_stable_b_tree_map_len(stable_b_tree_map_nodes);
     let stable_b_tree_map_remove = generate_stable_b_tree_map_remove(stable_b_tree_map_nodes);
     let stable64_grow = generate_stable64_grow();
@@ -154,6 +156,7 @@ pub fn generate_ic_object(
             #stable_b_tree_map_contains_key
             #stable_b_tree_map_get
             #stable_b_tree_map_insert
+            #stable_b_tree_map_is_empty
             #stable_b_tree_map_len
             #stable_b_tree_map_remove
             #stable64_grow
