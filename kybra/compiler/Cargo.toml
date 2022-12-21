@@ -13,9 +13,9 @@ opt-level = 'z'
 crate-type = ["cdylib"]
 
 [dependencies]
-ic-cdk = "0.5.6"
-ic-cdk-macros = "0.5.6"
-candid = "0.7.16"
+ic-cdk = { version = "0.6.8", features = ["timers"] }
+ic-cdk-macros = "0.6.8"
+candid = "0.8.4"
 kybra-vm-value-derive = { path = "./kybra_vm_value_derive" }
 # TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
 # rustpython = { git = "https://github.com/demergent-labs/RustPython", rev = "9ca024b30446249cc2a584543bbc658ab4b65c6f", default-features = false, features = ["stdlib", "freeze-stdlib"] }
@@ -30,3 +30,4 @@ getrandom = { version = "0.2.3", features = ["custom"] }
 serde = "1.0.137"
 async-recursion = "1.0.0"
 ic-stable-structures = "0.3.0"
+slotmap = "1.0.6"

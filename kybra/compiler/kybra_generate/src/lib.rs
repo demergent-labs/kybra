@@ -64,6 +64,7 @@ pub fn kybra_generate(
         use ic_cdk::api::call::CallResult;
         use serde::de::{DeserializeSeed, Visitor};
         use serde::ser::{Serialize, SerializeMap, SerializeSeq, SerializeTuple};
+        use slotmap::Key;
 
         static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;

@@ -49,6 +49,13 @@ pub fn generate_basic_impls() -> proc_macro2::TokenStream {
             }
         }
 
+        impl CdkActTryFromVmValue<ic_cdk::timer::TimerId, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::timer::TimerId, CdkActTryFromVmValueError> {
+                let vm_value_as_u64: u64 = _kybra_unwrap_rust_python_result(self.try_into_value(vm), vm);
+                Ok(ic_cdk::timer::TimerId::from(slotmap::KeyData::from_ffi(vm_value_as_u64)))
+            }
+        }
+
         impl CdkActTryFromVmValue<String, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<String, CdkActTryFromVmValueError> {
                 match self.try_into_value(vm) {

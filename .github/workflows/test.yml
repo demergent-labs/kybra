@@ -76,6 +76,7 @@ jobs:
                     "examples/key_value_store",
                     "examples/keywords",
                     "examples/ledger_canister",
+                    "examples/list_of_lists",
                     "examples/management_canister",
                     "examples/manual_reply",
                     "examples/motoko_examples/calc",
@@ -105,6 +106,7 @@ jobs:
                     "examples/stable_memory",
                     "examples/stable_storage",
                     "examples/stable_structures",
+                    "examples/timers",
                     "examples/tuple_types",
                     "examples/update"
                   ]
