@@ -37,9 +37,11 @@ fn generate_match_arms(
 
             // TODO the return value here might need a little work like in get
             quote! {
-                #memory_id => #map_name_ident.with(|p| {
-                    p.borrow_mut().insert(#key_wrapper_type_name(key_py_object_ref.try_from_vm_value(vm).unwrap()), #value_wrapper_type_name(value_py_object_ref.try_from_vm_value(vm).unwrap()))
-                }).unwrap().try_into_vm_value(vm).unwrap()
+                #memory_id => {
+                    #map_name_ident.with(|p| {
+                        p.borrow_mut().insert(#key_wrapper_type_name(key_py_object_ref.try_from_vm_value(vm).unwrap()), #value_wrapper_type_name(value_py_object_ref.try_from_vm_value(vm).unwrap()))
+                    }).unwrap().try_into_vm_value(vm).unwrap()
+                }
             }
         })
         .collect()

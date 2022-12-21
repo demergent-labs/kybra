@@ -61,6 +61,22 @@ def get_stable_map_0(key: nat8) -> opt[str]:
 def set_stable_map_0(key: nat8, value: str):
     return stable_map_0.insert(key, value)
 
+@update
+def remove_stable_map_0(key: nat8) -> opt[str]:
+    return stable_map_0.remove(key)
+
+@query
+def contains_key_stable_map_0(key: nat8) -> bool:
+    return stable_map_0.contains_key(key)
+
+@query
+def is_empty_stable_map_0() -> bool:
+    return stable_map_0.is_empty()
+
+@query
+def len_stable_map_0() -> nat64:
+    return stable_map_0.len()
+
 @query
 def get_stable_map_1(key: nat16) -> opt[blob]:
     return stable_map_1.get(key)

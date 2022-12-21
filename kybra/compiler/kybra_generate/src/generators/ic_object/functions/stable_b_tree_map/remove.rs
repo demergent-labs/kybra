@@ -4,18 +4,18 @@ use crate::{
     generators::stable_b_tree_map::generate_wrapper_type, py_ast::kybra_types::StableBTreeMapNode,
 };
 
-pub fn generate_stable_b_tree_map_get(
+pub fn generate_stable_b_tree_map_remove(
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
 ) -> proc_macro2::TokenStream {
     let match_arms = generate_match_arms(stable_b_tree_map_nodes);
 
     quote! {
         #[pymethod]
-        fn _kybra_stable_b_tree_map_get(&self, memory_id_py_object_ref: PyObjectRef, key_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {
+        fn _kybra_stable_b_tree_map_remove(&self, memory_id_py_object_ref: PyObjectRef, key_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {
             let memory_id: u8 = memory_id_py_object_ref.try_from_vm_value(vm).unwrap();
 
             match memory_id {
-                #(#match_arms)*
+                #(#match_arms),*
                 _ => panic!("memory_id {} does not have an associated StableBTreeMap", memory_id)
             }
         }
@@ -36,7 +36,7 @@ fn generate_match_arms(
 
             quote! {
                 #memory_id => {
-                    match #map_name_ident.with(|p| p.borrow().get(&#key_wrapper_type_name(key_py_object_ref.try_from_vm_value(vm).unwrap()))) {
+                    match #map_name_ident.with(|p| p.borrow_mut().remove(&#key_wrapper_type_name(key_py_object_ref.try_from_vm_value(vm).unwrap()))) {
                         Some(value) => value.0.try_into_vm_value(vm).unwrap(),
                         None => vm.ctx.none()
                     }

@@ -376,8 +376,20 @@ class StableBTreeMap(Generic[K, V]):
     def __init__(self, memory_id: nat8, max_key_size: int, max_value_size: int):
         self.memory_id = memory_id
 
+    def contains_key(self, key: K) -> bool:
+        return _kybra_ic._kybra_stable_b_tree_map_contains_key(self.memory_id, key) # type: ignore
+
     def get(self, key: K) -> opt[V]:
         return _kybra_ic._kybra_stable_b_tree_map_get(self.memory_id, key) # type: ignore
 
     def insert(self, key: K, value: V) -> V:
         return _kybra_ic._kybra_stable_b_tree_map_insert(self.memory_id, key, value) # type: ignore
+
+    def is_empty(self) -> bool:
+        return _kybra_ic._kybra_stable_b_tree_map_is_empty(self.memory_id) # type: ignore
+
+    def len(self) -> nat64:
+        return _kybra_ic._kybra_stable_b_tree_map_len(self.memory_id) # type: ignore
+
+    def remove(self, key: K) -> opt[V]:
+        return _kybra_ic._kybra_stable_b_tree_map_remove(self.memory_id, key) # type: ignore

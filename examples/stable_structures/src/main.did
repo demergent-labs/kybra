@@ -2,6 +2,7 @@ type BlogPost = record { title : text };
 type Reaction = variant { Sad; Happy };
 type User = record { username : text; blog_posts : vec BlogPost };
 service : () -> {
+  contains_key_stable_map_0 : (nat8) -> (bool) query;
   get_stable_map_0 : (nat8) -> (opt text) query;
   get_stable_map_1 : (nat16) -> (opt vec nat8) query;
   get_stable_map_10 : (float32) -> (opt opt bool) query;
@@ -16,6 +17,9 @@ service : () -> {
   get_stable_map_7 : (null) -> (opt null) query;
   get_stable_map_8 : (bool) -> (opt null) query;
   get_stable_map_9 : (float64) -> (opt vec text) query;
+  is_empty_stable_map_0 : () -> (bool) query;
+  len_stable_map_0 : () -> (nat64) query;
+  remove_stable_map_0 : (nat8) -> (opt text);
   set_stable_map_0 : (nat8, text) -> ();
   set_stable_map_1 : (nat16, vec nat8) -> ();
   set_stable_map_10 : (float32, opt bool) -> ();
