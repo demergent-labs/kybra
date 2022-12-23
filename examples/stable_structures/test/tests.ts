@@ -1,6 +1,5 @@
 import { Test } from 'azle/test';
 import {
-    BlogPost,
     Reaction,
     User,
     _SERVICE
@@ -60,6 +59,7 @@ const STABLE_MAP_KEYS: [
     new Uint8Array(HELLO_BYTES),
     'hello'
 ];
+
 const STABLE_MAP_VALUES: [
     string,
     blob,
@@ -217,15 +217,20 @@ function get_set_value_tests(
     suffix: string,
     stable_structures_canister: ActorSubclass<_SERVICE>
 ): Test[] {
-    return STABLE_MAP_KEYS.map((key, index) =>
-        generate_set_value_tests(
-            index,
-            key,
-            STABLE_MAP_VALUES[index],
-            suffix,
-            stable_structures_canister
-        )
-    );
+    return STABLE_MAP_KEYS.map((key, index) => {
+        return {
+            name: `stable_map_${index} set value ${suffix}`,
+            test: async () => {
+                const set_result = await (stable_structures_canister as any)[
+                    `set_stable_map_${index}`
+                ](key, STABLE_MAP_VALUES[index]);
+
+                return {
+                    ok: set_result === undefined
+                };
+            }
+        };
+    });
 }
 
 function get_contains_key_tests(
@@ -233,240 +238,124 @@ function get_contains_key_tests(
     suffix: string,
     stable_structures_canister: ActorSubclass<_SERVICE>
 ): Test[] {
-    return STABLE_MAP_KEYS.map((value, index) =>
-        generate_contains_key_test(
-            index,
-            value,
-            should_contain,
-            suffix,
-            stable_structures_canister
-        )
-    );
+    return STABLE_MAP_KEYS.map((stable_map_key, index) => {
+        return {
+            name: `stable_map_${index} contains key that exists ${suffix}`,
+            test: async () => {
+                const set_result = await (stable_structures_canister as any)[
+                    `contains_key_stable_map_${index}`
+                ](stable_map_key);
+
+                return {
+                    ok: set_result === should_contain
+                };
+            }
+        };
+    });
 }
 
 function get_empty_read_tests(
     suffix: string,
     stable_structures_canister: ActorSubclass<_SERVICE>
 ): Test[] {
-    return STABLE_MAP_KEYS.map((value, index) =>
-        generate_empty_read_tests(
-            index,
-            value,
-            suffix,
-            stable_structures_canister
-        )
-    );
+    return STABLE_MAP_KEYS.map((stable_map_key, index) => {
+        return {
+            name: `stable_map_${index} initial read ${suffix}`,
+            test: async () => {
+                const get_result = await (stable_structures_canister as any)[
+                    `get_stable_map_${index}`
+                ](stable_map_key);
+
+                return {
+                    ok: get_result[0] === undefined
+                };
+            }
+        };
+    });
 }
 
 function get_get_tests(
     suffix: string,
-    stable_structures: ActorSubclass<_SERVICE>
+    stable_structures_canister: ActorSubclass<_SERVICE>
 ): Test[] {
-    return STABLE_MAP_KEYS.map((value, index) =>
-        generate_get_value_test(
-            index,
-            value,
-            STABLE_MAP_VALUES[index],
-            STABLE_MAP_VALUE_COMPS[index],
-            suffix,
-            stable_structures
-        )
-    );
+    return STABLE_MAP_KEYS.map((stable_map_key, index) => {
+        let value_comp: (a: any, b: any) => boolean =
+            STABLE_MAP_VALUE_COMPS[index];
+        return {
+            name: `stable_map_${index} get test for sure automated ${suffix}`,
+            test: async () => {
+                const get_result = await (stable_structures_canister as any)[
+                    `get_stable_map_${index}`
+                ](stable_map_key);
+
+                return {
+                    ok: value_comp(get_result[0], STABLE_MAP_VALUES[index])
+                };
+            }
+        };
+    });
 }
 
 function get_is_empty_tests(
     should_be_empty: boolean,
     suffix: string,
-    stable_structures: ActorSubclass<_SERVICE>
+    stable_structures_canister: ActorSubclass<_SERVICE>
 ): Test[] {
-    return STABLE_MAP_KEYS.map((_value, index) =>
-        generate_is_empty_test(
-            index,
-            should_be_empty,
-            suffix,
-            stable_structures
-        )
-    );
-}
+    return STABLE_MAP_KEYS.map((_value, index) => {
+        return {
+            name: `stable_map_${index} is empty test ${suffix}`,
+            test: async () => {
+                const result = await (stable_structures_canister as any)[
+                    `is_empty_stable_map_${index}`
+                ]();
 
-function get_remove_tests(
-    suffix: string,
-    stable_structures: ActorSubclass<_SERVICE>
-): Test[] {
-    return STABLE_MAP_KEYS.map((value, index) =>
-        generate_remove_test(
-            index,
-            value,
-            STABLE_MAP_VALUES[index],
-            STABLE_MAP_VALUE_COMPS[index],
-            suffix,
-            stable_structures
-        )
-    );
+                return {
+                    ok: result === should_be_empty
+                };
+            }
+        };
+    });
 }
 
 function get_len_tests(
     expected_len: nat64,
     suffix: string,
-    stable_structures: ActorSubclass<_SERVICE>
+    stable_structures_canister: ActorSubclass<_SERVICE>
 ): Test[] {
-    return STABLE_MAP_KEYS.map((_value, index) =>
-        generate_len_test(index, expected_len, suffix, stable_structures)
-    );
+    return STABLE_MAP_KEYS.map((_value, index) => {
+        return {
+            name: `stable_map_${index} length test ${suffix}`,
+            test: async () => {
+                const result = await (stable_structures_canister as any)[
+                    `len_stable_map_${index}`
+                ]();
+
+                return {
+                    ok: result === expected_len
+                };
+            }
+        };
+    });
 }
 
-function generate_get_value_test(
-    num: number,
-    key: any,
-    value: any,
-    value_comp: (a: any, b: any) => boolean,
+function get_remove_tests(
     suffix: string,
     stable_structures_canister: ActorSubclass<_SERVICE>
-): Test {
-    return {
-        name: `stable_map_${num} get test for sure automated ${suffix}`,
-        test: async () => {
-            const get_result = await (stable_structures_canister as any)[
-                `get_stable_map_${num}`
-            ](key);
+): Test[] {
+    return STABLE_MAP_KEYS.map((stable_map_keys, index) => {
+        let value_comp: (a: any, b: any) => boolean =
+            STABLE_MAP_VALUE_COMPS[index];
+        return {
+            name: `stable_map_${index} remove value test ${suffix}`,
+            test: async () => {
+                const get_result = await (stable_structures_canister as any)[
+                    `remove_stable_map_${index}`
+                ](stable_map_keys);
 
-            return {
-                ok: value_comp(get_result[0], value)
-            };
-        }
-    };
-}
-
-function generate_contains_key_test(
-    num: number,
-    key: any,
-    should_contain: boolean,
-    suffix: string,
-    stable_structures_canister: ActorSubclass<_SERVICE>
-): Test {
-    return {
-        name: `stable_map_${num} contains key that exists ${suffix}`,
-        test: async () => {
-            const set_result = await (stable_structures_canister as any)[
-                `contains_key_stable_map_${num}`
-            ](key);
-
-            return {
-                ok: set_result === should_contain
-            };
-        }
-    };
-}
-
-function generate_set_value_tests(
-    num: number,
-    key: any,
-    value: any,
-    suffix: string,
-    stable_structures_canister: ActorSubclass<_SERVICE>
-): Test {
-    return {
-        name: `stable_map_${num} set value ${suffix}`,
-        test: async () => {
-            const set_result = await (stable_structures_canister as any)[
-                `set_stable_map_${num}`
-            ](key, value);
-
-            return {
-                ok: set_result === undefined
-            };
-        }
-    };
-}
-
-function generate_empty_read_tests(
-    num: number,
-    key: any,
-    suffix: string,
-    stable_structures_canister: ActorSubclass<_SERVICE>
-): Test {
-    return {
-        name: `stable_map_${num} initial read ${suffix}`,
-        test: async () => {
-            const get_result = await (stable_structures_canister as any)[
-                `get_stable_map_${num}`
-            ](key);
-
-            return {
-                ok: get_result[0] === undefined
-            };
-        }
-    };
-}
-
-function generate_len_test(
-    num: number,
-    length: nat64,
-    suffix: string,
-    stable_structures_canister: ActorSubclass<_SERVICE>
-): Test {
-    return {
-        name: `stable_map_${num} length test ${suffix}`,
-        test: async () => {
-            const result = await (stable_structures_canister as any)[
-                `len_stable_map_${num}`
-            ]();
-
-            console.log('the resutl is');
-            console.log(result);
-            console.log('the resutl shoul be');
-            console.log(length);
-
-            return {
-                ok: result === length
-            };
-        }
-    };
-}
-
-function generate_is_empty_test(
-    num: number,
-    should_be_empty: boolean,
-    suffix: string,
-    stable_structures_canister: ActorSubclass<_SERVICE>
-): Test {
-    return {
-        name: `stable_map_${num} is empty test ${suffix}`,
-        test: async () => {
-            const result = await (stable_structures_canister as any)[
-                `is_empty_stable_map_${num}`
-            ]();
-
-            console.log('the resutl is');
-            console.log(result);
-            console.log('the resutl shoul be');
-            console.log(should_be_empty);
-
-            return {
-                ok: result === should_be_empty
-            };
-        }
-    };
-}
-
-function generate_remove_test(
-    num: number,
-    key: any,
-    value: any,
-    value_comp: (a: any, b: any) => boolean,
-    suffix: string,
-    stable_structures_canister: ActorSubclass<_SERVICE>
-): Test {
-    return {
-        name: `stable_map_${num} remove value test ${suffix}`,
-        test: async () => {
-            const get_result = await (stable_structures_canister as any)[
-                `remove_stable_map_${num}`
-            ](key);
-
-            return {
-                ok: value_comp(get_result[0], value)
-            };
-        }
-    };
+                return {
+                    ok: value_comp(get_result[0], STABLE_MAP_VALUES[index])
+                };
+            }
+        };
+    });
 }
