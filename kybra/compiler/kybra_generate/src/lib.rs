@@ -36,10 +36,7 @@ pub fn kybra_generate(
         .map(|py_file_name| {
             let source = std::fs::read_to_string(py_file_name).unwrap();
 
-            let source_map = SourceMap {
-                lines: source.split("\n").map(|line| line.to_string()).collect(),
-                file_name: py_file_name.to_string(),
-            };
+            let source_map = SourceMap::new(&source, py_file_name);
 
             KybraProgram {
                 program: parser::parse(&source, Mode::Module, "").unwrap(),

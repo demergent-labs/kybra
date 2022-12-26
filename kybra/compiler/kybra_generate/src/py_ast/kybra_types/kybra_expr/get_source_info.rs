@@ -18,7 +18,10 @@ impl GetSourceInfo for KybraExpr<'_> {
     }
 
     fn get_source(&self) -> String {
-        self.source_map.get_source(self.located_expr.location)
+        self.source_map.get_source(
+            self.located_expr.location,
+            self.located_expr.get_token_length(),
+        )
     }
 
     fn generate_modified_source(&self, replacement: &String) -> String {

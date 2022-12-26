@@ -4,6 +4,8 @@ use rustpython_parser::ast::{
     TypeIgnore, Unaryop, Withitem,
 };
 
+use crate::py_ast::what_is_it::WhatIsIt;
+
 pub trait TokenLength {
     fn get_token_length(&self) -> usize;
 }
@@ -102,7 +104,10 @@ impl TokenLength for StmtKind {
                 Some(returns) => "return".len() + returns.get_token_length(),
                 None => 0,
             },
-            StmtKind::Delete { targets } => targets.get_token_length(),
+            StmtKind::Delete { targets: _ } => {
+                todo!();
+                // targets.get_token_length()
+            }
             StmtKind::Assign {
                 targets,
                 value,
@@ -115,8 +120,13 @@ impl TokenLength for StmtKind {
                         None => 0,
                     }
             }
-            StmtKind::AugAssign { target, op, value } => {
-                target.get_token_length() + op.get_token_length() + value.get_token_length()
+            StmtKind::AugAssign {
+                target: _,
+                op: _,
+                value: _,
+            } => {
+                todo!();
+                // target.get_token_length() + op.get_token_length() + value.get_token_length()
             }
             StmtKind::AnnAssign {
                 target,
@@ -133,96 +143,117 @@ impl TokenLength for StmtKind {
                     + simple.get_token_length()
             }
             StmtKind::For {
-                target,
-                iter,
-                body,
-                orelse,
-                type_comment,
+                target: _,
+                iter: _,
+                body: _,
+                orelse: _,
+                type_comment: _,
             } => {
-                target.get_token_length()
-                    + iter.get_token_length()
-                    + body.get_token_length()
-                    + orelse.get_token_length()
-                    + match type_comment {
-                        Some(type_comment) => type_comment.get_token_length(),
-                        None => 0,
-                    }
+                todo!();
+                // target.get_token_length()
+                //     + iter.get_token_length()
+                //     + body.get_token_length()
+                //     + orelse.get_token_length()
+                //     + match type_comment {
+                //         Some(type_comment) => type_comment.get_token_length(),
+                //         None => 0,
+                //     }
             }
             StmtKind::AsyncFor {
-                target,
-                iter,
-                body,
-                orelse,
-                type_comment,
+                target: _,
+                iter: _,
+                body: _,
+                orelse: _,
+                type_comment: _,
             } => {
-                target.get_token_length()
-                    + iter.get_token_length()
-                    + body.get_token_length()
-                    + orelse.get_token_length()
-                    + match type_comment {
-                        Some(type_comment) => type_comment.get_token_length(),
-                        None => 0,
-                    }
+                todo!();
+                // target.get_token_length()
+                //     + iter.get_token_length()
+                //     + body.get_token_length()
+                //     + orelse.get_token_length()
+                //     + match type_comment {
+                //         Some(type_comment) => type_comment.get_token_length(),
+                //         None => 0,
+                //     }
             }
-            StmtKind::While { test, body, orelse } => {
-                test.get_token_length() + body.get_token_length() + orelse.get_token_length()
+            StmtKind::While {
+                test: _,
+                body: _,
+                orelse: _,
+            } => {
+                todo!();
+                // test.get_token_length() + body.get_token_length() + orelse.get_token_length()
             }
-            StmtKind::If { test, body, orelse } => {
-                test.get_token_length() + body.get_token_length() + orelse.get_token_length()
+            StmtKind::If {
+                test: _,
+                body: _,
+                orelse: _,
+            } => {
+                todo!();
+                // test.get_token_length() + body.get_token_length() + orelse.get_token_length()
             }
             StmtKind::With {
-                items,
-                body,
-                type_comment,
+                items: _,
+                body: _,
+                type_comment: _,
             } => {
-                items.get_token_length()
-                    + body.get_token_length()
-                    + match type_comment {
-                        Some(type_comment) => type_comment.get_token_length(),
-                        None => 0,
-                    }
+                todo!();
+                // items.get_token_length()
+                //     + body.get_token_length()
+                //     + match type_comment {
+                //         Some(type_comment) => type_comment.get_token_length(),
+                //         None => 0,
+                //     }
             }
             StmtKind::AsyncWith {
-                items,
-                body,
-                type_comment,
+                items: _,
+                body: _,
+                type_comment: _,
             } => {
-                items.get_token_length()
-                    + body.get_token_length()
-                    + match type_comment {
-                        Some(type_comment) => type_comment.get_token_length(),
-                        None => 0,
-                    }
+                todo!();
+                // items.get_token_length()
+                //     + body.get_token_length()
+                //     + match type_comment {
+                //         Some(type_comment) => type_comment.get_token_length(),
+                //         None => 0,
+                //     }
             }
-            StmtKind::Match { subject, cases } => {
-                subject.get_token_length() + cases.get_token_length()
+            StmtKind::Match {
+                subject: _,
+                cases: _,
+            } => {
+                todo!();
+                // subject.get_token_length() + cases.get_token_length()
             }
-            StmtKind::Raise { exc, cause } => {
-                (match exc {
-                    Some(exc) => exc.get_token_length(),
-                    None => 0,
-                }) + match cause {
-                    Some(cause) => cause.get_token_length(),
-                    None => 0,
-                }
+            StmtKind::Raise { exc: _, cause: _ } => {
+                todo!();
+                // (match exc {
+                //     Some(exc) => exc.get_token_length(),
+                //     None => 0,
+                // }) + match cause {
+                //     Some(cause) => cause.get_token_length(),
+                //     None => 0,
+                // }
             }
             StmtKind::Try {
-                body,
-                handlers,
-                orelse,
-                finalbody,
+                body: _,
+                handlers: _,
+                orelse: _,
+                finalbody: _,
             } => {
-                body.get_token_length()
-                    + handlers.get_token_length()
-                    + orelse.get_token_length()
-                    + finalbody.get_token_length()
+                todo!();
+                // body.get_token_length()
+                //     + handlers.get_token_length()
+                //     + orelse.get_token_length()
+                //     + finalbody.get_token_length()
             }
-            StmtKind::Assert { test, msg } => {
-                test.get_token_length()
-                    + match msg {
-                        Some(msg) => msg.get_token_length(),
-                        None => 0,
-                    }
+            StmtKind::Assert { test: _, msg: _ } => {
+                todo!();
+                // test.get_token_length()
+                //     + match msg {
+                //         Some(msg) => msg.get_token_length(),
+                //         None => 0,
+                //     }
             }
             StmtKind::Import { names } => "import".len() + names.get_token_length(),
             StmtKind::ImportFrom {
@@ -242,12 +273,24 @@ impl TokenLength for StmtKind {
                         None => 0,
                     }
             }
-            StmtKind::Global { names } => names.get_token_length(),
-            StmtKind::Nonlocal { names } => names.get_token_length(),
+            StmtKind::Global { names: _ } => {
+                todo!();
+                // names.get_token_length()
+            }
+            StmtKind::Nonlocal { names: _ } => {
+                todo!();
+                // names.get_token_length()
+            }
             StmtKind::Expr { value } => value.get_token_length(),
-            StmtKind::Pass => "pass".len(),
+            StmtKind::Pass => {
+                todo!();
+                // "pass".len()
+            }
             StmtKind::Break => "break".len(),
-            StmtKind::Continue => "continue".len(),
+            StmtKind::Continue => {
+                todo!();
+                // "continue".len()
+            }
         }
     }
 }
@@ -276,10 +319,11 @@ impl TokenLength for Unaryop {
 
 impl TokenLength for Comprehension {
     fn get_token_length(&self) -> usize {
-        self.target.get_token_length()
-            + self.iter.get_token_length()
-            + self.ifs.get_token_length()
-            + self.is_async.get_token_length()
+        todo!();
+        // self.target.get_token_length()
+        //     + self.iter.get_token_length()
+        //     + self.ifs.get_token_length()
+        //     + self.is_async.get_token_length()
     }
 }
 
@@ -316,11 +360,11 @@ impl TokenLength for Constant {
                 }
             }
             Constant::Str(string) => "\"\"".len() + string.len(),
-            Constant::Bytes(bytes) => todo!(),
+            Constant::Bytes(_bytes) => todo!(),
             Constant::Int(int) => int.to_string().len(),
-            Constant::Tuple(tuple) => todo!(),
-            Constant::Float(float) => todo!(),
-            Constant::Complex { real, imag } => todo!(),
+            Constant::Tuple(_tuple) => todo!(),
+            Constant::Float(_float) => todo!(),
+            Constant::Complex { real: _, imag: _ } => todo!(),
             Constant::Ellipsis => "...".len(),
         }
     }
@@ -500,22 +544,23 @@ impl TokenLength for ArgData {
 
 impl TokenLength for Operator {
     fn get_token_length(&self) -> usize {
-        let op = match &self {
-            Operator::Add => "Add",
-            Operator::Sub => "Sub",
-            Operator::Mult => "Mult",
-            Operator::MatMult => "MatMult",
-            Operator::Div => "Div",
-            Operator::Mod => "Mod",
-            Operator::Pow => "Pow",
-            Operator::LShift => "LShift",
-            Operator::RShift => "RShift",
-            Operator::BitOr => "BitOr",
-            Operator::BitXor => "BitXor",
-            Operator::BitAnd => "BitAnd",
-            Operator::FloorDiv => "FloorDiv",
-        };
-        todo!("Operator token length");
+        match &self {
+            Operator::Add => "+",
+            Operator::Sub => "-",
+            Operator::Mult => "*",
+            Operator::MatMult => "@",
+            Operator::Div => "/",
+            Operator::Mod => "%",
+            Operator::Pow => "**",
+            Operator::LShift => "<<",
+            Operator::RShift => ">>",
+            Operator::BitOr => "|",
+            Operator::BitXor => "^",
+            Operator::BitAnd => "&",
+            Operator::FloorDiv => "//",
+        }
+        .len()
+            * 0 // We are removing special characters so all of these will eventually be 0 length
     }
 }
 

@@ -7,6 +7,7 @@ edition = "2018"
 quote = "1.0.21"
 syn = "1.0.99"
 proc-macro2 = "1.0.43"
+regex = "1.7.0"
 rustpython-parser = { git = "https://github.com/demergent-labs/RustPython", branch = "kybra_initial", default-features = false, features = [] }
 annotate-snippets = "0.9.1"
 # rustpython = { path = "../../../../RustPython", default-features = false, features = [] }

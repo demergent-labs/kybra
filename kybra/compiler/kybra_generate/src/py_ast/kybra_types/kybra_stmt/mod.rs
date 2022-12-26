@@ -1,4 +1,4 @@
-mod canister_method;
+mod canister_methods;
 mod data_types;
 mod external_canisters;
 mod get_dependencies;

@@ -1,3 +1,5 @@
+mod errors;
+
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{ExprKind, StmtKind};
@@ -12,6 +14,7 @@ use super::KybraStmt;
 
 impl KybraStmt<'_> {
     pub fn is_canister_method_stmt(&self) -> bool {
+        panic!("{}", self.test_error());
         self.is_canister_method_type(CanisterMethodType::Update)
             || self.is_canister_method_type(CanisterMethodType::Query)
     }

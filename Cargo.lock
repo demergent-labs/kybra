@@ -145,6 +145,7 @@ dependencies = [
  "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=b384c9a020c6466c5949fd3039c4b3b50959c4a3)",
  "proc-macro2",
  "quote",
+ "regex",
  "rustpython-parser",
  "syn",
 ]
