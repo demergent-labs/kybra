@@ -36,7 +36,7 @@ pub fn kybra_generate(
         .map(|py_file_name| {
             let source = std::fs::read_to_string(py_file_name).unwrap();
 
-            let source_map = SourceMap::new(&source, py_file_name);
+            let source_map = SourceMap::new(source.clone(), py_file_name);
 
             KybraProgram {
                 program: parser::parse(&source, Mode::Module, "").unwrap(),
@@ -48,7 +48,7 @@ pub fn kybra_generate(
         kybra_programs,
         entry_module_name: entry_module_name.to_string(),
     }
-    .analyze()
+    // .analyze()
     .to_kybra_ast()
     .to_act()
     .to_token_stream(());

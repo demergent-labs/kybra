@@ -1,10 +1,9 @@
+use regex::Regex;
 use rustpython_parser::ast::{
     AliasData, ArgData, Arguments, Boolop, Cmpop, Comprehension, Constant, ExcepthandlerKind,
     ExprContext, ExprKind, KeywordData, Located, MatchCase, Mod, Operator, PatternKind, StmtKind,
     TypeIgnore, Unaryop, Withitem,
 };
-
-use crate::py_ast::what_is_it::WhatIsIt;
 
 pub trait TokenLength {
     fn get_token_length(&self) -> usize;
@@ -45,7 +44,7 @@ impl TokenLength for StmtKind {
                 name,
                 args,
                 body,
-                decorator_list,
+                decorator_list: _,
                 returns,
                 type_comment,
             } => {
@@ -53,7 +52,7 @@ impl TokenLength for StmtKind {
                     + name.get_token_length()
                     + args.get_token_length()
                     + body.get_token_length()
-                    + decorator_list.get_token_length()
+                    // + decorator_list.get_token_length() // I don't think we need the decorator list since the token start is at the def key word so its after the decorators are already past
                     + match returns {
                         Some(returns) => returns.get_token_length(),
                         None => 0,
@@ -67,7 +66,7 @@ impl TokenLength for StmtKind {
                 name,
                 args,
                 body,
-                decorator_list,
+                decorator_list: _,
                 returns,
                 type_comment,
             } => {
@@ -76,7 +75,7 @@ impl TokenLength for StmtKind {
                     + name.get_token_length()
                     + args.get_token_length()
                     + body.get_token_length()
-                    + decorator_list.get_token_length()
+                    // + decorator_list.get_token_length() // See the decorator list from FunctionDefs
                     + match returns {
                         Some(returns) => returns.get_token_length(),
                         None => 0,
@@ -91,14 +90,16 @@ impl TokenLength for StmtKind {
                 bases,
                 keywords,
                 body,
-                decorator_list,
+                decorator_list: _,
             } => {
-                "class".len()
+                let result = "class".len()
                     + name.get_token_length()
                     + bases.get_token_length()
                     + keywords.get_token_length()
-                    + body.get_token_length()
-                    + decorator_list.get_token_length()
+                    + body.get_token_length();
+                // + decorator_list.get_token_length() // See the decorator list from FunctionDefs
+                eprintln!("The length of a class is {}", result);
+                result
             }
             StmtKind::Return { value } => match value {
                 Some(returns) => "return".len() + returns.get_token_length(),
@@ -332,19 +333,20 @@ impl TokenLength for Comprehension {
 // unlikely to runinto those operators in kybra right?
 impl TokenLength for Cmpop {
     fn get_token_length(&self) -> usize {
-        match self {
-            Cmpop::Eq => "==",
-            Cmpop::NotEq => "!=",
-            Cmpop::Lt => "<",
-            Cmpop::LtE => "<=",
-            Cmpop::Gt => ">",
-            Cmpop::GtE => ">=",
-            Cmpop::Is => "is",
-            Cmpop::IsNot => "isnot",
-            Cmpop::In => "in",
-            Cmpop::NotIn => "notin",
-        }
-        .len()
+        // match self {
+        //     Cmpop::Eq => "==",
+        //     Cmpop::NotEq => "!=",
+        //     Cmpop::Lt => "<",
+        //     Cmpop::LtE => "<=",
+        //     Cmpop::Gt => ">",
+        //     Cmpop::GtE => ">=",
+        //     Cmpop::Is => "is",
+        //     Cmpop::IsNot => "isnot",
+        //     Cmpop::In => "in",
+        //     Cmpop::NotIn => "notin",
+        // }
+        // .len();
+        todo!("I think that most of these will be sorted out but maybe not the isnot in and not in")
     }
 }
 
@@ -359,7 +361,10 @@ impl TokenLength for Constant {
                     "False".len()
                 }
             }
-            Constant::Str(string) => "\"\"".len() + string.len(),
+            Constant::Str(string) => {
+                let re = Regex::new(r"\s+").unwrap();
+                re.replace_all(&string, "").len()
+            }
             Constant::Bytes(_bytes) => todo!(),
             Constant::Int(int) => int.to_string().len(),
             Constant::Tuple(_tuple) => todo!(),
@@ -500,7 +505,8 @@ impl TokenLength for TypeIgnore {
 
 impl TokenLength for String {
     fn get_token_length(&self) -> usize {
-        self.len()
+        let re = Regex::new(r"[^A-Za-z0-9]").unwrap();
+        re.replace_all(self, "").len()
     }
 }
 

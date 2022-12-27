@@ -18,7 +18,7 @@ mod kybra_ast;
 mod kybra_types;
 mod system_methods;
 pub mod traits;
-mod what_is_it;
+pub mod what_is_it;
 
 pub struct PyAst {
     pub kybra_programs: Vec<KybraProgram>,
