@@ -77,32 +77,150 @@ impl SourceMap {
         // whitespace. So what we are going to do is start at the start index. We are going to iterate over all of the characters
         // in the source and if it's a white space or a special character then we are going to skip it
         // otherwise we are going to decrament our count,
-        let re = Regex::new(REGULAR_CHARACTERS).unwrap();
+        let reg_char_re = Regex::new(REGULAR_CHARACTERS).unwrap();
+        let comment_re = Regex::new("#").unwrap();
+        let newline_re = Regex::new("\n").unwrap();
+        let opening_re = Regex::new(r"[\{\[\(]").unwrap();
+        let closing_re = Regex::new(r"[\}\]\)]").unwrap();
+        let double_quote_re = Regex::new("\"").unwrap();
+        let single_quote_re = Regex::new("'").unwrap();
+        let escape_re = Regex::new(r"\\").unwrap();
         let mut real_count = 0;
         let mut end = 0;
         let token_length = token.get_token_length();
+        let mut is_comment = false;
+        let mut open_count = 0;
+        let mut is_double_quote_string = false;
+        let mut is_single_quote_string = false;
+        let mut is_escaping = false;
+        let mut found_escape_character = false;
         // eprintln!("The token length is {}", token_length);
-        // TODO okay this is working mostly well... The problem is that any special characters afterwards aren't included. But
-        // we can't go to the next non special character, because what if the next one starts with special characters.
-        // TODO also when we are doing this we need to skip over the lines that are comments since those are not included in the token length
+        // TODO We don't handle the closing ' or "
+        // TODO We don't handle calls that have no parameters. the '()' won't count towards the range
         for char_enum in self.file_contents[start - 1..].chars().enumerate() {
             let (index, char) = char_enum;
+            if found_escape_character {
+                found_escape_character = false;
+                is_escaping = true;
+            }
             // eprintln!("This is the char we are looking at ({}) the index is {} and we are shooting for 70ish I think", char, index);
-            if re.is_match(&char.to_string()) {
+            if is_comment && !newline_re.is_match(&char.to_string()) {
+                // If we are in a comment and the current character doesn't end the comment (with a new line) then we should continue
+                continue;
+            }
+            if is_comment && newline_re.is_match(&char.to_string()) {
+                // If we're in a comment and we hit a new line, end the comment
+                is_comment = false
+            }
+            if (!is_double_quote_string || !is_single_quote_string)
+                && opening_re.is_match(&char.to_string())
+            {
+                // If we find a open brace that isn't in a string or a comment then add to our open count
+                // TODO test to see if we need to take into account any string formatting `f'Hello {}'` would that last o be the end? Or since we're going to the end of the quote will we be fine?
+                open_count += 1
+            }
+            if (!is_double_quote_string || !is_single_quote_string)
+                && closing_re.is_match(&char.to_string())
+            {
+                // If we find a close brace that isn't in a string or a comment then subtract from our open count
+                open_count -= 1;
+            }
+            if is_double_quote_string || is_single_quote_string {
+                // If we are in a string then handle escape characters
+                // Here is how we are going to handle escape characters. When we find one we are going to mark that we found it.
+                // When we are on the very next character we will set at the beginning that we are processing it and we will set found to false
+                // After that we will set that to false on the next pass
+                // We need two variables so we can handle back to back escape characters.
+                if !is_escaping && escape_re.is_match(&char.to_string()) {
+                    found_escape_character = true;
+                }
+            }
+            if !is_single_quote_string && double_quote_re.is_match(&char.to_string()) {
+                // We can't use a continue like we can with a comment because we can ignore all characters in a comment but we cannot ignore the characters in a string
+                // If we aren't in a single quote or a comment and we hit a double quote then we are either going to start a double quote or end a double quote.
+                if is_double_quote_string {
+                    // If we are in a double quote and we see another double quote we end the quote unless the previous character was the escape character
+                    if !is_escaping {
+                        is_double_quote_string = false;
+                    }
+                } else {
+                    is_double_quote_string = true
+                }
+            }
+            if !is_double_quote_string && single_quote_re.is_match(&char.to_string()) {
+                // We can't use a continue like we can with a comment because we can ignore all characters in a comment but we cannot ignore the characters in a string
+                // If we aren't in a double quote or a comment and we hit a single quote then we are either going to start a single quote or end a single quote.
+                if is_single_quote_string {
+                    // If we are in a single quote and we see another single quote we end the quote unless the previous character was the escape character
+                    if !is_escaping {
+                        is_single_quote_string = false;
+                    }
+                } else {
+                    is_single_quote_string = true
+                }
+            }
+            if comment_re.is_match(&char.to_string()) {
+                is_comment = true
+            }
+            if reg_char_re.is_match(&char.to_string()) {
+                if real_count == token_length {
+                    // for whatever reason we didn't find all of the closing braces but now we are running into more code so we should stop here.
+                    end = start + index - 1; // Don't count the current character. We want to count closing braces not additional characters
+                    break;
+                }
                 real_count += 1;
                 // eprintln!(
                 //     "The token_length is {}, and so far the real count is {}",
                 //     token_length, real_count
                 // );
-                if real_count == token_length {
-                    end = start + index;
-                    break;
-                }
             }
+            if real_count == token_length
+                && open_count == 0
+                && !is_double_quote_string
+                && !is_single_quote_string
+            {
+                end = start + index;
+                break;
+            }
+            is_escaping = false; // We finished processing the character so we have nothing left to escape.
         }
         // eprintln!("We are making a span for this token:");
         // token.what_is_it();
         // eprintln!("This is the start {} and the end {}", start, end);
+
+        // eprintln!("###########################################################");
+        // eprintln!("### Here is the remaining bit of text #####################");
+        // eprintln!("###########################################################");
+        // eprintln!("{}", &self.file_contents[end..]);
+
+        let open_param_re = Regex::new(r"\(").unwrap();
+        let new_line_re = Regex::new(r"\n").unwrap();
+        let whitespace_re = Regex::new(r"\s").unwrap();
+        let close_param_re = Regex::new(r"\)").unwrap();
+        let mut found_open = false;
+        for char_enum in self.file_contents[end..].chars().enumerate() {
+            let (index, char) = char_enum;
+            let char = &char.to_string();
+            // eprintln!("We are looking at this char: {}", char);
+            if !found_open && (whitespace_re.is_match(char) || open_param_re.is_match(char)) {
+                // For the opening parenthesis you can have tabs or spaces before it but no new lines
+                if new_line_re.is_match(char) {
+                    break;
+                }
+                if open_param_re.is_match(char) {
+                    found_open = true
+                }
+                continue;
+            }
+            // For the closing parenthesis you can have whatever white space you want. So we'll keep going until we find something that isn't one of those.
+            if found_open && !(close_param_re.is_match(char) || whitespace_re.is_match(char)) {
+                break;
+            }
+            if found_open && close_param_re.is_match(char) {
+                end += index + 1; // To make up for starting over at 0
+                break; // There should be nothing left to see
+            }
+        }
         Span { start, end }
     }
 }
@@ -128,7 +246,7 @@ impl SourceMap {
         let end = self.lines[self.get_start_row(location) - 1..self.get_end_row(&span) - 1]
             .iter()
             .fold(0, |acc, line| acc + line.len() + 1);
-        // eprintln!("When caclulating the end this is the ");
+        // eprintln!("When calculating the end this is the ");
         let end = end + self.get_end_col(&span);
         (self.get_start_col(location), end)
     }
