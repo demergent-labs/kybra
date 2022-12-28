@@ -236,11 +236,11 @@ impl TokenLength for StmtKind {
                     }
             }
             StmtKind::Import { names } => {
-                eprintln!(
-                    "This is the length we are giving:\nimport: {}\nnames: {}",
-                    "import".len(),
-                    names.get_token_length()
-                );
+                // eprintln!(
+                //     "This is the length we are giving:\nimport: {}\nnames: {}",
+                //     "import".len(),
+                //     names.get_token_length()
+                // );
                 "import".len() + names.get_token_length()
             }
             StmtKind::ImportFrom {
