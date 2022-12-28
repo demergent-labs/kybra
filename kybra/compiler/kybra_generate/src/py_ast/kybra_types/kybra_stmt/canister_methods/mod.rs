@@ -14,7 +14,7 @@ use super::KybraStmt;
 
 impl KybraStmt<'_> {
     pub fn is_canister_method_stmt(&self) -> bool {
-        panic!("{}", self.test_error());
+        eprintln!("{}", self.test_error());
         self.is_canister_method_type(CanisterMethodType::Update)
             || self.is_canister_method_type(CanisterMethodType::Query)
     }

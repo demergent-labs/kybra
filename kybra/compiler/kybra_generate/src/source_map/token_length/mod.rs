@@ -5,6 +5,11 @@ use rustpython_parser::ast::{
     TypeIgnore, Unaryop, Withitem,
 };
 
+use crate::py_ast::what_is_it::WhatIsIt;
+
+pub const SPECIAL_CHARACTERS: &str = r"[^A-Za-z0-9]";
+pub const REGULAR_CHARACTERS: &str = r"[A-Za-z0-9]";
+
 pub trait TokenLength {
     fn get_token_length(&self) -> usize;
 }
@@ -12,8 +17,12 @@ pub trait TokenLength {
 impl TokenLength for Mod {
     fn get_token_length(&self) -> usize {
         match &self {
-            Mod::Module { body, type_ignores } => {
-                body.get_token_length() + type_ignores.get_token_length()
+            Mod::Module {
+                body,
+                type_ignores: _,
+            } => {
+                body.get_token_length()
+                //+ type_ignores.get_token_length() I don't think we need to take these into account
             }
             Mod::Interactive { body } => body.get_token_length(),
             Mod::Expression { body } => body.get_token_length(),
@@ -98,17 +107,14 @@ impl TokenLength for StmtKind {
                     + keywords.get_token_length()
                     + body.get_token_length();
                 // + decorator_list.get_token_length() // See the decorator list from FunctionDefs
-                eprintln!("The length of a class is {}", result);
+                // eprintln!("The length of a class is {}", result);
                 result
             }
             StmtKind::Return { value } => match value {
                 Some(returns) => "return".len() + returns.get_token_length(),
                 None => 0,
             },
-            StmtKind::Delete { targets: _ } => {
-                todo!();
-                // targets.get_token_length()
-            }
+            StmtKind::Delete { targets } => "del".len() + targets.get_token_length(),
             StmtKind::Assign {
                 targets,
                 value,
@@ -121,13 +127,8 @@ impl TokenLength for StmtKind {
                         None => 0,
                     }
             }
-            StmtKind::AugAssign {
-                target: _,
-                op: _,
-                value: _,
-            } => {
-                todo!();
-                // target.get_token_length() + op.get_token_length() + value.get_token_length()
+            StmtKind::AugAssign { target, op, value } => {
+                target.get_token_length() + op.get_token_length() + value.get_token_length()
             }
             StmtKind::AnnAssign {
                 target,
@@ -144,119 +145,104 @@ impl TokenLength for StmtKind {
                     + simple.get_token_length()
             }
             StmtKind::For {
-                target: _,
-                iter: _,
-                body: _,
-                orelse: _,
-                type_comment: _,
-            } => {
-                todo!();
-                // target.get_token_length()
-                //     + iter.get_token_length()
-                //     + body.get_token_length()
-                //     + orelse.get_token_length()
-                //     + match type_comment {
-                //         Some(type_comment) => type_comment.get_token_length(),
-                //         None => 0,
-                //     }
-            }
+                target,
+                iter,
+                body,
+                orelse,
+                type_comment,
+            } => calculate_for_loop_length(target, iter, body, orelse, type_comment),
             StmtKind::AsyncFor {
-                target: _,
-                iter: _,
-                body: _,
-                orelse: _,
-                type_comment: _,
+                target,
+                iter,
+                body,
+                orelse,
+                type_comment,
             } => {
-                todo!();
-                // target.get_token_length()
-                //     + iter.get_token_length()
-                //     + body.get_token_length()
-                //     + orelse.get_token_length()
-                //     + match type_comment {
-                //         Some(type_comment) => type_comment.get_token_length(),
-                //         None => 0,
-                //     }
+                "async".len() + calculate_for_loop_length(target, iter, body, orelse, type_comment)
             }
-            StmtKind::While {
-                test: _,
-                body: _,
-                orelse: _,
-            } => {
-                todo!();
-                // test.get_token_length() + body.get_token_length() + orelse.get_token_length()
+            StmtKind::While { test, body, orelse } => {
+                "while".len()
+                    + test.get_token_length()
+                    + body.get_token_length()
+                    + if orelse.len() > 0 { "else".len() } else { 0 }
+                    + orelse.get_token_length()
             }
-            StmtKind::If {
-                test: _,
-                body: _,
-                orelse: _,
-            } => {
-                todo!();
-                // test.get_token_length() + body.get_token_length() + orelse.get_token_length()
+            StmtKind::If { test, body, orelse } => {
+                "if".len()
+                    + test.get_token_length()
+                    + body.get_token_length()
+                    + if orelse.len() > 0 { "else".len() } else { 0 }
+                    + orelse.get_token_length()
             }
             StmtKind::With {
-                items: _,
-                body: _,
+                items,
+                body,
                 type_comment: _,
             } => {
-                todo!();
-                // items.get_token_length()
-                //     + body.get_token_length()
-                //     + match type_comment {
-                //         Some(type_comment) => type_comment.get_token_length(),
-                //         None => 0,
-                //     }
+                let result = calculate_with_length(items, body);
+                // eprintln!("Lets see the result for the with is {}", result);
+                result
             }
             StmtKind::AsyncWith {
-                items: _,
-                body: _,
+                items,
+                body,
                 type_comment: _,
-            } => {
-                todo!();
-                // items.get_token_length()
-                //     + body.get_token_length()
-                //     + match type_comment {
-                //         Some(type_comment) => type_comment.get_token_length(),
-                //         None => 0,
-                //     }
+            } => "async".len() + calculate_with_length(items, body),
+            StmtKind::Match { subject, cases } => {
+                "match".len() + subject.get_token_length() + cases.get_token_length()
             }
-            StmtKind::Match {
-                subject: _,
-                cases: _,
-            } => {
-                todo!();
-                // subject.get_token_length() + cases.get_token_length()
-            }
-            StmtKind::Raise { exc: _, cause: _ } => {
-                todo!();
-                // (match exc {
-                //     Some(exc) => exc.get_token_length(),
-                //     None => 0,
-                // }) + match cause {
-                //     Some(cause) => cause.get_token_length(),
-                //     None => 0,
-                // }
+            StmtKind::Raise { exc, cause } => {
+                // eprintln!("This is the exc");
+                // exc.as_ref().unwrap().what_is_it();
+                // eprintln!("This is the cause");
+                // cause.as_ref().unwrap().what_is_it();
+                "raise".len()
+                    + match exc {
+                        Some(exc) => exc.get_token_length(),
+                        None => 0,
+                    }
+                    + match cause {
+                        Some(cause) => "from".len() + cause.get_token_length(),
+                        None => 0,
+                    }
             }
             StmtKind::Try {
-                body: _,
-                handlers: _,
-                orelse: _,
-                finalbody: _,
+                body,
+                handlers,
+                orelse,
+                finalbody,
             } => {
-                todo!();
-                // body.get_token_length()
-                //     + handlers.get_token_length()
-                //     + orelse.get_token_length()
-                //     + finalbody.get_token_length()
+                for ore in orelse {
+                    ore.what_is_it()
+                }
+                "try".len()
+                    + body.get_token_length()
+                    + handlers.iter().fold(0, |acc, _| acc + "except".len())
+                    + handlers.get_token_length()
+                    + orelse.get_token_length()
+                    + if finalbody.len() > 0 {
+                        "finally".len()
+                    } else {
+                        0
+                    }
+                    + finalbody.get_token_length()
             }
-            StmtKind::Assert { test: _, msg: _ } => {
-                todo!();
-                // test.get_token_length()
-                //     + match msg {
-                //         Some(msg) => msg.get_token_length(),
-                //         None => 0,
-                //     }
+            StmtKind::Assert { test, msg } => {
+                "assert".len()
+                    + test.get_token_length()
+                    + match msg {
+                        Some(msg) => msg.get_token_length(),
+                        None => 0,
+                    }
             }
-            StmtKind::Import { names } => "import".len() + names.get_token_length(),
+            StmtKind::Import { names } => {
+                eprintln!(
+                    "This is the length we are giving:\nimport: {}\nnames: {}",
+                    "import".len(),
+                    names.get_token_length()
+                );
+                "import".len() + names.get_token_length()
+            }
             StmtKind::ImportFrom {
                 module,
                 names,
@@ -274,26 +260,56 @@ impl TokenLength for StmtKind {
                         None => 0,
                     }
             }
-            StmtKind::Global { names: _ } => {
-                todo!();
-                // names.get_token_length()
-            }
-            StmtKind::Nonlocal { names: _ } => {
-                todo!();
-                // names.get_token_length()
-            }
+            StmtKind::Global { names } => "global".len() + names.get_token_length(),
+            StmtKind::Nonlocal { names } => "nonlocal".len() + names.get_token_length(),
             StmtKind::Expr { value } => value.get_token_length(),
-            StmtKind::Pass => {
-                todo!();
-                // "pass".len()
-            }
+            StmtKind::Pass => "pass".len(),
             StmtKind::Break => "break".len(),
-            StmtKind::Continue => {
-                todo!();
-                // "continue".len()
-            }
+            StmtKind::Continue => "continue".len(),
         }
     }
+}
+
+fn calculate_with_length(items: &Vec<Withitem>, body: &Vec<Located<StmtKind>>) -> usize {
+    // eprintln!("with: {}", "with".len());
+    // eprintln!("as: {}", "as".len());
+    // eprintln!("items: {}", items.get_token_length());
+    // eprintln!("body: {}", body.get_token_length());
+    "with".len() + "as".len() + items.get_token_length() + body.get_token_length()
+}
+
+fn calculate_for_loop_length(
+    target: &Box<Located<ExprKind>>,
+    iter: &Box<Located<ExprKind>>,
+    body: &Vec<Located<StmtKind>>,
+    orelse: &Vec<Located<StmtKind>>,
+    _type_comment: &Option<String>,
+) -> usize {
+    // eprintln!("for len: {}", "for".len());
+    // eprintln!("target len: {}", target.get_token_length());
+    // eprintln!("in len: {}", "in".len());
+    // eprintln!("iter len: {}", iter.get_token_length());
+    // eprintln!("body len: {}", body.get_token_length());
+    // eprintln!(
+    //     "else len: {}",
+    //     if orelse.len() > 0 { "else".len() } else { 0 }
+    // );
+    // eprintln!("orelse len: {}", orelse.get_token_length());
+    // let result = "for".len()
+    //     + target.get_token_length()
+    //     + "in".len()
+    //     + iter.get_token_length()
+    //     + body.get_token_length()
+    //     + if orelse.len() > 0 { "else".len() } else { 0 }
+    //     + orelse.get_token_length();
+    // eprintln!("for a total of {}", result);
+    "for".len()
+        + target.get_token_length()
+        + "in".len()
+        + iter.get_token_length()
+        + body.get_token_length()
+        + if orelse.len() > 0 { "else".len() } else { 0 }
+        + orelse.get_token_length()
 }
 
 impl TokenLength for Boolop {
@@ -308,50 +324,51 @@ impl TokenLength for Boolop {
 
 impl TokenLength for Unaryop {
     fn get_token_length(&self) -> usize {
-        match self {
-            Unaryop::Invert => todo!("Invert"),
+        let uop = match self {
+            Unaryop::Invert => "~",
             Unaryop::Not => "not",
-            Unaryop::UAdd => todo!("UAdd"),
-            Unaryop::USub => todo!("USub"),
-        }
-        .len()
+            Unaryop::UAdd => "+",
+            Unaryop::USub => "-",
+        };
+        let re = Regex::new(SPECIAL_CHARACTERS).unwrap();
+        re.replace_all(uop, "").len()
     }
 }
 
 impl TokenLength for Comprehension {
     fn get_token_length(&self) -> usize {
-        todo!();
-        // self.target.get_token_length()
-        //     + self.iter.get_token_length()
-        //     + self.ifs.get_token_length()
-        //     + self.is_async.get_token_length()
+        "for".len()
+            + "in".len()
+            + self.target.get_token_length()
+            + self.iter.get_token_length()
+            + self.ifs.iter().fold(0, |acc, _| acc + "if".len())
+            + self.ifs.get_token_length()
+            + self.is_async.get_token_length()
     }
 }
 
-// TODO this one is a little weird because the isnot and notin could have any
-// number of space in the middle of the operator. However I think we are
-// unlikely to runinto those operators in kybra right?
 impl TokenLength for Cmpop {
     fn get_token_length(&self) -> usize {
-        // match self {
-        //     Cmpop::Eq => "==",
-        //     Cmpop::NotEq => "!=",
-        //     Cmpop::Lt => "<",
-        //     Cmpop::LtE => "<=",
-        //     Cmpop::Gt => ">",
-        //     Cmpop::GtE => ">=",
-        //     Cmpop::Is => "is",
-        //     Cmpop::IsNot => "isnot",
-        //     Cmpop::In => "in",
-        //     Cmpop::NotIn => "notin",
-        // }
-        // .len();
-        todo!("I think that most of these will be sorted out but maybe not the isnot in and not in")
+        let cmpop = match self {
+            Cmpop::Eq => "==",
+            Cmpop::NotEq => "!=",
+            Cmpop::Lt => "<",
+            Cmpop::LtE => "<=",
+            Cmpop::Gt => ">",
+            Cmpop::GtE => ">=",
+            Cmpop::Is => "is",
+            Cmpop::IsNot => "is not",
+            Cmpop::In => "in",
+            Cmpop::NotIn => "not in",
+        };
+        let re = Regex::new(SPECIAL_CHARACTERS).unwrap();
+        re.replace_all(cmpop, "").len()
     }
 }
 
 impl TokenLength for Constant {
     fn get_token_length(&self) -> usize {
+        let re = Regex::new(SPECIAL_CHARACTERS).unwrap();
         match self {
             Constant::None => "None".len(),
             Constant::Bool(bool) => {
@@ -361,16 +378,19 @@ impl TokenLength for Constant {
                     "False".len()
                 }
             }
-            Constant::Str(string) => {
-                let re = Regex::new(r"\s+").unwrap();
-                re.replace_all(&string, "").len()
-            }
-            Constant::Bytes(_bytes) => todo!(),
+            Constant::Str(string) => re.replace_all(&string, "").len(),
+            Constant::Bytes(bytes) => bytes
+                .iter()
+                .fold(0, |acc, byte| acc + byte.to_string().len()),
             Constant::Int(int) => int.to_string().len(),
-            Constant::Tuple(_tuple) => todo!(),
-            Constant::Float(_float) => todo!(),
-            Constant::Complex { real: _, imag: _ } => todo!(),
-            Constant::Ellipsis => "...".len(),
+            Constant::Tuple(tuple) => tuple.get_token_length(),
+            Constant::Float(float) => re.replace_all(&float.to_string(), "").len(),
+            Constant::Complex { real, imag } => {
+                "j".len()
+                    + re.replace_all(&real.to_string(), "").len()
+                    + re.replace_all(&imag.to_string(), "").len()
+            }
+            Constant::Ellipsis => re.replace_all("...", "").len(),
         }
     }
 }
@@ -392,9 +412,16 @@ impl TokenLength for ExprKind {
                 left.get_token_length() + op.get_token_length() + right.get_token_length()
             }
             ExprKind::UnaryOp { op, operand } => op.get_token_length() + operand.get_token_length(),
-            ExprKind::Lambda { args, body } => args.get_token_length() + body.get_token_length(),
+            ExprKind::Lambda { args, body } => {
+                "lambda".len() + args.get_token_length() + body.get_token_length()
+            }
             ExprKind::IfExp { test, body, orelse } => {
-                test.get_token_length() + body.get_token_length() + orelse.get_token_length()
+                // TODO elif is going to be a bit of a challenge that has not been figured out yet
+                "if".len()
+                    + test.get_token_length()
+                    + body.get_token_length()
+                    + "else".len()
+                    + orelse.get_token_length()
             }
             ExprKind::Dict { keys, values } => keys.get_token_length() + values.get_token_length(),
             ExprKind::Set { elts } => elts.get_token_length(),
@@ -412,12 +439,17 @@ impl TokenLength for ExprKind {
             ExprKind::GeneratorExp { elt, generators } => {
                 elt.get_token_length() + generators.get_token_length()
             }
-            ExprKind::Await { value } => value.get_token_length(),
-            ExprKind::Yield { value } => match &value {
-                Some(value) => value.get_token_length(),
-                None => 0,
-            },
-            ExprKind::YieldFrom { value } => value.get_token_length(),
+            ExprKind::Await { value } => "await".len() + value.get_token_length(),
+            ExprKind::Yield { value } => {
+                "yield".len()
+                    + match &value {
+                        Some(value) => value.get_token_length(),
+                        None => 0,
+                    }
+            }
+            ExprKind::YieldFrom { value } => {
+                "yield".len() + "from".len() + value.get_token_length()
+            }
             ExprKind::Compare {
                 left,
                 ops,
@@ -427,7 +459,16 @@ impl TokenLength for ExprKind {
                 func,
                 args,
                 keywords,
-            } => func.get_token_length() + args.get_token_length() + keywords.get_token_length(),
+            } => {
+                // let f_len = func.get_token_length();
+                // let a_len = args.get_token_length();
+                // let k_len = keywords.get_token_length();
+                // eprintln!(
+                //     "the func is {} long, the args are {} long, the keywords are {} long",
+                //     f_len, a_len, k_len
+                // );
+                func.get_token_length() + args.get_token_length() + keywords.get_token_length()
+            }
             ExprKind::FormattedValue {
                 value,
                 conversion,
@@ -495,17 +536,18 @@ where
 
 impl TokenLength for TypeIgnore {
     fn get_token_length(&self) -> usize {
-        match self {
-            TypeIgnore::TypeIgnore { lineno, tag } => {
-                lineno.get_token_length() + tag.get_token_length()
-            }
-        }
+        todo!();
+        // match self {
+        //     TypeIgnore::TypeIgnore { lineno, tag } => {
+        //         lineno.get_token_length() + tag.get_token_length()
+        //     }
+        // }
     }
 }
 
 impl TokenLength for String {
     fn get_token_length(&self) -> usize {
-        let re = Regex::new(r"[^A-Za-z0-9]").unwrap();
+        let re = Regex::new(SPECIAL_CHARACTERS).unwrap();
         re.replace_all(self, "").len()
     }
 }
@@ -541,16 +583,16 @@ impl TokenLength for ArgData {
                 Some(annotation) => annotation.get_token_length(),
                 None => 0,
             }
-            + match &self.type_comment {
-                Some(type_comment) => type_comment.get_token_length(),
-                None => 0,
-            }
+        // + match &self.type_comment {
+        //     Some(type_comment) => type_comment.get_token_length(),
+        //     None => 0,
+        // }
     }
 }
 
 impl TokenLength for Operator {
     fn get_token_length(&self) -> usize {
-        match &self {
+        let op = match &self {
             Operator::Add => "+",
             Operator::Sub => "-",
             Operator::Mult => "*",
@@ -564,19 +606,19 @@ impl TokenLength for Operator {
             Operator::BitXor => "^",
             Operator::BitAnd => "&",
             Operator::FloorDiv => "//",
-        }
-        .len()
-            * 0 // We are removing special characters so all of these will eventually be 0 length
+        };
+        let re = Regex::new(SPECIAL_CHARACTERS).unwrap();
+        re.replace_all(op, "").len()
     }
 }
 
 impl TokenLength for Withitem {
     fn get_token_length(&self) -> usize {
-        self.context_expr.get_token_length();
-        match &self.optional_vars {
-            Some(optional_vars) => optional_vars.get_token_length(),
-            None => 0,
-        }
+        self.context_expr.get_token_length()
+            + match &self.optional_vars {
+                Some(optional_vars) => optional_vars.get_token_length(),
+                None => 0,
+            }
     }
 }
 
@@ -629,7 +671,8 @@ impl TokenLength for PatternKind {
 
 impl TokenLength for MatchCase {
     fn get_token_length(&self) -> usize {
-        self.pattern.get_token_length()
+        "case".len()
+            + self.pattern.get_token_length()
             + match &self.guard {
                 Some(guard) => guard.get_token_length(),
                 None => 0,
@@ -646,7 +689,7 @@ impl TokenLength for ExcepthandlerKind {
                     Some(type_) => type_.get_token_length(),
                     None => 0,
                 }) + match &name {
-                    Some(name) => name.get_token_length(),
+                    Some(name) => "as".len() + name.get_token_length(),
                     None => 0,
                 } + body.get_token_length()
             }
@@ -658,7 +701,7 @@ impl TokenLength for AliasData {
     fn get_token_length(&self) -> usize {
         self.name.get_token_length()
             + match &self.asname {
-                Some(asname) => asname.get_token_length(),
+                Some(asname) => "as".len() + asname.get_token_length(),
                 None => 0,
             }
     }

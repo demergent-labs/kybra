@@ -5,6 +5,8 @@ use rustpython_parser::ast::Location;
 
 use crate::py_ast::what_is_it::WhatIsIt;
 
+use self::token_length::{REGULAR_CHARACTERS, SPECIAL_CHARACTERS};
+
 #[derive(Clone)]
 pub struct SourceMap {
     pub file_contents: String,
@@ -38,7 +40,7 @@ impl SourceMap {
         let token_lines = lines
             .iter()
             .map(|line| {
-                let re = Regex::new(r"[^A-Za-z0-9]").unwrap();
+                let re = Regex::new(SPECIAL_CHARACTERS).unwrap();
                 let s = re.replace_all(&line, "");
                 s.to_string()
             })
@@ -75,13 +77,14 @@ impl SourceMap {
         // whitespace. So what we are going to do is start at the start index. We are going to iterate over all of the characters
         // in the source and if it's a white space or a special character then we are going to skip it
         // otherwise we are going to decrament our count,
-        let re = Regex::new(r"[A-Za-z0-9]").unwrap();
+        let re = Regex::new(REGULAR_CHARACTERS).unwrap();
         let mut real_count = 0;
         let mut end = 0;
         let token_length = token.get_token_length();
         // eprintln!("The token length is {}", token_length);
         // TODO okay this is working mostly well... The problem is that any special characters afterwards aren't included. But
         // we can't go to the next non special character, because what if the next one starts with special characters.
+        // TODO also when we are doing this we need to skip over the lines that are comments since those are not included in the token length
         for char_enum in self.file_contents[start - 1..].chars().enumerate() {
             let (index, char) = char_enum;
             // eprintln!("This is the char we are looking at ({}) the index is {} and we are shooting for 70ish I think", char, index);
@@ -144,17 +147,21 @@ impl SourceMap {
         //     last_line,
         //     self.lines[last_line - 1]
         // );
-        let result = if first_line == last_line {
+        if first_line == last_line {
             // eprintln!("We decided that the first line and the last line were the same");
+            // eprintln!(
+            //     "And here is the source that we are returning: {}",
+            //     self.lines[first_line - 1].clone()
+            // );
             self.lines[first_line - 1].clone()
         } else {
             // eprintln!("We decided that the first line and the last line were not the same");
             // eprintln!("{:#?}", &self.lines[first_line - 1..last_line]);
-            self.lines[first_line - 1..last_line]
+            let result = self.lines[first_line - 1..last_line]
                 .iter()
-                .fold(String::new(), |acc, line| format!("{}{}\n", acc, line))
-        };
-        result[..result.len() - 1].to_string()
+                .fold(String::new(), |acc, line| format!("{}{}\n", acc, line));
+            result[..result.len() - 1].to_string()
+        }
     }
 
     /// get_source and replace token in span with replacement
