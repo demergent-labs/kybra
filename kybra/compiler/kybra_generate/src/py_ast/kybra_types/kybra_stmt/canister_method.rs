@@ -78,6 +78,10 @@ impl KybraStmt<'_> {
         }
     }
 
+    pub fn is_composite(&self) -> bool {
+        self.is_decorator_same_as("composite")
+    }
+
     pub fn as_canister_method(&self) -> Option<CanisterMethod> {
         match &self.stmt_kind.node {
             StmtKind::FunctionDef { name, .. } => {

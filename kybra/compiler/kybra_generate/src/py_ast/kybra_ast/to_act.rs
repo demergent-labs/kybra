@@ -9,7 +9,7 @@ impl ToAct for KybraAst {
             .canister_methods
             .iter()
             .filter(|method| match method {
-                ActCanisterMethod::QueryMethod(_) => true,
+                ActCanisterMethod::QueryMethod { .. } => true,
                 ActCanisterMethod::UpdateMethod(_) => false,
             })
             .map(|method| method.clone())
@@ -18,7 +18,7 @@ impl ToAct for KybraAst {
             .canister_methods
             .iter()
             .filter(|method| match method {
-                ActCanisterMethod::QueryMethod(_) => false,
+                ActCanisterMethod::QueryMethod { .. } => false,
                 ActCanisterMethod::UpdateMethod(_) => true,
             })
             .map(|method| method.clone())
