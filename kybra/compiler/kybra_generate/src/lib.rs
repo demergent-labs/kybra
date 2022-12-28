@@ -55,6 +55,7 @@ pub fn kybra_generate(
     eprintln!("-------------------------------------------");
     eprintln!("--- ENDING --------------------------------");
     eprintln!("-------------------------------------------");
+    todo!();
 
     quote! {
         #![allow(warnings, unused)]
