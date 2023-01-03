@@ -1,0 +1,34 @@
+{
+    "canisters": {
+        "canister1": {
+            "type": "custom",
+            "build": "python -m kybra canister1 src/canister1/canister1.py src/canister1/canister1.did",
+            "candid": "src/canister1/canister1.did",
+            "wasm": ".dfx/kybra/canister1/target/wasm32-unknown-unknown/release/canister1.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/canister1",
+                "node_compatibility": true
+            }
+        },
+        "canister2": {
+            "type": "custom",
+            "build": "python -m kybra canister2 src/canister2/canister2.py src/canister2/canister2.did",
+            "candid": "src/canister2/canister2.did",
+            "wasm": ".dfx/kybra/canister2/target/wasm32-unknown-unknown/release/canister2.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/canister2",
+                "node_compatibility": true
+            }
+        },
+        "canister3": {
+            "type": "custom",
+            "build": "python -m kybra canister3 src/canister3/canister3.py src/canister3/canister3.did",
+            "candid": "src/canister3/canister3.did",
+            "wasm": ".dfx/kybra/canister3/target/wasm32-unknown-unknown/release/canister3.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/canister3",
+                "node_compatibility": true
+            }
+        }
+    }
+}
