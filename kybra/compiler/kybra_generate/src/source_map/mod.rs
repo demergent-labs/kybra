@@ -80,6 +80,8 @@ impl SourceMap {
         let reg_char_re = Regex::new(REGULAR_CHARACTERS).unwrap();
         let comment_re = Regex::new("#").unwrap();
         let newline_re = Regex::new("\n").unwrap();
+        let whitespace_re = Regex::new(r"\s").unwrap();
+        let at_re = Regex::new(r"@").unwrap();
         let opening_re = Regex::new(r"[\{\[\(]").unwrap();
         let closing_re = Regex::new(r"[\}\]\)]").unwrap();
         let double_quote_re = Regex::new("\"").unwrap();
@@ -94,34 +96,44 @@ impl SourceMap {
         let mut is_single_quote_string = false;
         let mut is_escaping = false;
         let mut found_escape_character = false;
+        let mut found_first_character = false;
+        let mut is_decorator = false;
         // eprintln!("The token length is {}", token_length);
         // TODO We don't handle the closing ' or "
         // TODO We don't handle calls that have no parameters. the '()' won't count towards the range
         for char_enum in self.file_contents[start - 1..].chars().enumerate() {
             let (index, char) = char_enum;
+            let char = &char.to_string();
+            if !found_first_character {
+                // This is the first not whitespace character. Do all out necessary processing
+                if !whitespace_re.is_match(char) {
+                    found_first_character = true;
+                    if at_re.is_match(char) {
+                        is_decorator = true;
+                    }
+                }
+            }
             if found_escape_character {
                 found_escape_character = false;
                 is_escaping = true;
             }
             // eprintln!("This is the char we are looking at ({}) the index is {} and we are shooting for 70ish I think", char, index);
-            if is_comment && !newline_re.is_match(&char.to_string()) {
+            if (is_comment || is_decorator) && !newline_re.is_match(char) {
                 // If we are in a comment and the current character doesn't end the comment (with a new line) then we should continue
                 continue;
             }
-            if is_comment && newline_re.is_match(&char.to_string()) {
+            if newline_re.is_match(char) {
                 // If we're in a comment and we hit a new line, end the comment
-                is_comment = false
+                is_comment = false;
+                is_decorator = false;
+                found_first_character = false;
             }
-            if (!is_double_quote_string || !is_single_quote_string)
-                && opening_re.is_match(&char.to_string())
-            {
+            if (!is_double_quote_string || !is_single_quote_string) && opening_re.is_match(char) {
                 // If we find a open brace that isn't in a string or a comment then add to our open count
                 // TODO test to see if we need to take into account any string formatting `f'Hello {}'` would that last o be the end? Or since we're going to the end of the quote will we be fine?
                 open_count += 1
             }
-            if (!is_double_quote_string || !is_single_quote_string)
-                && closing_re.is_match(&char.to_string())
-            {
+            if (!is_double_quote_string || !is_single_quote_string) && closing_re.is_match(char) {
                 // If we find a close brace that isn't in a string or a comment then subtract from our open count
                 open_count -= 1;
             }
@@ -131,11 +143,11 @@ impl SourceMap {
                 // When we are on the very next character we will set at the beginning that we are processing it and we will set found to false
                 // After that we will set that to false on the next pass
                 // We need two variables so we can handle back to back escape characters.
-                if !is_escaping && escape_re.is_match(&char.to_string()) {
+                if !is_escaping && escape_re.is_match(char) {
                     found_escape_character = true;
                 }
             }
-            if !is_single_quote_string && double_quote_re.is_match(&char.to_string()) {
+            if !is_single_quote_string && double_quote_re.is_match(char) {
                 // We can't use a continue like we can with a comment because we can ignore all characters in a comment but we cannot ignore the characters in a string
                 // If we aren't in a single quote or a comment and we hit a double quote then we are either going to start a double quote or end a double quote.
                 if is_double_quote_string {
@@ -352,7 +364,7 @@ impl SourceMap {
                 //     span.end,
                 //     line.len() + 1 - (total - span.end) + 1
                 // );
-                return line.len() - (total - span.end) + 1; // Plus one for the new line that was deleted, plus one because we want columns not index // TODO I actually think we don't want the one from the new line because we aren't looking at the new line here?
+                return 1 + line.len() - (total - span.end); // Plus one for the new line that was deleted, plus one because we want columns not index // TODO I actually think we don't want the one from the new line because we aren't looking at the new line here? // Also lets move that 1 to the beginning. If we have a result that is going to be 0 then that is going to come from -1 + 1 and that's going to break our unsigned numbers
             }
             char_count += line.len() + 1 //Add the length of the line plus the new line character that is no longer there
         }

@@ -1,5 +1,5 @@
 use rustpython_parser::ast::{
-    ArgData, Arguments, Constant, ExprKind, KeywordData, Located, StmtKind,
+    ArgData, Arguments, Constant, ExprContext, ExprKind, KeywordData, Located, StmtKind,
 };
 
 use super::kybra_types::KybraStmt;
@@ -15,6 +15,17 @@ pub trait ToDisplayString {
 impl WhatIsIt for KybraStmt<'_> {
     fn what_is_it(&self) -> () {
         self.stmt_kind.what_is_it();
+    }
+}
+
+impl WhatIsIt for ExprContext {
+    fn what_is_it(&self) -> () {
+        let context = match &self {
+            ExprContext::Load => "load",
+            ExprContext::Store => "store",
+            ExprContext::Del => "del",
+        };
+        eprintln!("The Expr Context is {}", context)
     }
 }
 

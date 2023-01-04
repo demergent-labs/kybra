@@ -48,7 +48,7 @@ where
 
 impl TokenLength for StmtKind {
     fn get_token_length(&self) -> usize {
-        match &self {
+        let len = match &self {
             StmtKind::FunctionDef {
                 name,
                 args,
@@ -106,12 +106,32 @@ impl TokenLength for StmtKind {
                     + bases.get_token_length()
                     + keywords.get_token_length()
                     + body.get_token_length();
+                // eprintln!(
+                //     "My guess is its the body which is {} long",
+                //     body.get_token_length()
+                // );
+                // for stmt in body {
+                //     eprintln!(
+                //         "This is a stmt in the body and it's {} long",
+                //         stmt.get_token_length()
+                //     );
+                //     stmt.what_is_it()
+                // }
                 // + decorator_list.get_token_length() // See the decorator list from FunctionDefs
                 // eprintln!("The length of a class is {}", result);
                 result
             }
             StmtKind::Return { value } => match value {
-                Some(returns) => "return".len() + returns.get_token_length(),
+                Some(returns) => {
+                    // eprintln!("We are about to return the length of a return statement");
+                    // eprintln!("I think that it is {} long", returns.get_token_length());
+                    // returns.what_is_it();
+                    // eprintln!(
+                    //     "Plus the length of the return keyword which should be {} long",
+                    //     "return".len()
+                    // );
+                    "return".len() + returns.get_token_length()
+                }
                 None => 0,
             },
             StmtKind::Delete { targets } => "del".len() + targets.get_token_length(),
@@ -266,7 +286,11 @@ impl TokenLength for StmtKind {
             StmtKind::Pass => "pass".len(),
             StmtKind::Break => "break".len(),
             StmtKind::Continue => "continue".len(),
-        }
+        };
+        // eprintln!("We are looking at an STMT KIND:");
+        // self.what_is_it();
+        // eprintln!("This stmt kind is {} characters long", len);
+        len
     }
 }
 
@@ -403,7 +427,7 @@ impl TokenLength for ExprContext {
 
 impl TokenLength for ExprKind {
     fn get_token_length(&self) -> usize {
-        match &self {
+        let len = match &self {
             ExprKind::BoolOp { op, values } => op.get_token_length() + values.get_token_length(),
             ExprKind::NamedExpr { target, value } => {
                 target.get_token_length() + value.get_token_length()
@@ -464,7 +488,7 @@ impl TokenLength for ExprKind {
                 // let a_len = args.get_token_length();
                 // let k_len = keywords.get_token_length();
                 // eprintln!(
-                //     "the func is {} long, the args are {} long, the keywords are {} long",
+                //     "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<the func is {} long, the args are {} long, the keywords are {} long",
                 //     f_len, a_len, k_len
                 // );
                 func.get_token_length() + args.get_token_length() + keywords.get_token_length()
@@ -490,6 +514,41 @@ impl TokenLength for ExprKind {
                     }
             }
             ExprKind::Attribute { value, attr, ctx } => {
+                // let v_len = value.get_token_length();
+                // let a_len = attr.get_token_length();
+                // let c_len = ctx.get_token_length();
+                // eprintln!("What is the value?");
+                // value.what_is_it();
+                // match &value.node {
+                //     ExprKind::Constant { value, kind } => match &value {
+                //         Constant::None => todo!(),
+                //         Constant::Bool(_) => todo!(),
+                //         Constant::Str(string) => {
+                //             eprintln!("This is the string rep of the value: {}", string)
+                //         }
+                //         Constant::Bytes(_) => todo!(),
+                //         Constant::Int(_) => todo!(),
+                //         Constant::Tuple(_) => todo!(),
+                //         Constant::Float(_) => todo!(),
+                //         Constant::Complex { real, imag } => todo!(),
+                //         Constant::Ellipsis => todo!(),
+                //     },
+                //     _ => eprintln!("It wasn't a constant"),
+                // }
+                // eprintln!("What is the attr?");
+                // eprintln!("{}", attr);
+                // eprintln!("What is the ctx?");
+                // ctx.what_is_it();
+                // eprintln!(
+                //     ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>the value is {} long, the attr is {} long, the ctx are {} long",
+                //     v_len, a_len, c_len
+                // );
+                // We aren't going to take into account the value length of the
+                // attribute because it should already be take into account
+                // earlier, I think For example "hello".upper() "hello" counts
+                // as a constant and then looking at upper it will show up as an
+                // attribute on hello and "hello" would be the value. but it was
+                // also counted for it's self earlier
                 value.get_token_length() + attr.get_token_length() + ctx.get_token_length()
             }
             ExprKind::Subscript { value, slice, ctx } => {
@@ -511,7 +570,11 @@ impl TokenLength for ExprKind {
                     None => 0,
                 }
             }
-        }
+        };
+        // eprintln!("We are looking at an EXPR KIND:");
+        // self.what_is_it();
+        // eprintln!("This expr kind is {} characters long", len);
+        len
     }
 }
 
