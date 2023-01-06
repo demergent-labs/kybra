@@ -1,33 +1,27 @@
-from kybra import ic, init, nat, Record, query, update
+from kybra import init, nat, query, StableBTreeMap, update
 
-
-class StableStorage(Record):
-    counter: nat
-
-
-stable_storage: StableStorage = ic.stable_storage()
+stable_storage = StableBTreeMap[str, nat](memory_id=0, max_key_size=15, max_value_size=1_000)
 
 
 @init
 def init_():
-    global stable_storage
-    stable_storage['counter'] = 0
+    stable_storage.insert('counter', 0)
 
 
 @update
 def increment() -> nat:
-    global stable_storage
-    stable_storage['counter'] += 1
-    return stable_storage['counter']
+    counter = stable_storage.get('counter') or 0
+    stable_storage.insert('counter', counter + 1)
+    return counter
+    # return stable_storage.insert('counter', counter + 1) TODO do this once the insert return type is fixed
 
 
 @query
 def get() -> nat:
-    return stable_storage['counter']
+    return stable_storage.get('counter') or 0
 
 
 @update
 def reset() -> nat:
-    global stable_storage
-    stable_storage['counter'] = 0
-    return stable_storage['counter']
+    return 0
+    # return stable_storage.insert('counter', 0) TODO do this once the insert return type is fixed
