@@ -26,5 +26,6 @@ def get() -> nat:
 
 @update
 def reset() -> nat:
+    stable_storage.insert('counter', 0)
     return 0
     # return stable_storage.insert('counter', 0) TODO do this once the insert return type is fixed
