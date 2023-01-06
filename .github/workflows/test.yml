@@ -104,7 +104,6 @@ jobs:
                     "examples/simple_erc20",
                     "examples/simple_user_accounts",
                     "examples/stable_memory",
-                    "examples/stable_storage",
                     "examples/stable_structures",
                     "examples/timers",
                     "examples/tuple_types",

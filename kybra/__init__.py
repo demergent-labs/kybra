@@ -314,10 +314,6 @@ class ic(Generic[T]):
         _kybra_ic._kybra_stable64_write(offset, buf) # type: ignore
 
     @staticmethod
-    def stable_storage() -> Any:
-        return _kybra_stable_storage # type: ignore
-
-    @staticmethod
     def time() -> nat64:
         return _kybra_ic._kybra_time() # type: ignore
 
