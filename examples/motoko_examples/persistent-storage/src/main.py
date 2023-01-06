@@ -11,8 +11,11 @@ def init_():
 @update
 def increment() -> nat:
     counter = stable_storage.get('counter') or 0
-    stable_storage.insert('counter', counter + 1)
-    return counter
+    new_counter = counter + 1
+
+    stable_storage.insert('counter', new_counter)
+
+    return new_counter
     # return stable_storage.insert('counter', counter + 1) TODO do this once the insert return type is fixed
 
 
