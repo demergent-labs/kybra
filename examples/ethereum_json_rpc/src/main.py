@@ -1,12 +1,11 @@
 from kybra import Async, CanisterResult, ic, init, nat32, query, StableBTreeMap, update
 from kybra.canisters.management import management_canister
 from kybra.canisters.management.http import HttpResponse, HttpTransformArgs
-# from typing import TypedDict
 
 JSON = str
 
 
-stable_storage = StableBTreeMap[str, str](memory_id=0, max_key_size=0, max_value_size=1_000)
+stable_storage = StableBTreeMap[str, str](memory_id=0, max_key_size=20, max_value_size=1_000)
 
 
 @init

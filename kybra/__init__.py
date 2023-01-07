@@ -384,6 +384,9 @@ class StableBTreeMap(Generic[K, V]):
     def is_empty(self) -> bool:
         return _kybra_ic._kybra_stable_b_tree_map_is_empty(self.memory_id) # type: ignore
 
+    def keys(self) -> list[K]:
+        return _kybra_ic._kybra_stable_b_tree_map_keys(self.memory_id) # type: ignore
+
     def len(self) -> nat64:
         return _kybra_ic._kybra_stable_b_tree_map_len(self.memory_id) # type: ignore
 
