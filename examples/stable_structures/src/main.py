@@ -98,6 +98,16 @@ def is_empty_stable_map_0() -> bool:
 
 
 @query
+def keys_stable_map_0() -> list[nat8]:
+    return stable_map_0.keys()
+
+
+@query
+def values_stable_map_0() -> list[str]:
+    return stable_map_0.values()
+
+
+@query
 def len_stable_map_0() -> nat64:
     return stable_map_0.len()
 

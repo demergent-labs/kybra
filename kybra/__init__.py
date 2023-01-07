@@ -392,3 +392,6 @@ class StableBTreeMap(Generic[K, V]):
 
     def remove(self, key: K) -> opt[V]:
         return _kybra_ic._kybra_stable_b_tree_map_remove(self.memory_id, key) # type: ignore
+
+    def values(self) -> list[V]:
+        return _kybra_ic._kybra_stable_b_tree_map_values(self.memory_id) # type: ignore

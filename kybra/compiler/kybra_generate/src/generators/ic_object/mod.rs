@@ -44,6 +44,7 @@ use crate::generators::ic_object::functions::stable_b_tree_map::is_empty::genera
 use crate::generators::ic_object::functions::stable_b_tree_map::keys::generate_stable_b_tree_map_keys;
 use crate::generators::ic_object::functions::stable_b_tree_map::len::generate_stable_b_tree_map_len;
 use crate::generators::ic_object::functions::stable_b_tree_map::remove::generate_stable_b_tree_map_remove;
+use crate::generators::ic_object::functions::stable_b_tree_map::values::generate_stable_b_tree_map_values;
 use crate::generators::ic_object::functions::stable_bytes::generate_stable_bytes;
 use crate::generators::ic_object::functions::stable_grow::generate_stable_grow;
 use crate::generators::ic_object::functions::stable_read::generate_stable_read;
@@ -105,6 +106,7 @@ pub fn generate_ic_object(
     let stable_b_tree_map_keys = generate_stable_b_tree_map_keys(stable_b_tree_map_nodes);
     let stable_b_tree_map_len = generate_stable_b_tree_map_len(stable_b_tree_map_nodes);
     let stable_b_tree_map_remove = generate_stable_b_tree_map_remove(stable_b_tree_map_nodes);
+    let stable_b_tree_map_values = generate_stable_b_tree_map_values(stable_b_tree_map_nodes);
     let stable64_grow = generate_stable64_grow();
     let stable64_read = generate_stable64_read();
     let stable64_size = generate_stable64_size();
@@ -162,6 +164,7 @@ pub fn generate_ic_object(
             #stable_b_tree_map_keys
             #stable_b_tree_map_len
             #stable_b_tree_map_remove
+            #stable_b_tree_map_values
             #stable64_grow
             #stable64_read
             #stable64_size
