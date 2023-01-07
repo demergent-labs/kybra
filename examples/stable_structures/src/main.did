@@ -44,6 +44,7 @@ service : () -> {
   is_empty_stable_map_7 : () -> (bool) query;
   is_empty_stable_map_8 : () -> (bool) query;
   is_empty_stable_map_9 : () -> (bool) query;
+  items_stable_map_0 : () -> (vec record { nat8; text }) query;
   keys_stable_map_0 : () -> (vec nat8) query;
   len_stable_map_0 : () -> (nat64) query;
   len_stable_map_1 : () -> (nat64) query;

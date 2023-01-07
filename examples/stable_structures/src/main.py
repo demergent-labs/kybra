@@ -108,6 +108,11 @@ def values_stable_map_0() -> list[str]:
 
 
 @query
+def items_stable_map_0() -> list[tuple[nat8, str]]:
+    return stable_map_0.items()
+
+
+@query
 def len_stable_map_0() -> nat64:
     return stable_map_0.len()
 
