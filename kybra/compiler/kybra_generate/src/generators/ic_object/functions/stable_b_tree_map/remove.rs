@@ -1,8 +1,6 @@
-use quote::{format_ident, quote};
+use quote::quote;
 
-use crate::{
-    generators::stable_b_tree_map::generate_wrapper_type, py_ast::kybra_types::StableBTreeMapNode,
-};
+use crate::{generators::stable_b_tree_map, py_ast::kybra_types::StableBTreeMapNode};
 
 pub fn generate_stable_b_tree_map_remove(
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
@@ -29,10 +27,9 @@ fn generate_match_arms(
         .iter()
         .map(|stable_b_tree_map_node| {
             let memory_id = stable_b_tree_map_node.memory_id;
-            let map_name_ident =
-                format_ident!("STABLE_B_TREE_MAP_{}", stable_b_tree_map_node.memory_id);
+            let map_name_ident = stable_b_tree_map::ref_cell_ident(stable_b_tree_map_node.memory_id);
 
-            let (key_wrapper_type_name, _) = generate_wrapper_type(&stable_b_tree_map_node.key_type, memory_id, "Key");
+            let (key_wrapper_type_name, _) = stable_b_tree_map::generate_wrapper_type(&stable_b_tree_map_node.key_type, memory_id, "Key");
 
             quote! {
                 #memory_id => {
