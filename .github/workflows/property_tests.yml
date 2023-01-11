@@ -4,7 +4,6 @@
 # This GitHub Action flow works as follows:
 # The tests are currently simple example-based integration tests.
 # Each directory in the examples directory represents an example project and is intended to have tests that ensure the canisters contained in that example function properly.
-# These tests are currently written in TypeScript and are intended to be run in a Node.js environment.
 # This GitHub Action takes care of deploying to PyPI and GitHub.
 # Tests can either run against the current code of Kybra found in the repository, or the code deployed by the GitHub Action to PyPI.
 # Feature branch pull requests (pull requests without release-- in the base branch name) will run all tests against the code found in the repository.
@@ -100,10 +99,6 @@ jobs:
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               uses: actions/checkout@v2
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-              uses: actions/setup-node@v3
-              with:
-                  node-version: 18
-            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               run: DFX_VERSION=0.12.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               name: Install Rust ${{ matrix.rust }}
@@ -123,16 +118,10 @@ jobs:
                       ${{ matrix.example_directories }}/.dfx/kybra/*/target
                   key: kybra-cargo-${{ matrix.example_directories }}-${{ matrix.kybra_source }}-${{ hashFiles('kybra/compiler/Cargo.toml') }}
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-              working-directory: ${{ matrix.example_directories }}
               run: curl https://pyenv.run | bash
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-              working-directory: ${{ matrix.example_directories }}
               run: ~/.pyenv/bin/pyenv install 3.10.7
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-              working-directory: ${{ matrix.example_directories }}
-              run: ~/.pyenv/versions/3.10.7/bin/python -m venv .dfx/kybra/venv
-            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-              working-directory: ${{ matrix.example_directories }}
               run: dfx start --clean --background --host 127.0.0.1:8000
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               working-directory: kybra_tests
