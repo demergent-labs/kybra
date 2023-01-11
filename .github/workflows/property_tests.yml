@@ -1,0 +1,153 @@
+# TODO the next great simplification might be deploying multiple examples to one dfx replica instance: https://forum.dfinity.org/t/use-the-same-local-replica-for-multiple-projects/11900
+# TODO this might allow us to avoid spinning up so many jobs in the matrix
+
+# This GitHub Action flow works as follows:
+# The tests are currently simple example-based integration tests.
+# Each directory in the examples directory represents an example project and is intended to have tests that ensure the canisters contained in that example function properly.
+# These tests are currently written in TypeScript and are intended to be run in a Node.js environment.
+# This GitHub Action takes care of deploying to PyPI and GitHub.
+# Tests can either run against the current code of Kybra found in the repository, or the code deployed by the GitHub Action to PyPI.
+# Feature branch pull requests (pull requests without release-- in the base branch name) will run all tests against the code found in the repository.
+# Release branch pull requests (pull requests with release-- in the base branch name) will run all tests against the code found in the repository and the code deployed by the GitHub Action to PyPI.
+# Pushes to main will run all tests against the code in the repository if the latest commit was not a merge of a release branch, and will run tests against the code in the repository and the code deployed by the GitHub Action to PyPI otherwise.
+# The basic-integration-tests matrix spins up one job per combination of example directory and code source (repo or pypi).
+# The check-basic-integration-tests-success job is designed to ensure that all jobs spun up from the matrix in the basic-integration-tests have succeeded
+
+name: Kybra Property Tests
+on:
+    push:
+        branches:
+            - main
+    pull_request: # Runs on pull requests to any branch
+jobs:
+    release-candidate-deploy:
+        runs-on: ubuntu-latest
+        env:
+            GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }} # All commits must be verified
+            PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        outputs:
+            # These outputs are used to pass information along to the next job
+            should_run_tests: ${{ steps.should_run_tests.outputs.should_run_tests }} # We only want the next job to run the tests once we have finished deploying to PyPI and GitHub
+            example_directories: ${{ steps.example_directories.outputs.example_directories }}
+        steps:
+            - uses: actions/checkout@v2
+              # if: contains(github.head_ref, 'release--')
+              with:
+                  ref: ${{ contains(github.head_ref, 'release--') && github.event.pull_request.head.ref || github.ref }} # This is necessary for this job to be able to commit and push to the origin remote properly
+                  token: ${{ secrets.LASTMJS_GITHUB_TOKEN || github.token }} # A personal GitHub token is setup as a secret so that committing and pushing to GitHub from the Action will trigger another workflow
+            # TODO we should use some Action-specific bot account
+            - if: contains(github.head_ref, 'release--')
+              run: git config --global user.name 'Jordan Last'
+            - if: contains(github.head_ref, 'release--')
+              run: git config --global user.email 'jordan.michael.last@gmail.com'
+            - if: contains(github.head_ref, 'release--')
+              run: git config --global commit.gpgsign true
+            - if: contains(github.head_ref, 'release--')
+              run: echo -n "$GPG_SIGNING_KEY" | base64 --decode | gpg --import
+            - if: contains(github.head_ref, 'release--')
+              run: git config --global user.signingkey C8B77BCBE16CD2B94B43F9C8757397B82D4ED7B0
+            - if: contains(github.head_ref, 'release--')
+              run: curl https://pyenv.run | bash
+            - if: contains(github.head_ref, 'release--')
+              run: ~/.pyenv/bin/pyenv install 3.10.7
+            - id: example_directories
+              # TODO to improve this further we might be able to create an environment variable that grabs the example directories with a glob
+              # TODO we want to be able to easily include and exclude examples though
+              run: |
+                  EXAMPLE_DIRECTORIES=$(cat << END
+                  [
+                    "kybra_tests/src/candid_types/text"
+                  ]
+                  END
+                  )
+                  EXAMPLE_DIRECTORIES="${EXAMPLE_DIRECTORIES//'%'/'%25'}"
+                  EXAMPLE_DIRECTORIES="${EXAMPLE_DIRECTORIES//$'\n'/'%0A'}"
+                  EXAMPLE_DIRECTORIES="${EXAMPLE_DIRECTORIES//$'\r'/'%0D'}"
+                  echo "::set-output name=example_directories::$EXAMPLE_DIRECTORIES"
+            - id: should_run_tests
+              run: |
+                  BRANCH_NAME="${{ github.head_ref }}"
+                  RELEASE_VERSION="${BRANCH_NAME:9}"
+                  COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
+                  if [[ "${{ contains(github.head_ref, 'release--') }}" == "true" && "$COMMIT_MESSAGE" != "kybra-bot automated release $RELEASE_VERSION" ]]
+                  then
+                    ./publish-github-action.sh $RELEASE_VERSION ${{ toJSON(steps.example_directories.outputs.example_directories) }}
+                  else
+                    echo "::set-output name=should_run_tests::true"
+                  fi
+    basic-integration-tests:
+        needs: release-candidate-deploy
+        runs-on: ubuntu-latest
+        env:
+            ETHEREUM_URL: ${{ secrets.ETHEREUM_URL }}
+        strategy:
+            fail-fast: false # We want to see which example tests succeed and which ones fail, we don't want one example test to cancel the rest
+            matrix:
+                # TODO perhaps we should start testing on different versions of dfx as well
+                rust: [stable]
+                include_pypi:
+                    # Only include pypi in the matrix if you've pushed to main and the last commit was a merge of a release branch, or the base branch of the pull request is a release branch
+                    - ${{ (github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'Merge pull request') && contains(github.event.head_commit.message, 'demergent-labs/release--')) || contains(github.head_ref, 'release--') }}
+                kybra_source:
+                    - pypi
+                    - repo
+                exclude:
+                    - include_pypi: false
+                      kybra_source: pypi
+                # If should_run_tests is false, we still want the steps of this job to execute so that check-basic-integration-tests-success will run. We do this by creating an array with one dummy element
+                example_directories: ${{ needs.release-candidate-deploy.outputs.should_run_tests == 'true' && fromJSON(needs.release-candidate-deploy.outputs.example_directories) || fromJSON('["dummy"]') }}
+        steps:
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              uses: actions/checkout@v2
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              run: DFX_VERSION=0.12.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              name: Install Rust ${{ matrix.rust }}
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: ${{ matrix.rust }}
+                  profile: minimal
+                  override: true
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              uses: actions/cache@v3
+              with:
+                  path: |
+                      ~/.cargo/bin/
+                      ~/.cargo/registry/index/
+                      ~/.cargo/registry/cache/
+                      ~/.cargo/git/db/
+                      ${{ matrix.example_directories }}/.dfx/kybra/*/target
+                  key: kybra-cargo-${{ matrix.example_directories }}-${{ matrix.kybra_source }}-${{ hashFiles('kybra/compiler/Cargo.toml') }}
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              working-directory: ${{ matrix.example_directories }}
+              run: curl https://pyenv.run | bash
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              working-directory: ${{ matrix.example_directories }}
+              run: ~/.pyenv/bin/pyenv install 3.10.7
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              working-directory: ${{ matrix.example_directories }}
+              run: ~/.pyenv/versions/3.10.7/bin/python -m venv .dfx/kybra/venv
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              working-directory: ${{ matrix.example_directories }}
+              run: dfx start --clean --background --host 127.0.0.1:8000
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              working-directory: kybra_tests
+              run: KYBRA_CASES=1 cargo test -- --nocapture --test test_text # TODO we need to run the correct test
+
+    check-basic-integration-tests-success:
+        needs: basic-integration-tests
+        runs-on: ubuntu-latest
+        if: success()
+        steps:
+            - run: exit 0
+
+    check-basic-integration-tests-failure:
+        needs: basic-integration-tests
+        runs-on: ubuntu-latest
+        if: failure()
+        steps:
+            - run: exit 1
