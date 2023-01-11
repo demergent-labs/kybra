@@ -1,6 +1,7 @@
 // KYBRA_CASES=1 cargo test -- --nocapture --test test_text
 
 // TODO abstract away what is common to other tests
+// TODO let's move onto nat and see if we can make some nice abstractions
 
 #[cfg(test)]
 mod tests {

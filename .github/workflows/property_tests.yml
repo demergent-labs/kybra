@@ -1,3 +1,5 @@
+# TODO we REALLY would like to get caching to work properly
+
 name: Kybra Property Tests
 on:
     push:
@@ -5,7 +7,7 @@ on:
             - main
     pull_request: # Runs on pull requests to any branch
 jobs:
-    basic-integration-tests:
+    basic-integration-tests: # TODO let's change the name of this
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false # We want to see which example tests succeed and which ones fail, we don't want one example test to cancel the rest
@@ -29,8 +31,8 @@ jobs:
             - working-directory: ${{ matrix.tests.directory }}
               run: dfx start --clean --background --host 127.0.0.1:8000
             - working-directory: kybra_tests
-              run: KYBRA_CASES=10 cargo test -- --nocapture --test ${{ matrix.tests.name }} # TODO We need this name to be dynamic
-              # run: KYBRA_CASES=10 cargo test -- --nocapture --test ${{ matrix.example_directories }} # TODO we will want to configure KYBRA_CASES based on release candidates and full releases etc
+              shell: bash -l {0}
+              run: KYBRA_CASES=10 cargo test -- --nocapture --test ${{ matrix.tests.name }} # TODO we will want to configure KYBRA_CASES based on release candidates and full releases etc
 
     check-basic-integration-tests-success:
         needs: basic-integration-tests
