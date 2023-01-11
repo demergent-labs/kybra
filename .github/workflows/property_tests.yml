@@ -7,7 +7,7 @@ on:
             - main
     pull_request: # Runs on pull requests to any branch
 jobs:
-    basic-integration-tests: # TODO let's change the name of this
+    property-tests: # TODO let's change the name of this
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false # We want to see which example tests succeed and which ones fail, we don't want one example test to cancel the rest
@@ -15,8 +15,10 @@ jobs:
                 # TODO perhaps we should start testing on different versions of dfx as well
                 rust: [stable]
                 tests:
-                    - name: test_text
+                    - name: candid_types::text::property_tests::basic
                       directory: kybra_tests/src/candid_types/text
+                    - name: candid_types::nat::property_tests::basic
+                      directory: kybra_tests/src/candid_types/nat
         steps:
             - uses: actions/checkout@v3
             - run: DFX_VERSION=0.12.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
@@ -32,18 +34,17 @@ jobs:
               run: dfx start --clean --background --host 127.0.0.1:8000
             - working-directory: kybra_tests
               shell: bash -l {0}
-              run: KYBRA_CASES=10 cargo test -- --nocapture --test ${{ matrix.tests.name }} # TODO we will want to configure KYBRA_CASES based on release candidates and full releases etc
-              # TODO we keep failing at No such file or directory (os error 2), maybe the main.py file is not being written correctly
+              run: KYBRA_CASES=10 cargo test ${{ matrix.tests.name }} -- --nocapture --exact # TODO we will want to configure KYBRA_CASES based on release candidates and full releases etc
 
-    check-basic-integration-tests-success:
-        needs: basic-integration-tests
+    check-property-tests-success:
+        needs: property-tests
         runs-on: ubuntu-latest
         if: success()
         steps:
             - run: exit 0
 
-    check-basic-integration-tests-failure:
-        needs: basic-integration-tests
+    check-property-tests-failure:
+        needs: property-tests
         runs-on: ubuntu-latest
         if: failure()
         steps:
