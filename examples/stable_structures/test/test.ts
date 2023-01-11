@@ -1,8 +1,11 @@
 import { run_tests, Test } from 'azle/test';
 import { execSync } from 'child_process';
+import {
+    pre_redeploy_tests,
+    post_redeploy_tests
+} from 'azle/examples/stable_structures/test/tests';
 import { createActor as createActorCanister1 } from './dfx_generated/canister1';
 import { createActor as createActorCanister2 } from './dfx_generated/canister2';
-import { get_first_tests, get_second_tests } from './tests';
 
 const stable_structures_canister_1 = createActorCanister1(
     'rrkah-fqaaa-aaaaa-aaaaq-cai',
@@ -37,10 +40,10 @@ const tests: Test[] = [
             });
         }
     },
-    ...get_first_tests(stable_structures_canister_1, 0, 6),
-    ...get_first_tests(stable_structures_canister_2, 7, 13),
+    ...pre_redeploy_tests(stable_structures_canister_1 as any, 0, 6),
+    ...pre_redeploy_tests(stable_structures_canister_2 as any, 7, 13),
     {
-        name: 'deploy',
+        name: 'redeploy canisters',
         prep: async () => {
             await new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -49,8 +52,8 @@ const tests: Test[] = [
             });
         }
     },
-    ...get_second_tests(stable_structures_canister_1, 0, 6),
-    ...get_second_tests(stable_structures_canister_2, 7, 13)
+    ...post_redeploy_tests(stable_structures_canister_1 as any, 0, 6),
+    ...post_redeploy_tests(stable_structures_canister_2 as any, 7, 13)
 ];
 
 run_tests(tests);
