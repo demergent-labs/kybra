@@ -8,3 +8,5 @@ build
 kybra.egg-info
 node_modules
 __pycache__
+kybra_tests/src/**/*.py
+kybra_tests/src/**/*.did

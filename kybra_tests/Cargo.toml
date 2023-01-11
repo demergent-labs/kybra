@@ -1,0 +1,10 @@
+[package]
+name = "kybra_tests"
+version = "0.0.0"
+edition = "2018"
+
+[dependencies]
+candid = "0.8.4"
+ic-agent = "0.23.0"
+proptest = "1.0.0"
+tokio-test = "0.4.2"
