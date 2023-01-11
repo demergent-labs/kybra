@@ -365,8 +365,34 @@ def method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
 
     return intermediate_func # type: ignore
 
+
 K = TypeVar('K')
 V = TypeVar('V')
+
+
+class KeyTooLarge(Variant, total=False):
+    given: nat32
+    max: nat32
+
+
+class ValueTooLarge(Variant, total=False):
+    given: nat32
+    max: nat32
+
+
+class InsertError(Variant, total=False):
+    KeyTooLarge: KeyTooLarge
+    ValueTooLarge: ValueTooLarge
+
+
+class InsertResult(Generic[V]):
+    ok: V
+    err: Optional[InsertError]
+
+    def __init__(self, ok: V, err: InsertError):
+        self.ok = ok
+        self.err = err
+
 
 class StableBTreeMap(Generic[K, V]):
     def __init__(self, memory_id: nat8, max_key_size: int, max_value_size: int):
@@ -378,7 +404,7 @@ class StableBTreeMap(Generic[K, V]):
     def get(self, key: K) -> opt[V]:
         return _kybra_ic._kybra_stable_b_tree_map_get(self.memory_id, key) # type: ignore
 
-    def insert(self, key: K, value: V) -> V:
+    def insert(self, key: K, value: V) -> InsertResult[opt[V]]:
         return _kybra_ic._kybra_stable_b_tree_map_insert(self.memory_id, key, value) # type: ignore
 
     def is_empty(self) -> bool:

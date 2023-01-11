@@ -1,4 +1,4 @@
-from kybra import blob, opt, query, Record, StableBTreeMap, update, Variant
+from kybra import InsertError, blob, opt, query, Record, StableBTreeMap, update, Variant
 from kybra import nat, nat64, nat32, nat16, nat8
 from kybra import float32, float64
 
@@ -33,14 +33,58 @@ stable_map_6 = StableBTreeMap[list[nat64], bool](
     memory_id=6, max_key_size=100, max_value_size=1_000)
 
 
+class StableMap0InsertResult(Variant, total=False):
+    ok: opt[str]
+    err: InsertError
+
+
+class StableMap1InsertResult(Variant, total=False):
+    ok: opt[blob]
+    err: InsertError
+
+
+class StableMap2InsertResult(Variant, total=False):
+    ok: opt[nat]
+    err: InsertError
+
+
+class StableMap3InsertResult(Variant, total=False):
+    ok: opt[int]
+    err: InsertError
+
+
+class StableMap4InsertResult(Variant, total=False):
+    ok: opt[float32]
+    err: InsertError
+
+
+class StableMap5InsertResult(Variant, total=False):
+    ok: opt[float64]
+    err: InsertError
+
+
+class StableMap6InsertResult(Variant, total=False):
+    ok: opt[bool]
+    err: InsertError
+
+
 @query
 def stable_map_0_get(key: nat8) -> opt[str]:
     return stable_map_0.get(key)
 
 
 @update
-def stable_map_0_insert(key: nat8, value: str):
-    return stable_map_0.insert(key, value)
+def stable_map_0_insert(key: nat8, value: str) -> StableMap0InsertResult:
+    result = stable_map_0.insert(key, value)
+
+    if result.err is not None:
+        return {
+            'err': result.err
+        }
+
+    return {
+        'ok': result.ok
+    }
 
 
 @update
@@ -84,8 +128,17 @@ def stable_map_1_get(key: nat16) -> opt[blob]:
 
 
 @update
-def stable_map_1_insert(key: nat16, value: blob):
-    return stable_map_1.insert(key, value)
+def stable_map_1_insert(key: nat16, value: blob) -> StableMap1InsertResult:
+    result = stable_map_1.insert(key, value)
+
+    if result.err is not None:
+        return {
+            'err': result.err
+        }
+
+    return {
+        'ok': result.ok
+    }
 
 
 @update
@@ -129,8 +182,17 @@ def stable_map_2_get(key: nat32) -> opt[nat]:
 
 
 @update
-def stable_map_2_insert(key: nat32, value: nat):
-    return stable_map_2.insert(key, value)
+def stable_map_2_insert(key: nat32, value: nat) -> StableMap2InsertResult:
+    result = stable_map_2.insert(key, value)
+
+    if result.err is not None:
+        return {
+            'err': result.err
+        }
+
+    return {
+        'ok': result.ok
+    }
 
 
 @update
@@ -174,8 +236,17 @@ def stable_map_3_get(key: Reaction) -> opt[int]:
 
 
 @update
-def stable_map_3_insert(key: Reaction, value: int):
-    return stable_map_3.insert(key, value)
+def stable_map_3_insert(key: Reaction, value: int) -> StableMap3InsertResult:
+    result = stable_map_3.insert(key, value)
+
+    if result.err is not None:
+        return {
+            'err': result.err
+        }
+
+    return {
+        'ok': result.ok
+    }
 
 
 @update
@@ -219,8 +290,17 @@ def stable_map_4_get(key: User) -> opt[float32]:
 
 
 @update
-def stable_map_4_insert(key: User, value: float32):
-    return stable_map_4.insert(key, value)
+def stable_map_4_insert(key: User, value: float32) -> StableMap4InsertResult:
+    result = stable_map_4.insert(key, value)
+
+    if result.err is not None:
+        return {
+            'err': result.err
+        }
+
+    return {
+        'ok': result.ok
+    }
 
 
 @update
@@ -264,8 +344,17 @@ def stable_map_5_get(key: opt[str]) -> opt[float64]:
 
 
 @update
-def stable_map_5_insert(key: opt[str], value: float64):
-    return stable_map_5.insert(key, value)
+def stable_map_5_insert(key: opt[str], value: float64) -> StableMap5InsertResult:
+    result = stable_map_5.insert(key, value)
+
+    if result.err is not None:
+        return {
+            'err': result.err
+        }
+
+    return {
+        'ok': result.ok
+    }
 
 
 @update
@@ -309,8 +398,17 @@ def stable_map_6_get(key: list[nat64]) -> opt[bool]:
 
 
 @update
-def stable_map_6_insert(key: list[nat64], value: bool):
-    return stable_map_6.insert(key, value)
+def stable_map_6_insert(key: list[nat64], value: bool) -> StableMap6InsertResult:
+    result = stable_map_6.insert(key, value)
+
+    if result.err is not None:
+        return {
+            'err': result.err
+        }
+
+    return {
+        'ok': result.ok
+    }
 
 
 @update

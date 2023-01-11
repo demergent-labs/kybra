@@ -16,7 +16,8 @@ import {
     nat16,
     nat32,
     nat64,
-    nat8
+    nat8,
+    ok
 } from 'azle';
 
 type _SERVICE = CANISTER1_SERVICE | CANISTER2_SERVICE;
@@ -399,7 +400,7 @@ function get_stable_map_insert_tests(
                 ](key, STABLE_MAP_VALUES[index]);
 
                 return {
-                    ok: insert_result === undefined
+                    ok: ok(insert_result) && is_empty_opt(insert_result.ok)
                 };
             }
         };

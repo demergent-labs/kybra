@@ -136,5 +136,28 @@ Principal
                 Ok(self.to_pyobject(vm))
             }
         }
+
+        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_stable_structures::btreemap::InsertError {
+            fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
+                match self {
+                    ic_stable_structures::btreemap::InsertError::KeyTooLarge {given, max} => {
+                        let dict = vm.ctx.new_dict();
+
+                        dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
+                        dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+
+                        Ok(dict.into())
+                    },
+                    ic_stable_structures::btreemap::InsertError::ValueTooLarge {given, max} => {
+                        let dict = vm.ctx.new_dict();
+
+                        dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
+                        dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+
+                        Ok(dict.into())
+                    }
+                }
+            }
+        }
     }
 }

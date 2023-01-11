@@ -54,9 +54,11 @@ fn generate_global_stable_b_tree_maps_and_impls(
             let (key_wrapper_type_name, key_wrapper_type) = generate_wrapper_type(&stable_b_tree_map_node.key_type, memory_id, "Key");
             let (value_wrapper_type_name, value_wrapper_type) = generate_wrapper_type(&stable_b_tree_map_node.value_type, memory_id, "Value");
 
+            let key_try_into_vm_value_impl = generate_try_into_vm_value_impl(&key_wrapper_type_name);
             let key_storable_impl = generate_storable_impl(&key_wrapper_type_name);
             let key_bounded_storable_impl = generate_bounded_storable_impl(&key_wrapper_type_name, stable_b_tree_map_node.max_key_size);
 
+            let value_try_into_vm_value_impl = generate_try_into_vm_value_impl(&value_wrapper_type_name);
             let value_storable_impl = generate_storable_impl(&value_wrapper_type_name);
             let value_bounded_storable_impl = generate_bounded_storable_impl(&value_wrapper_type_name, stable_b_tree_map_node.max_value_size);
 
@@ -66,10 +68,12 @@ fn generate_global_stable_b_tree_maps_and_impls(
                 },
                 quote! {
                     #key_wrapper_type
+                    #key_try_into_vm_value_impl
                     #key_storable_impl
                     #key_bounded_storable_impl
 
                     #value_wrapper_type
+                    #value_try_into_vm_value_impl
                     #value_storable_impl
                     #value_bounded_storable_impl
                 }
@@ -90,10 +94,20 @@ pub fn generate_wrapper_type(
     (
         wrapper_struct_name_ident.clone(),
         quote! {
-            #[derive(CandidType, Deserialize, CdkActTryIntoVmValue, CdkActTryFromVmValue)]
+            #[derive(CandidType, Deserialize, CdkActTryFromVmValue)]
             struct #wrapper_struct_name_ident(#key_type);
         },
     )
+}
+
+pub fn generate_try_into_vm_value_impl(wrapper_type_name: &Ident) -> proc_macro2::TokenStream {
+    quote::quote! {
+        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for #wrapper_type_name {
+            fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
+                Ok(self.0.try_into_vm_value(vm).unwrap())
+            }
+        }
+    }
 }
 
 fn generate_storable_impl(wrapper_type_name: &Ident) -> proc_macro2::TokenStream {
