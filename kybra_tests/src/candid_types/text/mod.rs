@@ -45,9 +45,13 @@ mod tests {
         runner.run(&create_arb_program(), |arb_program| {
             let main_file_path = env::current_dir()?.join("src/candid_types/text/src/main.py");
 
+            println!("main_file_path: {}", main_file_path.to_string_lossy());
+
             std::fs::write(main_file_path, arb_program.code)?;
 
             let current_file_path = env::current_dir()?.join("src/candid_types/text");
+
+            println!("current_file_path: {}", current_file_path.to_string_lossy());
 
             let mut child = Command::new("bash")
                 .arg("-c")
