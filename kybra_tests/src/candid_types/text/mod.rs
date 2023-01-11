@@ -1,7 +1,5 @@
 // KYBRA_CASES=1 cargo test -- --nocapture --test test_text
 
-// TODO get the GitHub Action setup
-// TODO update calls
 // TODO abstract away what is common to other tests
 
 #[cfg(test)]
@@ -77,23 +75,33 @@ mod tests {
                 let encoded: Vec<u8> = args.to_bytes()?;
 
                 let response = tokio_test::block_on(async {
-                    agent
-                    .query(&canister_id, &arb_function.name)
-                    .with_arg(&encoded)
-                    .call()
-                    .await
+                    match arb_function.method_type {
+                        MethodType::QUERY => {
+                            agent
+                                .query(&canister_id, &arb_function.name)
+                                .with_arg(&encoded)
+                                .call()
+                                .await
+                        },
+                        MethodType::UPDATE => {
+                            agent
+                                .update(&canister_id, &arb_function.name)
+                                .with_arg(&encoded)
+                                .call_and_wait()
+                                .await
+                        }
+                    }
                 })?;
 
                 let result = Decode!(&response, String)?.replace("\\", "\\\\").replace("\"", "\\\"");
 
-                // assert!(result == arb_function.value);
-                if result != arb_function.value {
-                    println!("function: {}", &arb_function.name);
-                    println!("result: {}", result);
-                    println!("arb_function.value: {}", &arb_function.value);
-                    println!("\n\n");
-                    panic!();
-                }
+                println!("function: {}", &arb_function.name);
+                println!("\n");
+                println!("result: {}", result);
+                println!("arb_function.value: {}", &arb_function.value);
+                println!("\n\n");
+
+                assert!(result == arb_function.value);
             }
 
             Ok(())
@@ -109,9 +117,16 @@ mod tests {
     }
 
     #[derive(Debug, Clone)]
+    enum MethodType {
+        QUERY,
+        UPDATE,
+    }
+
+    #[derive(Debug, Clone)]
     struct ArbFunction {
         code: String,
         name: String,
+        method_type: MethodType,
         arb_params: Vec<ArbParam>,
         value: String,
     }
@@ -142,7 +157,7 @@ mod tests {
                 let alias_codes = arb_aliases.iter().map(|arb_alias| arb_alias.code.clone()).collect::<Vec<String>>().join("\n");
 
                 ArbProgram {
-                    code: format!("from kybra import query, text\n\n\n{alias_codes}\n\n\n{unique_arb_function_codes}"),
+                    code: format!("from kybra import query, text, update\n\n\n{alias_codes}\n\n\n{unique_arb_function_codes}"),
                     arb_functions
                 }
             })
@@ -153,8 +168,8 @@ mod tests {
         (
             create_arb_python_name(),
             prop::collection::vec(create_arb_param(arb_aliases), 0..5), // TODO Once we can support more params, let's increase this number
-            prop_oneof!["str", "text"],
-            prop_oneof!["@query"], // TODO add @update
+            create_arb_type(arb_aliases),
+            prop_oneof!["@query", "@update"],
             create_arb_string()
         ).prop_map(|(arb_function_name, arb_params, arb_return_type, arb_decorator, arb_return_string)| {
             let params = arb_params.iter().map(|arb_param| arb_param.code.clone()).collect::<Vec<String>>().join(", ");
@@ -167,6 +182,7 @@ mod tests {
             ArbFunction {
                 code: format!("{arb_decorator}\ndef {arb_function_name}({params}) -> {arb_return_type}:\n    return {return_string}"),
                 name: arb_function_name,
+                method_type: if arb_decorator == "@query" { MethodType::QUERY } else { MethodType::UPDATE },
                 arb_params: arb_params,
                 value: return_value
             }

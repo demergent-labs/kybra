@@ -55,7 +55,7 @@ jobs:
               run: |
                   EXAMPLE_DIRECTORIES=$(cat << END
                   [
-                    "test_text"
+                    "kybra_tests/src/candid_types/text"
                   ]
                   END
                   )
@@ -122,10 +122,12 @@ jobs:
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               run: ~/.pyenv/bin/pyenv install 3.10.7
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              working-directory: ${{ matrix.example_directories }}
               run: dfx start --clean --background --host 127.0.0.1:8000
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               working-directory: kybra_tests
-              run: KYBRA_CASES=10 cargo test -- --nocapture --test ${{ matrix.example_directories }} # TODO we will want to configure KYBRA_CASES based on release candidates and full releases etc
+              run: KYBRA_CASES=10 cargo test -- --nocapture --test test_text # TODO We need this name to be dynamic
+              # run: KYBRA_CASES=10 cargo test -- --nocapture --test ${{ matrix.example_directories }} # TODO we will want to configure KYBRA_CASES based on release candidates and full releases etc
 
     check-basic-integration-tests-success:
         needs: basic-integration-tests
