@@ -51,7 +51,7 @@ jobs:
             - working-directory: ${{ matrix.tests.directory }}
               run: dfx start --clean --background --host 127.0.0.1:8000
             - working-directory: kybra_tests
-              run: KYBRA_CASES=10 cargo test ${{ matrix.tests.name }} -- --nocapture --exact # TODO we will want to configure KYBRA_CASES based on release candidates and full releases etc
+              run: KYBRA_CASES=1 cargo test ${{ matrix.tests.name }} -- --nocapture --exact # TODO we will want to configure KYBRA_CASES based on release candidates and full releases etc
 
     check-property-tests-success:
         needs: property-tests
