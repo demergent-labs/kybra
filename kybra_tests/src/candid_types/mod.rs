@@ -209,7 +209,7 @@ pub fn create_arb_program<
                     code: format!(
                         "{import_statement}\n\n\n{alias_codes}\n\n\n{unique_arb_function_codes}"
                     ),
-                    arb_functions,
+                    arb_functions: unique_arb_functions,
                 }
             })
         },
