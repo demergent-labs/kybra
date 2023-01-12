@@ -16,6 +16,7 @@ mod property_tests {
                 // TODO we probably don't need to pass in this create_arb_program...at all
                 "from kybra import nat32, query, update".to_string(),
                 &create_arb_nat32(),
+                params_return_string_getter,
                 params_return_value_getter,
                 &prop_oneof!["nat32"],
                 no_params_return_value_getter,
@@ -30,6 +31,14 @@ mod property_tests {
         // Not using any::<u32>() because adding some u32s together later can get too large
         // So I started with the largest u32 and divided by ten, since we only add up 5 params for now
         0..858_993_459u32
+    }
+
+    fn params_return_string_getter(arb_params: Vec<ArbParam<u32>>) -> String {
+        arb_params
+            .iter()
+            .map(|arb_param| arb_param.name.clone())
+            .collect::<Vec<String>>()
+            .join(" + ")
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<u32>>) -> u32 {

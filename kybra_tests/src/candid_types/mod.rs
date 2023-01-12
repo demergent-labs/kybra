@@ -15,6 +15,7 @@ use std::error::Error;
 use std::fmt::{Debug, Display};
 use std::process::{Command, Stdio};
 
+mod bool;
 mod float32;
 mod float64;
 mod int;
@@ -28,6 +29,13 @@ mod nat32;
 mod nat64;
 mod nat8;
 mod text;
+
+const PYTHON_KEYWORDS: [&str; 35] = [
+    "False", "None", "True", "and", "as", "assert", "async", "await", "break", "class", "continue",
+    "def", "del", "elif", "else", "except", "finally", "for", "from", "global", "if", "import",
+    "in", "is", "lambda", "nonlocal", "not", "or", "pass", "raise", "return", "try", "while",
+    "with", "yield",
+];
 
 #[derive(Debug, Clone)]
 pub struct ArbProgram<CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display> {
@@ -162,6 +170,7 @@ pub fn create_arb_program<
 >(
     import_statement: String,
     arb_candid_value_strategy: &'c ArbCandidValueStrategy,
+    params_return_string_getter: fn(Vec<ArbParam<CandidValue>>) -> String,
     params_return_value_getter: fn(Vec<ArbParam<CandidValue>>) -> CandidValue,
     arb_type_strategy: &'c K,
     no_params_return_value_getter: fn(CandidValue) -> String,
@@ -174,6 +183,7 @@ pub fn create_arb_program<
                 create_arb_function(
                     &unique_arb_aliases,
                     arb_candid_value_strategy,
+                    params_return_string_getter,
                     params_return_value_getter,
                     arb_type_strategy,
                     no_params_return_value_getter,
@@ -215,6 +225,7 @@ fn create_arb_function<
 >(
     arb_aliases: &Vec<ArbAlias>,
     arb_candid_value_strategy: &'b ArbCandidValueStrategy,
+    params_return_string_getter: fn(Vec<ArbParam<CandidValue>>) -> String,
     params_return_value_getter: fn(Vec<ArbParam<CandidValue>>) -> CandidValue,
     arb_type_strategy: &'b K,
     no_params_return_value_getter: fn(CandidValue) -> String,
@@ -231,7 +242,7 @@ fn create_arb_function<
         let (
             return_string,
             return_value
-        ) = get_return_value(arb_params.clone(), arb_return_value.clone(), params_return_value_getter, no_params_return_value_getter);
+        ) = get_return_value(arb_params.clone(), arb_return_value.clone(), params_return_string_getter, params_return_value_getter, no_params_return_value_getter);
 
         ArbFunction {
             code: format!("{arb_decorator}\ndef {arb_function_name}({params}) -> {arb_return_type}:\n    return {return_string}"),
@@ -292,6 +303,8 @@ fn create_arb_python_name() -> impl Strategy<Value = String> {
     "[a-zA-Z][a-zA-Z0-9_]*".prop_map(|arb_python_name| {
         if arb_python_name.len() == 1 {
             format!("{arb_python_name}_") // TODO this is strange https://github.com/demergent-labs/kybra/issues/218#issuecomment-1378085756
+        } else if PYTHON_KEYWORDS.contains(&arb_python_name.as_str()) {
+            arb_python_name + "_"
         } else {
             arb_python_name
         }
@@ -330,6 +343,7 @@ fn get_return_value<
 >(
     arb_params: Vec<ArbParam<CandidValue>>,
     arb_return_value: CandidValue,
+    params_return_string_getter: fn(Vec<ArbParam<CandidValue>>) -> String,
     params_return_value_getter: fn(Vec<ArbParam<CandidValue>>) -> CandidValue,
     no_params_return_value_getter: fn(CandidValue) -> String,
 ) -> (String, CandidValue) {
@@ -340,11 +354,7 @@ fn get_return_value<
         )
     } else {
         (
-            arb_params
-                .iter()
-                .map(|arb_param| arb_param.name.clone())
-                .collect::<Vec<String>>()
-                .join(" + "),
+            params_return_string_getter(arb_params.clone()),
             params_return_value_getter(arb_params),
         )
     }

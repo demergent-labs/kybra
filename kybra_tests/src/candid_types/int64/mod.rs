@@ -17,6 +17,7 @@ mod property_tests {
             create_arb_program(
                 "from kybra import int64, query, update".to_string(),
                 &create_arb_int64(),
+                params_return_string_getter,
                 params_return_value_getter,
                 &prop_oneof!["int64"],
                 no_params_return_value_getter,
@@ -31,6 +32,14 @@ mod property_tests {
         // Not using any::<i64>() because adding some i64s together later can get too large
         // So I started with the largest i64 and divided by 10, since we only add up 5 params for now
         -922_337_203_685_477_580..922_337_203_685_477_580i64
+    }
+
+    fn params_return_string_getter(arb_params: Vec<ArbParam<i64>>) -> String {
+        arb_params
+            .iter()
+            .map(|arb_param| arb_param.name.clone())
+            .collect::<Vec<String>>()
+            .join(" + ")
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<i64>>) -> i64 {

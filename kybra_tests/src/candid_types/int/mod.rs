@@ -15,8 +15,9 @@ mod property_tests {
     fn basic() -> Result<(), Box<dyn Error>> {
         run_candid_types_property_tests(
             create_arb_program(
-                "from kybra import int, query, update".to_string(),
+                "from kybra import query, update".to_string(),
                 &create_arb_int(),
+                params_return_string_getter,
                 params_return_value_getter,
                 &prop_oneof!["int"],
                 no_params_return_value_getter,
@@ -29,6 +30,14 @@ mod property_tests {
 
     fn create_arb_int() -> impl Strategy<Value = candid::Int> {
         any::<i128>().prop_map(|arb_i128| arb_i128.into())
+    }
+
+    fn params_return_string_getter(arb_params: Vec<ArbParam<candid::Int>>) -> String {
+        arb_params
+            .iter()
+            .map(|arb_param| arb_param.name.clone())
+            .collect::<Vec<String>>()
+            .join(" + ")
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<candid::Int>>) -> candid::Int {

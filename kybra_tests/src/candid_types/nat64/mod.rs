@@ -16,6 +16,7 @@ mod property_tests {
                 // TODO we probably don't need to pass in this create_arb_program...at all
                 "from kybra import nat64, query, update".to_string(),
                 &create_arb_nat64(),
+                params_return_string_getter,
                 params_return_value_getter,
                 &prop_oneof!["nat64"],
                 no_params_return_value_getter,
@@ -30,6 +31,14 @@ mod property_tests {
         // Not using any::<u64>() because adding some u64s together later can get too large
         // So I started with the largest u64 and divided by 5, since we only add up 5 params for now
         0..1_844_674_407_370_955_161u64
+    }
+
+    fn params_return_string_getter(arb_params: Vec<ArbParam<u64>>) -> String {
+        arb_params
+            .iter()
+            .map(|arb_param| arb_param.name.clone())
+            .collect::<Vec<String>>()
+            .join(" + ")
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<u64>>) -> u64 {

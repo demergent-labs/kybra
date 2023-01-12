@@ -15,6 +15,7 @@ mod property_tests {
             create_arb_program(
                 "from kybra import int16, query, update".to_string(),
                 &create_arb_int16(),
+                params_return_string_getter,
                 params_return_value_getter,
                 &prop_oneof!["int16"],
                 no_params_return_value_getter,
@@ -29,6 +30,14 @@ mod property_tests {
         // Not using any::<i16>() because adding some i16s together later can get too large
         // So I started with the largest i16 and divided by 5, since we only add up 5 params for now
         -6_553..6_553i16
+    }
+
+    fn params_return_string_getter(arb_params: Vec<ArbParam<i16>>) -> String {
+        arb_params
+            .iter()
+            .map(|arb_param| arb_param.name.clone())
+            .collect::<Vec<String>>()
+            .join(" + ")
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<i16>>) -> i16 {

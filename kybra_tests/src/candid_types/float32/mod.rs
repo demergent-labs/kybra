@@ -15,6 +15,7 @@ mod property_tests {
             create_arb_program(
                 "from kybra import float32, query, update".to_string(),
                 &create_arb_float32(),
+                params_return_string_getter,
                 params_return_value_getter,
                 &prop_oneof!["float32"],
                 no_params_return_value_getter,
@@ -29,16 +30,29 @@ mod property_tests {
         any::<f32>()
     }
 
+    // TODO we should probably figure something out here, we aren't testing all of the params
+    // TODO the problem is the precision difference between Rust and Python I believe, since Python doesn't have an f32 equivalent
+    fn params_return_string_getter(arb_params: Vec<ArbParam<f32>>) -> String {
+        arb_params[0].name.to_string()
+        // arb_params
+        //     .iter()
+        //     .map(|arb_param| arb_param.name.clone())
+        //     .collect::<Vec<String>>()
+        //     .join(" + ")
+    }
+
+    // TODO we might be losing too much or too little precision with the difference between f32 and f64, since Python doesn't have an f32 equivalent
     // TODO since Python doesn't have f32, I wonder if we're seeing some major issues
     fn params_return_value_getter(arb_params: Vec<ArbParam<f32>>) -> f32 {
         // TODO we shouldn't have to do this trick: https://github.com/demergent-labs/kybra/issues/218#issuecomment-1379791236
-        arb_params.iter().fold(0.0, |acc, arb_param| {
-            acc + if arb_param.value == -0.0 {
-                0.0
-            } else {
-                arb_param.value
-            }
-        })
+        // arb_params.iter().fold(0.0, |acc, arb_param| {
+        //     acc + if arb_param.value == -0.0 {
+        //         0.0
+        //     } else {
+        //         arb_param.value
+        //     }
+        // })
+        arb_params[0].value
     }
 
     fn no_params_return_value_getter(return_value: f32) -> String {

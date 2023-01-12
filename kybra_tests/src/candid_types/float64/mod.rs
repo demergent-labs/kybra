@@ -15,6 +15,7 @@ mod property_tests {
             create_arb_program(
                 "from kybra import float64, query, update".to_string(),
                 &create_arb_float64(),
+                params_return_string_getter,
                 params_return_value_getter,
                 &prop_oneof!["float64"],
                 no_params_return_value_getter,
@@ -27,6 +28,14 @@ mod property_tests {
 
     fn create_arb_float64() -> impl Strategy<Value = f64> {
         any::<f64>()
+    }
+
+    fn params_return_string_getter(arb_params: Vec<ArbParam<f64>>) -> String {
+        arb_params
+            .iter()
+            .map(|arb_param| arb_param.name.clone())
+            .collect::<Vec<String>>()
+            .join(" + ")
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<f64>>) -> f64 {
