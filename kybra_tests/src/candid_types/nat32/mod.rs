@@ -15,7 +15,7 @@ mod property_tests {
             create_arb_program(
                 // TODO we probably don't need to pass in this create_arb_program...at all
                 "from kybra import nat32, query, update".to_string(),
-                &create_arb_nat(),
+                &create_arb_nat32(),
                 params_return_value_getter,
                 &prop_oneof!["nat32"],
                 no_params_return_value_getter,
@@ -26,7 +26,7 @@ mod property_tests {
         )
     }
 
-    fn create_arb_nat() -> impl Strategy<Value = u32> {
+    fn create_arb_nat32() -> impl Strategy<Value = u32> {
         // Not using any::<u32>() because adding some u32s together later can get too large
         // So I started with the largest u32 and divided by ten, since we only add up 5 params for now
         0..858_993_459u32

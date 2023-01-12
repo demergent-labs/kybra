@@ -15,6 +15,11 @@ use std::error::Error;
 use std::fmt::{Debug, Display};
 use std::process::{Command, Stdio};
 
+mod int;
+mod int16;
+mod int32;
+mod int64;
+mod int8;
 mod nat;
 mod nat16;
 mod nat32;

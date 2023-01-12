@@ -27,6 +27,16 @@ jobs:
                       directory: kybra_tests/src/candid_types/nat16
                     - name: candid_types::nat8::property_tests::basic
                       directory: kybra_tests/src/candid_types/nat8
+                    - name: candid_types::int::property_tests::basic
+                      directory: kybra_tests/src/candid_types/int
+                    - name: candid_types::int64::property_tests::basic
+                      directory: kybra_tests/src/candid_types/int64
+                    - name: candid_types::int32::property_tests::basic
+                      directory: kybra_tests/src/candid_types/int32
+                    - name: candid_types::int16::property_tests::basic
+                      directory: kybra_tests/src/candid_types/int16
+                    - name: candid_types::int8::property_tests::basic
+                      directory: kybra_tests/src/candid_types/int8
         steps:
             - uses: actions/checkout@v3
             - run: DFX_VERSION=0.12.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
