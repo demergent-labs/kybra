@@ -38,15 +38,20 @@ mod property_tests {
             .join(" + ")
     }
 
+    // TODO RustPython seems to not treat additions of -0.0 correctly, thus we are doing these tricks
     fn params_return_value_getter(arb_params: Vec<ArbParam<f64>>) -> f64 {
-        // TODO we shouldn't have to do this trick: https://github.com/demergent-labs/kybra/issues/218#issuecomment-1379791236
-        arb_params.iter().fold(0.0, |acc, arb_param| {
-            acc + if arb_param.value == -0.0 {
-                0.0
-            } else {
-                arb_param.value
-            }
-        })
+        if arb_params.len() == 1 {
+            arb_params[0].value
+        } else {
+            // TODO we shouldn't have to do this trick: https://github.com/demergent-labs/kybra/issues/218#issuecomment-1379791236
+            arb_params.iter().fold(0.0, |acc, arb_param| {
+                acc + if arb_param.value == -0.0 {
+                    0.0
+                } else {
+                    arb_param.value
+                }
+            })
+        }
     }
 
     fn no_params_return_value_getter(return_value: f64) -> String {

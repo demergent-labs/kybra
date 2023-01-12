@@ -12,9 +12,10 @@ use serde::Deserialize;
 use std::collections::HashSet;
 use std::env;
 use std::error::Error;
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
 use std::process::{Command, Stdio};
 
+mod blob;
 mod bool;
 mod float32;
 mod float64;
@@ -28,6 +29,7 @@ mod nat16;
 mod nat32;
 mod nat64;
 mod nat8;
+mod null;
 mod text;
 
 const PYTHON_KEYWORDS: [&str; 35] = [
@@ -37,8 +39,16 @@ const PYTHON_KEYWORDS: [&str; 35] = [
     "with", "yield",
 ];
 
+const RUST_KEYWORDS: [&str; 51] = [
+    "abstract", "as", "async", "await", "become", "box", "break", "const", "continue", "crate",
+    "do", "dyn", "else", "enum", "extern", "false", "final", "fn", "for", "if", "impl", "in",
+    "let", "loop", "macro", "match", "mod", "move", "mut", "override", "priv", "pub", "ref",
+    "return", "self", "Self", "static", "struct", "super", "trait", "true", "try", "type",
+    "typeof", "unsafe", "unsized", "use", "virtual", "where", "while", "yield",
+];
+
 #[derive(Debug, Clone)]
-pub struct ArbProgram<CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display> {
+pub struct ArbProgram<CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a>> {
     code: String,
     arb_functions: Vec<ArbFunction<CandidValue>>,
 }
@@ -50,7 +60,7 @@ enum MethodType {
 }
 
 #[derive(Debug, Clone)]
-struct ArbFunction<CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display> {
+struct ArbFunction<CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a>> {
     code: String,
     name: String,
     method_type: MethodType,
@@ -59,7 +69,7 @@ struct ArbFunction<CandidValue: CandidType + Clone + Debug + for<'a> Deserialize
 }
 
 #[derive(Debug, Clone)]
-pub struct ArbParam<CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display> {
+pub struct ArbParam<CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a>> {
     code: String,
     name: String,
     value: CandidValue,
@@ -73,7 +83,7 @@ struct ArbAlias {
 
 pub fn run_candid_types_property_tests<
     T: Strategy<Value = ArbProgram<CandidValue>>,
-    CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display + std::cmp::PartialEq + 'static,
+    CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + std::cmp::PartialEq + 'static,
 >(
     arb_program_strategy: T,
     assertion: fn(CandidValue, CandidValue),
@@ -148,8 +158,8 @@ pub fn run_candid_types_property_tests<
 
             println!("function: {}", &arb_function.name);
             println!("\n");
-            println!("result: {}", result);
-            println!("arb_function.value: {}", &arb_function.value);
+            println!("result: {:#?}", result);
+            println!("arb_function.value: {:#?}", &arb_function.value);
             println!("\n\n");
 
             assertion(result, arb_function.value);
@@ -164,7 +174,7 @@ pub fn run_candid_types_property_tests<
 pub fn create_arb_program<
     'a,
     'c,
-    CandidValue: CandidType + Clone + Debug + for<'b> Deserialize<'b> + Display + 'static,
+    CandidValue: CandidType + Clone + Debug + for<'b> Deserialize<'b> + 'static,
     ArbCandidValueStrategy: Strategy<Value = CandidValue> + 'a,
     K: Strategy<Value = String> + 'c,
 >(
@@ -173,7 +183,7 @@ pub fn create_arb_program<
     params_return_string_getter: fn(Vec<ArbParam<CandidValue>>) -> String,
     params_return_value_getter: fn(Vec<ArbParam<CandidValue>>) -> CandidValue,
     arb_type_strategy: &'c K,
-    no_params_return_value_getter: fn(CandidValue) -> String,
+    no_params_return_string_getter: fn(CandidValue) -> String,
 ) -> impl Strategy<Value = ArbProgram<CandidValue>> + 'c {
     prop::collection::vec(create_arb_alias(arb_type_strategy), 1..100).prop_flat_map(
         move |arb_aliases| {
@@ -186,7 +196,7 @@ pub fn create_arb_program<
                     params_return_string_getter,
                     params_return_value_getter,
                     arb_type_strategy,
-                    no_params_return_value_getter,
+                    no_params_return_string_getter,
                 ),
                 0..100,
             )
@@ -219,7 +229,7 @@ pub fn create_arb_program<
 fn create_arb_function<
     'b,
     'c,
-    CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display + 'c + 'b + 'static,
+    CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + 'c + 'b + 'static,
     ArbCandidValueStrategy: Strategy<Value = CandidValue>,
     K: Strategy<Value = String> + 'b,
 >(
@@ -228,7 +238,7 @@ fn create_arb_function<
     params_return_string_getter: fn(Vec<ArbParam<CandidValue>>) -> String,
     params_return_value_getter: fn(Vec<ArbParam<CandidValue>>) -> CandidValue,
     arb_type_strategy: &'b K,
-    no_params_return_value_getter: fn(CandidValue) -> String,
+    no_params_return_string_getter: fn(CandidValue) -> String,
 ) -> impl Strategy<Value = ArbFunction<CandidValue>> + 'b {
     (
         create_arb_python_name(),
@@ -242,7 +252,7 @@ fn create_arb_function<
         let (
             return_string,
             return_value
-        ) = get_return_value(arb_params.clone(), arb_return_value.clone(), params_return_string_getter, params_return_value_getter, no_params_return_value_getter);
+        ) = get_return_value(arb_params.clone(), arb_return_value.clone(), params_return_string_getter, params_return_value_getter, no_params_return_string_getter);
 
         ArbFunction {
             code: format!("{arb_decorator}\ndef {arb_function_name}({params}) -> {arb_return_type}:\n    return {return_string}"),
@@ -265,7 +275,7 @@ fn create_arb_alias<'a, K: Strategy<Value = String>>(
 
 fn create_arb_param<
     'b,
-    CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display,
+    CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a>,
     T: Strategy<Value = CandidValue> + 'b,
     K: Strategy<Value = String> + 'b,
 >(
@@ -303,7 +313,10 @@ fn create_arb_python_name() -> impl Strategy<Value = String> {
     "[a-zA-Z][a-zA-Z0-9_]*".prop_map(|arb_python_name| {
         if arb_python_name.len() == 1 {
             format!("{arb_python_name}_") // TODO this is strange https://github.com/demergent-labs/kybra/issues/218#issuecomment-1378085756
-        } else if PYTHON_KEYWORDS.contains(&arb_python_name.as_str()) {
+        } else if PYTHON_KEYWORDS.contains(&arb_python_name.as_str())
+            || RUST_KEYWORDS.contains(&arb_python_name.as_str())
+        // TODO we shouldn't have to strip out Rust keywords: https://github.com/demergent-labs/kybra/issues/218#issuecomment-1380999174
+        {
             arb_python_name + "_"
         } else {
             arb_python_name
@@ -311,9 +324,7 @@ fn create_arb_python_name() -> impl Strategy<Value = String> {
     }) // TODO underscores are not valid as the first character until this is fixed: https://github.com/demergent-labs/kybra/issues/218#issuecomment-1376175383
 }
 
-fn deduplicate_arb_functions<
-    CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display,
->(
+fn deduplicate_arb_functions<CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a>>(
     arb_functions: Vec<ArbFunction<CandidValue>>,
 ) -> Vec<ArbFunction<CandidValue>> {
     let mut set = HashSet::new();
@@ -337,19 +348,16 @@ fn deduplicate_arb_aliases(arb_aliases: Vec<ArbAlias>) -> Vec<ArbAlias> {
     result
 }
 
-fn get_return_value<
-    'b,
-    CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display,
->(
+fn get_return_value<'b, CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a>>(
     arb_params: Vec<ArbParam<CandidValue>>,
     arb_return_value: CandidValue,
     params_return_string_getter: fn(Vec<ArbParam<CandidValue>>) -> String,
     params_return_value_getter: fn(Vec<ArbParam<CandidValue>>) -> CandidValue,
-    no_params_return_value_getter: fn(CandidValue) -> String,
+    no_params_return_string_getter: fn(CandidValue) -> String,
 ) -> (String, CandidValue) {
     if arb_params.len() == 0 {
         (
-            no_params_return_value_getter(arb_return_value.clone()),
+            no_params_return_string_getter(arb_return_value.clone()),
             arb_return_value,
         )
     } else {
