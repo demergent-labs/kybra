@@ -2221,7 +2221,7 @@ def callback():
 
 ### Stable Memory
 
--   [stable storage](#stable-storage)
+-   [stable structures](#stable-structures)
 -   [stable64 grow](#stable64-grow)
 -   [stable64 read](#stable64-read)
 -   [stable64 size](#stable64-size)
@@ -2232,36 +2232,106 @@ def callback():
 -   [stable size](#stable-size)
 -   [stable write](#stable-write)
 
-#### stable storage
+#### stable structures
 
-The current stable storage implementation is limited in how much data can be serialized/deserialized in the pre_upgrade/post_upgrade step before the cycle limit is reached. It's unclear exactly what the serialization/deserialization limits are, but consider that they will most likely be significantly less than 4GiB.
+Higher-level data structures backed directly by the lower level [stable memory](#stable-memory). These data structures can grow to GiBs in size across canister upgrades without the need for manual serialization/deserialization in pre/post upgrade hooks. These data structures are based on their Rust counterparts [here](https://github.com/dfinity/stable-structures).
 
-This applies to stable storage only, not the more primitive stable memory operations.
+Currently Kybra only exposes the `StableBTreeMap` data structure. Additional structures will be added in the future.
 
-To resolve these issues, we plan to release a Kybra-specific stable structure similar to what can be found [here](https://github.com/dfinity/stable-structures).
+#### StableBTreeMap
+
+Given the types `Key`, and `Value`, a new StableBTreeMap can be created like this:
+
+```python
+from kybra import StableBTreeMap
+
+stable_storage = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=100)
+```
+
+Note that the constructor requires the following parameters in the specified order:
+
+0. `memory_id` the memory id at which to instantiate this map. Must be between 0 and 255 inclusive.
+1. `max_key_size` the largest size (in bytes) a key can be
+2. `max_value_size` the largest size (in bytes) a value can be
+
+Items inserted into the map must be smaller than the specified max values otherwise an [InsertError](kybra/__init__.py#L383) will be returned.
 
 Examples:
 
--   [func_types](/examples/func_types)
 -   [http_counter](/examples/motoko_examples/http_counter)
 -   [persistent_storage](/examples/motoko_examples/persistent-storage)
 -   [pre_and_post_upgrade](/examples/pre_and_post_upgrade)
--   [stable_storage](/examples/stable_storage)
--   [tuple_types](/examples/tuple_types)
+-   [stable_structures](/examples/stable_structures)
 
 ```python
-from kybra import init, nat, update
+from kybra import InsertError, nat64, nat8, opt, query, StableBTreeMap, update, Variant
 
-from typing import TypedDict
 
-class StableStorage(TypedDict):
-    stable_nat: nat
+Key = nat8
+Value = str
 
-stable_storage: StableStorage = ic.stable_storage()
 
-@init
-def init_(stable_nat: nat):
-    stable_storage['stable_nat'] = stable_nat
+class InsertResult(Variant, total=False):
+    ok: opt[Value]
+    err: InsertError
+
+
+map = StableBTreeMap[Key, Value](
+    memory_id=0, max_key_size=100, max_value_size=100)
+
+
+@query
+def contains_key(key: Key) -> bool:
+    return map.contains_key(key)
+
+
+@query
+def get(key: Key) -> opt[Value]:
+    return map.get(key)
+
+
+@update
+def insert(key: Key, value: Value) -> InsertResult:
+    result = map.insert(key, value)
+
+    if result.err is not None:
+        return {
+            'err': result.err
+        }
+
+    return {
+        'ok': result.ok
+    }
+
+
+@query
+def is_empty() -> bool:
+    return map.is_empty()
+
+
+@query
+def items() -> list[tuple[Key, Value]]:
+    return map.items()
+
+
+@query
+def keys() -> list[Key]:
+    return map.keys()
+
+
+@query
+def len() -> nat64:
+    return map.len()
+
+
+@update
+def remove(key: Key) -> opt[Value]:
+    return map.remove(key)
+
+
+@query
+def values() -> list[Value]:
+    return map.values()
 ```
 
 #### stable64 grow
