@@ -274,7 +274,13 @@ fn create_arb_type<T: Strategy<Value = String>>(
 }
 
 fn create_arb_python_name() -> impl Strategy<Value = String> {
-    "[a-zA-Z][a-zA-Z0-9_]*" // TODO underscores are not valid as the first character until this is fixed: https://github.com/demergent-labs/kybra/issues/218#issuecomment-1376175383
+    "[a-zA-Z][a-zA-Z0-9_]*".prop_map(|arb_python_name| {
+        if arb_python_name == "T" {
+            "TT".to_string() // TODO this is strange https://github.com/demergent-labs/kybra/issues/218#issuecomment-1378085756
+        } else {
+            arb_python_name
+        }
+    }) // TODO underscores are not valid as the first character until this is fixed: https://github.com/demergent-labs/kybra/issues/218#issuecomment-1376175383
 }
 
 fn deduplicate_arb_functions<
