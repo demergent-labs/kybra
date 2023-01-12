@@ -30,21 +30,35 @@ mod property_tests {
         any::<bool>()
     }
 
-    // TODO we should probably do random and/or instead of just anding everything together
     fn params_return_string_getter(arb_params: Vec<ArbParam<bool>>) -> String {
         arb_params
             .iter()
-            .map(|arb_param| arb_param.name.clone())
-            .collect::<Vec<String>>()
-            .join(" and ")
+            .enumerate()
+            .map(|(index, arb_param)| {
+                if index == arb_params.len() - 1 {
+                    arb_param.name.to_string()
+                } else {
+                    format!(
+                        "{} {} ",
+                        arb_param.name,
+                        if index % 2 == 0 { "and" } else { "or" }
+                    )
+                }
+            })
+            .collect::<String>()
     }
 
-    // TODO we need to have a different little algorithm thing for bool
-    // TODO we should probably do the same with f32, so let's make this part generic
     fn params_return_value_getter(arb_params: Vec<ArbParam<bool>>) -> bool {
         arb_params
             .iter()
-            .fold(true, |acc, arb_param| acc && arb_param.value)
+            .enumerate()
+            .fold(true, |acc, (index, arb_param)| {
+                if index % 2 != 0 {
+                    acc && arb_param.value
+                } else {
+                    acc || arb_param.value
+                }
+            })
     }
 
     fn no_params_return_value_getter(return_value: bool) -> String {
