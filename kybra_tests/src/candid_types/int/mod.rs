@@ -1,11 +1,10 @@
 // KYBRA_CASES=1 cargo test candid_types::int::property_tests::basic -- --nocapture --exact
 
-// TODO do we want to test with bigger numbers? I am just using i128 right now for the strategy. To get HUGE numbers we could create a string of numbers...some regex to give us ginormous numbers
-
 #[cfg(test)]
 mod property_tests {
     use proptest::prelude::*;
     use std::error::Error;
+    use std::str::FromStr;
 
     use crate::candid_types::create_arb_program;
     use crate::candid_types::run_candid_types_property_tests;
@@ -29,7 +28,7 @@ mod property_tests {
     }
 
     fn create_arb_int() -> impl Strategy<Value = candid::Int> {
-        any::<i128>().prop_map(|arb_i128| arb_i128.into())
+        "-?[0-9]{1,100}".prop_map(|nat_string| candid::Int::from_str(&nat_string).unwrap())
     }
 
     fn params_return_string_getter(arb_params: Vec<ArbParam<candid::Int>>) -> String {

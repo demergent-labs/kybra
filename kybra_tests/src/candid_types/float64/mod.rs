@@ -44,13 +44,16 @@ mod property_tests {
             arb_params[0].value
         } else {
             // TODO we shouldn't have to do this trick: https://github.com/demergent-labs/kybra/issues/218#issuecomment-1379791236
-            arb_params.iter().fold(0.0, |acc, arb_param| {
-                acc + if arb_param.value == -0.0 {
-                    0.0
-                } else {
-                    arb_param.value
-                }
-            })
+            // arb_params.iter().fold(0.0, |acc, arb_param| {
+            //     acc + if arb_param.value == -0.0 {
+            //         0.0
+            //     } else {
+            //         arb_param.value
+            //     }
+            // })
+            arb_params
+                .iter()
+                .fold(0.0, |acc, arb_param| acc + arb_param.value)
         }
     }
 
