@@ -370,12 +370,12 @@ K = TypeVar('K')
 V = TypeVar('V')
 
 
-class KeyTooLarge(Variant, total=False):
+class KeyTooLarge(Record):
     given: nat32
     max: nat32
 
 
-class ValueTooLarge(Variant, total=False):
+class ValueTooLarge(Record):
     given: nat32
     max: nat32
 

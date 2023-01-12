@@ -2,18 +2,15 @@ import { run_tests, Test } from 'azle/test';
 import { execSync } from 'child_process';
 import {
     pre_redeploy_tests,
-    post_redeploy_tests
+    post_redeploy_tests,
+    insert_error_tests
 } from 'azle/examples/stable_structures/test/tests';
 import { createActor as createActorCanister1 } from './dfx_generated/canister1';
 import { createActor as createActorCanister2 } from './dfx_generated/canister2';
 
 const stable_structures_canister_1 = createActorCanister1(
     'rrkah-fqaaa-aaaaa-aaaaq-cai',
-    {
-        agentOptions: {
-            host: 'http://127.0.0.1:8000'
-        }
-    }
+    { agentOptions: { host: 'http://127.0.0.1:8000' } }
 );
 
 const stable_structures_canister_2 = createActorCanister2(
@@ -53,7 +50,11 @@ const tests: Test[] = [
         }
     },
     ...post_redeploy_tests(stable_structures_canister_1 as any, 0, 6),
-    ...post_redeploy_tests(stable_structures_canister_2 as any, 7, 13)
+    ...post_redeploy_tests(stable_structures_canister_2 as any, 7, 13),
+    ...insert_error_tests(
+        stable_structures_canister_1 as any,
+        stable_structures_canister_2 as any
+    )
 ];
 
 run_tests(tests);

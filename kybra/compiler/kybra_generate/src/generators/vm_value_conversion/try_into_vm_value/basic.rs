@@ -143,16 +143,22 @@ Principal
                     ic_stable_structures::btreemap::InsertError::KeyTooLarge {given, max} => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
-                        dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+                        let key_too_large_dict = vm.ctx.new_dict();
+                        key_too_large_dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
+                        key_too_large_dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+
+                        dict.set_item("KeyTooLarge", key_too_large_dict.into(), vm);
 
                         Ok(dict.into())
                     },
                     ic_stable_structures::btreemap::InsertError::ValueTooLarge {given, max} => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
-                        dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+                        let value_too_large_dict = vm.ctx.new_dict();
+                        value_too_large_dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
+                        value_too_large_dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+
+                        dict.set_item("ValueTooLarge", value_too_large_dict.into(), vm);
 
                         Ok(dict.into())
                     }

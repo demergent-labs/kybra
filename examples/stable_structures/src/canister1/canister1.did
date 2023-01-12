@@ -3,7 +3,7 @@ type InsertError = variant {
   ValueTooLarge : KeyTooLarge;
   KeyTooLarge : KeyTooLarge;
 };
-type KeyTooLarge = variant { max : nat32; given : nat32 };
+type KeyTooLarge = record { max : nat32; given : nat32 };
 type Reaction = variant { Sad; Happy };
 type StableMap0InsertResult = variant { ok : opt text; err : InsertError };
 type StableMap1InsertResult = variant { ok : opt vec nat8; err : InsertError };

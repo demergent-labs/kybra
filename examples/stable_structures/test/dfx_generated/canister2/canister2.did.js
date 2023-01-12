@@ -1,5 +1,5 @@
 export const idlFactory = ({ IDL }) => {
-    const KeyTooLarge = IDL.Variant({ max: IDL.Nat32, given: IDL.Nat32 });
+    const KeyTooLarge = IDL.Record({ max: IDL.Nat32, given: IDL.Nat32 });
     const InsertError = IDL.Variant({
         ValueTooLarge: KeyTooLarge,
         KeyTooLarge: KeyTooLarge

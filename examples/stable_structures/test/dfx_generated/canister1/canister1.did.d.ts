@@ -7,7 +7,10 @@ export interface BlogPost {
 export type InsertError =
     | { ValueTooLarge: KeyTooLarge }
     | { KeyTooLarge: KeyTooLarge };
-export type KeyTooLarge = { max: number } | { given: number };
+export interface KeyTooLarge {
+    max: number;
+    given: number;
+}
 export type Reaction = { Sad: null } | { Happy: null };
 export type StableMap0InsertResult =
     | { ok: [] | [string] }
