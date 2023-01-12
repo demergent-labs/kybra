@@ -30,6 +30,7 @@ mod nat32;
 mod nat64;
 mod nat8;
 mod null;
+mod principal;
 mod text;
 
 const PYTHON_KEYWORDS: [&str; 35] = [

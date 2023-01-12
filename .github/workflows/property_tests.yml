@@ -47,6 +47,8 @@ jobs:
                       directory: kybra_tests/src/candid_types/bool
                     - name: candid_types::null::property_tests::basic
                       directory: kybra_tests/src/candid_types/null
+                    - name: candid_types::principal::property_tests::basic
+                      directory: kybra_tests/src/candid_types/principal
         steps:
             - uses: actions/checkout@v3
             - run: DFX_VERSION=0.12.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
