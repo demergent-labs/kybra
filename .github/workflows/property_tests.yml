@@ -19,6 +19,14 @@ jobs:
                       directory: kybra_tests/src/candid_types/text
                     - name: candid_types::nat::property_tests::basic
                       directory: kybra_tests/src/candid_types/nat
+                    - name: candid_types::nat64::property_tests::basic
+                      directory: kybra_tests/src/candid_types/nat64
+                    - name: candid_types::nat32::property_tests::basic
+                      directory: kybra_tests/src/candid_types/nat32
+                    - name: candid_types::nat16::property_tests::basic
+                      directory: kybra_tests/src/candid_types/nat16
+                    - name: candid_types::nat8::property_tests::basic
+                      directory: kybra_tests/src/candid_types/nat8
         steps:
             - uses: actions/checkout@v3
             - run: DFX_VERSION=0.12.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
@@ -33,7 +41,6 @@ jobs:
             - working-directory: ${{ matrix.tests.directory }}
               run: dfx start --clean --background --host 127.0.0.1:8000
             - working-directory: kybra_tests
-              shell: bash -l {0}
               run: KYBRA_CASES=10 cargo test ${{ matrix.tests.name }} -- --nocapture --exact # TODO we will want to configure KYBRA_CASES based on release candidates and full releases etc
 
     check-property-tests-success:

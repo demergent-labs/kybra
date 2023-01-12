@@ -21,6 +21,7 @@ mod property_tests {
             ),
             assertion,
             arb_param_to_candid_string,
+            "src/candid_types/text",
         )
     }
 

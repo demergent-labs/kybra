@@ -1,6 +1,5 @@
 // KYBRA_CASES=1 cargo test candid_types::nat::property_tests::basic -- --nocapture --exact
 
-// TODO we actually aren't testing the generated candid files...
 // TODO do we want to test with bigger numbers? I am just using u128 right now for the strategy. To get HUGE numbers we could create a string of numbers...some regex to give us ginormous numbers
 
 #[cfg(test)]
@@ -24,6 +23,7 @@ mod property_tests {
             ),
             assertion,
             arb_param_to_candid_string,
+            "src/candid_types/nat",
         )
     }
 

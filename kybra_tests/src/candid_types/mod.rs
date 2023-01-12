@@ -16,6 +16,10 @@ use std::fmt::{Debug, Display};
 use std::process::{Command, Stdio};
 
 mod nat;
+mod nat16;
+mod nat32;
+mod nat64;
+mod nat8;
 mod text;
 
 #[derive(Debug, Clone)]
@@ -59,6 +63,7 @@ pub fn run_candid_types_property_tests<
     arb_program_strategy: T,
     assertion: fn(CandidValue, CandidValue),
     arb_param_to_candid_string: fn(ArbParam<CandidValue>) -> String,
+    test_path: &str,
 ) -> Result<(), Box<dyn Error>> {
     let mut runner = TestRunner::new(Config {
         cases: env::var("KYBRA_CASES")
@@ -70,11 +75,11 @@ pub fn run_candid_types_property_tests<
     });
 
     runner.run(&arb_program_strategy, |arb_program| {
-        let main_file_path = env::current_dir()?.join("src/candid_types/text/src/main.py");
+        let main_file_path = env::current_dir()?.join(format!("{test_path}/src/main.py"));
 
         std::fs::write(main_file_path, arb_program.code)?;
 
-        let current_file_path = env::current_dir()?.join("src/candid_types/text");
+        let current_file_path = env::current_dir()?.join(test_path);
 
         let mut child = Command::new("bash")
             .arg("-c")
