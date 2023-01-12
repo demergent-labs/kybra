@@ -28,7 +28,7 @@ mod property_tests {
     fn create_arb_int8() -> impl Strategy<Value = i8> {
         // Not using any::<i8>() because adding some i8s together later can get too large
         // So I started with the largest i8 and divided by 5, since we only add up 5 params for now
-        -128..25i8
+        -25..25i8
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<i8>>) -> i8 {

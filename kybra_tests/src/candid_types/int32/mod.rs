@@ -30,7 +30,7 @@ mod property_tests {
     fn create_arb_int32() -> impl Strategy<Value = i32> {
         // Not using any::<i32>() because adding some i32s together later can get too large
         // So I started with the largest i32 and divided by 5, since we only add up 5 params for now
-        -2_147_483_648..429_496_729i32
+        -429_496_729..429_496_729i32
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<i32>>) -> i32 {

@@ -30,7 +30,7 @@ mod property_tests {
     fn create_arb_int64() -> impl Strategy<Value = i64> {
         // Not using any::<i64>() because adding some i64s together later can get too large
         // So I started with the largest i64 and divided by 10, since we only add up 5 params for now
-        -9_223_372_036_854_775_808..922_337_203_685_477_580i64
+        -922_337_203_685_477_580..922_337_203_685_477_580i64
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<i64>>) -> i64 {

@@ -15,6 +15,8 @@ use std::error::Error;
 use std::fmt::{Debug, Display};
 use std::process::{Command, Stdio};
 
+mod float32;
+mod float64;
 mod int;
 mod int16;
 mod int32;
@@ -109,6 +111,9 @@ pub fn run_candid_types_property_tests<
 
         for arb_function in arb_program.arb_functions {
             let args_candid_string = arb_function.arb_params.clone().into_iter().map(|arb_param| arb_param_to_candid_string(arb_param)).collect::<Vec<String>>().join(",");
+
+            println!("args_candid_string: {}", args_candid_string);
+
             let args: IDLArgs = format!("({args_candid_string})").parse()?;
             let encoded: Vec<u8> = args.to_bytes()?;
 
@@ -285,8 +290,8 @@ fn create_arb_type<T: Strategy<Value = String>>(
 
 fn create_arb_python_name() -> impl Strategy<Value = String> {
     "[a-zA-Z][a-zA-Z0-9_]*".prop_map(|arb_python_name| {
-        if arb_python_name == "T" {
-            "TT".to_string() // TODO this is strange https://github.com/demergent-labs/kybra/issues/218#issuecomment-1378085756
+        if arb_python_name.len() == 1 {
+            format!("{arb_python_name}_") // TODO this is strange https://github.com/demergent-labs/kybra/issues/218#issuecomment-1378085756
         } else {
             arb_python_name
         }

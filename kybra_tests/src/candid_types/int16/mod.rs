@@ -28,7 +28,7 @@ mod property_tests {
     fn create_arb_int16() -> impl Strategy<Value = i16> {
         // Not using any::<i16>() because adding some i16s together later can get too large
         // So I started with the largest i16 and divided by 5, since we only add up 5 params for now
-        -32_768..6_553i16
+        -6_553..6_553i16
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<i16>>) -> i16 {
