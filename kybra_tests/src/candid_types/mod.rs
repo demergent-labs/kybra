@@ -1,3 +1,7 @@
+// TODO refactor the lifetimes
+// TODO see if we can just implement a trait on a Struct or something, maybe we don't even need a trait?
+// TODO it would be easier to pass around a struct that has everything on it, rather than having to pass params around everywhere
+
 use candid::CandidType;
 use candid::Decode;
 use candid::IDLArgs;
@@ -54,6 +58,7 @@ pub fn run_candid_types_property_tests<
 >(
     arb_program_strategy: T,
     assertion: fn(CandidValue, CandidValue),
+    arb_param_to_candid_string: fn(ArbParam<CandidValue>) -> String,
 ) -> Result<(), Box<dyn Error>> {
     let mut runner = TestRunner::new(Config {
         cases: env::var("KYBRA_CASES")
@@ -93,7 +98,7 @@ pub fn run_candid_types_property_tests<
         let canister_id = Principal::from_text("rrkah-fqaaa-aaaaa-aaaaq-cai")?;
 
         for arb_function in arb_program.arb_functions {
-            let args_candid_string = arb_function.arb_params.clone().into_iter().map(|arb_param| format!("\"{}\"", arb_param.value)).collect::<Vec<String>>().join(",");
+            let args_candid_string = arb_function.arb_params.clone().into_iter().map(|arb_param| arb_param_to_candid_string(arb_param)).collect::<Vec<String>>().join(",");
             let args: IDLArgs = format!("({args_candid_string})").parse()?;
             let encoded: Vec<u8> = args.to_bytes()?;
 
@@ -138,44 +143,52 @@ pub fn create_arb_program<
     'c,
     CandidValue: CandidType + Clone + Debug + for<'b> Deserialize<'b> + Display + 'static,
     ArbCandidValueStrategy: Strategy<Value = CandidValue> + 'a,
+    K: Strategy<Value = String> + 'c,
 >(
     import_statement: String,
-    arb_candid_value_strategy: &ArbCandidValueStrategy,
+    arb_candid_value_strategy: &'c ArbCandidValueStrategy,
     params_return_value_getter: fn(Vec<ArbParam<CandidValue>>) -> CandidValue,
-) -> impl Strategy<Value = ArbProgram<CandidValue>> + '_ {
-    prop::collection::vec(create_arb_alias(), 0..100).prop_flat_map(move |arb_aliases| {
-        let import_statement = import_statement.clone();
-        prop::collection::vec(
-            create_arb_function(
-                &arb_aliases,
-                arb_candid_value_strategy,
-                params_return_value_getter,
-            ),
-            0..100,
-        )
-        .prop_map(move |arb_functions| {
-            let unique_arb_functions = remove_duplicates(arb_functions.clone());
-            let unique_arb_function_codes = unique_arb_functions
-                .clone()
-                .iter()
-                .map(|arb_function| arb_function.code.clone())
-                .collect::<Vec<String>>()
-                .join("\n\n\n");
-
-            let alias_codes = arb_aliases
-                .iter()
-                .map(|arb_alias| arb_alias.code.clone())
-                .collect::<Vec<String>>()
-                .join("\n");
-
-            ArbProgram {
-                code: format!(
-                    "{import_statement}\n\n\n{alias_codes}\n\n\n{unique_arb_function_codes}"
+    arb_type_strategy: &'c K,
+    no_params_return_value_getter: fn(CandidValue) -> String,
+) -> impl Strategy<Value = ArbProgram<CandidValue>> + 'c {
+    prop::collection::vec(create_arb_alias(arb_type_strategy), 1..100).prop_flat_map(
+        move |arb_aliases| {
+            let unique_arb_aliases = deduplicate_arb_aliases(arb_aliases);
+            let import_statement = import_statement.clone();
+            prop::collection::vec(
+                create_arb_function(
+                    &unique_arb_aliases,
+                    arb_candid_value_strategy,
+                    params_return_value_getter,
+                    arb_type_strategy,
+                    no_params_return_value_getter,
                 ),
-                arb_functions,
-            }
-        })
-    })
+                0..100,
+            )
+            .prop_map(move |arb_functions| {
+                let unique_arb_functions = deduplicate_arb_functions(arb_functions.clone());
+                let unique_arb_function_codes = unique_arb_functions
+                    .clone()
+                    .iter()
+                    .map(|arb_function| arb_function.code.clone())
+                    .collect::<Vec<String>>()
+                    .join("\n\n\n");
+
+                let alias_codes = unique_arb_aliases
+                    .iter()
+                    .map(|arb_alias| arb_alias.code.clone())
+                    .collect::<Vec<String>>()
+                    .join("\n");
+
+                ArbProgram {
+                    code: format!(
+                        "{import_statement}\n\n\n{alias_codes}\n\n\n{unique_arb_function_codes}"
+                    ),
+                    arb_functions,
+                }
+            })
+        },
+    )
 }
 
 fn create_arb_function<
@@ -183,15 +196,18 @@ fn create_arb_function<
     'c,
     CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display + 'c + 'b + 'static,
     ArbCandidValueStrategy: Strategy<Value = CandidValue>,
+    K: Strategy<Value = String> + 'b,
 >(
     arb_aliases: &Vec<ArbAlias>,
     arb_candid_value_strategy: &'b ArbCandidValueStrategy,
     params_return_value_getter: fn(Vec<ArbParam<CandidValue>>) -> CandidValue,
+    arb_type_strategy: &'b K,
+    no_params_return_value_getter: fn(CandidValue) -> String,
 ) -> impl Strategy<Value = ArbFunction<CandidValue>> + 'b {
     (
         create_arb_python_name(),
-        prop::collection::vec(create_arb_param(arb_aliases, arb_candid_value_strategy), 0..5), // TODO Once we can support more params, let's increase this number
-        create_arb_type(arb_aliases),
+        prop::collection::vec(create_arb_param(arb_aliases, arb_candid_value_strategy, arb_type_strategy), 0..5), // TODO Once we can support more params, let's increase this number
+        create_arb_type(arb_aliases, arb_type_strategy),
         prop_oneof!["@query", "@update"],
         arb_candid_value_strategy
     ).prop_map(move |(arb_function_name, arb_params, arb_return_type, arb_decorator, arb_return_value)| {
@@ -200,7 +216,7 @@ fn create_arb_function<
         let (
             return_string,
             return_value
-        ) = get_return_value(arb_params.clone(), arb_return_value.clone(), params_return_value_getter);
+        ) = get_return_value(arb_params.clone(), arb_return_value.clone(), params_return_value_getter, no_params_return_value_getter);
 
         ArbFunction {
             code: format!("{arb_decorator}\ndef {arb_function_name}({params}) -> {arb_return_type}:\n    return {return_string}"),
@@ -212,26 +228,28 @@ fn create_arb_function<
     })
 }
 
-fn create_arb_alias() -> impl Strategy<Value = ArbAlias> {
-    (create_arb_python_name(), prop_oneof!["str", "text"]).prop_map(
-        |(arb_python_name, arb_type)| ArbAlias {
-            code: format!("{arb_python_name} = {arb_type}"),
-            name: arb_python_name,
-        },
-    )
+fn create_arb_alias<'a, K: Strategy<Value = String>>(
+    arb_type_strategy: &'a K,
+) -> impl Strategy<Value = ArbAlias> + 'a {
+    (create_arb_python_name(), arb_type_strategy).prop_map(|(arb_python_name, arb_type)| ArbAlias {
+        code: format!("{arb_python_name} = {arb_type}"),
+        name: arb_python_name,
+    })
 }
 
 fn create_arb_param<
     'b,
     CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display,
     T: Strategy<Value = CandidValue> + 'b,
+    K: Strategy<Value = String> + 'b,
 >(
     arb_aliases: &Vec<ArbAlias>,
     arb_candid_value_strategy: &'b T,
+    arb_type_strategy: K,
 ) -> impl Strategy<Value = ArbParam<CandidValue>> + 'b {
     (
         create_arb_python_name(),
-        create_arb_type(arb_aliases),
+        create_arb_type(arb_aliases, arb_type_strategy),
         arb_candid_value_strategy,
     )
         .prop_map(
@@ -243,17 +261,15 @@ fn create_arb_param<
         )
 }
 
-fn create_arb_type(arb_aliases: &Vec<ArbAlias>) -> impl Strategy<Value = String> {
+fn create_arb_type<T: Strategy<Value = String>>(
+    arb_aliases: &Vec<ArbAlias>,
+    arb_type_strategy: T,
+) -> impl Strategy<Value = String> {
     prop_oneof![
-        "str",
-        "text",
-        Just(arb_aliases.clone()).prop_shuffle().prop_map(
-            |arb_aliases| if arb_aliases.len() == 0 {
-                "str".to_string()
-            } else {
-                arb_aliases[0].name.clone()
-            }
-        )
+        arb_type_strategy,
+        Just(arb_aliases.clone())
+            .prop_shuffle()
+            .prop_map(|arb_aliases| arb_aliases[0].name.clone())
     ]
 }
 
@@ -261,7 +277,7 @@ fn create_arb_python_name() -> impl Strategy<Value = String> {
     "[a-zA-Z][a-zA-Z0-9_]*" // TODO underscores are not valid as the first character until this is fixed: https://github.com/demergent-labs/kybra/issues/218#issuecomment-1376175383
 }
 
-fn remove_duplicates<
+fn deduplicate_arb_functions<
     CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display,
 >(
     arb_functions: Vec<ArbFunction<CandidValue>>,
@@ -276,6 +292,17 @@ fn remove_duplicates<
     result
 }
 
+fn deduplicate_arb_aliases(arb_aliases: Vec<ArbAlias>) -> Vec<ArbAlias> {
+    let mut set = HashSet::new();
+    let mut result = Vec::new();
+    for arb_alias in arb_aliases {
+        if set.insert(arb_alias.clone().name) {
+            result.push(arb_alias.clone());
+        }
+    }
+    result
+}
+
 fn get_return_value<
     'b,
     CandidValue: CandidType + Clone + Debug + for<'a> Deserialize<'a> + Display,
@@ -283,10 +310,11 @@ fn get_return_value<
     arb_params: Vec<ArbParam<CandidValue>>,
     arb_return_value: CandidValue,
     params_return_value_getter: fn(Vec<ArbParam<CandidValue>>) -> CandidValue,
+    no_params_return_value_getter: fn(CandidValue) -> String,
 ) -> (String, CandidValue) {
     if arb_params.len() == 0 {
         (
-            format!("\"{}\"", arb_return_value.to_string()),
+            no_params_return_value_getter(arb_return_value.clone()),
             arb_return_value,
         )
     } else {

@@ -16,13 +16,24 @@ mod property_tests {
                 "from kybra import query, text, update".to_string(),
                 &create_arb_string(),
                 params_return_value_getter,
+                &prop_oneof!["str", "text"],
+                no_params_return_value_getter,
             ),
             assertion,
+            arb_param_to_candid_string,
         )
+    }
+
+    fn arb_param_to_candid_string(arb_param: ArbParam<String>) -> String {
+        format!("\"{}\"", arb_param.value)
     }
 
     fn create_arb_string() -> impl Strategy<Value = String> {
         any::<String>().prop_map(|s| s.replace("\\", "\\\\").replace("\"", "\\\""))
+    }
+
+    fn no_params_return_value_getter(return_value: String) -> String {
+        format!("\"{}\"", return_value)
     }
 
     fn params_return_value_getter(arb_params: Vec<ArbParam<String>>) -> String {
