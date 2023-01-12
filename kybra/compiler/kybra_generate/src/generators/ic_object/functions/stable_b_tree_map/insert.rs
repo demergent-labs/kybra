@@ -29,7 +29,7 @@ fn generate_match_arms(
         .iter()
         .map(|stable_b_tree_map_node| {
             let memory_id = stable_b_tree_map_node.memory_id;
-            let map_name_ident =
+            let stable_b_tree_map_ref_cell =
                 format_ident!("STABLE_B_TREE_MAP_{}", stable_b_tree_map_node.memory_id);
 
             let (key_wrapper_type_name, _) = generate_wrapper_type(&stable_b_tree_map_node.key_type, memory_id, "Key");
@@ -38,9 +38,49 @@ fn generate_match_arms(
             // TODO the return value here might need a little work like in get
             quote! {
                 #memory_id => {
-                    #map_name_ident.with(|p| {
-                        p.borrow_mut().insert(#key_wrapper_type_name(key_py_object_ref.try_from_vm_value(vm).unwrap()), #value_wrapper_type_name(value_py_object_ref.try_from_vm_value(vm).unwrap()))
-                    }).unwrap().try_into_vm_value(vm).unwrap()
+                    let key = #key_wrapper_type_name(key_py_object_ref.try_from_vm_value(vm).unwrap());
+                    let value = #value_wrapper_type_name(value_py_object_ref.try_from_vm_value(vm).unwrap());
+
+                    let result = #stable_b_tree_map_ref_cell.with(|stable_b_tree_map_ref_cell| {
+                        stable_b_tree_map_ref_cell
+                            .borrow_mut()
+                            .insert(key, value)
+                    });
+
+                    let insert_result_class = _kybra_unwrap_rust_python_result(vm.run_block_expr(
+                    vm.new_scope_with_builtins(),
+                        r#"
+from kybra import InsertResult
+
+InsertResult
+                        "#
+                    ), vm);
+
+                    match result {
+                        Ok(ok) => {
+                            let method_result = vm.invoke(&insert_result_class, (ok.try_into_vm_value(vm).unwrap(), vm.ctx.none()));
+
+                            _kybra_unwrap_rust_python_result(method_result, vm)
+
+                            // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
+                            // let dict = vm.ctx.new_dict();
+
+                            // dict.set_item("ok", ok.try_into_vm_value(vm).unwrap(), vm);
+
+                            // dict
+                        },
+                        Err(err) => {
+                            let method_result = vm.invoke(&insert_result_class, (vm.ctx.none(), err.try_into_vm_value(vm).unwrap()));
+                            _kybra_unwrap_rust_python_result(method_result, vm)
+
+                            // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
+                            // let dict = vm.ctx.new_dict();
+
+                            // dict.set_item("err", err_string.try_into_vm_value(vm).unwrap(), vm);
+
+                            // dict
+                        }
+                    }
                 }
             }
         })

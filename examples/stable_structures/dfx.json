@@ -1,12 +1,22 @@
 {
     "canisters": {
-        "stable_structures": {
+        "canister1": {
             "type": "custom",
-            "build": "python -m kybra stable_structures src/main.py src/main.did",
-            "candid": "src/main.did",
-            "wasm": ".dfx/kybra/stable_structures/target/wasm32-unknown-unknown/release/stable_structures.wasm.gz",
+            "build": "python -m kybra canister1 src/canister1/canister1.py src/canister1/canister1.did",
+            "candid": "src/canister1/canister1.did",
+            "wasm": ".dfx/kybra/canister1/target/wasm32-unknown-unknown/release/canister1.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/stable_structures",
+                "output": "test/dfx_generated/canister1",
+                "node_compatibility": true
+            }
+        },
+        "canister2": {
+            "type": "custom",
+            "build": "python -m kybra canister2 src/canister2/canister2.py src/canister2/canister2.did",
+            "candid": "src/canister2/canister2.did",
+            "wasm": ".dfx/kybra/canister2/target/wasm32-unknown-unknown/release/canister2.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/canister2",
                 "node_compatibility": true
             }
         }
