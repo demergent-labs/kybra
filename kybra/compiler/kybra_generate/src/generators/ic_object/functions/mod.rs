@@ -33,6 +33,7 @@ pub mod stable64_grow;
 pub mod stable64_read;
 pub mod stable64_size;
 pub mod stable64_write;
+pub mod stable_b_tree_map;
 pub mod stable_bytes;
 pub mod stable_grow;
 pub mod stable_read;

@@ -8,6 +8,8 @@ use cdk_framework::{ActCanisterMethod, ActDataType, CanisterMethodType};
 use super::KybraStmt;
 
 mod build_external_canisters;
+pub mod stable_b_tree_map_nodes;
+pub use stable_b_tree_map_nodes::StableBTreeMapNode;
 
 pub struct KybraProgram<'a> {
     pub program: Mod,
@@ -75,6 +77,26 @@ impl KybraProgram<'_> {
                         source_map: self.source_map,
                     };
                     kybra_stmt.is_external_canister()
+                })
+                .map(|stmt_kind| KybraStmt {
+                    stmt_kind,
+                    source_map: self.source_map,
+                })
+                .collect(),
+            _ => vec![],
+        }
+    }
+
+    pub fn get_kybra_stable_b_tree_node_stmts(&self) -> Vec<KybraStmt> {
+        match &self.program {
+            Mod::Module { body, .. } => body
+                .iter()
+                .filter(|stmt_kind| {
+                    let kybra_stmt = KybraStmt {
+                        stmt_kind,
+                        source_map: self.source_map,
+                    };
+                    kybra_stmt.is_stable_b_tree_map_node()
                 })
                 .map(|stmt_kind| KybraStmt {
                     stmt_kind,

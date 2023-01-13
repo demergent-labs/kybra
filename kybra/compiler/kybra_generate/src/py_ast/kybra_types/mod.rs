@@ -6,4 +6,5 @@ mod kybra_stmt;
 pub use kybra_arguments::KybraArguments;
 pub use kybra_expr::KybraExpr;
 pub use kybra_program::KybraProgram;
+pub use kybra_program::StableBTreeMapNode;
 pub use kybra_stmt::KybraStmt;

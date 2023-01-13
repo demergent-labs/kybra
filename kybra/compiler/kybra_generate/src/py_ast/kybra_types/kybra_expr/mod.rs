@@ -6,6 +6,7 @@ pub mod get_dependencies;
 mod hash;
 mod opt;
 mod to_act_data_type;
+pub mod to_hash_string;
 mod tuple;
 
 use rustpython_parser::ast::{ExprKind, Located};

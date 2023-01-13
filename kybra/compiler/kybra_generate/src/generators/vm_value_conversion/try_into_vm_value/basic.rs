@@ -136,5 +136,34 @@ Principal
                 Ok(self.to_pyobject(vm))
             }
         }
+
+        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_stable_structures::btreemap::InsertError {
+            fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
+                match self {
+                    ic_stable_structures::btreemap::InsertError::KeyTooLarge {given, max} => {
+                        let dict = vm.ctx.new_dict();
+
+                        let key_too_large_dict = vm.ctx.new_dict();
+                        key_too_large_dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
+                        key_too_large_dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+
+                        dict.set_item("KeyTooLarge", key_too_large_dict.into(), vm);
+
+                        Ok(dict.into())
+                    },
+                    ic_stable_structures::btreemap::InsertError::ValueTooLarge {given, max} => {
+                        let dict = vm.ctx.new_dict();
+
+                        let value_too_large_dict = vm.ctx.new_dict();
+                        value_too_large_dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
+                        value_too_large_dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+
+                        dict.set_item("ValueTooLarge", value_too_large_dict.into(), vm);
+
+                        Ok(dict.into())
+                    }
+                }
+            }
+        }
     }
 }

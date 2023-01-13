@@ -1,6 +1,9 @@
 use quote::quote;
 
-use crate::{generators::ic_object, py_ast::PyAst};
+use crate::{
+    generators::ic_object,
+    py_ast::{kybra_types::StableBTreeMapNode, PyAst},
+};
 use cdk_framework::{
     nodes::{ActExternalCanister, ActInitMethod},
     ActCanisterMethod, CanisterMethodType,
@@ -11,8 +14,13 @@ impl PyAst<'_> {
         &self,
         canister_methods: &Vec<ActCanisterMethod>,
         external_canisters: &Vec<ActExternalCanister>,
+        stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
     ) -> ActInitMethod {
-        let ic_object = ic_object::generate_ic_object(canister_methods, external_canisters);
+        let ic_object = ic_object::generate_ic_object(
+            canister_methods,
+            external_canisters,
+            stable_b_tree_map_nodes,
+        );
 
         let init_function_defs = self.get_function_def_of_type(CanisterMethodType::Init);
 
@@ -47,7 +55,6 @@ impl PyAst<'_> {
                     Ic::make_class(&vm.ctx);
                     _kybra_unwrap_rust_python_result(vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm), vm);
 
-                    _kybra_unwrap_rust_python_result(vm.builtins.set_attr("_kybra_stable_storage", vm.ctx.new_dict(), vm), vm);
 
                     let result = vm.run_code_string(
                         _kybra_scope.clone(),

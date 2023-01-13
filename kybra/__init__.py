@@ -314,10 +314,6 @@ class ic(Generic[T]):
         _kybra_ic._kybra_stable64_write(offset, buf) # type: ignore
 
     @staticmethod
-    def stable_storage() -> Any:
-        return _kybra_stable_storage # type: ignore
-
-    @staticmethod
     def time() -> nat64:
         return _kybra_ic._kybra_time() # type: ignore
 
@@ -368,3 +364,128 @@ def method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
         ])
 
     return intermediate_func # type: ignore
+
+
+K = TypeVar('K')
+V = TypeVar('V')
+
+
+class KeyTooLarge(Record):
+    given: nat32
+    max: nat32
+
+
+class ValueTooLarge(Record):
+    given: nat32
+    max: nat32
+
+
+class InsertError(Variant, total=False):
+    KeyTooLarge: KeyTooLarge
+    ValueTooLarge: ValueTooLarge
+
+
+class InsertResult(Generic[V]):
+    ok: V
+    err: Optional[InsertError]
+
+    def __init__(self, ok: V, err: InsertError):
+        self.ok = ok
+        self.err = err
+
+
+class StableBTreeMap(Generic[K, V]):
+    """
+    A map based on a self-balancing tree that persists across canister upgrades.
+    """
+
+    def __init__(self, memory_id: nat8, max_key_size: int, max_value_size: int):
+        """
+        Initialize the stable B-tree map.
+
+        :param memory_id: The memory ID of the stable B-tree map.
+        :param max_key_size: The maximum size of the keys (in bytes) in the map.
+        :param max_value_size: The maximum size of the values (in bytes) in the map.
+        """
+        self.memory_id = memory_id
+
+    def contains_key(self, key: K) -> bool:
+        """
+        Check if the map contains a key.
+
+        :param key: The key to check for in the map.
+        :return: True if the key is in the map, False otherwise.
+        """
+        return _kybra_ic._kybra_stable_b_tree_map_contains_key(self.memory_id, key)  # type: ignore
+
+    def get(self, key: K) -> opt[V]:
+        """
+        Get the value associated with a key in the map.
+
+        :param key: The key to get the value for.
+        :return: The value associated with the key, or None if the key is not in the map.
+        """
+        return _kybra_ic._kybra_stable_b_tree_map_get(self.memory_id, key)  # type: ignore
+
+    def insert(self, key: K, value: V) -> InsertResult[opt[V]]:
+        """
+        Insert a key-value pair into the map.
+
+        :param key: The key to insert.
+        :param value: The value to insert.
+        :return: An instance of InsertResult containing an ok attribute if the insertion succeeded
+        or an err attribute if the insertion failed. If the insertion succeeded the ok attribute
+        will contain the previous value associated with the key, if any. If the insertion failed,
+        the err attribute will contain an instance of InsertError indicating the reason for the
+        failure.
+        """
+        return _kybra_ic._kybra_stable_b_tree_map_insert(self.memory_id, key, value)  # type: ignore
+
+    def is_empty(self) -> bool:
+        """
+        Check if the map is empty.
+
+        :return: True if the map is empty, False otherwise.
+        """
+        return _kybra_ic._kybra_stable_b_tree_map_is_empty(self.memory_id)  # type: ignore
+
+    def items(self) -> list[tuple[K, V]]:
+        """
+        Get a list of all key-value pairs in the map.
+
+        :return: A list of tuples containing all key-value pairs in the map.
+        """
+        return _kybra_ic._kybra_stable_b_tree_map_items(self.memory_id)  # type: ignore
+
+    def keys(self) -> list[K]:
+        """
+        Get a list of all keys in the map.
+
+        :return: A list of all keys in the map.
+        """
+        return _kybra_ic._kybra_stable_b_tree_map_keys(self.memory_id)  # type: ignore
+
+    def len(self) -> nat64:
+        """
+        Get the number of key-value pairs in the map.
+
+        :return: The number of key-value pairs in the map.
+        """
+        return _kybra_ic._kybra_stable_b_tree_map_len(self.memory_id)  # type: ignore
+
+    def remove(self, key: K) -> opt[V]:
+        """
+        Remove a key-value pair from the map.
+
+        :param key: The key of the key-value pair to remove.
+        :return: The value associated with the key, or None if the key is not in the map.
+        """
+        return _kybra_ic._kybra_stable_b_tree_map_remove(self.memory_id, key)  # type: ignore
+
+    def values(self) -> list[V]:
+        """
+        Get a list of all values in the map.
+
+        :return: A list of all values in the map.
+        """
+        return _kybra_ic._kybra_stable_b_tree_map_values(self.memory_id)  # type: ignore

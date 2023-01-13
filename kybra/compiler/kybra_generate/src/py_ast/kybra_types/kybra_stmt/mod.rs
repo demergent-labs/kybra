@@ -3,6 +3,7 @@ mod data_types;
 mod external_canisters;
 mod get_dependencies;
 mod get_source_info;
+pub mod stable_b_tree_map_nodes;
 mod system_methods;
 mod type_alias;
 

@@ -1,21 +1,16 @@
-from kybra import Async, CanisterResult, ic, init, nat32, query, update
+from kybra import Async, CanisterResult, ic, init, nat32, query, StableBTreeMap, update
 from kybra.canisters.management import management_canister
 from kybra.canisters.management.http import HttpResponse, HttpTransformArgs
-from typing import TypedDict
 
 JSON = str
 
 
-class StableStorage(TypedDict):
-    ethereum_url: str
-
-
-stable_storage: StableStorage = ic.stable_storage()
+stable_storage = StableBTreeMap[str, str](memory_id=0, max_key_size=20, max_value_size=1_000)
 
 
 @init
 def init_(ethereum_url: str):
-    stable_storage['ethereum_url'] = ethereum_url
+    stable_storage.insert('ethereum_url', ethereum_url)
 
 
 @update
@@ -28,7 +23,7 @@ def eth_get_balance(ethereum_address: str) -> Async[JSON]:
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
     http_result: CanisterResult[HttpResponse] = yield management_canister.http_request({
-        'url': stable_storage['ethereum_url'],
+        'url': stable_storage.get('ethereum_url') or '',
         'max_response_bytes': max_response_bytes,
         'method': {'post': None},
         'headers': [],
@@ -57,7 +52,7 @@ def eth_get_block_by_number(number: nat32) -> Async[JSON]:
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
     http_result: CanisterResult[HttpResponse] = yield management_canister.http_request({
-        'url': stable_storage['ethereum_url'],
+        'url': stable_storage.get('ethereum_url') or '',
         'max_response_bytes': max_response_bytes,
         'method': {'post': None},
         'headers': [],

@@ -66,6 +66,7 @@ jobs:
                     "examples/cross_canister_calls",
                     "examples/cycles",
                     "examples/date",
+                    "examples/ethereum_json_rpc",
                     "examples/func_types",
                     "examples/generators",
                     "examples/heartbeat",
@@ -104,7 +105,7 @@ jobs:
                     "examples/simple_erc20",
                     "examples/simple_user_accounts",
                     "examples/stable_memory",
-                    "examples/stable_storage",
+                    "examples/stable_structures",
                     "examples/timers",
                     "examples/tuple_types",
                     "examples/update"

@@ -1,4 +1,4 @@
-from kybra import blob, Func, ic, nat, nat16, opt, Query, query, Record, update, Variant
+from kybra import blob, Func, ic, nat, nat16, opt, Query, query, Record, StableBTreeMap, update, Variant
 from typing import TypeAlias
 
 
@@ -40,15 +40,9 @@ class HttpRequest(Record):
     headers: list[HeaderField]
     body: blob
 
+stable_storage = StableBTreeMap[str, nat](memory_id=0, max_key_size=15, max_value_size=1_000)
 
-class StableStorage(Record):
-    counter: nat
-
-
-stable_storage: StableStorage = ic.stable_storage()
-
-stable_storage['counter'] = 0
-
+stable_storage.insert('counter', 0)
 
 def isGzip(x: HeaderField) -> bool:
     return x[0].lower() == 'accept-encoding' and 'gzip' in x[1].lower()
@@ -78,7 +72,7 @@ def http_request(req: HttpRequest) -> HttpResponse:
             return {
                 'status_code': 200,
                 'headers': [('content-type', 'text/plain')],
-                'body': f"Counter is {stable_storage['counter']}\n{req['url']}".encode('utf-8'),
+                'body': f"Counter is {stable_storage.get('counter')}\n{req['url']}".encode('utf-8'),
                 'streaming_strategy': None,
                 'upgrade': None
             }
@@ -114,13 +108,14 @@ def http_request_update(req: HttpRequest) -> HttpResponse:
     global stable_storage
 
     if req['method'] == 'POST':
-        stable_storage['counter'] += 1
+        counter = stable_storage.get('counter') or 0
+        stable_storage.insert('counter', counter + 1)
 
         if next(filter(isGzip, req['headers']), None) is None:
             return {
                 'status_code': 201,
                 'headers': [('content-type', 'text/plain')],
-                'body': f"Counter updated to {stable_storage['counter']}".encode('utf-8'),
+                'body': f"Counter updated to {stable_storage.get('counter')}".encode('utf-8'),
                 'streaming_strategy': None,
                 'upgrade': None
             }
@@ -172,7 +167,7 @@ def http_streaming(token: Token) -> StreamingCallbackHttpResponse:
         }
     elif token['arbitrary_data'] == 'next':
         return {
-            'body': f"{stable_storage['counter']}".encode('utf-8'),
+            'body': f"{stable_storage.get('counter')}".encode('utf-8'),
             'token': {'arbitrary_data': 'last'}
         }
     elif token['arbitrary_data'] == 'last':

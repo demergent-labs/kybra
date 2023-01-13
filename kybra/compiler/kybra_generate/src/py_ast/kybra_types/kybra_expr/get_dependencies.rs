@@ -8,7 +8,6 @@ use rustpython_parser::ast::{Constant, ExprKind};
 use crate::py_ast::{
     kybra_types::{KybraExpr, KybraStmt},
     traits::GetDependencies,
-    what_is_it::WhatIsIt,
 };
 
 impl KybraExpr<'_> {
@@ -58,15 +57,12 @@ impl GetDependencies for KybraExpr<'_> {
                 .get_dependent_types(type_alias_lookup, found_type_names);
                 acc.union(&dependencies).cloned().collect()
             }),
-            ExprKind::Constant { value, .. } => {
-                self.located_expr.what_is_it();
-                match value {
-                    Constant::Str(string) => {
-                        self.add_dependency(string.clone(), type_alias_lookup, found_type_names)
-                    }
-                    _ => HashSet::new(),
+            ExprKind::Constant { value, .. } => match value {
+                Constant::Str(string) => {
+                    self.add_dependency(string.clone(), type_alias_lookup, found_type_names)
                 }
-            }
+                _ => HashSet::new(),
+            },
             ExprKind::Name { id, .. } => match &id[..] {
                 "blob" => HashSet::new(),
                 "empty" => HashSet::new(),
@@ -98,6 +94,23 @@ impl GetDependencies for KybraExpr<'_> {
                 .get_dependent_types(type_alias_lookup, found_type_names);
                 acc.union(&dependencies).cloned().collect()
             }),
+            ExprKind::Call { func, .. } => {
+                if self.is_stable_b_tree_map_node() {
+                    let kybra_expr = KybraExpr {
+                        located_expr: func,
+                        source_map: self.source_map,
+                    };
+                    let key_deps = kybra_expr
+                        .get_key_type()
+                        .get_dependent_types(type_alias_lookup, found_type_names);
+                    let value_deps = kybra_expr
+                        .get_value_type()
+                        .get_dependent_types(type_alias_lookup, found_type_names);
+                    key_deps.union(&value_deps).cloned().collect()
+                } else {
+                    HashSet::new()
+                }
+            }
             _ => HashSet::new(),
         }
     }
