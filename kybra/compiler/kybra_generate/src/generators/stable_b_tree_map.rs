@@ -47,8 +47,7 @@ fn generate_global_stable_b_tree_maps_and_impls(
     stable_b_tree_map_nodes
         .iter()
         .map(|stable_b_tree_map_node| {
-            let map_name_ident =
-                format_ident!("STABLE_B_TREE_MAP_{}", stable_b_tree_map_node.memory_id);
+            let map_name_ident = ref_cell_ident(stable_b_tree_map_node.memory_id);
             let memory_id = stable_b_tree_map_node.memory_id;
 
             let (key_wrapper_type_name, key_wrapper_type) = generate_wrapper_type(&stable_b_tree_map_node.key_type, memory_id, "Key");
@@ -80,6 +79,10 @@ fn generate_global_stable_b_tree_maps_and_impls(
             )
         })
         .collect()
+}
+
+pub fn ref_cell_ident(memory_id: u8) -> proc_macro2::Ident {
+    format_ident!("STABLE_B_TREE_MAP_{}_REF_CELL", memory_id)
 }
 
 pub fn generate_wrapper_type(
