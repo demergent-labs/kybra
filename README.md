@@ -2248,7 +2248,7 @@ from kybra import StableBTreeMap
 stable_storage = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=100)
 ```
 
-Note that the constructor requires the following parameters in the specified order:
+Note that the constructor requires the following parameters:
 
 0. `memory_id` the memory id at which to instantiate this map. Must be between 0 and 255 inclusive.
 1. `max_key_size` the largest size (in bytes) a key can be
