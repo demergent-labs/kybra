@@ -19,6 +19,16 @@
                 "output": "test/dfx_generated/canister2",
                 "node_compatibility": true
             }
+        },
+        "canister3": {
+            "type": "custom",
+            "build": "python -m kybra canister3 src/canister3/canister3.py src/canister3/canister3.did",
+            "candid": "src/canister3/canister3.did",
+            "wasm": ".dfx/kybra/canister3/target/wasm32-unknown-unknown/release/canister3.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/canister3",
+                "node_compatibility": true
+            }
         }
     }
 }
