@@ -1,4 +1,4 @@
-from kybra import Async, CanisterResult, composite, ic, manual, nat, Principal, query, update
+from kybra import Async, CanisterResult, ic, manual, nat, Principal, query, update
 from src.canister1.types import StringQueryResult
 from src.canister3.types import Canister3
 
@@ -8,7 +8,6 @@ counter: nat = 0
 
 
 @query
-@composite
 def inc_counter() -> nat:
     global counter
     counter += 1
@@ -31,7 +30,6 @@ def manual_query() -> manual[str]:
 
 
 @query
-@composite
 def deep_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister3.deep_query()
 

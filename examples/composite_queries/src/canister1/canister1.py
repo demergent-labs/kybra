@@ -1,4 +1,4 @@
-from kybra import Async, CanisterResult, composite, nat, Principal, query, update
+from kybra import Async, CanisterResult, nat, Principal, query, update, manual, ic
 from src.canister1.types import Canister1, NatQueryResult, StringQueryResult
 from src.canister2.types import Canister2
 
@@ -10,7 +10,6 @@ counter: nat = 0
 
 # Composite query calling a query
 @query
-@composite
 def simple_composite_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.simple_query()
 
@@ -25,7 +24,6 @@ def simple_composite_query() -> Async[StringQueryResult]:
 
 
 # Composite query calling a manual query
-@composite
 @query
 def manual_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.manual_query()
@@ -40,9 +38,23 @@ def manual_query() -> Async[StringQueryResult]:
     }
 
 
+# Manual composite query calling a manual query
+@query
+def totally_manual_query() -> Async[manual[StringQueryResult]]:
+    result: CanisterResult[str] = yield canister2.manual_query()
+
+    if result.err is not None:
+        ic.reply({
+            'err': result.err
+        })
+
+    ic.reply({
+        'ok': result.ok
+    })
+
+
 # Composite query calling another composite query
 @query
-@composite
 def deep_query() -> Async[StringQueryResult]:
     result: CanisterResult[StringQueryResult] = yield canister2.deep_query()
 
@@ -66,28 +78,12 @@ def deep_query() -> Async[StringQueryResult]:
 
 # Composite query calling an update method. SHOULDN'T WORK
 @query
-@composite
 def update_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.update_query()
 
     if result.err is not None:
         return {
             'err': result.err
-        }
-
-    return {
-        'ok': result.ok
-    }
-
-
-# Composite query being called by a query method. SHOULDN'T WORK
-@query
-def simple_query() -> Async[StringQueryResult]:
-    result: CanisterResult[str] = yield canister2.simple_query()
-
-    if result.err is not None:
-        return {
-            'err': f'So is this our err {result.err}'
         }
 
     return {
@@ -112,7 +108,6 @@ def simple_update() -> Async[StringQueryResult]:
 
 # Composite query that modifies the state. Should revert after the call is done
 @query
-@composite
 def inc_counter() -> nat:
     global counter
     counter += 1
@@ -121,7 +116,6 @@ def inc_counter() -> nat:
 
 # Composite query calling queries on the same canister. SHOULDN'T WORK
 @query
-@composite
 def inc_canister1() -> Async[NatQueryResult]:
     global counter
     counter += 1
@@ -145,7 +139,6 @@ def inc_canister1() -> Async[NatQueryResult]:
 
 # Composite query calling queries that modify the state
 @query
-@composite
 def inc_canister2() -> Async[NatQueryResult]:
     global counter
     counter += 1

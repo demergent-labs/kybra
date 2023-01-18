@@ -65,6 +65,11 @@ pub fn kybra_generate(
         use serde::de::{DeserializeSeed, Visitor};
         use serde::ser::{Serialize, SerializeMap, SerializeSeq, SerializeTuple};
         use slotmap::Key;
+        use rand::{Rng, SeedableRng, rngs::StdRng};
+
+        thread_local! {
+            static RNG_REF_CELL: std::cell::RefCell<StdRng> = std::cell::RefCell::new(SeedableRng::from_seed([0u8; 32]));
+        }
 
         static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;

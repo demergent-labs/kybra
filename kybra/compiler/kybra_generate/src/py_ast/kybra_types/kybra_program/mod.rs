@@ -147,11 +147,7 @@ impl KybraProgram<'_> {
                     match kybra_stmt.as_canister_method() {
                         Some(canister_method) => {
                             if kybra_stmt.is_canister_method_type(CanisterMethodType::Query) {
-                                let is_composite: bool = kybra_stmt.is_composite();
-                                ActCanisterMethod::QueryMethod {
-                                    query_method: canister_method,
-                                    is_composite,
-                                }
+                                ActCanisterMethod::QueryMethod(canister_method)
                             } else {
                                 ActCanisterMethod::UpdateMethod(canister_method)
                             }
