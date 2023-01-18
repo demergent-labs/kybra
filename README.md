@@ -58,7 +58,7 @@ You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.micr
 
 #### Python 3.10.7
 
-It is highly recommended to install Python 3.10.7 using [pyenv](https://github.com/pyenv/pyenv). To do so, use the [pyenv installer](https://github.com/pyenv/pyenv-installer):
+It is highly recommended to install Python 3.10.7 using [pyenv](https://github.com/pyenv/pyenv). To do so, use the [pyenv installer](https://github.com/pyenv/pyenv-installer) as shown below:
 
 ```bash
 # install pyenv
@@ -66,20 +66,6 @@ curl https://pyenv.run | bash
 
 # install Python 3.10.7
 ~/.pyenv/bin/pyenv install 3.10.7
-```
-
-#### Rust
-
-Run the following command to install Rust:
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
-
-If you already have Rust installed, make sure you are up to date:
-
-```bash
-rustup update
 ```
 
 #### dfx
@@ -117,21 +103,13 @@ Set the setting `python.analysis.typeCheckingMode` to `strict`:
 VS Code -> Preferences -> Settings -> Search for python.analysis.typeCheckingMode and set it to strict
 ```
 
-##### Set python.analysis.extraPaths
-
-Set the setting `python.analysis.extraPaths` with the path to your `site-packages` directory `.dfx/kybra/venv/lib/python3.10/site-packages`:
-
-```
-VS Code -> Preferences -> Settings -> Search for python.analysis.extraPaths and add .dfx/kybra/venv/lib/python3.10/site-packages
-```
-
 #### Kybra
 
 Follow these steps to create a Kybra project. The steps below assume a project called `hello_world`:
 
 1. Create a directory for your project (`mkdir hello_world && cd hello_world`)
-2. Create the virtual environment: (`~/.pyenv/versions/3.10.7/bin/python -m venv .dfx/kybra/venv`)
-3. Activate the virtual environment: (`source .dfx/kybra/venv/bin/activate`)
+2. Create the virtual environment: (`~/.pyenv/versions/3.10.7/bin/python -m venv venv`)
+3. Activate the virtual environment: (`source venv/bin/activate`)
 4. Install Kybra (`pip install kybra`)
 5. Create a `dfx.json` file (`touch dfx.json`)
 6. Create a directory and an entry Python file for your canister (`mkdir src && touch src/main.py`)
