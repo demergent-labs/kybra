@@ -12,7 +12,7 @@ impl ToAct for KybraAst {
                 ActCanisterMethod::QueryMethod { .. } => true,
                 ActCanisterMethod::UpdateMethod(_) => false,
             })
-            .map(|method| method.clone())
+            .cloned()
             .collect();
         let update_methods: Vec<ActCanisterMethod> = self
             .canister_methods
@@ -21,7 +21,7 @@ impl ToAct for KybraAst {
                 ActCanisterMethod::QueryMethod { .. } => false,
                 ActCanisterMethod::UpdateMethod(_) => true,
             })
-            .map(|method| method.clone())
+            .cloned()
             .collect();
 
         let arrays: Vec<ActDataType> = self
@@ -31,7 +31,7 @@ impl ToAct for KybraAst {
                 ActDataType::Array(_) => true,
                 _ => false,
             })
-            .map(|act| act.clone())
+            .cloned()
             .collect();
         let funcs: Vec<ActDataType> = self
             .canister_types
@@ -40,7 +40,7 @@ impl ToAct for KybraAst {
                 ActDataType::Func(_) => true,
                 _ => false,
             })
-            .map(|act| act.clone())
+            .cloned()
             .collect();
         let options: Vec<ActDataType> = self
             .canister_types
@@ -49,7 +49,7 @@ impl ToAct for KybraAst {
                 ActDataType::Option(_) => true,
                 _ => false,
             })
-            .map(|act| act.clone())
+            .cloned()
             .collect();
         let primitives: Vec<ActDataType> = self
             .canister_types
@@ -58,7 +58,7 @@ impl ToAct for KybraAst {
                 ActDataType::Primitive(_) => true,
                 _ => false,
             })
-            .map(|act| act.clone())
+            .cloned()
             .collect();
         let records: Vec<ActDataType> = self
             .canister_types
@@ -67,7 +67,7 @@ impl ToAct for KybraAst {
                 ActDataType::Record(_) => true,
                 _ => false,
             })
-            .map(|act| act.clone())
+            .cloned()
             .collect();
         let tuples: Vec<ActDataType> = self
             .canister_types
@@ -76,7 +76,7 @@ impl ToAct for KybraAst {
                 ActDataType::Tuple(_) => true,
                 _ => false,
             })
-            .map(|act| act.clone())
+            .cloned()
             .collect();
         let type_refs: Vec<ActDataType> = self
             .canister_types
@@ -85,7 +85,7 @@ impl ToAct for KybraAst {
                 ActDataType::TypeRef(_) => true,
                 _ => false,
             })
-            .map(|act| act.clone())
+            .cloned()
             .collect();
         let variants: Vec<ActDataType> = self
             .canister_types
@@ -94,7 +94,7 @@ impl ToAct for KybraAst {
                 ActDataType::Variant(_) => true,
                 _ => false,
             })
-            .map(|act| act.clone())
+            .cloned()
             .collect();
 
         let heartbeat_method = self.heartbeat.clone();
@@ -108,10 +108,9 @@ impl ToAct for KybraAst {
         let try_into_vm_value_impls = try_into_vm_value::generate_try_into_vm_value_impls();
         let try_from_vm_value_impls = try_from_vm_value::generate_try_from_vm_value_impls();
 
-        let rust_code = self.rust_code.clone();
-
         AbstractCanisterTree {
             cdk_name: "kybra".to_string(),
+            body: self.rust_code.clone(),
             update_methods,
             query_methods,
             heartbeat_method,
@@ -119,7 +118,6 @@ impl ToAct for KybraAst {
             inspect_message_method,
             post_upgrade_method,
             pre_upgrade_method,
-            rust_code,
             arrays,
             funcs,
             options,
@@ -132,6 +130,7 @@ impl ToAct for KybraAst {
             variants,
             external_canisters,
             keywords: crate::get_python_keywords(),
+            header: self.header.clone(),
         }
     }
 }

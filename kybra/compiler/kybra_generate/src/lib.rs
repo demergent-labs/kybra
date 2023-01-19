@@ -43,18 +43,8 @@ pub fn kybra_generate(
             }
         })
         .collect();
-    let canister_definition = PyAst {
-        kybra_programs,
-        entry_module_name: entry_module_name.to_string(),
-    }
-    .to_kybra_ast()
-    .to_act()
-    .to_token_stream(());
-    eprintln!("-------------------------------------------");
-    eprintln!("--- ENDING --------------------------------");
-    eprintln!("-------------------------------------------");
 
-    quote! {
+    let header = quote! {
         #![allow(warnings, unused)]
 
         use rustpython_vm::{AsObject, builtins::{PyDict, PyBaseException, PyGenerator, PyListRef, PyTupleRef, PyIntRef, PyStr, PyList, PyTuple, PyBytes}, class::PyClassImpl, convert::ToPyObject, function::IntoFuncArgs, PyObjectRef, PyObject, PyRef, VirtualMachine, protocol::{PyIter, PyIterReturn}, py_serde::{deserialize, serialize}};
@@ -78,6 +68,19 @@ pub fn kybra_generate(
         // #[link_section = "icp:public cdk"]
         // pub static NAME: [u8; 12] = *b"kybra v0.0.0";
 
-        #canister_definition
+    };
+
+    let canister_definition = PyAst {
+        kybra_programs,
+        entry_module_name: entry_module_name.to_string(),
+        header,
     }
+    .to_kybra_ast()
+    .to_act()
+    .to_token_stream(());
+
+    eprintln!("-------------------------------------------");
+    eprintln!("--- ENDING --------------------------------");
+    eprintln!("-------------------------------------------");
+    canister_definition
 }
