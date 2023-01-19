@@ -19,7 +19,7 @@ def main():
     args = parse_args_or_exit(sys.argv)
     paths = create_paths(args)
     is_verbose = args["flags"]["verbose"]
-    is_initial_compile = detect_initial_compile(paths["gzipped_wasm"])
+    is_initial_compile = detect_initial_compile(paths["global_kybra_target_dir"])
 
     subprocess.run(
         [
@@ -47,6 +47,7 @@ def main():
     if os.path.exists(paths["canister"]):
         shutil.rmtree(paths["canister"])
     shutil.copytree(paths["compiler"], paths["canister"], dirs_exist_ok=True)
+    create_file(f"{paths['compiler']}/Cargo.toml", generate_cargo_toml(canister_name))
 
     # Add CARGO_TARGET_DIR to env for all cargo commands
     cargo_env = {
@@ -69,6 +70,7 @@ def main():
 
     build_wasm_binary_or_exit(
         paths,
+        canister_name,
         cargo_env,
         verbose=is_verbose,
         label=f"[3/3] 🚧 Building Wasm binary...{show_empathy(is_initial_compile)}",
@@ -167,8 +169,8 @@ def create_paths(args: Args) -> Paths:
     }
 
 
-def detect_initial_compile(gzipped_wasm_path: str) -> bool:
-    return not os.path.exists(gzipped_wasm_path)
+def detect_initial_compile(global_kybra_target_dir: str) -> bool:
+    return not os.path.exists(global_kybra_target_dir)
 
 
 @timed_inline
@@ -325,7 +327,7 @@ def run_rustfmt_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool =
 
 @timed_inline
 def build_wasm_binary_or_exit(
-    paths: Paths, cargo_env: dict[str, str], verbose: bool = False
+    paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
 ):
     # Compile the generated Rust code
     cargo_build_result = subprocess.run(
@@ -334,7 +336,7 @@ def build_wasm_binary_or_exit(
             "build",
             f"--manifest-path={paths['canister']}/Cargo.toml",
             "--target=wasm32-unknown-unknown",
-            "--package=kybra_generated_canister",  # TODO we should probably change the name here
+            f"--package={canister_name}",
             "--release",
         ],
         capture_output=not verbose,
@@ -352,7 +354,7 @@ def build_wasm_binary_or_exit(
     optimization_result = subprocess.run(
         [
             f"{paths['global_kybra_bin_dir']}/ic-cdk-optimizer",
-            f"{paths['global_kybra_target_dir']}/wasm32-unknown-unknown/release/kybra_generated_canister.wasm",
+            f"{paths['global_kybra_target_dir']}/wasm32-unknown-unknown/release/{canister_name}.wasm",
             f"-o={paths['wasm']}",
         ],
         capture_output=not verbose,
@@ -360,7 +362,7 @@ def build_wasm_binary_or_exit(
     # optimization_result = subprocess.run(
     #     [
     #         f"{cargo_bin_root}/bin/ic-wasm",
-    #         f"{paths['target']}/wasm32-unknown-unknown/release/kybra_generated_canister.wasm",
+    #         f"{paths['target']}/wasm32-unknown-unknown/release/{canister_name}.wasm",
     #         f"-o={paths['wasm']}",
     #         "shrink",
     #     ],
@@ -483,6 +485,44 @@ def inline_timed(
         print(f'{move_cursor_up_one_line}{label} {dim(f"{round(duration, 2)}s")}')
 
     return end_time - start_time
+
+
+def generate_cargo_toml(canister_name: str) -> str:
+    return f"""
+[package]
+name = "{canister_name}"
+version = "0.0.0"
+edition = "2018"
+
+[profile.release]
+opt-level = 'z'
+
+[profile.test]
+opt-level = 'z'
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ic-cdk = {{ version = "0.6.8", features = ["timers"] }}
+ic-cdk-macros = "0.6.8"
+candid = "0.8.4"
+kybra-vm-value-derive = {{ path = "./kybra_vm_value_derive" }}
+# TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
+# rustpython = {{ git = "https://github.com/demergent-labs/RustPython", rev = "9ca024b30446249cc2a584543bbc658ab4b65c6f", default-features = false, features = ["stdlib", "freeze-stdlib"] }}
+rustpython = {{ git = "https://github.com/demergent-labs/RustPython", rev = "9ca024b30446249cc2a584543bbc658ab4b65c6f", default-features = false, features = ["stdlib"] }}
+rustpython-vm = {{ git = "https://github.com/demergent-labs/RustPython", rev = "9ca024b30446249cc2a584543bbc658ab4b65c6f", default-features = false, features = [] }}
+rustpython-stdlib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "9ca024b30446249cc2a584543bbc658ab4b65c6f", default-features = false, features = [] }}
+rustpython-derive = {{ git = "https://github.com/demergent-labs/RustPython", rev = "9ca024b30446249cc2a584543bbc658ab4b65c6f", default-features = false, features = [] }}
+# TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
+# rustpython-pylib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "9ca024b30446249cc2a584543bbc658ab4b65c6f", default-features = false, features = [] }}
+# rustpython = {{ path = "../../../../../../RustPython", default-features = false, features = [] }}
+getrandom = {{ version = "0.2.3", features = ["custom"] }}
+serde = "1.0.137"
+async-recursion = "1.0.0"
+ic-stable-structures = "0.3.0"
+slotmap = "1.0.6"
+    """
 
 
 main()
