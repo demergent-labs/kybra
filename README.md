@@ -51,8 +51,7 @@ Follow instructions exactly as stated below to avoid issues.
 You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)) with bash and have the following installed on your system:
 
 -   [Python 3.10.7](#python-3.10.7)
--   [Rust](#rust)
--   [dfx 0.12.0](#dfx)
+-   [dfx 0.12.1](#dfx)
 -   [Python VS Code Extension](#python-vs-code-extension)
 -   [Common Errors](#common-errors)
 
@@ -70,10 +69,10 @@ curl https://pyenv.run | bash
 
 #### dfx
 
-Run the following command to install dfx 0.12.0:
+Run the following command to install dfx 0.12.1:
 
 ```bash
-DFX_VERSION=0.12.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+DFX_VERSION=0.12.1 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
 ```
 
 #### Python VS Code Extension
@@ -203,7 +202,7 @@ Please keep in mind that you must deploy from within the `virtualenv` that you s
 
 #### Local Deployment
 
-Start up an IC replica and deploy. The first deploy will likely take multiple minutes as it downloads and compiles many Rust dependencies. Subsequent deploys should be much quicker:
+Start up an IC replica and deploy:
 
 ```bash
 # Open a terminal and navigate to your project's root directory, then run the following command to start a local IC replica
