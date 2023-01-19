@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra call_raw src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/call_raw/target/wasm32-unknown-unknown/release/call_raw.wasm.gz",
+            "wasm": ".kybra/call_raw/call_raw.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/call_raw"
             }

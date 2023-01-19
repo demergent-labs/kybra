@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra factorial src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/factorial/target/wasm32-unknown-unknown/release/factorial.wasm.gz",
+            "wasm": ".kybra/factorial/factorial.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/factorial",
                 "node_compatibility": true

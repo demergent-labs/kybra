@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra heartbeat src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/heartbeat/target/wasm32-unknown-unknown/release/heartbeat.wasm.gz",
+            "wasm": ".kybra/heartbeat/heartbeat.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/heartbeat",
                 "node_compatibility": true

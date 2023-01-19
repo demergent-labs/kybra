@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra pre_and_post_upgrade src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/pre_and_post_upgrade/target/wasm32-unknown-unknown/release/pre_and_post_upgrade.wasm.gz",
+            "wasm": ".kybra/pre_and_post_upgrade/pre_and_post_upgrade.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/pre_and_post_upgrade"
             }

@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra ethereum_json_rpc src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/ethereum_json_rpc/target/wasm32-unknown-unknown/release/ethereum_json_rpc.wasm.gz",
+            "wasm": ".kybra/ethereum_json_rpc/ethereum_json_rpc.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/ethereum_json_rpc",
                 "node_compatibility": true

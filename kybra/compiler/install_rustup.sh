@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # TODO If we want to save a little bit of time we might be able to instruct rustup to not install some components initially, like clippy and docs
+# TODO we might want to implement all of this in Python in the future for platform-independence etc
 
 kybra_version=$1
 rust_version=$2

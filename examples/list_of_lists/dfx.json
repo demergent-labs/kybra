@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra list_of_lists src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/list_of_lists/target/wasm32-unknown-unknown/release/list_of_lists.wasm.gz",
+            "wasm": ".kybra/list_of_lists/list_of_lists.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/list_of_lists",
                 "node_compatibility": true

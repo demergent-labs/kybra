@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra counter src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/counter/target/wasm32-unknown-unknown/release/counter.wasm.gz",
+            "wasm": ".kybra/counter/counter.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/counter",
                 "node_compatibility": true

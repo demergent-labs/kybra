@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra simple_to_do src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/simple_to_do/target/wasm32-unknown-unknown/release/simple_to_do.wasm.gz",
+            "wasm": ".kybra/simple_to_do/simple_to_do.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/simple_to_do",
                 "node_compatibility": true

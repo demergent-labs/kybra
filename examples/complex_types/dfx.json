@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra complex_types src/complex_types.py src/complex_types.did",
             "candid": "src/complex_types.did",
-            "wasm": ".dfx/kybra/complex_types/target/wasm32-unknown-unknown/release/complex_types.wasm.gz",
+            "wasm": ".kybra/complex_types/complex_types.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/complex_types"
             }
