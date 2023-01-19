@@ -1,0 +1,80 @@
+# TODO we REALLY would like to get caching to work properly
+
+name: Kybra Property Tests
+on:
+    push:
+        branches:
+            - main
+    pull_request: # Runs on pull requests to any branch
+jobs:
+    property-tests: # TODO let's change the name of this
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false # We want to see which example tests succeed and which ones fail, we don't want one example test to cancel the rest
+            matrix:
+                # TODO perhaps we should start testing on different versions of dfx as well
+                rust: [stable]
+                tests:
+                    - name: candid_types::text::property_tests::basic
+                      directory: kybra_tests/src/candid_types/text
+                    - name: candid_types::blob::property_tests::basic
+                      directory: kybra_tests/src/candid_types/blob
+                    - name: candid_types::nat::property_tests::basic
+                      directory: kybra_tests/src/candid_types/nat
+                    - name: candid_types::nat64::property_tests::basic
+                      directory: kybra_tests/src/candid_types/nat64
+                    - name: candid_types::nat32::property_tests::basic
+                      directory: kybra_tests/src/candid_types/nat32
+                    - name: candid_types::nat16::property_tests::basic
+                      directory: kybra_tests/src/candid_types/nat16
+                    - name: candid_types::nat8::property_tests::basic
+                      directory: kybra_tests/src/candid_types/nat8
+                    - name: candid_types::int::property_tests::basic
+                      directory: kybra_tests/src/candid_types/int
+                    - name: candid_types::int64::property_tests::basic
+                      directory: kybra_tests/src/candid_types/int64
+                    - name: candid_types::int32::property_tests::basic
+                      directory: kybra_tests/src/candid_types/int32
+                    - name: candid_types::int16::property_tests::basic
+                      directory: kybra_tests/src/candid_types/int16
+                    - name: candid_types::int8::property_tests::basic
+                      directory: kybra_tests/src/candid_types/int8
+                    - name: candid_types::float64::property_tests::basic
+                      directory: kybra_tests/src/candid_types/float64
+                    - name: candid_types::float32::property_tests::basic
+                      directory: kybra_tests/src/candid_types/float32
+                    - name: candid_types::bool::property_tests::basic
+                      directory: kybra_tests/src/candid_types/bool
+                    - name: candid_types::null::property_tests::basic
+                      directory: kybra_tests/src/candid_types/null
+                    - name: candid_types::principal::property_tests::basic
+                      directory: kybra_tests/src/candid_types/principal
+        steps:
+            - uses: actions/checkout@v3
+            - run: DFX_VERSION=0.12.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+            - name: Install Rust ${{ matrix.rust }}
+              uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: ${{ matrix.rust }}
+                  profile: minimal
+                  override: true
+            - run: curl https://pyenv.run | bash
+            - run: ~/.pyenv/bin/pyenv install 3.10.7
+            - working-directory: ${{ matrix.tests.directory }}
+              run: dfx start --clean --background --host 127.0.0.1:8000
+            - working-directory: kybra_tests
+              run: KYBRA_CASES=10 cargo test ${{ matrix.tests.name }} -- --nocapture --exact # TODO we will want to configure KYBRA_CASES based on release candidates and full releases etc
+
+    check-property-tests-success:
+        needs: property-tests
+        runs-on: ubuntu-latest
+        if: success()
+        steps:
+            - run: exit 0
+
+    check-property-tests-failure:
+        needs: property-tests
+        runs-on: ubuntu-latest
+        if: failure()
+        steps:
+            - run: exit 1

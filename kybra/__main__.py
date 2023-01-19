@@ -38,6 +38,22 @@ def main():
     # Copy all of the Rust project structure from the pip package to an area designed for Rust compiling
     shutil.copytree(paths["compiler"], paths["canister"], dirs_exist_ok=True)
 
+    workspace_cargo_toml = f"""
+[workspace]
+members=[
+    "{canister_name}",
+    "{canister_name}/kybra_generate"
+]
+
+[profile.release]
+opt-level = 'z'
+
+[profile.test]
+opt-level = 'z'
+    """
+
+    create_file(".dfx/kybra/Cargo.toml", workspace_cargo_toml)
+
     # Add CARGO_TARGET_DIR to env for all cargo commands
     cargo_env = {**os.environ.copy(), "CARGO_TARGET_DIR": paths["target"]}
 
@@ -277,15 +293,10 @@ def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose:
     )
 
     if kybra_generate_result.returncode != 0:
-        print(
-            red("\n💣 Something about your Python code violates Kybra's requirements\n")
-        )
         print(parse_kybra_generate_error(kybra_generate_result.stderr))
         print(
-            "\nIf you are unable to decipher the error above, reach out in the #typescript"
+            "\nReach out on the DFINITY DEV OFFICIAL Discord if you need help: https://discord.gg/5Hb6rM2QUM"
         )
-        print("channel of the DFINITY DEV OFFICIAL discord:")
-        print("\nhttps://discord.com/channels/748416164832608337/1019372359775440988\n")
         print("💀 Build failed")
         sys.exit(1)
 
@@ -303,10 +314,7 @@ def parse_kybra_generate_error(stdout: bytes) -> str:
             i for i, v in enumerate(std_err_lines) if "', src/" in v
         )
     except:
-        return (
-            "The underlying cause is likely at the bottom of the following output:\n\n"
-            + err
-        )
+        return err
 
     err_lines = std_err_lines[
         line_where_error_message_starts : line_where_error_message_ends + 1

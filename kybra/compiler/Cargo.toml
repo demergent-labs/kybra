@@ -3,12 +3,6 @@ name = "kybra_generated_canister"
 version = "0.0.0"
 edition = "2018"
 
-[profile.release]
-opt-level = 'z'
-
-[profile.test]
-opt-level = 'z'
-
 [lib]
 crate-type = ["cdylib"]
 

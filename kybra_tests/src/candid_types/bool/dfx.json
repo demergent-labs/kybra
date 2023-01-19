@@ -1,0 +1,10 @@
+{
+    "canisters": {
+        "kybra_tests_candid_types_bool": {
+            "type": "custom",
+            "build": "python -m kybra kybra_tests_candid_types_bool src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".dfx/kybra/kybra_tests_candid_types_bool/target/wasm32-unknown-unknown/release/kybra_tests_candid_types_bool.wasm.gz"
+        }
+    }
+}
