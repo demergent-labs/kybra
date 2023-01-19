@@ -169,33 +169,30 @@ jobs:
               run: ~/.pyenv/bin/pyenv install 3.10.7
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               working-directory: ${{ matrix.example_directories }}
-              run: ~/.pyenv/versions/3.10.7/bin/python -m venv .dfx/kybra/venv
-            # - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-            #   working-directory: ${{ matrix.example_directories }}
-            #   run: source .dfx/kybra/venv/bin/activate
+              run: ~/.pyenv/versions/3.10.7/bin/python -m venv venv
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               working-directory: ${{ matrix.example_directories }}
               run: dfx start --clean --background --host 127.0.0.1:8000
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests && matrix.kybra_source == 'repo' && !startsWith(matrix.example_directories, 'examples/motoko_examples') }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}
-              run: source .dfx/kybra/venv/bin/activate && pip install ../..
+              run: source venv/bin/activate && pip install ../..
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests && matrix.kybra_source == 'repo' && startsWith(matrix.example_directories, 'examples/motoko_examples') }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}
-              run: source .dfx/kybra/venv/bin/activate && pip install ../../..
+              run: source venv/bin/activate && pip install ../../..
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests && matrix.kybra_source == 'pypi' }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}
-              run: source .dfx/kybra/venv/bin/activate && pip install -r requirements.txt
+              run: source venv/bin/activate && pip install -r requirements.txt
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}/test
-              run: source ../.dfx/kybra/venv/bin/activate && npm install
+              run: source ../venv/bin/activate && npm install
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               shell: bash -l {0}
               working-directory: ${{ matrix.example_directories }}/test
-              run: source ../.dfx/kybra/venv/bin/activate && npm test
+              run: source ../venv/bin/activate && npm test
 
     check-basic-integration-tests-success:
         needs: basic-integration-tests
