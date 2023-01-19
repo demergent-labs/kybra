@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra timers src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/timers/target/wasm32-unknown-unknown/release/timers.wasm.gz",
+            "wasm": ".kybra/timers/timers.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/timers",
                 "node_compatibility": true

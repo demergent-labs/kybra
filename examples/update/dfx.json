@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra update src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/update/target/wasm32-unknown-unknown/release/update.wasm.gz",
+            "wasm": ".kybra/update/update.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/update"
             }

@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra tuple_types src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/tuple_types/target/wasm32-unknown-unknown/release/tuple_types.wasm.gz",
+            "wasm": ".kybra/tuple_types/tuple_types.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/tuple_types"
             }

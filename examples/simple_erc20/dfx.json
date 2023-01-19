@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra simple_erc20 src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/simple_erc20/target/wasm32-unknown-unknown/release/simple_erc20.wasm.gz",
+            "wasm": ".kybra/simple_erc20/simple_erc20.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/simple_erc20"
             }

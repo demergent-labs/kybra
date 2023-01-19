@@ -53,7 +53,6 @@ You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.micr
 -   [Python 3.10.7](#python-3.10.7)
 -   [dfx 0.12.1](#dfx)
 -   [Python VS Code Extension](#python-vs-code-extension)
--   [Common Errors](#common-errors)
 
 #### Python 3.10.7
 

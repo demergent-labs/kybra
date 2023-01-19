@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra rejections src/rejections/rejections.py src/rejections/rejections.did",
             "candid": "src/rejections/rejections.did",
-            "wasm": ".dfx/kybra/rejections/target/wasm32-unknown-unknown/release/rejections.wasm.gz",
+            "wasm": ".kybra/rejections/rejections.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/rejections"
             }
@@ -13,7 +13,7 @@
             "type": "custom",
             "build": "python -m kybra some_service src/some_service/some_service.py src/some_service/some_service.did",
             "candid": "src/some_service/some_service.did",
-            "wasm": ".dfx/kybra/some_service/target/wasm32-unknown-unknown/release/some_service.wasm.gz",
+            "wasm": ".kybra/some_service/some_service.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/some_service"
             }
