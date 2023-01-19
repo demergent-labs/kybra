@@ -121,7 +121,7 @@ Your `dfx.json` file should look like this:
             "type": "custom",
             "build": "python -m kybra hello_world src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/hello_world/target/wasm32-unknown-unknown/release/hello_world.wasm.gz"
+            "wasm": ".kybra/hello_world/hello_world.wasm.gz"
         }
     }
 }
