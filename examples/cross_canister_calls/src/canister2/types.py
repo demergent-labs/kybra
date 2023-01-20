@@ -1,12 +1,15 @@
-from kybra import Canister, method, nat64, opt, Record
+from kybra import Canister, method, nat64, opt, Record, void
 from typing import TypedDict
+
 
 class Account(Record):
     id: str
     balance: nat64
 
+
 class AccountArgs(Record):
     id: str
+
 
 class Canister2(Canister):
     @method
@@ -25,7 +28,8 @@ class Canister2(Canister):
     def trap(self) -> str: ...
 
     @method
-    def receive_notification(self, message: str) -> None: ...
+    def receive_notification(self, message: str) -> void: ...
+
 
 class State(TypedDict):
     accounts: dict[str, "Account"]

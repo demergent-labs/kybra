@@ -13,6 +13,7 @@ from kybra import (
     nat16,
     nat32,
     nat64,
+    null,
     opt,
     Principal,
     Query,
@@ -30,9 +31,9 @@ class Person(Record):
 
 
 class State(Variant, total=False):
-    solid: None
-    liquid: None
-    gas: None
+    solid: null
+    liquid: null
+    gas: null
 
 
 BasicFunc: TypeAlias = Func(Query[[str], str])
@@ -112,7 +113,7 @@ def list_of_list_of_int8() -> list[list[list[list[list[list[list[int8]]]]]]]:
 
 
 @query
-def list_of_null(param: list[list[list[None]]]) -> list[list[list[None]]]:
+def list_of_null(param: list[list[list[null]]]) -> list[list[list[null]]]:
     return param
 
 

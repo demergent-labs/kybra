@@ -47,6 +47,7 @@ Variant = TypedDict
 blob = bytes
 
 null: TypeAlias = None
+void: TypeAlias = None
 
 reserved = Any
 empty = NoReturn  # TODO in Python 3.11 I believe there is a Never type

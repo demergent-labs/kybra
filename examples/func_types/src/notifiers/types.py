@@ -1,7 +1,7 @@
 from typing import TypeAlias
-from kybra import blob, Func, Canister, method, Oneway
+from kybra import blob, Func, Canister, method, Oneway, void
 
-NotifierFunc: TypeAlias = Func(Oneway[[blob], None])
+NotifierFunc: TypeAlias = Func(Oneway[[blob], void])
 
 
 class Notifier(Canister):

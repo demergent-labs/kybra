@@ -4,6 +4,7 @@ from kybra import (
     Func,
     CanisterResult,
     nat64,
+    null,
     Principal,
     Query,
     query,
@@ -23,8 +24,8 @@ class User(Record):
 
 
 class Reaction(Variant, total=False):
-    Good: None
-    Bad: None
+    Good: null
+    Bad: null
     BasicFunc: "BasicFunc"
     ComplexFunc: "ComplexFunc"
 
@@ -36,10 +37,11 @@ class GetNotifierFromNotifiersCanisterResult(Variant, total=False):
 
 BasicFunc: TypeAlias = Func(Query[[str], str])
 ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])
+StableFunc: TypeAlias = Func(Query[[nat64, str], void])
 
 
 @query
-def get_stable_func() -> BasicFunc:
+def get_stable_func() -> StableFunc:
     # TODO Pull this from stable storage instead
     return (Principal.from_str("aaaaa-aa"), "start_canister")
 
@@ -82,7 +84,8 @@ def complex_func_return_type() -> ComplexFunc:
 def get_notifier_from_notifiers_canister() -> Async[
     GetNotifierFromNotifiersCanisterResult
 ]:
-    notifiers_canister = Notifier(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
+    notifiers_canister = Notifier(
+        Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
 
     result: CanisterResult[NotifierFunc] = yield notifiers_canister.get_notifier()
 

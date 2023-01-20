@@ -1,5 +1,13 @@
-from kybra import InsertError, opt, query, StableBTreeMap, update, Variant
-from kybra import nat64, nat8
+from kybra import (
+    InsertError,
+    nat64,
+    nat8,
+    opt,
+    query,
+    StableBTreeMap,
+    update,
+    Variant
+)
 
 
 class StableMap0InsertResult(Variant, total=False):

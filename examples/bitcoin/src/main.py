@@ -1,4 +1,4 @@
-from kybra import Async, blob, CanisterResult, update
+from kybra import Async, blob, CanisterResult, null, update
 from kybra.canisters.management.bitcoin import GetUtxosResult, MillisatoshiPerByte, Satoshi
 from kybra.canisters.management import management_canister
 from bitcoin_types import ExecuteGetBalanceResult, ExecuteGetCurrentFeePercentiles, ExecuteGetUtxosResult, ExecuteSendTransactionResult
@@ -63,7 +63,7 @@ def send_transaction(
     transaction_fee = BITCOIN_BASE_TRANSACTION_COST + \
         len(transaction) * BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE
 
-    canister_result: CanisterResult[None] = yield management_canister.bitcoin_send_transaction({
+    canister_result: CanisterResult[null] = yield management_canister.bitcoin_send_transaction({
         'transaction': transaction,
         'network': {'Regtest': None}
     }).with_cycles(transaction_fee)
