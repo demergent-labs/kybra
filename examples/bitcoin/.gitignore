@@ -1,6 +1,8 @@
 .dfx
+.kybra
 node_modules
 target
+venv
 
 # Bitcoin
 .bitcoin/*

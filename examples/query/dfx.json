@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra query src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/query/target/wasm32-unknown-unknown/release/query.wasm.gz",
+            "wasm": ".kybra/query/query.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/query"
             }

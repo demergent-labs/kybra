@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra management_canister src/management_canister.py src/management_canister.did",
             "candid": "src/management_canister.did",
-            "wasm": ".dfx/kybra/management_canister/target/wasm32-unknown-unknown/release/management_canister.wasm.gz",
+            "wasm": ".kybra/management_canister/management_canister.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/management_canister"
             }

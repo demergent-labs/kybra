@@ -51,14 +51,12 @@ Follow instructions exactly as stated below to avoid issues.
 You should be using a \*nix environment (Linux, Mac OS, [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)) with bash and have the following installed on your system:
 
 -   [Python 3.10.7](#python-3.10.7)
--   [Rust](#rust)
--   [dfx 0.12.0](#dfx)
+-   [dfx 0.12.1](#dfx)
 -   [Python VS Code Extension](#python-vs-code-extension)
--   [Common Errors](#common-errors)
 
 #### Python 3.10.7
 
-It is highly recommended to install Python 3.10.7 using [pyenv](https://github.com/pyenv/pyenv). To do so, use the [pyenv installer](https://github.com/pyenv/pyenv-installer):
+It is highly recommended to install Python 3.10.7 using [pyenv](https://github.com/pyenv/pyenv). To do so, use the [pyenv installer](https://github.com/pyenv/pyenv-installer) as shown below:
 
 ```bash
 # install pyenv
@@ -68,26 +66,12 @@ curl https://pyenv.run | bash
 ~/.pyenv/bin/pyenv install 3.10.7
 ```
 
-#### Rust
-
-Run the following command to install Rust:
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
-
-If you already have Rust installed, make sure you are up to date:
-
-```bash
-rustup update
-```
-
 #### dfx
 
-Run the following command to install dfx 0.12.0:
+Run the following command to install dfx 0.12.1:
 
 ```bash
-DFX_VERSION=0.12.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+DFX_VERSION=0.12.1 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
 ```
 
 #### Python VS Code Extension
@@ -117,21 +101,13 @@ Set the setting `python.analysis.typeCheckingMode` to `strict`:
 VS Code -> Preferences -> Settings -> Search for python.analysis.typeCheckingMode and set it to strict
 ```
 
-##### Set python.analysis.extraPaths
-
-Set the setting `python.analysis.extraPaths` with the path to your `site-packages` directory `.dfx/kybra/venv/lib/python3.10/site-packages`:
-
-```
-VS Code -> Preferences -> Settings -> Search for python.analysis.extraPaths and add .dfx/kybra/venv/lib/python3.10/site-packages
-```
-
 #### Kybra
 
 Follow these steps to create a Kybra project. The steps below assume a project called `hello_world`:
 
 1. Create a directory for your project (`mkdir hello_world && cd hello_world`)
-2. Create the virtual environment: (`~/.pyenv/versions/3.10.7/bin/python -m venv .dfx/kybra/venv`)
-3. Activate the virtual environment: (`source .dfx/kybra/venv/bin/activate`)
+2. Create the virtual environment: (`~/.pyenv/versions/3.10.7/bin/python -m venv venv`)
+3. Activate the virtual environment: (`source venv/bin/activate`)
 4. Install Kybra (`pip install kybra`)
 5. Create a `dfx.json` file (`touch dfx.json`)
 6. Create a directory and an entry Python file for your canister (`mkdir src && touch src/main.py`)
@@ -145,7 +121,7 @@ Your `dfx.json` file should look like this:
             "type": "custom",
             "build": "python -m kybra hello_world src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/hello_world/target/wasm32-unknown-unknown/release/hello_world.wasm.gz"
+            "wasm": ".kybra/hello_world/hello_world.wasm.gz"
         }
     }
 }
@@ -225,7 +201,7 @@ Please keep in mind that you must deploy from within the `virtualenv` that you s
 
 #### Local Deployment
 
-Start up an IC replica and deploy. The first deploy will likely take multiple minutes as it downloads and compiles many Rust dependencies. Subsequent deploys should be much quicker:
+Start up an IC replica and deploy:
 
 ```bash
 # Open a terminal and navigate to your project's root directory, then run the following command to start a local IC replica

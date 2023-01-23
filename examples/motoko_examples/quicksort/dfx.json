@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra quicksort src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/quicksort/target/wasm32-unknown-unknown/release/quicksort.wasm.gz",
+            "wasm": ".kybra/quicksort/quicksort.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/quicksort",
                 "node_compatibility": true

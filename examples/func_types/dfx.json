@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra func_types src/func_types/main.py src/func_types/main.did",
             "candid": "src/func_types/main.did",
-            "wasm": ".dfx/kybra/func_types/target/wasm32-unknown-unknown/release/func_types.wasm.gz",
+            "wasm": ".kybra/func_types/func_types.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/func_types"
             }
@@ -13,7 +13,7 @@
             "type": "custom",
             "build": "python -m kybra notifiers src/notifiers/main.py src/notifiers/main.did",
             "candid": "src/notifiers/main.did",
-            "wasm": ".dfx/kybra/notifiers/target/wasm32-unknown-unknown/release/notifiers.wasm.gz",
+            "wasm": ".kybra/notifiers/notifiers.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/notifiers"
             }

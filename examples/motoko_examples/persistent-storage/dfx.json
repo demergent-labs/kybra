@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra persistent_storage src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/persistent_storage/target/wasm32-unknown-unknown/release/persistent_storage.wasm.gz",
+            "wasm": ".kybra/persistent_storage/persistent_storage.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/persistent_storage",
                 "node_compatibility": true

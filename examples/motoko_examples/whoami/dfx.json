@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra whoami src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/whoami/target/wasm32-unknown-unknown/release/whoami.wasm.gz",
+            "wasm": ".kybra/whoami/whoami.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/whoami",
                 "node_compatibility": true

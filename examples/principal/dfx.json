@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra principal src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/principal/target/wasm32-unknown-unknown/release/principal.wasm.gz",
+            "wasm": ".kybra/principal/principal.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/principal",
                 "node_compatibility": true

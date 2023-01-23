@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra blob_array src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/blob_array/target/wasm32-unknown-unknown/release/blob_array.wasm.gz",
+            "wasm": ".kybra/blob_array/blob_array.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/blob_array"
             }

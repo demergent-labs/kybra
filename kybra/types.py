@@ -1,5 +1,6 @@
 from typing import TypedDict
 
+
 class Args(TypedDict):
     empty: bool
     flags: "Args_flags"
@@ -7,8 +8,10 @@ class Args(TypedDict):
     entry_point: str
     did_path: str
 
+
 class Args_flags(TypedDict):
     verbose: bool
+
 
 class Paths(TypedDict):
     py_entry_file: str
@@ -20,7 +23,9 @@ class Paths(TypedDict):
     compiler: str
     lib: str
     generated_did: str
-    target: str
     wasm: str
     gzipped_wasm: str
     custom_modules: str
+    global_kybra_config_dir: str
+    global_kybra_bin_dir: str
+    global_kybra_target_dir: str

@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra generators src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/generators/target/wasm32-unknown-unknown/release/generators.wasm.gz",
+            "wasm": ".kybra/generators/generators.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/generators"
             }

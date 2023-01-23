@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra cycles src/cycles/cycles.py src/cycles/cycles.did",
             "candid": "src/cycles/cycles.did",
-            "wasm": ".dfx/kybra/cycles/target/wasm32-unknown-unknown/release/cycles.wasm.gz",
+            "wasm": ".kybra/cycles/cycles.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/cycles"
             }
@@ -13,7 +13,7 @@
             "type": "custom",
             "build": "python -m kybra intermediary src/intermediary/intermediary.py src/intermediary/intermediary.did",
             "candid": "src/intermediary/intermediary.did",
-            "wasm": ".dfx/kybra/intermediary/target/wasm32-unknown-unknown/release/intermediary.wasm.gz",
+            "wasm": ".kybra/intermediary/intermediary.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/intermediary"
             }

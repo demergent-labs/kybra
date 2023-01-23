@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra key_value_store src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/key_value_store/target/wasm32-unknown-unknown/release/key_value_store.wasm.gz",
+            "wasm": ".kybra/key_value_store/key_value_store.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/key_value_store"
             }

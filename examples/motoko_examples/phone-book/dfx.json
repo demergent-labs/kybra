@@ -4,7 +4,7 @@
             "type": "custom",
             "build": "python -m kybra phone_book src/main.py src/main.did",
             "candid": "src/main.did",
-            "wasm": ".dfx/kybra/phone_book/target/wasm32-unknown-unknown/release/phone_book.wasm.gz",
+            "wasm": ".kybra/phone_book/phone_book.wasm.gz",
             "declarations": {
                 "output": "test/dfx_generated/phone_book",
                 "node_compatibility": true
