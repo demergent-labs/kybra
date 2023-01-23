@@ -1,4 +1,4 @@
-service : {
+service : () -> {
   get_current_message : () -> (text) query;
   simple_update : (text) -> (text);
 }

@@ -24,7 +24,7 @@ def main():
 
     subprocess.run(
         [
-            f"{paths['compiler']}/install_rustup.sh",
+            f"{paths['compiler']}/install_rust_dependencies.sh",
             kybra.__version__,
             kybra.__rust_version__,
         ]
@@ -48,7 +48,7 @@ def main():
     if os.path.exists(paths["canister"]):
         shutil.rmtree(paths["canister"])
     shutil.copytree(paths["compiler"], paths["canister"], dirs_exist_ok=True)
-    create_file(f"{paths['compiler']}/Cargo.toml", generate_cargo_toml(canister_name))
+    create_file(f"{paths['canister']}/Cargo.toml", generate_cargo_toml(canister_name))
 
     # Add CARGO_TARGET_DIR to env for all cargo commands
     cargo_env = {
