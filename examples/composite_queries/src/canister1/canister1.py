@@ -42,6 +42,7 @@ def manual_query() -> Async[StringQueryResult]:
 @query
 def totally_manual_query() -> Async[manual[StringQueryResult]]:
     result: CanisterResult[str] = yield canister2.manual_query()
+    # ic.reply(result)
 
     if result.err is not None:
         ic.reply({
@@ -120,20 +121,20 @@ def inc_canister1() -> Async[NatQueryResult]:
     global counter
     counter += 1
 
-    canister1_a: CanisterResult[nat] = yield canister1.inc_counter()
-    if canister1_a.err is not None:
+    canister1_a_result: CanisterResult[nat] = yield canister1.inc_counter()
+    if canister1_a_result.err is not None:
         return {
-            'err': canister1_a.err
+            'err': canister1_a_result.err
         }
 
-    canister1_b: CanisterResult[nat] = yield canister1.inc_counter()
-    if canister1_b.err is not None:
+    canister1_b_result: CanisterResult[nat] = yield canister1.inc_counter()
+    if canister1_b_result.err is not None:
         return {
-            'err': canister1_b.err
+            'err': canister1_b_result.err
         }
 
     return {
-        'ok': counter + canister1_a.ok + canister1_b.ok
+        'ok': counter + canister1_a_result.ok + canister1_b_result.ok
     }
 
 
@@ -143,18 +144,18 @@ def inc_canister2() -> Async[NatQueryResult]:
     global counter
     counter += 1
 
-    canister2_a: CanisterResult[nat] = yield canister2.inc_counter()
-    if canister2_a.err is not None:
+    canister2_a_result: CanisterResult[nat] = yield canister2.inc_counter()
+    if canister2_a_result.err is not None:
         return {
-            'err': canister2_a.err
+            'err': canister2_a_result.err
         }
 
-    canister2_b: CanisterResult[nat] = yield canister2.inc_counter()
-    if canister2_b.err is not None:
+    canister2_b_result: CanisterResult[nat] = yield canister2.inc_counter()
+    if canister2_b_result.err is not None:
         return {
-            'err': canister2_b.err
+            'err': canister2_b_result.err
         }
 
     return {
-        'ok': counter + canister2_a.ok + canister2_b.ok
+        'ok': counter + canister2_a_result.ok + canister2_b_result.ok
     }
