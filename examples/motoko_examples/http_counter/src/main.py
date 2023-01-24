@@ -11,7 +11,8 @@ class StreamingCallbackHttpResponse(Record):
     token: opt[Token]
 
 
-Callback: TypeAlias = Func(Query[[Token], StreamingCallbackHttpResponse])
+Callback: TypeAlias = Func(
+    Query[[Token], StreamingCallbackHttpResponse])  # type: ignore
 
 
 class CallbackStrategy(Record):
@@ -40,9 +41,12 @@ class HttpRequest(Record):
     headers: list[HeaderField]
     body: blob
 
-stable_storage = StableBTreeMap[str, nat](memory_id=0, max_key_size=15, max_value_size=1_000)
+
+stable_storage = StableBTreeMap[str, nat](
+    memory_id=0, max_key_size=15, max_value_size=1_000)
 
 stable_storage.insert('counter', 0)
+
 
 def isGzip(x: HeaderField) -> bool:
     return x[0].lower() == 'accept-encoding' and 'gzip' in x[1].lower()

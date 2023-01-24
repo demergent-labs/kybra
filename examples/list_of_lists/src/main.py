@@ -36,7 +36,7 @@ class State(Variant, total=False):
     gas: null
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])
+BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
 
 
 @query
