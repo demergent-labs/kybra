@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
+use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::generators::{
@@ -26,6 +27,7 @@ mod what_is_it;
 pub struct PyAst<'a> {
     pub kybra_programs: Vec<KybraProgram<'a>>,
     pub entry_module_name: String,
+    pub header: TokenStream,
 }
 
 impl PyAst<'_> {
@@ -146,6 +148,7 @@ impl PyAst<'_> {
             canister_methods: self.build_canister_methods(),
             external_canisters,
             rust_code,
+            header: self.header.clone(),
         }
     }
 

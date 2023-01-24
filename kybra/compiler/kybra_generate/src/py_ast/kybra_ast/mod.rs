@@ -19,6 +19,7 @@ pub struct KybraAst {
     pub post_upgrade: ActPostUpgradeMethod,
     pub heartbeat: Option<ActHeartbeatMethod>,
     pub rust_code: TokenStream,
+    pub header: TokenStream,
 }
 
 pub trait ToKybraAst {
