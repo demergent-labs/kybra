@@ -3,15 +3,18 @@ from kybra import (
     Async,
     Func,
     CanisterResult,
+    init,
     nat64,
     null,
     Principal,
     Query,
     query,
     Record,
+    StableBTreeMap,
     Update,
     update,
     Variant,
+    void
 )
 
 from src.notifiers.types import Notifier, NotifierFunc
@@ -35,15 +38,33 @@ class GetNotifierFromNotifiersCanisterResult(Variant, total=False):
     err: str
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])
-StableFunc: TypeAlias = Func(Query[[nat64, str], void])
+BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
+ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+StableFunc: TypeAlias = Func(Query[[nat64, str], void])  # type: ignore
+NullFunc: TypeAlias = Func(Query[[nat64, str], null])  # type: ignore
+
+
+stable_storage = StableBTreeMap[str, StableFunc](
+    memory_id=0, max_key_size=25, max_value_size=1_000)
+
+
+@init
+def init_():
+    stable_storage.insert(
+        'stable_func', (Principal.from_str('aaaaa-aa'), 'start_canister'))
 
 
 @query
 def get_stable_func() -> StableFunc:
-    # TODO Pull this from stable storage instead
-    return (Principal.from_str("aaaaa-aa"), "start_canister")
+    result = stable_storage.get('stable_func')
+    if result:
+        return result
+    return (Principal.from_str("aaaaa-aa"), "raw_rand")
+
+
+@query
+def null_func_param(null_func: NullFunc) -> NullFunc:
+    return null_func
 
 
 @query

@@ -17,4 +17,5 @@ service : () -> {
   set_large_null_record : (ThreeNullRecord) -> (ThreeNullRecord);
   set_partially_null_record : (PartiallyNullRecord) -> (PartiallyNullRecord);
   set_small_null_record : (TwoNullRecord) -> (TwoNullRecord);
+  void_stuff : () -> () query;
 }

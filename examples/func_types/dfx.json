@@ -6,7 +6,8 @@
             "candid": "src/func_types/main.did",
             "wasm": ".kybra/func_types/func_types.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/func_types"
+                "output": "test/dfx_generated/func_types",
+                "node_compatibility": true
             }
         },
         "notifiers": {
@@ -15,7 +16,8 @@
             "candid": "src/notifiers/main.did",
             "wasm": ".kybra/notifiers/notifiers.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/notifiers"
+                "output": "test/dfx_generated/notifiers",
+                "node_compatibility": true
             }
         }
     }

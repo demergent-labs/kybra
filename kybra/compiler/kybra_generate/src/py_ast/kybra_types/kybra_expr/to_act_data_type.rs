@@ -31,6 +31,7 @@ impl ToActDataType for KybraExpr<'_> {
                 "reserved" => ActPrimitiveLit::Reserved.to_act_data_type(alias_name),
                 "str" => ActPrimitiveLit::String.to_act_data_type(alias_name),
                 "text" => ActPrimitiveLit::String.to_act_data_type(alias_name),
+                "void" => ActPrimitiveLit::Void.to_act_data_type(alias_name),
                 _ => ActDataType::TypeRef(ActTypeRef {
                     act_type: LiteralOrTypeAlias::Literal(ActTypeRefLit {
                         name: id.to_string(),
