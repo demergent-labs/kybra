@@ -84,15 +84,6 @@ It is highly recommended to use VS Code and to install the [Microsoft Python ext
 VS Code -> Preferences -> Extensions -> Search for Python by Microsoft and install it
 ```
 
-##### Set the interpreter to Python 3.10.7
-
-Use the `Python: Select Interpreter` command from the `Command Palette`:
-
-```
-(Ctrl+Shift+P) then search for and select "Python: Select Interpreter"
-Select or enter this path to the interpreter: ~/.pyenv/versions/3.10.7/bin/python
-```
-
 ##### Set python.analysis.typeCheckingMode
 
 Set the setting `python.analysis.typeCheckingMode` to `strict`:
