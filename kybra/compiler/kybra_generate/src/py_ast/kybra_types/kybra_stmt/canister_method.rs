@@ -78,6 +78,24 @@ impl KybraStmt<'_> {
         }
     }
 
+    pub fn is_async(&self) -> bool {
+        let returns = match &self.stmt_kind.node {
+            StmtKind::FunctionDef { returns, .. } => returns,
+            _ => return false,
+        };
+
+        match returns {
+            Some(returns) => match &returns.node {
+                ExprKind::Subscript { value, .. } => match &value.node {
+                    ExprKind::Name { id, .. } => id == "Async",
+                    _ => false,
+                },
+                _ => false,
+            },
+            None => false,
+        }
+    }
+
     pub fn as_canister_method(&self) -> Option<CanisterMethod> {
         match &self.stmt_kind.node {
             StmtKind::FunctionDef { name, .. } => {
@@ -91,6 +109,8 @@ impl KybraStmt<'_> {
                     is_manual: self.is_manual(),
                     name: name.clone(),
                     return_type,
+                    is_async: self.is_async(),
+                    cdk_name: "kybra".to_string(),
                 })
             }
             _ => None,

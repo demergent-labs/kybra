@@ -43,18 +43,8 @@ pub fn kybra_generate(
             }
         })
         .collect();
-    let canister_definition = PyAst {
-        kybra_programs,
-        entry_module_name: entry_module_name.to_string(),
-    }
-    .to_kybra_ast()
-    .to_act()
-    .to_token_stream(());
-    eprintln!("-------------------------------------------");
-    eprintln!("--- ENDING --------------------------------");
-    eprintln!("-------------------------------------------");
 
-    quote! {
+    let header = quote! {
         #![allow(warnings, unused)]
 
         use rustpython_vm::{AsObject, builtins::{PyDict, PyBaseException, PyGenerator, PyListRef, PyTupleRef, PyIntRef, PyStr, PyList, PyTuple, PyBytes}, class::PyClassImpl, convert::ToPyObject, function::IntoFuncArgs, PyObjectRef, PyObject, PyRef, VirtualMachine, protocol::{PyIter, PyIterReturn}, py_serde::{deserialize, serialize}};
@@ -65,6 +55,11 @@ pub fn kybra_generate(
         use serde::de::{DeserializeSeed, Visitor};
         use serde::ser::{Serialize, SerializeMap, SerializeSeq, SerializeTuple};
         use slotmap::Key;
+        use rand::{Rng, SeedableRng, rngs::StdRng};
+
+        thread_local! {
+            static RNG_REF_CELL: std::cell::RefCell<StdRng> = std::cell::RefCell::new(SeedableRng::from_seed([0u8; 32]));
+        }
 
         static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;
@@ -73,6 +68,19 @@ pub fn kybra_generate(
         // #[link_section = "icp:public cdk"]
         // pub static NAME: [u8; 12] = *b"kybra v0.0.0";
 
-        #canister_definition
+    };
+
+    let canister_definition = PyAst {
+        kybra_programs,
+        entry_module_name: entry_module_name.to_string(),
+        header,
     }
+    .to_kybra_ast()
+    .to_act()
+    .to_token_stream(());
+
+    eprintln!("-------------------------------------------");
+    eprintln!("--- ENDING --------------------------------");
+    eprintln!("-------------------------------------------");
+    canister_definition
 }
