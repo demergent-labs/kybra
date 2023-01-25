@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 import time
+import site
 from typing import Any, Callable
 
 import kybra
@@ -189,9 +190,13 @@ def encourage_patience(is_initial_compile: bool) -> str:
 
 def bundle_python_code(paths: Paths):
     # Begin module bundling/gathering process
-    path = list(filter(lambda x: x.startswith(os.getcwd()), sys.path)) + [
-        os.path.dirname(paths["py_entry_file"])
-    ]
+    path = (
+        list(filter(lambda x: x.startswith(os.getcwd()), sys.path))
+        + [
+            os.path.dirname(paths["py_entry_file"]),
+        ]
+        + site.getsitepackages()
+    )
 
     graph = modulegraph.modulegraph.ModuleGraph(path)  # type: ignore
     entry_point = graph.run_script(paths["py_entry_file"])  # type: ignore
