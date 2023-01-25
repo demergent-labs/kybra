@@ -16,9 +16,23 @@ pub fn generate_set_timer() -> proc_macro2::TokenStream {
                 unsafe {
                     let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
                     let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+
                     let vm = &_kybra_interpreter.vm;
 
-                    _kybra_unwrap_rust_python_result(vm.invoke(&func_py_object_ref, ()), vm);
+                    let result_py_object_ref = vm.invoke(&func_py_object_ref, ());
+
+                    match result_py_object_ref {
+                        Ok(py_object_ref) => {
+                            ic_cdk::spawn(async move {
+                                _kybra_async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
+                            });
+                        },
+                        Err(err) => {
+                            let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+
+                            panic!("{}", err_string);
+                        }
+                    };
                 }
             };
 

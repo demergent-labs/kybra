@@ -1,4 +1,16 @@
-from kybra import Duration, ic, nat8, query, Record, TimerId, update
+from kybra import (
+    Async,
+    blob,
+    CanisterResult,
+    Duration,
+    ic,
+    nat8,
+    query,
+    Record,
+    TimerId,
+    update,
+)
+from kybra.canisters.management import management_canister
 
 
 class StatusReport(Record):
@@ -6,6 +18,8 @@ class StatusReport(Record):
     inline: nat8
     capture: str
     repeat: nat8
+    single_cross_canister: blob
+    repeat_cross_canister: blob
 
 
 class TimerIds(Record):
@@ -13,6 +27,8 @@ class TimerIds(Record):
     inline: TimerId
     capture: TimerId
     repeat: TimerId
+    single_cross_canister: TimerId
+    repeat_cross_canister: TimerId
 
 
 status: StatusReport = {
@@ -20,6 +36,8 @@ status: StatusReport = {
     "inline": 0,
     "capture": "",
     "repeat": 0,
+    "single_cross_canister": bytes(),
+    "repeat_cross_canister": bytes(),
 }
 
 
@@ -53,11 +71,19 @@ def set_timers(delay: Duration, interval: Duration) -> TimerIds:
 
     repeat_id = ic.set_timer_interval(interval, repeat_timer_callback)
 
+    single_cross_canister_id = ic.set_timer(delay, single_cross_canister_timer_callback)
+
+    repeat_cross_canister_id = ic.set_timer_interval(
+        interval, repeat_cross_canister_timer_callback
+    )
+
     return {
         "single": single_id,
         "inline": inline_id,
         "capture": capture_id,
         "repeat": repeat_id,
+        "single_cross_canister": single_cross_canister_id,
+        "repeat_cross_canister": repeat_cross_canister_id,
     }
 
 
@@ -82,3 +108,31 @@ def update_inline_status():
 
 def update_capture_status(value: str):
     status["capture"] = value
+
+
+# TODO It would probably be better for this to have a return type of Async[void] once we have void types working
+def single_cross_canister_timer_callback() -> Async[blob]:
+    ic.print("single_cross_canister_timer_callback")
+
+    result: CanisterResult[blob] = yield management_canister.raw_rand()
+
+    if result.err is not None:
+        return bytes()
+
+    status["single_cross_canister"] = result.ok
+
+    return result.ok
+
+
+# TODO It would probably be better for this to have a return type of Async[void] once we have void types working
+def repeat_cross_canister_timer_callback() -> Async[blob]:
+    ic.print("repeat_cross_canister_timer_callback")
+
+    result: CanisterResult[blob] = yield management_canister.raw_rand()
+
+    if result.err is not None:
+        return bytes()
+
+    status["repeat_cross_canister"] += result.ok
+
+    return result.ok
