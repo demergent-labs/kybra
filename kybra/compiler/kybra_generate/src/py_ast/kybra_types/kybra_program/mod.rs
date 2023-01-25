@@ -1,10 +1,10 @@
 use std::collections::{HashMap, HashSet};
 
-use rustpython_parser::ast::Mod;
+use rustpython_parser::ast::{Constant, ExprKind, Mod, StmtKind};
 
 use crate::source_map::SourceMap;
 use cdk_framework::{
-    nodes::{ActCanisterMethod, ActDataType},
+    nodes::{ActCanisterMethod, ActDataType, ActFunctionGuard},
     CanisterMethodType,
 };
 
@@ -155,6 +155,82 @@ impl KybraProgram<'_> {
                                 ActCanisterMethod::UpdateMethod(canister_method)
                             }
                         }
+                        None => panic!("Unreachable"),
+                    }
+                })
+                .collect(),
+            _ => vec![],
+        }
+    }
+
+    fn get_guard_function_names(&self) -> Vec<String> {
+        match &self.program {
+            Mod::Module { body, .. } => body
+                .iter()
+                .map(|stmt_kind| match &stmt_kind.node {
+                    StmtKind::FunctionDef { decorator_list, .. } => {
+                        decorator_list
+                            .iter()
+                            .fold(None, |_, decorator| match &decorator.node {
+                                ExprKind::Call { keywords, .. } => {
+                                    keywords.iter().fold(None, |_, keyword| {
+                                        if let Some(arg) = &keyword.node.arg {
+                                            if arg == "guard" {
+                                                match &keyword.node.value.node {
+                                                    ExprKind::Constant { value, .. } => match value
+                                                    {
+                                                        Constant::Str(string) => {
+                                                            Some(string.clone())
+                                                        }
+                                                        _ => None,
+                                                    },
+                                                    _ => None,
+                                                }
+                                            } else {
+                                                None
+                                            }
+                                        } else {
+                                            None
+                                        }
+                                    })
+                                }
+                                _ => None,
+                            })
+                    }
+                    _ => None,
+                })
+                .collect(),
+            _ => vec![],
+        }
+        .iter()
+        .fold(vec![], |acc, result| match result {
+            Some(result) => {
+                if !acc.contains(result) {
+                    vec![acc, vec![result.clone()]].concat()
+                } else {
+                    acc
+                }
+            }
+            None => acc,
+        })
+    }
+
+    pub fn build_function_guard_act_nodes(&self) -> Vec<ActFunctionGuard> {
+        let function_guard_names = self.get_guard_function_names();
+        match &self.program {
+            Mod::Module { body, .. } => body
+                .iter()
+                .filter(|stmt_kind| match &stmt_kind.node {
+                    StmtKind::FunctionDef { name, .. } => function_guard_names.contains(name),
+                    _ => false,
+                })
+                .map(|stmt_kind| {
+                    let kybra_stmt = KybraStmt {
+                        stmt_kind,
+                        source_map: self.source_map,
+                    };
+                    match kybra_stmt.as_function_guard() {
+                        Some(function_guard) => function_guard,
                         None => panic!("Unreachable"),
                     }
                 })

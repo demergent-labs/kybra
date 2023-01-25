@@ -12,6 +12,7 @@ mod to_act;
 pub struct KybraAst {
     pub external_canisters: Vec<ActExternalCanister>,
     pub canister_methods: Vec<ActCanisterMethod>,
+    pub function_guards: Vec<ActFunctionGuard>,
     pub canister_types: Vec<ActDataType>,
     pub init_method: ActInitMethod,
     pub inspect_method: Option<ActInspectMessageMethod>,

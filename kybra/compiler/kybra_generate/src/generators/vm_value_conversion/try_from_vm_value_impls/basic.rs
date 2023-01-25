@@ -64,5 +64,21 @@ pub fn generate() -> proc_macro2::TokenStream {
                 }
             }
         }
+
+        impl CdkActTryFromVmValue<Result<(), String>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Result<(), String>, CdkActTryFromVmValueError> {
+                let err = self.get_item("err", vm);
+                if let Ok(error_message) = err {
+                    return Ok(Err(error_message.try_from_vm_value(vm).unwrap()));
+                }
+                let ok = self.get_item("ok", vm);
+                if let Ok(_) = ok {
+                    Ok(Ok(()))
+                }
+                else {
+                    Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to Result<(), String>".to_string()))
+                }
+            }
+        }
     }
 }

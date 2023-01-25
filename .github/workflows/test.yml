@@ -69,6 +69,7 @@ jobs:
                     "examples/date",
                     "examples/ethereum_json_rpc",
                     "examples/func_types",
+                    "examples/function_guards",
                     "examples/generators",
                     "examples/heartbeat",
                     "examples/ic_api",

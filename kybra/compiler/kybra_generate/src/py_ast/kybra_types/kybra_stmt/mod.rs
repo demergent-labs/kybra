@@ -1,6 +1,7 @@
 mod canister_method;
 mod data_types;
 mod external_canisters;
+pub mod function_guards;
 mod get_dependencies;
 mod get_source_info;
 pub mod stable_b_tree_map_nodes;

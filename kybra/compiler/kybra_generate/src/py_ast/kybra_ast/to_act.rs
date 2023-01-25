@@ -72,6 +72,7 @@ impl ToAct for KybraAst {
             external_canisters,
             keywords: crate::get_python_keywords(),
             header,
+            function_guards: self.function_guards.iter().cloned().collect(),
         }
     }
 }
