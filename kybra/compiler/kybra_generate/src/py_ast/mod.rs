@@ -5,7 +5,7 @@ use quote::quote;
 
 use crate::generators::{
     async_result_handler::generate_async_result_handler, kybra_serde::generate_kybra_serde,
-    stable_b_tree_map::generate_stable_b_tree_map,
+    rng_seed, stable_b_tree_map::generate_stable_b_tree_map,
 };
 use cdk_framework::{
     nodes::{act_canister_method, data_type_nodes, ActExternalCanister},
@@ -108,6 +108,8 @@ impl PyAst<'_> {
 
         let stable_b_tree_map = generate_stable_b_tree_map(&stable_b_tree_map_nodes);
 
+        let rng_seed = rng_seed::generate();
+
         let rust_code = quote! {
             pub fn _kybra_unwrap_rust_python_result<T>(
                 rust_python_result: Result<T, PyRef<PyBaseException>>,
@@ -128,6 +130,8 @@ impl PyAst<'_> {
             #kybra_serde
 
             #stable_b_tree_map
+
+            #rng_seed
         };
 
         KybraAst {

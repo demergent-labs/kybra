@@ -56,6 +56,7 @@ pub fn kybra_generate(
         use serde::ser::{Serialize, SerializeMap, SerializeSeq, SerializeTuple};
         use slotmap::Key;
         use rand::{Rng, SeedableRng, rngs::StdRng};
+        use std::convert::TryInto;
 
         thread_local! {
             static RNG_REF_CELL: std::cell::RefCell<StdRng> = std::cell::RefCell::new(SeedableRng::from_seed([0u8; 32]));
