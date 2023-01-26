@@ -23,7 +23,7 @@ pub fn get_python_keywords() -> Vec<String> {
         .collect()
 }
 
-pub fn kybra_generate(
+pub fn generate_canister(
     py_file_names: &Vec<&str>,
     entry_module_name: &str,
 ) -> proc_macro2::token_stream::TokenStream {
