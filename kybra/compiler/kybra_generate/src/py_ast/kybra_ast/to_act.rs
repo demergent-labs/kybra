@@ -1,10 +1,15 @@
-use crate::generators::vm_value_conversion::{try_from_vm_value, try_into_vm_value};
 use cdk_framework::{AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct};
 
 use super::KybraAst;
+use crate::generators::{
+    header,
+    vm_value_conversion::{try_from_vm_value, try_into_vm_value},
+};
 
 impl ToAct for KybraAst {
     fn to_act(&self) -> AbstractCanisterTree {
+        let header = header::generate();
+
         let query_methods: Vec<ActCanisterMethod> = self
             .canister_methods
             .iter()
@@ -130,7 +135,7 @@ impl ToAct for KybraAst {
             variants,
             external_canisters,
             keywords: crate::get_python_keywords(),
-            header: self.header.clone(),
+            header,
         }
     }
 }

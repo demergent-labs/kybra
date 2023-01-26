@@ -1,5 +1,6 @@
 pub mod async_result_handler;
 pub mod canister_methods;
+pub mod header;
 pub mod ic_object;
 pub mod kybra_serde;
 pub mod rng_seed;

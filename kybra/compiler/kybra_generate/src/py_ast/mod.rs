@@ -1,15 +1,14 @@
+use quote::quote;
 use std::collections::{HashMap, HashSet};
 
-use proc_macro2::TokenStream;
-use quote::quote;
+use cdk_framework::{
+    nodes::{act_canister_method, data_type_nodes, ActExternalCanister},
+    ActCanisterMethod, ActDataType, CanisterMethodType,
+};
 
 use crate::generators::{
     async_result_handler::generate_async_result_handler, kybra_serde::generate_kybra_serde,
     rng_seed, stable_b_tree_map::generate_stable_b_tree_map,
-};
-use cdk_framework::{
-    nodes::{act_canister_method, data_type_nodes, ActExternalCanister},
-    ActCanisterMethod, ActDataType, CanisterMethodType,
 };
 
 pub use self::{kybra_ast::KybraAst, kybra_types::KybraProgram};
@@ -19,15 +18,15 @@ use self::{
 };
 
 mod kybra_ast;
-pub mod kybra_types;
 mod system_methods;
-pub mod traits;
 mod what_is_it;
+
+pub mod kybra_types;
+pub mod traits;
 
 pub struct PyAst<'a> {
     pub kybra_programs: Vec<KybraProgram<'a>>,
     pub entry_module_name: String,
-    pub header: TokenStream,
 }
 
 impl PyAst<'_> {
@@ -152,7 +151,6 @@ impl PyAst<'_> {
             canister_methods: self.build_canister_methods(),
             external_canisters,
             rust_code,
-            header: self.header.clone(),
         }
     }
 
