@@ -1,4 +1,5 @@
 pub mod async_result_handler;
+pub mod body;
 pub mod canister_methods;
 pub mod header;
 pub mod ic_object;
