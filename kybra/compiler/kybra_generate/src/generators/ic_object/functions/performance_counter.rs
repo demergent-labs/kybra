@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_performance_counter() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_performance_counter(&self, counter_type_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {

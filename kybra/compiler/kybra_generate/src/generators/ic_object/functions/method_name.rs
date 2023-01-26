@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_method_name() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_method_name(&self, vm: &VirtualMachine) -> PyObjectRef {

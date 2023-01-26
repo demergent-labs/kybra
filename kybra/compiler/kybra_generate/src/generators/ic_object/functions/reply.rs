@@ -1,7 +1,7 @@
 use cdk_framework::{ActCanisterMethod, ToTokenStream};
 use quote::quote;
 
-pub fn generate_reply(canister_methods: &Vec<ActCanisterMethod>) -> proc_macro2::TokenStream {
+pub fn generate(canister_methods: &Vec<ActCanisterMethod>) -> proc_macro2::TokenStream {
     let match_arms = generate_match_arms(canister_methods);
     quote! {
         #[pymethod]

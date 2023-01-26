@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_candid_encode() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_candid_encode(&self, candid_string_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {

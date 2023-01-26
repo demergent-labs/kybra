@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_stable64_grow() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_stable64_grow(&self, new_pages_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {

@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_canister_balance() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_canister_balance(&self, vm: &VirtualMachine) -> PyObjectRef {

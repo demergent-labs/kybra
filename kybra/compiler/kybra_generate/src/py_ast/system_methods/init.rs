@@ -17,7 +17,7 @@ impl PyAst<'_> {
     ) -> ActInitMethod {
         // TODO: Abstract IC Object generation out to a standalone function
         // in the generated code, not just in our code.
-        let ic_object = ic_object::generate_ic_object(
+        let ic_object = ic_object::generate(
             canister_methods,
             external_canisters,
             stable_b_tree_map_nodes,

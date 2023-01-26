@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_msg_cycles_accept128() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_msg_cycles_accept128(&self, max_amount_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {
