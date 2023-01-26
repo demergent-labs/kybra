@@ -59,16 +59,7 @@ pub fn generate(
     let stable_read = stable_read::generate();
     let stable_size = stable_size::generate();
     let stable_write = stable_write::generate();
-    let stable_b_tree_map_contains_key =
-        stable_b_tree_map::contains_key::generate(stable_b_tree_map_nodes);
-    let stable_b_tree_map_get = stable_b_tree_map::get::generate(stable_b_tree_map_nodes);
-    let stable_b_tree_map_insert = stable_b_tree_map::insert::generate(stable_b_tree_map_nodes);
-    let stable_b_tree_map_is_empty = stable_b_tree_map::is_empty::generate(stable_b_tree_map_nodes);
-    let stable_b_tree_map_items = stable_b_tree_map::items::generate(stable_b_tree_map_nodes);
-    let stable_b_tree_map_keys = stable_b_tree_map::keys::generate(stable_b_tree_map_nodes);
-    let stable_b_tree_map_len = stable_b_tree_map::len::generate(stable_b_tree_map_nodes);
-    let stable_b_tree_map_remove = stable_b_tree_map::remove::generate(stable_b_tree_map_nodes);
-    let stable_b_tree_map_values = stable_b_tree_map::values::generate(stable_b_tree_map_nodes);
+    let stable_b_tree_map = stable_b_tree_map::generate(stable_b_tree_map_nodes);
     let stable64_grow = stable64_grow::generate();
     let stable64_read = stable64_read::generate();
     let stable64_size = stable64_size::generate();
@@ -119,15 +110,7 @@ pub fn generate(
             #stable_read
             #stable_size
             #stable_write
-            #stable_b_tree_map_contains_key
-            #stable_b_tree_map_get
-            #stable_b_tree_map_insert
-            #stable_b_tree_map_is_empty
-            #stable_b_tree_map_items
-            #stable_b_tree_map_keys
-            #stable_b_tree_map_len
-            #stable_b_tree_map_remove
-            #stable_b_tree_map_values
+            #stable_b_tree_map
             #stable64_grow
             #stable64_read
             #stable64_size
