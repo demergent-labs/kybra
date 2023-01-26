@@ -8,4 +8,5 @@ pub mod kybra_serde;
 pub mod rng_seed;
 pub mod stable_b_tree_map;
 pub mod tuple;
+pub mod unwrap_rust_python_result;
 pub mod vm_value_conversion;
