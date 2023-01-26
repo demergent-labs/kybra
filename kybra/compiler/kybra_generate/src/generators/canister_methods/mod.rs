@@ -7,6 +7,7 @@ pub mod init;
 pub mod inspect_message;
 pub mod post_upgrade;
 pub mod pre_upgrade;
+pub mod query_and_update;
 
 pub fn generate_call_to_py_function(statement: &KybraStmt) -> proc_macro2::TokenStream {
     match statement.stmt_kind.node {
