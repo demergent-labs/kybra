@@ -4,7 +4,7 @@ use quote::{format_ident, quote};
 
 use crate::generators::tuple;
 
-pub fn generate_async_result_handler(external_canisters: &Vec<ActExternalCanister>) -> TokenStream {
+pub fn generate(external_canisters: &Vec<ActExternalCanister>) -> TokenStream {
     let call_match_arms = generate_call_match_arms(external_canisters);
     let call_with_payment_match_arms = generate_call_with_payment_match_arms(external_canisters);
     let call_with_payment128_match_arms =

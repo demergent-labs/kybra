@@ -1,10 +1,7 @@
 use cdk_framework::nodes::ActExternalCanister;
 
 use crate::{
-    generators::{
-        async_result_handler::generate_async_result_handler, kybra_serde::generate_kybra_serde,
-        rng_seed, stable_b_tree_map::generate_stable_b_tree_map,
-    },
+    generators::{async_result_handler, kybra_serde, rng_seed, stable_b_tree_map},
     py_ast::kybra_types::StableBTreeMapNode,
 };
 
@@ -12,9 +9,9 @@ pub fn generate(
     external_canisters: &Vec<ActExternalCanister>,
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
 ) -> proc_macro2::TokenStream {
-    let async_result_handler = generate_async_result_handler(&external_canisters);
-    let kybra_serde = generate_kybra_serde();
-    let stable_b_tree_map = generate_stable_b_tree_map(stable_b_tree_map_nodes);
+    let async_result_handler = async_result_handler::generate(&external_canisters);
+    let kybra_serde = kybra_serde::generate();
+    let stable_b_tree_map = stable_b_tree_map::generate(stable_b_tree_map_nodes);
     let rng_seed = rng_seed::generate();
 
     quote::quote! {

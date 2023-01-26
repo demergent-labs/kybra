@@ -4,9 +4,7 @@ use syn::Ident;
 
 use crate::py_ast::kybra_types::StableBTreeMapNode;
 
-pub fn generate_stable_b_tree_map(
-    stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
-) -> proc_macro2::TokenStream {
+pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> proc_macro2::TokenStream {
     let stable_b_tree_maps_and_impls =
         generate_global_stable_b_tree_maps_and_impls(stable_b_tree_map_nodes);
     let stable_b_tree_maps: Vec<proc_macro2::TokenStream> = stable_b_tree_maps_and_impls

@@ -24,7 +24,7 @@
 
 use quote::quote;
 
-pub fn generate_kybra_serde() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[inline]
         pub fn kybra_serialize<S>(
