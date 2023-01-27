@@ -2444,7 +2444,7 @@ There is limited support for the `stdlib`. The following modules may be supporte
 -   math
 -   pyexpat
 -   \_struct
--   \_random (May not work yet: https://github.com/demergent-labs/kybra/issues/169)
+-   \_random
 -   \_statistics
 -   unicodedata
 -   zlib
