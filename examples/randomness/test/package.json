@@ -4,7 +4,7 @@
     "test": "cd .. && ts-node --transpile-only --ignore=false test/test.ts"
   },
   "dependencies": {
-    "azle": "github:demergent-labs/azle#seed_the_custom_randomness"
+    "azle": "github:demergent-labs/azle"
   },
   "devDependencies": {
     "@dfinity/agent": "0.11.1",
