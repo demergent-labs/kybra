@@ -1,13 +1,13 @@
-from kybra import blob, nat32, nat64, opt, Record, Variant
+from kybra import blob, nat32, nat64, null, opt, Record, Variant
 
 BitcoinAddress = str
 BlockHash = blob
 
 
 class BitcoinNetwork(Variant, total=False):
-    Mainnet: None
-    Regtest: None
-    Testnet: None
+    Mainnet: null
+    Regtest: null
+    Testnet: null
 
 
 class GetBalanceArgs(Record):
@@ -64,5 +64,5 @@ class SendTransactionArgs(Record):
 
 
 class SendTransactionError(Variant, total=False):
-    MalformedTransaction: None
-    QueueFull: None
+    MalformedTransaction: null
+    QueueFull: null

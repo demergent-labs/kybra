@@ -1,11 +1,11 @@
-from kybra import blob, Func, nat, nat64, opt, Query, Record, Variant
+from kybra import blob, Func, nat, nat64, null, opt, Query, Record, Variant
 from typing import TypeAlias
 
 
 class HttpMethod(Variant, total=False):
-    get: None
-    head: None
-    post: None
+    get: null
+    head: null
+    post: null
 
 
 class HttpHeader(Record):
@@ -24,7 +24,8 @@ class HttpTransformArgs(Record):
     context: blob
 
 
-HttpTransformFunc: TypeAlias = Func(Query[[HttpTransformArgs], HttpResponse])
+HttpTransformFunc: TypeAlias = Func(
+    Query[[HttpTransformArgs], HttpResponse])  # type: ignore
 
 
 class HttpTransform(Record):

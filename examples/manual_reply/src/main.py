@@ -42,7 +42,7 @@ class Orbital(Record):
 
 class State(Variant, total=False):
     Gas: "Gas"
-    Liquid: None
+    Liquid: null
     Solid: "Solid"
 
 
