@@ -1,5 +1,6 @@
-from setuptools import setup
 from kybra import __version__
+from pathlib import Path
+from setuptools import setup
 
 setup(
     name="kybra",
@@ -8,4 +9,6 @@ setup(
     include_package_data=True,
     packages=["kybra"],
     install_requires=["modulegraph==0.19.3"],
+    long_description=Path("README.md").read_text(encoding="utf-8"),
+    long_description_content_type="text/markdown",
 )
