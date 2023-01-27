@@ -3,7 +3,7 @@ use cdk_framework::{AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct}
 use super::KybraAst;
 use crate::generators::{
     header,
-    vm_value_conversion::{try_from_vm_value, try_into_vm_value},
+    vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
 };
 
 impl ToAct for KybraAst {
@@ -46,8 +46,8 @@ impl ToAct for KybraAst {
 
         let external_canisters = self.external_canisters.clone();
 
-        let try_into_vm_value_impls = try_into_vm_value::generate_try_into_vm_value_impls();
-        let try_from_vm_value_impls = try_from_vm_value::generate_try_from_vm_value_impls();
+        let try_into_vm_value_impls = try_into_vm_value_impls::generate();
+        let try_from_vm_value_impls = try_from_vm_value_impls::generate();
 
         AbstractCanisterTree {
             cdk_name: "kybra".to_string(),

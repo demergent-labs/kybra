@@ -1,4 +1,4 @@
-pub fn generate_vec_impls() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote::quote! {
         trait KybraTryIntoVec {}
 
