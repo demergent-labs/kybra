@@ -77,6 +77,8 @@ impl PyAst<'_> {
                 #ic_object
 
                 #call_to_post_upgrade_py_function
+
+                ic_cdk::timer::set_timer(core::time::Duration::new(0, 0), _azle_rng_seed);
             }
         };
         ActPostUpgradeMethod { params, body }

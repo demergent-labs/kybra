@@ -76,6 +76,7 @@ impl PyAst<'_> {
 
                 #call_to_init_py_function
 
+                ic_cdk::timer::set_timer(core::time::Duration::new(0, 0), _azle_rng_seed);
             }
         };
         ActInitMethod { params, body }

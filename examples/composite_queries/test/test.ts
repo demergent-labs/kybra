@@ -1,4 +1,4 @@
-import { run_tests, Test } from 'azle/test';
+import { run_tests } from 'azle/test';
 import { get_tests } from 'azle/examples/composite_queries/test/tests';
 import { createActor } from './dfx_generated/canister1';
 
