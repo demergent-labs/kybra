@@ -1,4 +1,4 @@
-use cdk_framework::{AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct};
+use cdk_framework::{nodes::ActCanisterMethod, AbstractCanisterTree, ActDataType, ToAct};
 
 use super::KybraAst;
 use crate::generators::{

@@ -3,7 +3,10 @@ use std::collections::{HashMap, HashSet};
 use rustpython_parser::ast::Mod;
 
 use crate::source_map::SourceMap;
-use cdk_framework::{ActCanisterMethod, ActDataType, CanisterMethodType};
+use cdk_framework::{
+    nodes::{ActCanisterMethod, ActDataType},
+    CanisterMethodType,
+};
 
 use super::KybraStmt;
 

@@ -1,6 +1,9 @@
 use cdk_framework::{
-    nodes::{act_canister_method, data_type_nodes, ActExternalCanister},
-    ActCanisterMethod, ActDataType, CanisterMethodType,
+    nodes::{
+        act_canister_method, data_type_nodes,
+        {ActCanisterMethod, ActExternalCanister, ActFunctionGuard},
+    },
+    ActDataType, CanisterMethodType,
 };
 use std::collections::{HashMap, HashSet};
 

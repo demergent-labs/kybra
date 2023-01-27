@@ -1,9 +1,9 @@
 use cdk_framework::{
     nodes::{
-        ActExternalCanister, ActHeartbeatMethod, ActInitMethod, ActInspectMessageMethod,
-        ActPostUpgradeMethod, ActPreUpgradeMethod,
+        ActCanisterMethod, ActExternalCanister, ActFunctionGuard, ActHeartbeatMethod,
+        ActInitMethod, ActInspectMessageMethod, ActPostUpgradeMethod, ActPreUpgradeMethod,
     },
-    ActCanisterMethod, ActDataType,
+    ActDataType,
 };
 use proc_macro2::TokenStream;
 
