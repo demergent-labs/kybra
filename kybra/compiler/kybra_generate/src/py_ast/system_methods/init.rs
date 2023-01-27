@@ -1,27 +1,9 @@
-use cdk_framework::{
-    nodes::{ActExternalCanister, ActInitMethod},
-    ActCanisterMethod, CanisterMethodType,
-};
+use cdk_framework::{nodes::ActInitMethod, CanisterMethodType};
 
-use crate::{
-    generators::{canister_methods::init, ic_object},
-    py_ast::{kybra_types::StableBTreeMapNode, PyAst},
-};
+use crate::{generators::canister_methods::init, py_ast::PyAst};
 
 impl PyAst<'_> {
-    pub fn build_init_method(
-        &self,
-        canister_methods: &Vec<ActCanisterMethod>,
-        external_canisters: &Vec<ActExternalCanister>,
-        stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
-    ) -> ActInitMethod {
-        // TODO: Abstract IC Object generation out to a standalone function
-        // in the generated code, not just in our code.
-        let ic_object = ic_object::generate(
-            canister_methods,
-            external_canisters,
-            stable_b_tree_map_nodes,
-        );
+    pub fn build_init_method(&self) -> ActInitMethod {
         let init_function_defs = self.get_function_def_of_type(CanisterMethodType::Init);
 
         if init_function_defs.len() > 1 {
@@ -35,11 +17,9 @@ impl PyAst<'_> {
             None => vec![],
         };
 
-        let body = init::generate_init_method_body(
-            init_function_def_option,
-            &self.entry_module_name,
-            ic_object,
-        );
+        let body =
+            init::generate_init_method_body(init_function_def_option, &self.entry_module_name);
+
         ActInitMethod { params, body }
     }
 }

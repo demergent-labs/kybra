@@ -6,7 +6,6 @@ use crate::py_ast::kybra_types::KybraStmt;
 pub fn generate_post_upgrade_method_body(
     post_upgrade_function_def_option: Option<&KybraStmt>,
     entry_module_name: &String,
-    ic_object: TokenStream,
 ) -> TokenStream {
     let call_to_post_upgrade_py_function = match &post_upgrade_function_def_option {
         Some(post_upgrade_function_def) => post_upgrade_function_def.generate_call_to_py_function(),
@@ -42,8 +41,6 @@ pub fn generate_post_upgrade_method_body(
 
             _KYBRA_INTERPRETER_OPTION = Some(_kybra_interpreter);
             _KYBRA_SCOPE_OPTION = Some(_kybra_scope);
-
-            #ic_object
 
             #call_to_post_upgrade_py_function
 

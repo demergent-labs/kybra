@@ -5,7 +5,6 @@ use crate::py_ast::kybra_types::KybraStmt;
 pub fn generate_init_method_body(
     init_function_def_option: Option<&KybraStmt>,
     entry_module_name: &String,
-    ic_object: proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
     let call_to_init_py_function = match init_function_def_option {
         Some(init_function_def) => init_function_def.generate_call_to_py_function(),
@@ -42,8 +41,6 @@ pub fn generate_init_method_body(
 
             _KYBRA_INTERPRETER_OPTION = Some(_kybra_interpreter);
             _KYBRA_SCOPE_OPTION = Some(_kybra_scope);
-
-            #ic_object
 
             #call_to_init_py_function
 

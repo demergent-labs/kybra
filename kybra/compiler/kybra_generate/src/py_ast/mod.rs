@@ -98,20 +98,16 @@ impl PyAst<'_> {
 
         let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes();
 
-        let rust_code = body::generate(&external_canisters, &stable_b_tree_map_nodes);
+        let rust_code = body::generate(
+            &canister_methods,
+            &external_canisters,
+            &stable_b_tree_map_nodes,
+        );
 
         KybraAst {
-            init_method: self.build_init_method(
-                &canister_methods,
-                &external_canisters,
-                &stable_b_tree_map_nodes,
-            ),
+            init_method: self.build_init_method(),
             pre_upgrade: self.build_pre_upgrade_method(),
-            post_upgrade: self.build_post_upgrade_method(
-                &canister_methods,
-                &external_canisters,
-                &stable_b_tree_map_nodes,
-            ),
+            post_upgrade: self.build_post_upgrade_method(),
             inspect_method: self.build_inspect_method(),
             heartbeat: self.build_heartbeat_method(),
             canister_types: all_types,
