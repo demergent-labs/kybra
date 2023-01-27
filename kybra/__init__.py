@@ -301,11 +301,11 @@ class ic(Generic[T]):
         _kybra_ic._kybra_set_certified_data(data)  # type: ignore
 
     @staticmethod
-    def set_timer(delay: Duration, func: Callable[[], None]) -> TimerId:
+    def set_timer(delay: Duration, func: Callable[[], Any]) -> TimerId:
         return _kybra_ic._kybra_set_timer(delay, func)  # type: ignore
 
     @staticmethod
-    def set_timer_interval(interval: Duration, func: Callable[[], None]) -> TimerId:
+    def set_timer_interval(interval: Duration, func: Callable[[], Any]) -> TimerId:
         return _kybra_ic._kybra_set_timer_interval(interval, func)  # type: ignore
 
     @staticmethod
