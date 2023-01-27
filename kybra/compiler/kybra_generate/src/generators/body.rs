@@ -1,9 +1,7 @@
 use cdk_framework::nodes::ActExternalCanister;
 
 use crate::{
-    generators::{
-        async_result_handler, kybra_serde, rng_seed, stable_b_tree_map, unwrap_rust_python_result,
-    },
+    generators::{async_result_handler, rng_seed, stable_b_tree_map, unwrap_rust_python_result},
     py_ast::kybra_types::StableBTreeMapNode,
 };
 
@@ -13,14 +11,12 @@ pub fn generate(
 ) -> proc_macro2::TokenStream {
     let unwrap_rust_python_result = unwrap_rust_python_result::generate();
     let async_result_handler = async_result_handler::generate(&external_canisters);
-    let kybra_serde = kybra_serde::generate();
     let stable_b_tree_map = stable_b_tree_map::generate(stable_b_tree_map_nodes);
     let rng_seed = rng_seed::generate();
 
     quote::quote! {
         #unwrap_rust_python_result
         #async_result_handler
-        #kybra_serde
         #stable_b_tree_map
         #rng_seed
     }

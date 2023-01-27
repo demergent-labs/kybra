@@ -4,7 +4,6 @@ pub mod canister_methods;
 pub mod func;
 pub mod header;
 pub mod ic_object;
-pub mod kybra_serde;
 pub mod rng_seed;
 pub mod stable_b_tree_map;
 pub mod tuple;
