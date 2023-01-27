@@ -1,4 +1,4 @@
-from kybra import Async, blob, CanisterResult, nat, null, Principal, query, update
+from kybra import Async, blob, CanisterResult, nat, Principal, query, update, void
 from kybra.canisters.management import CreateCanisterResult, CanisterStatusArgs, CanisterStatusResult, management_canister, ProvisionalCreateCanisterWithCyclesResult
 from src.types import DefaultResult, ExecuteCreateCanisterResult, ExecuteProvisionalCreateCanisterWithCyclesResult, GetCanisterStatusResult, RawRandResult
 from typing import TypedDict
@@ -36,7 +36,7 @@ def execute_create_canister() -> Async[ExecuteCreateCanisterResult]:
 
 @update
 def execute_update_settings(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[null] = yield management_canister.update_settings({
+    canister_result: CanisterResult[void] = yield management_canister.update_settings({
         'canister_id': canister_id,
         'settings': {
             'controllers': None,
@@ -58,7 +58,7 @@ def execute_update_settings(canister_id: Principal) -> Async[DefaultResult]:
 
 @update
 def execute_install_code(canister_id: Principal, wasm_module: blob) -> Async[DefaultResult]:
-    canister_result: CanisterResult[null] = yield management_canister.install_code({
+    canister_result: CanisterResult[void] = yield management_canister.install_code({
         'mode': {
             'install': None
         },
@@ -79,7 +79,7 @@ def execute_install_code(canister_id: Principal, wasm_module: blob) -> Async[Def
 
 @update
 def execute_uninstall_code(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[null] = yield management_canister.uninstall_code({
+    canister_result: CanisterResult[void] = yield management_canister.uninstall_code({
         'canister_id': canister_id
     })
 
@@ -95,7 +95,7 @@ def execute_uninstall_code(canister_id: Principal) -> Async[DefaultResult]:
 
 @update
 def execute_start_canister(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[null] = yield management_canister.start_canister({
+    canister_result: CanisterResult[void] = yield management_canister.start_canister({
         'canister_id': canister_id
     })
 
@@ -111,7 +111,7 @@ def execute_start_canister(canister_id: Principal) -> Async[DefaultResult]:
 
 @update
 def execute_stop_canister(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[null] = yield management_canister.stop_canister({
+    canister_result: CanisterResult[void] = yield management_canister.stop_canister({
         'canister_id': canister_id
     })
 
@@ -145,7 +145,7 @@ def get_canister_status(args: CanisterStatusArgs) -> Async[GetCanisterStatusResu
 
 @update
 def execute_delete_canister(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[null] = yield management_canister.delete_canister({
+    canister_result: CanisterResult[void] = yield management_canister.delete_canister({
         'canister_id': canister_id
     })
 
@@ -200,7 +200,7 @@ def provisional_create_canister_with_cycles() -> Async[ExecuteProvisionalCreateC
 
 @update
 def provisional_top_up_canister(canister_id: Principal, amount: nat) -> Async[DefaultResult]:
-    canister_result: CanisterResult[null] = yield management_canister.provisional_top_up_canister({
+    canister_result: CanisterResult[void] = yield management_canister.provisional_top_up_canister({
         'canister_id': canister_id,
         'amount': amount
     })

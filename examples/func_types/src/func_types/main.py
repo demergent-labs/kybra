@@ -6,6 +6,7 @@ from kybra import (
     init,
     nat64,
     null,
+    opt,
     Principal,
     Query,
     query,
@@ -41,7 +42,8 @@ class GetNotifierFromNotifiersCanisterResult(Variant, total=False):
 BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
 ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
 StableFunc: TypeAlias = Func(Query[[nat64, str], void])  # type: ignore
-NullFunc: TypeAlias = Func(Query[[nat64, str], null])  # type: ignore
+NullFunc: TypeAlias = Func(
+    Query[[opt[null], list[null], null, list[list[null]], list[opt[null]]], null])  # type: ignore
 
 
 stable_storage = StableBTreeMap[str, StableFunc](
