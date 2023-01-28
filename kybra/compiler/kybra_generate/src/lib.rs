@@ -26,15 +26,21 @@ pub fn generate_canister(
     py_file_names: &Vec<&str>,
     entry_module_name: &str,
 ) -> proc_macro2::token_stream::TokenStream {
-    let source_map = SourceMap {};
+    let source_maps: Vec<_> = py_file_names
+        .iter()
+        .map(|py_file_name| SourceMap {
+            file_name: py_file_name.to_string(),
+        })
+        .collect();
     let kybra_programs: Vec<KybraProgram> = py_file_names
         .iter()
-        .map(|py_file_name| {
+        .enumerate()
+        .map(|(index, py_file_name)| {
             let source = std::fs::read_to_string(py_file_name).unwrap();
 
             KybraProgram {
                 program: parser::parse(&source, Mode::Module, "").unwrap(),
-                source_map: &source_map,
+                source_map: &source_maps[index],
             }
         })
         .collect();
