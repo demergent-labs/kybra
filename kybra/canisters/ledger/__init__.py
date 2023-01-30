@@ -1,13 +1,30 @@
-from kybra import blob, Canister, Func, method, nat32, nat64, opt, Principal, Query, Record, Variant
+from kybra import (
+    blob,
+    Canister,
+    Func,
+    method,
+    nat32,
+    nat64,
+    null,
+    opt,
+    Principal,
+    Query,
+    Record,
+    Variant)
 from typing import TypeAlias
 
 # Amount of tokens, measured in 10^-8 of a token.
+
+
 class Tokens(Record):
     e8s: nat64
 
 # Number of nanoseconds from the UNIX epoch in UTC timezone.
+
+
 class TimeStamp(Record):
     timestamp_nanos: nat64
+
 
 # AccountIdentifier is a 32-byte array.
 # The first 4 bytes is big-endian encoding of a CRC32 checksum of the last 28 bytes.
@@ -26,6 +43,8 @@ BlockIndex = nat64
 Memo = nat64
 
 # Arguments for the `transfer` call.
+
+
 class TransferArgs(Record):
     # Transaction memo.
     # See comments for the `Memo` type.
@@ -46,17 +65,22 @@ class TransferArgs(Record):
     # If null, the ledger uses current IC time as the timestamp.
     created_at_time: opt[TimeStamp]
 
+
 class TransferError_BadFee(Record):
     expected_fee: Tokens
+
 
 class TransferError_InsufficientFunds(Record):
     balance: Tokens
 
+
 class TransferError_TxTooOld(Record):
     allowed_window_nanos: nat64
 
+
 class TransferError_TxDuplicate(Record):
     duplicate_of: BlockIndex
+
 
 class TransferError(Variant, total=False):
     # The fee that the caller specified in the transfer request was not the one that ledger expects.
@@ -70,24 +94,31 @@ class TransferError(Variant, total=False):
     TxTooOld: TransferError_TxTooOld
     # The caller specified `created_at_time` that is too far in future.
     # The caller can retry the request later.
-    TxCreatedInFuture: None
+    TxCreatedInFuture: null
     # The ledger has already executed the request.
     # `duplicate_of` field is equal to the index of the block containing the original transaction.
     TxDuplicate: TransferError_TxDuplicate
+
 
 class TransferResult(Variant, total=False):
     Ok: nat64
     Err: TransferError
 
 # Arguments for the `account_balance` call.
+
+
 class AccountBalanceArgs(Record):
     account: AccountIdentifier
 
-class TransferFeeArg(Record): ...
+
+class TransferFeeArg(Record):
+    ...
+
 
 class TransferFee(Record):
     # The fee to pay to perform a transfer
     transfer_fee: Tokens
+
 
 class GetBlocksArgs(Record):
     # The index of the first block to fetch.
@@ -95,13 +126,16 @@ class GetBlocksArgs(Record):
     # Max number of blocks to fetch.
     length: nat64
 
+
 class Operation_Mint(Record):
     to: AccountIdentifier
     amount: Tokens
 
+
 class Operation_Burn(Record):
     from_: AccountIdentifier
     amount: Tokens
+
 
 class Operation_Transfer(Record):
     from_: AccountIdentifier
@@ -109,15 +143,18 @@ class Operation_Transfer(Record):
     amount: Tokens
     fee: Tokens
 
+
 class Operation(Variant, total=False):
     Mint: Operation_Mint
     Burn: Operation_Burn
     Transfer: Operation_Transfer
 
+
 class Transaction(Record):
     memo: Memo
     operation: opt[Operation]
     created_at_time: TimeStamp
+
 
 class Block(Record):
     parent_hash: opt[blob]
@@ -125,6 +162,8 @@ class Block(Record):
     timestamp: TimeStamp
 
 # A prefix of the block range specified in the [GetBlocksArgs] request.
+
+
 class BlockRange(Record):
     # A prefix of the requested block range.
     # The index of the first block is equal to [GetBlocksArgs.from].
@@ -141,15 +180,19 @@ class BlockRange(Record):
     # 2. [GetBlocksArgs.from] was larger than the last block known to the canister.
     blocks: list[Block]
 
+
 class QueryArchiveError_BadFirstBlockIndex(Record):
     requested_index: BlockIndex
     first_valid_index: BlockIndex
+
 
 class QueryArchiveError_Other(Record):
     error_code: nat64
     error_message: str
 
 # An error indicating that the arguments passed to [QueryArchiveFn] were invalid.
+
+
 class QueryArchiveError(Variant, total=False):
     # [GetBlocksArgs.from] argument was smaller than the first block
     # served by the canister that received the request.
@@ -157,14 +200,18 @@ class QueryArchiveError(Variant, total=False):
     # Reserved for future use.
     Other: QueryArchiveError_Other
 
+
 class QueryArchiveResult(Variant, total=False):
     # Successfully fetched zero or more blocks.
     Ok: BlockRange
     # The [GetBlocksArgs] request was invalid.
     Err: QueryArchiveError
 
+
 # A function that is used for fetching archived ledger blocks.
-QueryArchiveFn: TypeAlias = Func(Query[[GetBlocksArgs], QueryArchiveResult])
+QueryArchiveFn: TypeAlias = Func(
+    Query[[GetBlocksArgs], QueryArchiveResult])  # type: ignore
+
 
 class QueryBlocksResponse_archived_blocks(Record):
     # The index of the first archived block that can be fetched using the callback.
@@ -186,6 +233,8 @@ class QueryBlocksResponse_archived_blocks(Record):
 #
 # Note: as of Q4 2021 when this interface is authored, the IC doesn't support making nested
 # query calls within a query call.
+
+
 class QueryBlocksResponse(Record):
     # The total number of blocks in the chain.
     # If the chain length is positive, the index of the last block is `chain_len - 1`.
@@ -215,22 +264,29 @@ class QueryBlocksResponse(Record):
     # of the originally requested block range.
     archived_blocks: list[QueryBlocksResponse_archived_blocks]
 
+
 class Archive(Record):
     canister_id: Principal
+
 
 class Archives(Record):
     archives: list[Archive]
 
+
 class SymbolResult(Record):
     symbol: str
+
 
 class NameResult(Record):
     name: str
 
+
 class DecimalsResult(Record):
     decimals: nat32
 
+
 Address = str
+
 
 class Ledger(Canister):
     # Transfers tokens from a subaccount of the caller to the destination address.
@@ -241,15 +297,18 @@ class Ledger(Canister):
 
     # Returns the amount of Tokens on the specified account.
     @method
-    def account_balance(self, account_balance_args: AccountBalanceArgs) -> Tokens: ...
+    def account_balance(
+        self, account_balance_args: AccountBalanceArgs) -> Tokens: ...
 
     # Returns the current transfer_fee.
     @method
-    def transfer_fee(self, transfer_fee_arg: TransferFeeArg) -> TransferFee: ...
+    def transfer_fee(
+        self, transfer_fee_arg: TransferFeeArg) -> TransferFee: ...
 
     # Queries blocks in the specified range.
     @method
-    def query_blocks(self, get_blocks_args: GetBlocksArgs) -> QueryBlocksResponse: ...
+    def query_blocks(
+        self, get_blocks_args: GetBlocksArgs) -> QueryBlocksResponse: ...
 
     # Returns token symbol.
     @method
