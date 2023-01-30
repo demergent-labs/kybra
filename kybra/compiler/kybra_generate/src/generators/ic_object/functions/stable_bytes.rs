@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_stable_bytes() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_stable_bytes(&self, vm: &VirtualMachine) -> PyObjectRef {

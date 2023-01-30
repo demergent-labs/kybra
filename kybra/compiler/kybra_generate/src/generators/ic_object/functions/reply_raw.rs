@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_reply_raw() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_reply_raw(&self, buf_vector_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {

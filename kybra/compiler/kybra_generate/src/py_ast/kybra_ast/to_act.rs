@@ -1,10 +1,15 @@
-use crate::generators::vm_value_conversion::{try_from_vm_value, try_into_vm_value};
 use cdk_framework::{AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct};
 
 use super::KybraAst;
+use crate::generators::{
+    header,
+    vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
+};
 
 impl ToAct for KybraAst {
     fn to_act(&self) -> AbstractCanisterTree {
+        let header = header::generate();
+
         let query_methods: Vec<ActCanisterMethod> = self
             .canister_methods
             .iter()
@@ -24,78 +29,14 @@ impl ToAct for KybraAst {
             .cloned()
             .collect();
 
-        let arrays: Vec<ActDataType> = self
-            .canister_types
-            .iter()
-            .filter(|act| match act {
-                ActDataType::Array(_) => true,
-                _ => false,
-            })
-            .cloned()
-            .collect();
-        let funcs: Vec<ActDataType> = self
-            .canister_types
-            .iter()
-            .filter(|act| match act {
-                ActDataType::Func(_) => true,
-                _ => false,
-            })
-            .cloned()
-            .collect();
-        let options: Vec<ActDataType> = self
-            .canister_types
-            .iter()
-            .filter(|act| match act {
-                ActDataType::Option(_) => true,
-                _ => false,
-            })
-            .cloned()
-            .collect();
-        let primitives: Vec<ActDataType> = self
-            .canister_types
-            .iter()
-            .filter(|act| match act {
-                ActDataType::Primitive(_) => true,
-                _ => false,
-            })
-            .cloned()
-            .collect();
-        let records: Vec<ActDataType> = self
-            .canister_types
-            .iter()
-            .filter(|act| match act {
-                ActDataType::Record(_) => true,
-                _ => false,
-            })
-            .cloned()
-            .collect();
-        let tuples: Vec<ActDataType> = self
-            .canister_types
-            .iter()
-            .filter(|act| match act {
-                ActDataType::Tuple(_) => true,
-                _ => false,
-            })
-            .cloned()
-            .collect();
-        let type_refs: Vec<ActDataType> = self
-            .canister_types
-            .iter()
-            .filter(|act| match act {
-                ActDataType::TypeRef(_) => true,
-                _ => false,
-            })
-            .cloned()
-            .collect();
-        let variants: Vec<ActDataType> = self
-            .canister_types
-            .iter()
-            .filter(|act| match act {
-                ActDataType::Variant(_) => true,
-                _ => false,
-            })
-            .cloned()
-            .collect();
+        let arrays = filter_by_variant(&self.canister_types, "Array");
+        let funcs = filter_by_variant(&self.canister_types, "Func");
+        let options = filter_by_variant(&self.canister_types, "Option");
+        let primitives = filter_by_variant(&self.canister_types, "Primitive");
+        let records = filter_by_variant(&self.canister_types, "Record");
+        let tuples = filter_by_variant(&self.canister_types, "Tuple");
+        let type_refs = filter_by_variant(&self.canister_types, "TypeRef");
+        let variants = filter_by_variant(&self.canister_types, "Variant");
 
         let heartbeat_method = self.heartbeat.clone();
         let init_method = self.init_method.clone();
@@ -105,8 +46,8 @@ impl ToAct for KybraAst {
 
         let external_canisters = self.external_canisters.clone();
 
-        let try_into_vm_value_impls = try_into_vm_value::generate_try_into_vm_value_impls();
-        let try_from_vm_value_impls = try_from_vm_value::generate_try_from_vm_value_impls();
+        let try_into_vm_value_impls = try_into_vm_value_impls::generate();
+        let try_from_vm_value_impls = try_from_vm_value_impls::generate();
 
         AbstractCanisterTree {
             cdk_name: "kybra".to_string(),
@@ -130,7 +71,24 @@ impl ToAct for KybraAst {
             variants,
             external_canisters,
             keywords: crate::get_python_keywords(),
-            header: self.header.clone(),
+            header,
         }
     }
+}
+
+fn filter_by_variant(types: &Vec<ActDataType>, variant: &str) -> Vec<ActDataType> {
+    types
+        .iter()
+        .filter(|act| match act {
+            ActDataType::Array(_) => variant == "Array",
+            ActDataType::Func(_) => variant == "Func",
+            ActDataType::Option(_) => variant == "Option",
+            ActDataType::Primitive(_) => variant == "Primitive",
+            ActDataType::Record(_) => variant == "Record",
+            ActDataType::Tuple(_) => variant == "Tuple",
+            ActDataType::TypeRef(_) => variant == "TypeRef",
+            ActDataType::Variant(_) => variant == "Variant",
+        })
+        .cloned()
+        .collect()
 }

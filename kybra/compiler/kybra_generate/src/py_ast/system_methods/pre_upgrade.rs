@@ -1,7 +1,6 @@
-use quote::quote;
-
-use crate::py_ast::PyAst;
 use cdk_framework::{nodes::ActPreUpgradeMethod, CanisterMethodType};
+
+use crate::{generators::canister_methods::pre_upgrade, py_ast::PyAst};
 
 impl PyAst<'_> {
     pub fn build_pre_upgrade_method(&self) -> ActPreUpgradeMethod {
@@ -12,23 +11,9 @@ impl PyAst<'_> {
             todo!();
         }
 
-        let call_to_pre_upgrade_py_function = match pre_upgrade_function_defs.get(0) {
-            Some(pre_upgrade_function_def) => {
-                pre_upgrade_function_def.generate_call_to_py_function()
-            }
-            None => quote!(),
-        };
+        let pre_upgrade_function_def_option = pre_upgrade_function_defs.get(0);
 
-        let body = quote! {
-            unsafe {
-                let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-                let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
-
-                _kybra_interpreter.enter(|vm| {
-                    #call_to_pre_upgrade_py_function
-                });
-            }
-        };
+        let body = pre_upgrade::generate_pre_upgrade_method_body(pre_upgrade_function_def_option);
 
         ActPreUpgradeMethod { body }
     }

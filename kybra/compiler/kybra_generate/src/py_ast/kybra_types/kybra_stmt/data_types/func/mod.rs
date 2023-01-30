@@ -1,14 +1,15 @@
-use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
-use rustpython_parser::ast::{ExprKind, Located, StmtKind};
-
-use crate::py_ast::kybra_types::{KybraExpr, KybraStmt};
 use cdk_framework::{
     nodes::data_type_nodes::{
         act_funcs::{Func, FuncTypeAlias},
-        ActFunc, LiteralOrTypeAlias, ToIdent,
+        ActFunc, LiteralOrTypeAlias,
     },
     ActDataType, ToActDataType,
+};
+use rustpython_parser::ast::{ExprKind, Located, StmtKind};
+
+use crate::{
+    generators::func,
+    py_ast::kybra_types::{KybraExpr, KybraStmt},
 };
 
 mod errors;
@@ -88,10 +89,12 @@ impl KybraStmt<'_> {
                         ActDataType::Func(ActFunc {
                             act_type: LiteralOrTypeAlias::TypeAlias(FuncTypeAlias {
                                 func: Func {
-                                    to_vm_value: generate_func_to_vm_value(&name),
-                                    list_to_vm_value: generate_func_list_to_vm_value(&name),
-                                    from_vm_value: generate_func_from_vm_value(&name),
-                                    list_from_vm_value: generate_func_list_from_vm_value(&name),
+                                    to_vm_value: func::generate_func_to_vm_value(&name),
+                                    list_to_vm_value: func::generate_func_list_to_vm_value(&name),
+                                    from_vm_value: func::generate_func_from_vm_value(&name),
+                                    list_from_vm_value: func::generate_func_list_from_vm_value(
+                                        &name,
+                                    ),
                                     name,
                                     params,
                                     return_type,
@@ -147,51 +150,6 @@ impl KybraStmt<'_> {
                 None => None,
             },
             _ => None,
-        }
-    }
-}
-
-fn generate_func_to_vm_value(name: &String) -> TokenStream {
-    let type_alias_name = name.to_identifier().to_token_stream();
-    quote! {
-        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for #type_alias_name {
-            fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                self.0.try_into_vm_value(vm)
-            }
-        }
-    }
-}
-
-fn generate_func_list_to_vm_value(name: &String) -> TokenStream {
-    let type_alias_name = name.to_identifier().to_token_stream();
-    quote! {
-        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for Vec<#type_alias_name> {
-            fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                try_into_vm_value_generic_array(self, vm)
-            }
-        }
-    }
-}
-
-fn generate_func_from_vm_value(name: &String) -> TokenStream {
-    let type_alias_name = name.to_identifier().to_token_stream();
-    quote! {
-        impl CdkActTryFromVmValue<#type_alias_name, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<#type_alias_name, CdkActTryFromVmValueError> {
-                let candid_func: candid::Func = self.try_from_vm_value(vm).unwrap();
-                Ok(candid_func.into())
-            }
-        }
-    }
-}
-
-fn generate_func_list_from_vm_value(name: &String) -> TokenStream {
-    let type_alias_name = name.to_identifier().to_token_stream();
-    quote! {
-        impl CdkActTryFromVmValue<Vec<#type_alias_name>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<#type_alias_name>, CdkActTryFromVmValueError> {
-                try_from_vm_value_generic_array(self, vm)
-            }
         }
     }
 }

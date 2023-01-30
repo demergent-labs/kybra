@@ -2,9 +2,7 @@ use quote::quote;
 
 use crate::{generators::stable_b_tree_map, py_ast::kybra_types::StableBTreeMapNode};
 
-pub fn generate_stable_b_tree_map_items(
-    stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
-) -> proc_macro2::TokenStream {
+pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> proc_macro2::TokenStream {
     let match_arms = generate_match_arms(stable_b_tree_map_nodes);
 
     quote! {
@@ -27,7 +25,7 @@ fn generate_match_arms(
         .iter()
         .map(|stable_b_tree_map_node| {
             let memory_id = stable_b_tree_map_node.memory_id;
-            let map_name_ident = stable_b_tree_map::ref_cell_ident(stable_b_tree_map_node.memory_id);
+            let map_name_ident = stable_b_tree_map::ref_cell_ident::generate(stable_b_tree_map_node.memory_id);
 
             quote! {
                 #memory_id => {

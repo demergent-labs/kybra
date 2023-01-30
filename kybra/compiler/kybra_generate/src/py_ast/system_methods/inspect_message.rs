@@ -1,7 +1,6 @@
-use quote::quote;
-
-use crate::py_ast::PyAst;
 use cdk_framework::{nodes::ActInspectMessageMethod, CanisterMethodType};
+
+use crate::{generators::canister_methods::inspect_message, py_ast::PyAst};
 
 impl PyAst<'_> {
     pub fn build_inspect_method(&self) -> Option<ActInspectMessageMethod> {
@@ -15,19 +14,8 @@ impl PyAst<'_> {
         let inspect_message_function_def_option = inspect_message_function_defs.get(0);
 
         if let Some(inspect_method_function_def) = inspect_message_function_def_option {
-            let call_to_inspect_message_py_function =
-                inspect_method_function_def.generate_call_to_py_function();
-
-            let body = quote! {
-                unsafe {
-                    let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-                    let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
-
-                    _kybra_interpreter.enter(|vm| {
-                        #call_to_inspect_message_py_function
-                    });
-                }
-            };
+            let body =
+                inspect_message::generate_inspect_message_method_body(inspect_method_function_def);
             Some(ActInspectMessageMethod { body })
         } else {
             None

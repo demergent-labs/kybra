@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_msg_cycles_refunded() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_msg_cycles_refunded(&self, vm: &VirtualMachine) -> PyObjectRef {

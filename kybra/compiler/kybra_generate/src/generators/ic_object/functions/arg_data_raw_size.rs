@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_arg_data_raw_size() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_arg_data_raw_size(&self, vm: &VirtualMachine) -> PyObjectRef {

@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_reject_code() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_reject_code(&self, vm: &VirtualMachine) -> PyObjectRef {

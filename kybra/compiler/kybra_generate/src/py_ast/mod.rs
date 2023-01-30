@@ -1,33 +1,29 @@
-use std::collections::{HashMap, HashSet};
-
-use proc_macro2::TokenStream;
-use quote::quote;
-
-use crate::generators::{
-    async_result_handler::generate_async_result_handler, kybra_serde::generate_kybra_serde,
-    rng_seed, stable_b_tree_map::generate_stable_b_tree_map,
-};
 use cdk_framework::{
     nodes::{act_canister_method, data_type_nodes, ActExternalCanister},
     ActCanisterMethod, ActDataType, CanisterMethodType,
 };
+use std::collections::{HashMap, HashSet};
 
-pub use self::{kybra_ast::KybraAst, kybra_types::KybraProgram};
-use self::{
-    kybra_types::{KybraStmt, StableBTreeMapNode},
-    traits::GetDependencies,
+use crate::{
+    generators::body,
+    py_ast::{
+        kybra_types::{KybraStmt, StableBTreeMapNode},
+        traits::GetDependencies,
+    },
 };
 
+pub use self::{kybra_ast::KybraAst, kybra_types::KybraProgram};
+
 mod kybra_ast;
-pub mod kybra_types;
 mod system_methods;
-pub mod traits;
 mod what_is_it;
+
+pub mod kybra_types;
+pub mod traits;
 
 pub struct PyAst<'a> {
     pub kybra_programs: Vec<KybraProgram<'a>>,
     pub entry_module_name: String,
-    pub header: TokenStream,
 }
 
 impl PyAst<'_> {
@@ -102,57 +98,22 @@ impl PyAst<'_> {
 
         let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes();
 
-        let async_result_handler = generate_async_result_handler(&external_canisters);
-
-        let kybra_serde = generate_kybra_serde();
-
-        let stable_b_tree_map = generate_stable_b_tree_map(&stable_b_tree_map_nodes);
-
-        let rng_seed = rng_seed::generate();
-
-        let rust_code = quote! {
-            pub fn _kybra_unwrap_rust_python_result<T>(
-                rust_python_result: Result<T, PyRef<PyBaseException>>,
-                vm: &rustpython::vm::VirtualMachine
-            ) -> T {
-                match rust_python_result {
-                    Ok(ok) => ok,
-                    Err(err) => {
-                        let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                        panic!("{}", err_string);
-                    },
-                }
-            }
-
-            #async_result_handler
-
-            #kybra_serde
-
-            #stable_b_tree_map
-
-            #rng_seed
-        };
+        let rust_code = body::generate(
+            &canister_methods,
+            &external_canisters,
+            &stable_b_tree_map_nodes,
+        );
 
         KybraAst {
-            init_method: self.build_init_method(
-                &canister_methods,
-                &external_canisters,
-                &stable_b_tree_map_nodes,
-            ),
+            init_method: self.build_init_method(),
             pre_upgrade: self.build_pre_upgrade_method(),
-            post_upgrade: self.build_post_upgrade_method(
-                &canister_methods,
-                &external_canisters,
-                &stable_b_tree_map_nodes,
-            ),
+            post_upgrade: self.build_post_upgrade_method(),
             inspect_method: self.build_inspect_method(),
             heartbeat: self.build_heartbeat_method(),
             canister_types: all_types,
             canister_methods: self.build_canister_methods(),
             external_canisters,
             rust_code,
-            header: self.header.clone(),
         }
     }
 

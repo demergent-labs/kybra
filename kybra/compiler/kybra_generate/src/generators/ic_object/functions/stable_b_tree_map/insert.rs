@@ -2,9 +2,7 @@ use quote::quote;
 
 use crate::{generators::stable_b_tree_map, py_ast::kybra_types::StableBTreeMapNode};
 
-pub fn generate_stable_b_tree_map_insert(
-    stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
-) -> proc_macro2::TokenStream {
+pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> proc_macro2::TokenStream {
     let match_arms = generate_match_arms(stable_b_tree_map_nodes);
 
     quote! {
@@ -27,10 +25,10 @@ fn generate_match_arms(
         .iter()
         .map(|stable_b_tree_map_node| {
             let memory_id = stable_b_tree_map_node.memory_id;
-            let stable_b_tree_map_ref_cell = stable_b_tree_map::ref_cell_ident(stable_b_tree_map_node.memory_id);
+            let stable_b_tree_map_ref_cell = stable_b_tree_map::ref_cell_ident::generate(stable_b_tree_map_node.memory_id);
 
-            let (key_wrapper_type_name, _) = stable_b_tree_map::generate_wrapper_type(&stable_b_tree_map_node.key_type, memory_id, "Key");
-            let (value_wrapper_type_name, _) = stable_b_tree_map::generate_wrapper_type(&stable_b_tree_map_node.value_type, memory_id, "Value");
+            let (key_wrapper_type_name, _) = stable_b_tree_map::wrapper_type::generate(&stable_b_tree_map_node.key_type, memory_id, "Key");
+            let (value_wrapper_type_name, _) = stable_b_tree_map::wrapper_type::generate(&stable_b_tree_map_node.value_type, memory_id, "Value");
 
             // TODO the return value here might need a little work like in get
             quote! {

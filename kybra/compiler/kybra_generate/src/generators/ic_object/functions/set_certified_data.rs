@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn generate_set_certified_data() -> proc_macro2::TokenStream {
+pub fn generate() -> proc_macro2::TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_set_certified_data(&self, data_py_object_ref: PyObjectRef, vm: &VirtualMachine) {
