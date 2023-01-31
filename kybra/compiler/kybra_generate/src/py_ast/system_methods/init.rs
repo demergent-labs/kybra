@@ -1,9 +1,9 @@
-use cdk_framework::{nodes::ActInitMethod, CanisterMethodType};
+use cdk_framework::{act::node::canister_method::InitMethod, CanisterMethodType};
 
 use crate::{generators::canister_methods::init, py_ast::PyAst};
 
 impl PyAst<'_> {
-    pub fn build_init_method(&self) -> ActInitMethod {
+    pub fn build_init_method(&self) -> InitMethod {
         let init_function_defs = self.get_function_def_of_type(CanisterMethodType::Init);
 
         if init_function_defs.len() > 1 {
@@ -20,6 +20,6 @@ impl PyAst<'_> {
         let body =
             init::generate_init_method_body(init_function_def_option, &self.entry_module_name);
 
-        ActInitMethod { params, body }
+        InitMethod { params, body }
     }
 }

@@ -1,19 +1,16 @@
 use rustpython_parser::ast::{Constant, ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::KybraStmt;
-use cdk_framework::{
-    nodes::data_type_nodes::{
-        act_record::{Record, RecordTypeAlias},
-        ActRecord, ActRecordMember, LiteralOrTypeAlias,
-    },
-    ActDataType,
+use cdk_framework::act::node::data_type::{
+    record::{ActRecordMember, Record},
+    DataType,
 };
 
 mod errors;
 mod record_members;
 
 impl KybraStmt<'_> {
-    pub fn as_record(&self) -> ActDataType {
+    pub fn as_record(&self) -> DataType {
         match &self.stmt_kind.node {
             StmtKind::ClassDef { name, body, .. } => {
                 let members: Vec<ActRecordMember> = body
@@ -37,13 +34,9 @@ impl KybraStmt<'_> {
                         .as_record_member()
                     })
                     .collect();
-                ActDataType::Record(ActRecord {
-                    act_type: LiteralOrTypeAlias::TypeAlias(RecordTypeAlias {
-                        record: Record {
-                            name: name.clone(),
-                            members,
-                        },
-                    }),
+                DataType::Record(Record {
+                    name: Some(name.clone()),
+                    members,
                 })
             }
             _ => panic!("{}", self.not_a_record_error()),

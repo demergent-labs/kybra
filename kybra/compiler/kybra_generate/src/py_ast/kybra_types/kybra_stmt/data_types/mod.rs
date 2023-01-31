@@ -4,14 +4,13 @@ mod tuples;
 mod type_alias;
 mod variants;
 
+use cdk_framework::act::node::DataType;
 use rustpython_parser::ast::StmtKind;
-
-use cdk_framework::ActDataType;
 
 use super::KybraStmt;
 
 impl KybraStmt<'_> {
-    pub fn build_act_data_type(&self) -> ActDataType {
+    pub fn build_act_data_type(&self) -> DataType {
         match &self.stmt_kind.node {
             StmtKind::ClassDef { .. } => {
                 if self.is_record() {

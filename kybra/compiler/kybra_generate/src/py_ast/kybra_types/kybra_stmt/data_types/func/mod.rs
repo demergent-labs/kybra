@@ -1,9 +1,6 @@
 use cdk_framework::{
-    nodes::data_type_nodes::{
-        act_funcs::{Func, FuncTypeAlias},
-        ActFunc, LiteralOrTypeAlias,
-    },
-    ActDataType, ToActDataType,
+    act::node::{data_type::Func, DataType},
+    ToActDataType,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
@@ -15,7 +12,7 @@ use crate::{
 mod errors;
 
 impl KybraStmt<'_> {
-    pub fn as_func(&self) -> ActDataType {
+    pub fn as_func(&self) -> DataType {
         match &self.stmt_kind.node {
             StmtKind::AnnAssign { target, value, .. } => match &value {
                 Some(value) => match &value.node {
@@ -86,21 +83,15 @@ impl KybraStmt<'_> {
                                 _ => todo!(),
                             }
                         });
-                        ActDataType::Func(ActFunc {
-                            act_type: LiteralOrTypeAlias::TypeAlias(FuncTypeAlias {
-                                func: Func {
-                                    to_vm_value: func::generate_func_to_vm_value(&name),
-                                    list_to_vm_value: func::generate_func_list_to_vm_value(&name),
-                                    from_vm_value: func::generate_func_from_vm_value(&name),
-                                    list_from_vm_value: func::generate_func_list_from_vm_value(
-                                        &name,
-                                    ),
-                                    name,
-                                    params,
-                                    return_type,
-                                    mode,
-                                },
-                            }),
+                        DataType::Func(Func {
+                            to_vm_value: func::generate_func_to_vm_value(&name),
+                            list_to_vm_value: func::generate_func_list_to_vm_value(&name),
+                            from_vm_value: func::generate_func_from_vm_value(&name),
+                            list_from_vm_value: func::generate_func_list_from_vm_value(&name),
+                            name,
+                            params,
+                            return_type,
+                            mode,
                         })
                     }
                     _ => todo!(),

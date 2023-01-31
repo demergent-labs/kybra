@@ -1,11 +1,11 @@
-use cdk_framework::nodes::ActExternalCanister;
+use cdk_framework::act::node::ExternalCanister;
 use rustpython_parser::ast::Mod;
 
 use super::KybraProgram;
 use crate::py_ast::KybraStmt;
 
 impl KybraProgram<'_> {
-    pub fn build_external_canisters(&self) -> Vec<ActExternalCanister> {
+    pub fn build_external_canisters(&self) -> Vec<ExternalCanister> {
         match &self.program {
             Mod::Module { body, .. } => body
                 .iter()

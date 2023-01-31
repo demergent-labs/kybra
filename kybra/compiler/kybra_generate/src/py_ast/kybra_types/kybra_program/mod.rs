@@ -4,7 +4,10 @@ use rustpython_parser::ast::{Constant, ExprKind, Mod, StmtKind};
 
 use crate::source_map::SourceMap;
 use cdk_framework::{
-    nodes::{ActCanisterMethod, ActDataType, ActFunctionGuard},
+    act::node::{
+        canister_method::{QueryMethod, UpdateMethod},
+        ActFunctionGuard, DataType,
+    },
     CanisterMethodType,
 };
 
@@ -130,33 +133,16 @@ impl KybraProgram<'_> {
         }
     }
 
-    pub fn build_canister_method_act_nodes(&self) -> Vec<ActCanisterMethod> {
+    pub fn build_query_method_act_nodes(&self) -> Vec<QueryMethod> {
         match &self.program {
             Mod::Module { body, .. } => body
                 .iter()
-                .filter(|stmt_kind| {
-                    let kybra_stmt = KybraStmt {
+                .filter_map(|stmt_kind| {
+                    KybraStmt {
                         stmt_kind,
                         source_map: self.source_map,
-                    };
-                    kybra_stmt.is_canister_method_type(CanisterMethodType::Query)
-                        || kybra_stmt.is_canister_method_type(CanisterMethodType::Update)
-                })
-                .map(|stmt_kind| {
-                    let kybra_stmt = KybraStmt {
-                        stmt_kind,
-                        source_map: self.source_map,
-                    };
-                    match kybra_stmt.as_canister_method() {
-                        Some(canister_method) => {
-                            if kybra_stmt.is_canister_method_type(CanisterMethodType::Query) {
-                                ActCanisterMethod::QueryMethod(canister_method)
-                            } else {
-                                ActCanisterMethod::UpdateMethod(canister_method)
-                            }
-                        }
-                        None => panic!("Unreachable"),
                     }
+                    .as_query_method()
                 })
                 .collect(),
             _ => vec![],
@@ -238,8 +224,23 @@ impl KybraProgram<'_> {
             _ => vec![],
         }
     }
+    pub fn build_update_method_act_nodes(&self) -> Vec<UpdateMethod> {
+        match &self.program {
+            Mod::Module { body, .. } => body
+                .iter()
+                .filter_map(|stmt_kind| {
+                    KybraStmt {
+                        stmt_kind,
+                        source_map: self.source_map,
+                    }
+                    .as_update_method()
+                })
+                .collect(),
+            _ => vec![],
+        }
+    }
 
-    pub fn get_act_data_type_nodes(&self, dependencies: &HashSet<String>) -> Vec<ActDataType> {
+    pub fn get_act_data_type_nodes(&self, dependencies: &HashSet<String>) -> Vec<DataType> {
         match &self.program {
             Mod::Module { body, .. } => body
                 .iter()

@@ -2,11 +2,8 @@ use rustpython_parser::ast::ExprKind;
 
 use crate::py_ast::traits::GenerateInlineName;
 use cdk_framework::{
-    nodes::data_type_nodes::{
-        act_tuple::{Tuple, TupleLiteral, TupleTypeAlias},
-        ActTuple, ActTupleElem, LiteralOrTypeAlias,
-    },
-    ActDataType, ToActDataType,
+    act::node::data_type::{tuple::ActTupleElem, DataType, Tuple},
+    ToActDataType,
 };
 
 use super::KybraExpr;
@@ -22,7 +19,7 @@ impl KybraExpr<'_> {
         }
     }
 
-    pub fn to_tuple(&self, alias_name: &Option<&String>) -> ActDataType {
+    pub fn to_tuple(&self, alias_name: &Option<&String>) -> DataType {
         match &self.located_expr.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
@@ -55,21 +52,13 @@ impl KybraExpr<'_> {
                     })
                     .collect();
                 match alias_name {
-                    Some(_) => ActDataType::Tuple(ActTuple {
-                        act_type: LiteralOrTypeAlias::TypeAlias(TupleTypeAlias {
-                            tuple: Tuple {
-                                name: alias_name.unwrap().clone(),
-                                elems: act_elems,
-                            },
-                        }),
+                    Some(alias_name) => DataType::Tuple(Tuple {
+                        name: alias_name.clone().clone(),
+                        elems: act_elems,
                     }),
-                    None => ActDataType::Tuple(ActTuple {
-                        act_type: LiteralOrTypeAlias::Literal(TupleLiteral {
-                            tuple: Tuple {
-                                name: self.generate_inline_name(),
-                                elems: act_elems,
-                            },
-                        }),
+                    None => DataType::Tuple(Tuple {
+                        name: self.generate_inline_name(),
+                        elems: act_elems,
                     }),
                 }
             }

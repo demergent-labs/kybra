@@ -1,4 +1,4 @@
-use cdk_framework::{ActDataType, ToActDataType};
+use cdk_framework::{act::node::DataType, ToActDataType};
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::{KybraExpr, KybraStmt};
@@ -18,7 +18,7 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub fn as_type_alias(&self) -> ActDataType {
+    pub fn as_type_alias(&self) -> DataType {
         let (alias_name, value) = match &self.stmt_kind.node {
             StmtKind::Assign { targets, value, .. } => {
                 if targets.len() > 1 {

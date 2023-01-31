@@ -1,4 +1,7 @@
-use cdk_framework::nodes::{ActCanisterMethod, ActExternalCanister};
+use cdk_framework::act::node::{
+    canister_method::{QueryMethod, UpdateMethod},
+    ExternalCanister,
+};
 
 use crate::{
     generators::{
@@ -8,12 +11,14 @@ use crate::{
 };
 
 pub fn generate(
-    canister_methods: &Vec<ActCanisterMethod>,
-    external_canisters: &Vec<ActExternalCanister>,
+    update_methods: &Vec<UpdateMethod>,
+    query_methods: &Vec<QueryMethod>,
+    external_canisters: &Vec<ExternalCanister>,
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
 ) -> proc_macro2::TokenStream {
     let ic_object = ic_object::generate(
-        canister_methods,
+        update_methods,
+        query_methods,
         external_canisters,
         stable_b_tree_map_nodes,
     );

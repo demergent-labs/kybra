@@ -1,4 +1,4 @@
-use cdk_framework::nodes::ActFunctionGuard;
+use cdk_framework::act::node::ActFunctionGuard;
 use proc_macro2::TokenStream;
 use quote::quote;
 use rustpython_parser::ast::StmtKind;
