@@ -1,8 +1,8 @@
 use cdk_framework::act::node::canister_methods::{
     ActCanisterMethod, InitMethod, PostUpgradeMethod, PreUpgradeMethod, UpdateMethod,
 };
-use cdk_framework::act::node::data_types::primitive::ActPrimitiveLit;
-use cdk_framework::act::node::data_types::{
+use cdk_framework::act::node::data_type::primitive::ActPrimitiveLit;
+use cdk_framework::act::node::data_type::{
     ActArray, ActFunc, ActOption, ActPrimitive, ActRecord, ActTuple, ActTypeRef, ActVariant,
 };
 use cdk_framework::act::node::{ActDataType, ActNode};
