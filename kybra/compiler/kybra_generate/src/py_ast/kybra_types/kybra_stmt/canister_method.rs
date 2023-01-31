@@ -1,6 +1,10 @@
 use cdk_framework::{
-    nodes::{data_type_nodes::ActPrimitiveLit, ActFnParam},
-    ActDataType, CanisterMethod, CanisterMethodType, ToActDataType,
+    act::node::{
+        canister_methods::{ActFnParam, QueryMethod, UpdateMethod},
+        data_types::primitive::ActPrimitiveLit,
+        ActDataType,
+    },
+    CanisterMethodType, ToActDataType,
 };
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
@@ -93,14 +97,14 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub fn as_canister_method(&self) -> Option<CanisterMethod> {
+    pub fn as_update_method(&self) -> Option<UpdateMethod> {
         match &self.stmt_kind.node {
             StmtKind::FunctionDef { name, .. } => {
                 let body = query_and_update::generate_body(&self);
                 let params = self.build_act_params();
                 let return_type = self.build_act_return_type();
 
-                Some(CanisterMethod {
+                Some(UpdateMethod {
                     body,
                     params,
                     is_manual: self.is_manual(),
@@ -108,6 +112,29 @@ impl KybraStmt<'_> {
                     return_type,
                     is_async: self.is_async(),
                     cdk_name: "kybra".to_string(),
+                    function_guard_name: None,
+                })
+            }
+            _ => None,
+        }
+    }
+
+    pub fn as_query_method(&self) -> Option<QueryMethod> {
+        match &self.stmt_kind.node {
+            StmtKind::FunctionDef { name, .. } => {
+                let body = query_and_update::generate_body(&self);
+                let params = self.build_act_params();
+                let return_type = self.build_act_return_type();
+
+                Some(QueryMethod {
+                    body,
+                    params,
+                    is_manual: self.is_manual(),
+                    name: name.clone(),
+                    return_type,
+                    is_async: self.is_async(),
+                    cdk_name: "kybra".to_string(),
+                    function_guard_name: None,
                 })
             }
             _ => None,

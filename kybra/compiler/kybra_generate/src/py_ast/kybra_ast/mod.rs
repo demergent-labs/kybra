@@ -1,27 +1,29 @@
-use cdk_framework::{
-    nodes::{
-        ActExternalCanister, ActHeartbeatMethod, ActInitMethod, ActInspectMessageMethod,
-        ActPostUpgradeMethod, ActPreUpgradeMethod,
+use cdk_framework::act::node::{
+    canister_methods::{
+        HeartbeatMethod, InitMethod, InspectMessageMethod, PostUpgradeMethod, PreUpgradeMethod,
+        QueryMethod, UpdateMethod,
     },
-    ActCanisterMethod, ActDataType,
+    ActDataType, ExternalCanister,
 };
 use proc_macro2::TokenStream;
 
 mod to_act;
 
 pub struct KybraAst {
-    pub external_canisters: Vec<ActExternalCanister>,
-    pub canister_methods: Vec<ActCanisterMethod>,
+    pub external_canisters: Vec<ExternalCanister>,
+    pub query_methods: Vec<QueryMethod>,
+    pub update_methods: Vec<UpdateMethod>,
     pub canister_types: Vec<ActDataType>,
-    pub init_method: ActInitMethod,
-    pub inspect_method: Option<ActInspectMessageMethod>,
-    pub pre_upgrade: ActPreUpgradeMethod,
-    pub post_upgrade: ActPostUpgradeMethod,
-    pub heartbeat: Option<ActHeartbeatMethod>,
+    pub init_method: InitMethod,
+    pub inspect_method: Option<InspectMessageMethod>,
+    pub pre_upgrade: PreUpgradeMethod,
+    pub post_upgrade: PostUpgradeMethod,
+    pub heartbeat: Option<HeartbeatMethod>,
     pub rust_code: TokenStream,
 }
 
 pub trait ToKybraAst {
-    fn build_canister_method_act_nodes(&self) -> Vec<ActCanisterMethod>;
+    fn build_update_method_act_nodes(&self) -> Vec<UpdateMethod>;
+    fn build_query_method_act_nodes(&self) -> Vec<QueryMethod>;
     fn get_act_data_type_nodes(&self) -> Vec<ActDataType>;
 }
