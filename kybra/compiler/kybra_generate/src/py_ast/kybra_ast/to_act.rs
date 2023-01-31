@@ -1,4 +1,7 @@
-use cdk_framework::{AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct};
+use cdk_framework::{
+    act::node::canister_methods::{QueryMethod, UpdateMethod},
+    AbstractCanisterTree, ToAct,
+};
 
 use super::KybraAst;
 use crate::generators::{
@@ -10,33 +13,49 @@ impl ToAct for KybraAst {
     fn to_act(&self) -> AbstractCanisterTree {
         let header = header::generate();
 
-        let query_methods: Vec<ActCanisterMethod> = self
-            .canister_methods
-            .iter()
-            .filter(|method| match method {
-                ActCanisterMethod::QueryMethod { .. } => true,
-                ActCanisterMethod::UpdateMethod(_) => false,
-            })
-            .cloned()
-            .collect();
-        let update_methods: Vec<ActCanisterMethod> = self
-            .canister_methods
-            .iter()
-            .filter(|method| match method {
-                ActCanisterMethod::QueryMethod { .. } => false,
-                ActCanisterMethod::UpdateMethod(_) => true,
-            })
-            .cloned()
-            .collect();
+        let query_methods: Vec<QueryMethod> = self.query_methods.iter().cloned().collect();
+        let update_methods: Vec<UpdateMethod> = self.update_methods.iter().cloned().collect();
 
-        let arrays = filter_by_variant(&self.canister_types, "Array");
-        let funcs = filter_by_variant(&self.canister_types, "Func");
-        let options = filter_by_variant(&self.canister_types, "Option");
-        let primitives = filter_by_variant(&self.canister_types, "Primitive");
-        let records = filter_by_variant(&self.canister_types, "Record");
-        let tuples = filter_by_variant(&self.canister_types, "Tuple");
-        let type_refs = filter_by_variant(&self.canister_types, "TypeRef");
-        let variants = filter_by_variant(&self.canister_types, "Variant");
+        let arrays = self
+            .canister_types
+            .iter()
+            .filter_map(|array| array.as_array().cloned())
+            .collect();
+        let funcs = self
+            .canister_types
+            .iter()
+            .filter_map(|func| func.as_func().cloned())
+            .collect();
+        let options = self
+            .canister_types
+            .iter()
+            .filter_map(|option| option.as_option().cloned())
+            .collect();
+        let primitives = self
+            .canister_types
+            .iter()
+            .filter_map(|canister_type| canister_type.as_primitive().cloned())
+            .collect();
+        let records = self
+            .canister_types
+            .iter()
+            .filter_map(|canister_type| canister_type.as_record().cloned())
+            .collect();
+        let tuples = self
+            .canister_types
+            .iter()
+            .filter_map(|canister_type| canister_type.as_tuple().cloned())
+            .collect();
+        let type_refs = self
+            .canister_types
+            .iter()
+            .filter_map(|canister_type| canister_type.as_type_ref().cloned())
+            .collect();
+        let variants = self
+            .canister_types
+            .iter()
+            .filter_map(|canister_type| canister_type.as_variant().cloned())
+            .collect();
 
         let heartbeat_method = self.heartbeat.clone();
         let init_method = self.init_method.clone();
@@ -72,23 +91,7 @@ impl ToAct for KybraAst {
             external_canisters,
             keywords: crate::get_python_keywords(),
             header,
+            function_guards: vec![],
         }
     }
-}
-
-fn filter_by_variant(types: &Vec<ActDataType>, variant: &str) -> Vec<ActDataType> {
-    types
-        .iter()
-        .filter(|act| match act {
-            ActDataType::Array(_) => variant == "Array",
-            ActDataType::Func(_) => variant == "Func",
-            ActDataType::Option(_) => variant == "Option",
-            ActDataType::Primitive(_) => variant == "Primitive",
-            ActDataType::Record(_) => variant == "Record",
-            ActDataType::Tuple(_) => variant == "Tuple",
-            ActDataType::TypeRef(_) => variant == "TypeRef",
-            ActDataType::Variant(_) => variant == "Variant",
-        })
-        .cloned()
-        .collect()
 }
