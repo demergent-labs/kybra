@@ -1,7 +1,7 @@
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::KybraStmt;
-use cdk_framework::act::node::data_types::{
+use cdk_framework::act::node::data_type::{
     variant::{ActVariantMember, Variant, VariantTypeAlias},
     ActDataType, ActVariant, LiteralOrTypeAlias,
 };

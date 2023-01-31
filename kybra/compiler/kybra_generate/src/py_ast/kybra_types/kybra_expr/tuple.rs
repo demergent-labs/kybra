@@ -2,7 +2,7 @@ use rustpython_parser::ast::ExprKind;
 
 use crate::py_ast::traits::GenerateInlineName;
 use cdk_framework::{
-    act::node::data_types::{
+    act::node::data_type::{
         tuple::{ActTupleElem, Tuple, TupleLiteral, TupleTypeAlias},
         ActDataType, ActTuple, LiteralOrTypeAlias,
     },

@@ -1,7 +1,7 @@
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::{KybraExpr, KybraStmt};
-use cdk_framework::{act::node::data_types::record::ActRecordMember, ToActDataType};
+use cdk_framework::{act::node::data_type::record::ActRecordMember, ToActDataType};
 
 mod errors;
 mod warnings;

@@ -1,5 +1,5 @@
 use cdk_framework::{
-    act::node::data_types::{
+    act::node::data_type::{
         func::{Func, FuncTypeAlias},
         ActDataType, ActFunc, LiteralOrTypeAlias,
     },

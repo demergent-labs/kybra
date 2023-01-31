@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
 
-use cdk_framework::act::node::data_types::traits::ToIdent;
+use cdk_framework::act::node::data_type::traits::ToIdent;
 
 pub fn generate_func_to_vm_value(name: &String) -> TokenStream {
     let type_alias_name = name.to_identifier().to_token_stream();

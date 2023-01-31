@@ -3,7 +3,7 @@ mod errors;
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::{KybraExpr, KybraStmt};
-use cdk_framework::act::node::data_types::ActDataType;
+use cdk_framework::act::node::data_type::ActDataType;
 
 impl KybraStmt<'_> {
     pub fn is_tuple(&self) -> bool {

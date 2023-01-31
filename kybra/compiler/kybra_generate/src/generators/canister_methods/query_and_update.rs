@@ -1,5 +1,5 @@
 use cdk_framework::act::node::{
-    data_types::{primitive::ActPrimitiveLit, LiteralOrTypeAlias},
+    data_type::{primitive::ActPrimitiveLit, LiteralOrTypeAlias},
     ActDataType,
 };
 use proc_macro2::TokenStream;

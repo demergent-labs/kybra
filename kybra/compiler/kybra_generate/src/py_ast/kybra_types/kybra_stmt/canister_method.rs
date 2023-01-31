@@ -1,7 +1,7 @@
 use cdk_framework::{
     act::node::{
         canister_methods::{ActFnParam, QueryMethod, UpdateMethod},
-        data_types::primitive::ActPrimitiveLit,
+        data_type::primitive::ActPrimitiveLit,
         ActDataType,
     },
     CanisterMethodType, ToActDataType,

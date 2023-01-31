@@ -1,7 +1,7 @@
 use rustpython_parser::ast::ExprKind;
 
 use cdk_framework::{
-    act::node::data_types::{
+    act::node::data_type::{
         array::{ActArrayLiteral, ActArrayTypeAlias},
         ActArray, ActDataType, LiteralOrTypeAlias,
     },

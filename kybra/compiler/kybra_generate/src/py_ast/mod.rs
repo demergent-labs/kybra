@@ -1,7 +1,7 @@
 use cdk_framework::{
     act::node::{
         canister_methods::{GetAllTypes, QueryMethod, UpdateMethod},
-        data_types, ActDataType, ExternalCanister,
+        data_type, ActDataType, ExternalCanister,
     },
     CanisterMethodType,
 };
@@ -83,7 +83,7 @@ impl PyAst<'_> {
 
     pub fn to_kybra_ast(&self) -> KybraAst {
         let canister_types = self.build_canister_types();
-        let types_alias_inline_types = data_types::build_inline_type_acts(&canister_types);
+        let types_alias_inline_types = data_type::build_inline_type_acts(&canister_types);
         let update_methods = self.build_update_methods();
         let query_methods = self.build_query_methods();
         let canister_method_types = vec![
@@ -92,7 +92,7 @@ impl PyAst<'_> {
         ]
         .concat();
         let canister_method_inline_types =
-            data_types::build_inline_type_acts(&canister_method_types);
+            data_type::build_inline_type_acts(&canister_method_types);
 
         let all_types = vec![
             canister_types,
