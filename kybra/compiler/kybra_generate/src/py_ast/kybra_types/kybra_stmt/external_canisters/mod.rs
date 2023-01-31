@@ -1,5 +1,5 @@
 use cdk_framework::{
-    nodes::{ActExternalCanister, ActExternalCanisterMethod},
+    act::node::{ExternalCanister, ExternalCanisterMethod},
     ToActDataType,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
@@ -8,13 +8,13 @@ use super::KybraStmt;
 use crate::py_ast::kybra_types::{KybraArguments, KybraExpr};
 
 impl KybraStmt<'_> {
-    pub fn to_act_external_canister(&self) -> ActExternalCanister {
+    pub fn to_act_external_canister(&self) -> ExternalCanister {
         match &self.stmt_kind.node {
             StmtKind::ClassDef { name, body, .. } => {
                 let canister_name = name.clone();
-                let methods: Vec<ActExternalCanisterMethod> = body
+                let methods: Vec<ExternalCanisterMethod> = body
                     .iter()
-                    .map(|located_statement| -> ActExternalCanisterMethod {
+                    .map(|located_statement| -> ExternalCanisterMethod {
                         match &located_statement.node {
                             StmtKind::FunctionDef { name, args, body: _, decorator_list, returns, type_comment: _ } => {
                                 ensure_decorated_as_method_or_panic(decorator_list, &canister_name, name);
@@ -32,7 +32,7 @@ impl KybraStmt<'_> {
                                     source_map: self.source_map,
                                 }.to_act_data_type(&None);
 
-                                ActExternalCanisterMethod {
+                                ExternalCanisterMethod {
                                     name: name.clone(),
                                     params,
                                     return_type,
@@ -47,7 +47,7 @@ impl KybraStmt<'_> {
                     panic!("class \"{}\" doesn't have any methods. External canisters are required to expose at least one method.", name)
                 }
 
-                ActExternalCanister {
+                ExternalCanister {
                     name: canister_name,
                     methods,
                 }

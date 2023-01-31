@@ -1,4 +1,4 @@
-use cdk_framework::{ActDataType, ToTokenStream};
+use cdk_framework::{act::node::ActDataType, ToTokenStream};
 use quote::{format_ident, quote};
 use syn::Ident;
 

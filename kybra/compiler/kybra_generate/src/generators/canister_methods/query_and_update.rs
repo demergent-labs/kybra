@@ -1,4 +1,7 @@
-use cdk_framework::{nodes::data_type_nodes::ActPrimitiveLit, ActDataType};
+use cdk_framework::act::node::{
+    data_types::{primitive::ActPrimitiveLit, LiteralOrTypeAlias},
+    ActDataType,
+};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
@@ -75,20 +78,16 @@ fn generate_return_expression(kybra_statement: &KybraStmt) -> TokenStream {
 fn type_is_null_or_void(act_type: ActDataType) -> bool {
     match act_type {
         ActDataType::Primitive(primitive) => match primitive.act_type {
-            cdk_framework::nodes::data_type_nodes::LiteralOrTypeAlias::Literal(literal) => {
-                match literal {
-                    ActPrimitiveLit::Null => true,
-                    ActPrimitiveLit::Void => true,
-                    _ => false,
-                }
-            }
-            cdk_framework::nodes::data_type_nodes::LiteralOrTypeAlias::TypeAlias(type_alias) => {
-                match type_alias.aliased_type {
-                    ActPrimitiveLit::Null => true,
-                    ActPrimitiveLit::Void => true,
-                    _ => false,
-                }
-            }
+            LiteralOrTypeAlias::Literal(literal) => match literal {
+                ActPrimitiveLit::Null => true,
+                ActPrimitiveLit::Void => true,
+                _ => false,
+            },
+            LiteralOrTypeAlias::TypeAlias(type_alias) => match type_alias.aliased_type {
+                ActPrimitiveLit::Null => true,
+                ActPrimitiveLit::Void => true,
+                _ => false,
+            },
         },
         _ => false,
     }

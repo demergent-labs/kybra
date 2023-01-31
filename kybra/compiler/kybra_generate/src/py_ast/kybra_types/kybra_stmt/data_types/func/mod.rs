@@ -1,9 +1,9 @@
 use cdk_framework::{
-    nodes::data_type_nodes::{
-        act_funcs::{Func, FuncTypeAlias},
-        ActFunc, LiteralOrTypeAlias,
+    act::node::data_types::{
+        func::{Func, FuncTypeAlias},
+        ActDataType, ActFunc, LiteralOrTypeAlias,
     },
-    ActDataType, ToActDataType,
+    ToActDataType,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 

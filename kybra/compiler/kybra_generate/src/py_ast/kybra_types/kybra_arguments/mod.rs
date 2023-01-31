@@ -1,4 +1,4 @@
-use cdk_framework::{nodes::ActFnParam, ToActDataType};
+use cdk_framework::{act::node::canister_methods::ActFnParam, ToActDataType};
 use rustpython_parser::ast::Arguments;
 
 use crate::source_map::SourceMap;

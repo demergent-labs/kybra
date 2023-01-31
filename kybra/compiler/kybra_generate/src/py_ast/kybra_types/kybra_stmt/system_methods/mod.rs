@@ -1,4 +1,4 @@
-use cdk_framework::{nodes::ActFnParam, ToActDataType};
+use cdk_framework::{act::node::canister_methods::ActFnParam, ToActDataType};
 use proc_macro2::TokenStream;
 
 use super::KybraStmt;

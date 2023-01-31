@@ -1,12 +1,9 @@
 use rustpython_parser::ast::{Constant, ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::KybraStmt;
-use cdk_framework::{
-    nodes::data_type_nodes::{
-        act_record::{Record, RecordTypeAlias},
-        ActRecord, ActRecordMember, LiteralOrTypeAlias,
-    },
-    ActDataType,
+use cdk_framework::act::node::data_types::{
+    record::{ActRecordMember, Record, RecordTypeAlias},
+    ActDataType, ActRecord, LiteralOrTypeAlias,
 };
 
 mod errors;

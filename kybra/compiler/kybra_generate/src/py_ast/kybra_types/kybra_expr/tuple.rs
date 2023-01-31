@@ -2,11 +2,11 @@ use rustpython_parser::ast::ExprKind;
 
 use crate::py_ast::traits::GenerateInlineName;
 use cdk_framework::{
-    nodes::data_type_nodes::{
-        act_tuple::{Tuple, TupleLiteral, TupleTypeAlias},
-        ActTuple, ActTupleElem, LiteralOrTypeAlias,
+    act::node::data_types::{
+        tuple::{ActTupleElem, Tuple, TupleLiteral, TupleTypeAlias},
+        ActDataType, ActTuple, LiteralOrTypeAlias,
     },
-    ActDataType, ToActDataType,
+    ToActDataType,
 };
 
 use super::KybraExpr;

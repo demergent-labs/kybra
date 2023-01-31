@@ -1,12 +1,9 @@
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::KybraStmt;
-use cdk_framework::{
-    nodes::data_type_nodes::{
-        act_variants::{Variant, VariantTypeAlias},
-        ActVariant, ActVariantMember, LiteralOrTypeAlias,
-    },
-    ActDataType,
+use cdk_framework::act::node::data_types::{
+    variant::{ActVariantMember, Variant, VariantTypeAlias},
+    ActDataType, ActVariant, LiteralOrTypeAlias,
 };
 
 mod errors;

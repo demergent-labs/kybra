@@ -3,7 +3,7 @@ mod errors;
 use crate::py_ast::kybra_types::{
     kybra_program::stable_b_tree_map_nodes::StableBTreeMapNode, KybraExpr, KybraStmt,
 };
-use cdk_framework::{ActDataType, ToActDataType};
+use cdk_framework::{act::node::ActDataType, ToActDataType};
 use num_bigint::{BigInt, Sign};
 use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
 

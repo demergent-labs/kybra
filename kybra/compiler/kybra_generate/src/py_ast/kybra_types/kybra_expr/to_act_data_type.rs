@@ -1,8 +1,11 @@
 use rustpython_parser::ast::{Constant, ExprKind};
 
 use cdk_framework::{
-    nodes::data_type_nodes::{ActPrimitiveLit, ActTypeRef, ActTypeRefLit, LiteralOrTypeAlias},
-    ActDataType, ToActDataType,
+    act::node::data_types::{
+        primitive::ActPrimitiveLit, type_ref::ActTypeRefLit, ActDataType, ActTypeRef,
+        LiteralOrTypeAlias,
+    },
+    ToActDataType,
 };
 
 use super::KybraExpr;

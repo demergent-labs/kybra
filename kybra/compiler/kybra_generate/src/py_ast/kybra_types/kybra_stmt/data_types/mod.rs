@@ -4,9 +4,8 @@ mod tuples;
 mod type_alias;
 mod variants;
 
+use cdk_framework::act::node::ActDataType;
 use rustpython_parser::ast::StmtKind;
-
-use cdk_framework::ActDataType;
 
 use super::KybraStmt;
 

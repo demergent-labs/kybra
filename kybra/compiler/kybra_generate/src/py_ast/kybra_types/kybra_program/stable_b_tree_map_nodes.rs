@@ -1,4 +1,4 @@
-use cdk_framework::ActDataType;
+use cdk_framework::act::node::ActDataType;
 
 use super::KybraProgram;
 

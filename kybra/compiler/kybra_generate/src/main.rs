@@ -1,3 +1,5 @@
+pub mod kybra_ast;
+
 use std::fs::File;
 use std::io::Write;
 
