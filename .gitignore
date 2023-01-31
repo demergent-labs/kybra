@@ -8,3 +8,4 @@ build
 kybra.egg-info
 node_modules
 __pycache__
+function_guards
