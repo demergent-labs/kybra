@@ -98,6 +98,9 @@ impl KybraStmt<'_> {
     }
 
     pub fn as_update_method(&self) -> Option<UpdateMethod> {
+        if !self.is_canister_method_type(CanisterMethodType::Update) {
+            return None;
+        }
         match &self.stmt_kind.node {
             StmtKind::FunctionDef { name, .. } => {
                 let body = query_and_update::generate_body(&self);
@@ -120,6 +123,9 @@ impl KybraStmt<'_> {
     }
 
     pub fn as_query_method(&self) -> Option<QueryMethod> {
+        if !self.is_canister_method_type(CanisterMethodType::Query) {
+            return None;
+        }
         match &self.stmt_kind.node {
             StmtKind::FunctionDef { name, .. } => {
                 let body = query_and_update::generate_body(&self);
