@@ -1,4 +1,7 @@
-use cdk_framework::{ActDataType, ToActDataType};
+use cdk_framework::{
+    act::node::{data_type::TypeAlias, DataType},
+    ToDataType,
+};
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::{KybraExpr, KybraStmt};
@@ -18,7 +21,7 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub fn as_type_alias(&self) -> ActDataType {
+    pub fn as_type_alias(&self) -> DataType {
         let (alias_name, value) = match &self.stmt_kind.node {
             StmtKind::Assign { targets, value, .. } => {
                 if targets.len() > 1 {
@@ -43,10 +46,14 @@ impl KybraStmt<'_> {
             }
             _ => panic!("This is not a type alias"),
         };
-        KybraExpr {
+        let enclosed_type = KybraExpr {
             located_expr: value,
             source_map: self.source_map,
         }
-        .to_act_data_type(&Some(&alias_name))
+        .to_data_type();
+        DataType::TypeAlias(TypeAlias {
+            name: alias_name,
+            aliased_type: Box::new(enclosed_type),
+        })
     }
 }

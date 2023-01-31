@@ -1,4 +1,4 @@
-use cdk_framework::{nodes::ActFnParam, ToActDataType};
+use cdk_framework::{act::node::param::Param, ToDataType};
 use rustpython_parser::ast::Arguments;
 
 use crate::source_map::SourceMap;
@@ -11,7 +11,7 @@ pub struct KybraArguments<'a> {
 }
 
 impl KybraArguments<'_> {
-    pub fn to_act_fn_params(&self) -> Result<Vec<ActFnParam>, String> {
+    pub fn to_act_fn_params(&self) -> Result<Vec<Param>, String> {
         if self.arguments.kwarg.is_some() {
             return Err("the dictionary unpacking operator (**) is not supported".to_string());
         }
@@ -43,11 +43,11 @@ impl KybraArguments<'_> {
                             located_expr: annotation.as_ref(),
                             source_map: self.source_map,
                         }
-                        .to_act_data_type(&None);
+                        .to_data_type();
 
-                        Ok(ActFnParam {
+                        Ok(Param {
                             name: name.to_string(),
-                            data_type,
+                            type_: data_type,
                         })
                     }
                     None => Err(format!("parameter \"{}\" is missing a type annotation. All method parameters must specify their type.", &name)),

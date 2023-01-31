@@ -1,63 +1,60 @@
 use rustpython_parser::ast::{Constant, ExprKind};
 
 use cdk_framework::{
-    nodes::data_type_nodes::{ActPrimitiveLit, ActTypeRef, ActTypeRefLit, LiteralOrTypeAlias},
-    ActDataType, ToActDataType,
+    act::node::data_type::{primitive::Primitive, DataType, TypeRef},
+    ToDataType,
 };
 
 use super::KybraExpr;
 
-impl ToActDataType for KybraExpr<'_> {
-    fn to_act_data_type(&self, alias_name: &Option<&String>) -> ActDataType {
+impl ToDataType for KybraExpr<'_> {
+    fn to_data_type(&self) -> DataType {
         match &self.located_expr.node {
             ExprKind::Name { id, .. } => match &id[..] {
-                "blob" => ActPrimitiveLit::Blob.to_act_data_type(alias_name),
-                "empty" => ActPrimitiveLit::Empty.to_act_data_type(alias_name),
-                "float64" => ActPrimitiveLit::Float64.to_act_data_type(alias_name),
-                "float32" => ActPrimitiveLit::Float32.to_act_data_type(alias_name),
-                "int" => ActPrimitiveLit::Int.to_act_data_type(alias_name),
-                "int64" => ActPrimitiveLit::Int64.to_act_data_type(alias_name),
-                "int32" => ActPrimitiveLit::Int32.to_act_data_type(alias_name),
-                "int16" => ActPrimitiveLit::Int16.to_act_data_type(alias_name),
-                "int8" => ActPrimitiveLit::Int8.to_act_data_type(alias_name),
-                "nat" => ActPrimitiveLit::Nat.to_act_data_type(alias_name),
-                "nat64" => ActPrimitiveLit::Nat64.to_act_data_type(alias_name),
-                "nat32" => ActPrimitiveLit::Nat32.to_act_data_type(alias_name),
-                "nat16" => ActPrimitiveLit::Nat16.to_act_data_type(alias_name),
-                "nat8" => ActPrimitiveLit::Nat8.to_act_data_type(alias_name),
-                "null" => ActPrimitiveLit::Null.to_act_data_type(alias_name),
-                "Principal" => ActPrimitiveLit::Principal.to_act_data_type(alias_name),
-                "bool" => ActPrimitiveLit::Bool.to_act_data_type(alias_name),
-                "reserved" => ActPrimitiveLit::Reserved.to_act_data_type(alias_name),
-                "str" => ActPrimitiveLit::String.to_act_data_type(alias_name),
-                "text" => ActPrimitiveLit::String.to_act_data_type(alias_name),
-                "void" => ActPrimitiveLit::Void.to_act_data_type(alias_name),
-                _ => ActDataType::TypeRef(ActTypeRef {
-                    act_type: LiteralOrTypeAlias::Literal(ActTypeRefLit {
-                        name: id.to_string(),
-                    }),
+                "blob" => Primitive::Blob.to_data_type(),
+                "empty" => Primitive::Empty.to_data_type(),
+                "float64" => Primitive::Float64.to_data_type(),
+                "float32" => Primitive::Float32.to_data_type(),
+                "int" => Primitive::Int.to_data_type(),
+                "int64" => Primitive::Int64.to_data_type(),
+                "int32" => Primitive::Int32.to_data_type(),
+                "int16" => Primitive::Int16.to_data_type(),
+                "int8" => Primitive::Int8.to_data_type(),
+                "nat" => Primitive::Nat.to_data_type(),
+                "nat64" => Primitive::Nat64.to_data_type(),
+                "nat32" => Primitive::Nat32.to_data_type(),
+                "nat16" => Primitive::Nat16.to_data_type(),
+                "nat8" => Primitive::Nat8.to_data_type(),
+                "null" => Primitive::Null.to_data_type(),
+                "Principal" => Primitive::Principal.to_data_type(),
+                "bool" => Primitive::Bool.to_data_type(),
+                "reserved" => Primitive::Reserved.to_data_type(),
+                "str" => Primitive::String.to_data_type(),
+                "text" => Primitive::String.to_data_type(),
+                "void" => Primitive::Void.to_data_type(),
+                _ => DataType::TypeRef(TypeRef {
+                    name: id.to_string(),
                 }),
             },
             ExprKind::Subscript { value, slice, .. } => match &value.node {
                 ExprKind::Name { id, .. } => match &id[..] {
-                    "Async" => self.to_async(alias_name),
-                    "opt" => self.to_opt(alias_name),
-                    "list" => self.to_array(alias_name),
-                    "tuple" => self.to_tuple(alias_name),
+                    "Async" => self.to_async(),
+                    "opt" => self.to_opt(),
+                    "list" => self.to_array(),
+                    "tuple" => self.to_tuple(None),
                     "manual" => KybraExpr {
                         located_expr: slice,
                         source_map: self.source_map,
                     }
-                    .to_act_data_type(alias_name),
+                    .to_data_type(),
                     _ => panic!("{}", self.invalid_subscript_value_error()),
                 },
                 _ => panic!("{}", self.invalid_subscript_value_error()),
             },
+            // ExprKind::Subscript { value, slice, ctx } => todo!(),
             ExprKind::Constant { value, .. } => match value {
-                Constant::Str(string) => ActDataType::TypeRef(ActTypeRef {
-                    act_type: LiteralOrTypeAlias::Literal(ActTypeRefLit {
-                        name: string.clone(),
-                    }),
+                Constant::Str(string) => DataType::TypeRef(TypeRef {
+                    name: string.clone(),
                 }),
                 Constant::None => {
                     todo!("{}", self.none_cant_be_a_type_error());

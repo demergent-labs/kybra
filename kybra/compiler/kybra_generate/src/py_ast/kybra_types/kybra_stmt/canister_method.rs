@@ -1,6 +1,11 @@
 use cdk_framework::{
-    nodes::{data_type_nodes::ActPrimitiveLit, ActFnParam},
-    ActDataType, CanisterMethod, CanisterMethodType, ToActDataType,
+    act::node::{
+        canister_method::{CanisterMethodType, QueryMethod, UpdateMethod},
+        data_type::primitive::Primitive,
+        param::Param,
+        DataType,
+    },
+    ToDataType,
 };
 use rustpython_parser::ast::{Constant, ExprKind, StmtKind};
 
@@ -43,7 +48,7 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub fn build_act_params(&self) -> Vec<ActFnParam> {
+    pub fn build_act_params(&self) -> Vec<Param> {
         match &self.stmt_kind.node {
             StmtKind::FunctionDef { args, .. } => {
                 args.args
@@ -55,8 +60,15 @@ impl KybraStmt<'_> {
                                 located_expr: &annotation,
                                 source_map: &self.source_map,
                             };
-                            let data_type = kybra_annotation.to_act_data_type(&None);
-                            vec![acc, vec![ActFnParam { name, data_type }]].concat()
+                            let data_type = kybra_annotation.to_data_type();
+                            vec![
+                                acc,
+                                vec![Param {
+                                    name,
+                                    type_: data_type,
+                                }],
+                            ]
+                            .concat()
                         }
                         None => todo!("Param type needs type annotation"),
                     })
@@ -97,14 +109,17 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub fn as_canister_method(&self) -> Option<CanisterMethod> {
+    pub fn as_update_method(&self) -> Option<UpdateMethod> {
+        if !self.is_canister_method_type(CanisterMethodType::Update) {
+            return None;
+        }
         match &self.stmt_kind.node {
             StmtKind::FunctionDef { name, .. } => {
                 let body = query_and_update::generate_body(&self);
                 let params = self.build_act_params();
                 let return_type = self.build_act_return_type();
 
-                Some(CanisterMethod {
+                Some(UpdateMethod {
                     body,
                     params,
                     is_manual: self.is_manual(),
@@ -112,14 +127,39 @@ impl KybraStmt<'_> {
                     return_type,
                     is_async: self.is_async(),
                     cdk_name: "kybra".to_string(),
-                    function_guard_name: self.get_guard_function_name(),
+                    guard_function_name: self.get_guard_function_name(),
                 })
             }
             _ => None,
         }
     }
 
-    pub fn build_act_return_type(&self) -> ActDataType {
+    pub fn as_query_method(&self) -> Option<QueryMethod> {
+        if !self.is_canister_method_type(CanisterMethodType::Query) {
+            return None;
+        }
+        match &self.stmt_kind.node {
+            StmtKind::FunctionDef { name, .. } => {
+                let body = query_and_update::generate_body(&self);
+                let params = self.build_act_params();
+                let return_type = self.build_act_return_type();
+
+                Some(QueryMethod {
+                    body,
+                    params,
+                    is_manual: self.is_manual(),
+                    name: name.clone(),
+                    return_type,
+                    is_async: self.is_async(),
+                    cdk_name: "kybra".to_string(),
+                    guard_function_name: self.get_guard_function_name(),
+                })
+            }
+            _ => None,
+        }
+    }
+
+    pub fn build_act_return_type(&self) -> DataType {
         let returns = match &self.stmt_kind.node {
             StmtKind::FunctionDef { returns, .. } => returns,
             _ => panic!("Unreachable"),
@@ -131,9 +171,9 @@ impl KybraStmt<'_> {
                     located_expr: &return_type,
                     source_map: &self.source_map,
                 };
-                kybra_return_type.to_act_data_type(&None)
+                kybra_return_type.to_data_type()
             }
-            None => ActPrimitiveLit::Void.to_act_data_type(&None),
+            None => Primitive::Void.to_data_type(),
         }
     }
 

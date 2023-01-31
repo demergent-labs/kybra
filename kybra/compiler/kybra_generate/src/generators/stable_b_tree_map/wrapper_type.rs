@@ -1,15 +1,19 @@
-use cdk_framework::{ActDataType, ToTokenStream};
-use quote::{format_ident, quote};
+use cdk_framework::{
+    act::node::{data_type::type_annotation::ToTypeAnnotation, DataType},
+    traits::ToIdent,
+};
+use quote::quote;
 use syn::Ident;
 
 pub fn generate(
-    act_data_type: &ActDataType,
+    act_data_type: &DataType,
     memory_id: u8,
     key_or_value: &str,
 ) -> (Ident, proc_macro2::TokenStream) {
-    let key_type = &act_data_type.to_token_stream(&vec![]); // TODO do we need the keyword lists?
-    let wrapper_struct_name_ident =
-        format_ident!("StableBTreeMap{}{}Type", memory_id, key_or_value);
+    let wrapper_struct_name = format!("StableBTreeMap{}{}Type", memory_id, key_or_value);
+    let key_type = &act_data_type
+        .to_type_annotation(&crate::get_python_keywords(), wrapper_struct_name.clone());
+    let wrapper_struct_name_ident = wrapper_struct_name.to_identifier();
 
     (
         wrapper_struct_name_ident.clone(),

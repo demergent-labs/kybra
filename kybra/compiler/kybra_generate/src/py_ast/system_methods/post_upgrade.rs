@@ -1,9 +1,9 @@
-use cdk_framework::{nodes::ActPostUpgradeMethod, CanisterMethodType};
+use cdk_framework::act::node::canister_method::{CanisterMethodType, PostUpgradeMethod};
 
 use crate::{generators::canister_methods::post_upgrade, py_ast::PyAst};
 
 impl PyAst<'_> {
-    pub fn build_post_upgrade_method(&self) -> ActPostUpgradeMethod {
+    pub fn build_post_upgrade_method(&self) -> PostUpgradeMethod {
         let post_upgrade_function_defs =
             self.get_function_def_of_type(CanisterMethodType::PostUpgrade);
 
@@ -23,6 +23,6 @@ impl PyAst<'_> {
             &self.entry_module_name,
         );
 
-        ActPostUpgradeMethod { params, body }
+        PostUpgradeMethod { params, body }
     }
 }

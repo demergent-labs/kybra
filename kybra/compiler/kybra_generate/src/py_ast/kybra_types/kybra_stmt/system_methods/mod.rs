@@ -1,4 +1,4 @@
-use cdk_framework::{nodes::ActFnParam, ToActDataType};
+use cdk_framework::{act::node::param::Param, ToDataType};
 use proc_macro2::TokenStream;
 
 use super::KybraStmt;
@@ -7,7 +7,7 @@ use crate::{generators::canister_methods, py_ast::kybra_types::KybraExpr};
 mod errors;
 
 impl KybraStmt<'_> {
-    pub fn build_params(&self) -> Vec<ActFnParam> {
+    pub fn build_params(&self) -> Vec<Param> {
         match &self.stmt_kind.node {
             rustpython_parser::ast::StmtKind::FunctionDef { args, .. } => args
                 .args
@@ -18,12 +18,12 @@ impl KybraStmt<'_> {
                             located_expr: &annotation,
                             source_map: self.source_map,
                         }
-                        .to_act_data_type(&None),
+                        .to_data_type(),
                         None => panic!("{}", self.missing_type_annotation_error()),
                     };
-                    ActFnParam {
+                    Param {
                         name: arg.node.arg.clone(),
-                        data_type,
+                        type_: data_type,
                     }
                 })
                 .collect(),

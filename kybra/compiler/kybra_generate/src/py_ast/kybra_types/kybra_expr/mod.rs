@@ -9,7 +9,7 @@ mod to_act_data_type;
 pub mod to_hash_string;
 mod tuple;
 
-use rustpython_parser::ast::{ExprKind, Located};
+use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::source_map::SourceMap;
 

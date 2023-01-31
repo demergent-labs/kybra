@@ -1,4 +1,4 @@
-use cdk_framework::nodes::ActFunctionGuard;
+use cdk_framework::act::node::GuardFunction;
 use proc_macro2::TokenStream;
 use quote::quote;
 use rustpython_parser::ast::StmtKind;
@@ -6,7 +6,7 @@ use rustpython_parser::ast::StmtKind;
 use super::KybraStmt;
 
 impl KybraStmt<'_> {
-    pub fn as_function_guard(&self) -> Option<ActFunctionGuard> {
+    pub fn as_function_guard(&self) -> Option<GuardFunction> {
         match &self.stmt_kind.node {
             StmtKind::FunctionDef { name, .. } => {
                 let body = self.generate_function_guard_body(name);
@@ -14,7 +14,7 @@ impl KybraStmt<'_> {
                     todo!("{}", "Function guards can't have parameters")
                 }
 
-                Some(ActFunctionGuard {
+                Some(GuardFunction {
                     body,
                     name: name.clone(),
                 })

@@ -1,10 +1,10 @@
-use cdk_framework::{nodes::act_external_canister::ActExternalCanister, ToTokenStream};
+use cdk_framework::act::node::{external_canister::ExternalCanister, traits::HasParams};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 use crate::generators::tuple;
 
-pub fn generate(external_canisters: &Vec<ActExternalCanister>) -> TokenStream {
+pub fn generate(external_canisters: &Vec<ExternalCanister>) -> TokenStream {
     let call_match_arms = generate_call_match_arms(external_canisters);
     let call_with_payment_match_arms = generate_call_with_payment_match_arms(external_canisters);
     let call_with_payment128_match_arms =
@@ -175,7 +175,7 @@ CanisterResult
     }
 }
 
-fn generate_call_match_arms(external_canisters: &Vec<ActExternalCanister>) -> Vec<TokenStream> {
+fn generate_call_match_arms(external_canisters: &Vec<ExternalCanister>) -> Vec<TokenStream> {
     external_canisters
     .iter()
     .map(|act_external_canister| {
@@ -194,7 +194,7 @@ fn generate_call_match_arms(external_canisters: &Vec<ActExternalCanister>) -> Ve
 
                 let param_variable_definitions: Vec<TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
                     let variable_name = format_ident!("{}", act_fn_param.prefixed_name());
-                    let variable_type = act_fn_param.data_type.to_token_stream(&crate::get_python_keywords());
+                    let variable_type = act_external_canister_method.create_param_type_annotation(index, &crate::get_python_keywords(), &act_external_canister_method.name);
                     let actual_index = index + 2;
 
                     quote! {
@@ -228,7 +228,7 @@ fn generate_call_match_arms(external_canisters: &Vec<ActExternalCanister>) -> Ve
 }
 
 fn generate_call_with_payment_match_arms(
-    external_canisters: &Vec<ActExternalCanister>,
+    external_canisters: &Vec<ExternalCanister>,
 ) -> Vec<TokenStream> {
     external_canisters
     .iter()
@@ -248,7 +248,7 @@ fn generate_call_with_payment_match_arms(
 
                 let param_variable_definitions: Vec<TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
                     let variable_name = format_ident!("{}", act_fn_param.prefixed_name());
-                    let variable_type = act_fn_param.data_type.to_token_stream(&crate::get_python_keywords());
+                    let variable_type = act_external_canister_method.create_param_type_annotation(index, &crate::get_python_keywords(), &act_external_canister_method.name);
                     let actual_index = index + 2;
 
                     quote! {
@@ -286,7 +286,7 @@ fn generate_call_with_payment_match_arms(
 }
 
 fn generate_call_with_payment128_match_arms(
-    external_canisters: &Vec<ActExternalCanister>,
+    external_canisters: &Vec<ExternalCanister>,
 ) -> Vec<TokenStream> {
     external_canisters
     .iter()
@@ -306,7 +306,7 @@ fn generate_call_with_payment128_match_arms(
 
                 let param_variable_definitions: Vec<TokenStream> = act_external_canister_method.params.iter().enumerate().map(|(index, act_fn_param)| {
                     let variable_name = format_ident!("{}", act_fn_param.prefixed_name());
-                    let variable_type = act_fn_param.data_type.to_token_stream(&crate::get_python_keywords());
+                    let variable_type = act_external_canister_method.create_param_type_annotation(index, &crate::get_python_keywords(), &act_external_canister_method.name);
                     let actual_index = index + 2;
 
                     quote! {

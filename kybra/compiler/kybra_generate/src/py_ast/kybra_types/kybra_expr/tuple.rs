@@ -1,12 +1,8 @@
 use rustpython_parser::ast::ExprKind;
 
-use crate::py_ast::traits::GenerateInlineName;
 use cdk_framework::{
-    nodes::data_type_nodes::{
-        act_tuple::{Tuple, TupleLiteral, TupleTypeAlias},
-        ActTuple, ActTupleElem, LiteralOrTypeAlias,
-    },
-    ActDataType, ToActDataType,
+    act::node::data_type::{tuple::Member, DataType, Tuple},
+    ToDataType,
 };
 
 use super::KybraExpr;
@@ -22,7 +18,7 @@ impl KybraExpr<'_> {
         }
     }
 
-    pub fn to_tuple(&self, alias_name: &Option<&String>) -> ActDataType {
+    pub fn to_tuple(&self, tuple_name: Option<&String>) -> DataType {
         match &self.located_expr.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
@@ -50,26 +46,18 @@ impl KybraExpr<'_> {
                 };
                 let act_elems = kybra_elem_exprs
                     .iter()
-                    .map(|kybra_elem| ActTupleElem {
-                        elem_type: kybra_elem.to_act_data_type(&None),
+                    .map(|kybra_elem| Member {
+                        type_: kybra_elem.to_data_type(),
                     })
                     .collect();
-                match alias_name {
-                    Some(_) => ActDataType::Tuple(ActTuple {
-                        act_type: LiteralOrTypeAlias::TypeAlias(TupleTypeAlias {
-                            tuple: Tuple {
-                                name: alias_name.unwrap().clone(),
-                                elems: act_elems,
-                            },
-                        }),
+                match tuple_name {
+                    Some(alias_name) => DataType::Tuple(Tuple {
+                        name: Some(alias_name.clone().clone()),
+                        members: act_elems,
                     }),
-                    None => ActDataType::Tuple(ActTuple {
-                        act_type: LiteralOrTypeAlias::Literal(TupleLiteral {
-                            tuple: Tuple {
-                                name: self.generate_inline_name(),
-                                elems: act_elems,
-                            },
-                        }),
+                    None => DataType::Tuple(Tuple {
+                        name: None,
+                        members: act_elems,
                     }),
                 }
             }

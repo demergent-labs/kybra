@@ -1,9 +1,6 @@
-use cdk_framework::{
-    nodes::{
-        act_canister_method, data_type_nodes,
-        {ActCanisterMethod, ActExternalCanister, ActFunctionGuard},
-    },
-    ActDataType, CanisterMethodType,
+use cdk_framework::act::node::{
+    canister_method::{CanisterMethodType, QueryMethod, UpdateMethod},
+    DataType, ExternalCanister, GuardFunction,
 };
 use std::collections::{HashMap, HashSet};
 
@@ -82,27 +79,14 @@ impl PyAst<'_> {
     }
 
     pub fn to_kybra_ast(&self) -> KybraAst {
-        let canister_types = self.build_canister_types();
-        let types_alias_inline_types = data_type_nodes::build_inline_type_acts(&canister_types);
-        let canister_methods = self.build_canister_methods();
-        let canister_method_types =
-            act_canister_method::get_all_types_from_canister_method_acts(&canister_methods);
-        let canister_method_inline_types =
-            data_type_nodes::build_inline_type_acts(&canister_method_types);
-
-        let all_types = vec![
-            canister_types,
-            types_alias_inline_types,
-            canister_method_inline_types,
-        ]
-        .concat();
-
+        let update_methods = self.build_update_methods();
+        let query_methods = self.build_query_methods();
         let external_canisters = self.build_external_canisters();
-
         let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes();
 
         let rust_code = body::generate(
-            &canister_methods,
+            &update_methods,
+            &query_methods,
             &external_canisters,
             &stable_b_tree_map_nodes,
         );
@@ -113,11 +97,11 @@ impl PyAst<'_> {
             post_upgrade: self.build_post_upgrade_method(),
             inspect_method: self.build_inspect_method(),
             heartbeat: self.build_heartbeat_method(),
-            canister_types: all_types,
-            canister_methods: self.build_canister_methods(),
             function_guards: self.build_function_guards(),
             external_canisters,
             rust_code,
+            query_methods,
+            update_methods,
         }
     }
 
@@ -145,15 +129,15 @@ impl PyAst<'_> {
             })
     }
 
-    fn build_canister_methods(&self) -> Vec<ActCanisterMethod> {
+    fn build_update_methods(&self) -> Vec<UpdateMethod> {
         self.kybra_programs
             .iter()
             .fold(vec![], |acc, kybra_program| {
-                vec![acc, kybra_program.build_canister_method_act_nodes()].concat()
+                vec![acc, kybra_program.build_update_method_act_nodes()].concat()
             })
     }
 
-    fn build_function_guards(&self) -> Vec<ActFunctionGuard> {
+    fn build_function_guards(&self) -> Vec<GuardFunction> {
         self.kybra_programs
             .iter()
             .fold(vec![], |acc, kybra_program| {
@@ -161,7 +145,15 @@ impl PyAst<'_> {
             })
     }
 
-    fn build_canister_types(&self) -> Vec<ActDataType> {
+    fn build_query_methods(&self) -> Vec<QueryMethod> {
+        self.kybra_programs
+            .iter()
+            .fold(vec![], |acc, kybra_program| {
+                vec![acc, kybra_program.build_query_method_act_nodes()].concat()
+            })
+    }
+
+    fn build_canister_types(&self) -> Vec<DataType> {
         let dependencies = self.get_dependencies();
         self.kybra_programs
             .iter()
@@ -187,7 +179,7 @@ impl PyAst<'_> {
             .concat()
     }
 
-    fn build_external_canisters(&self) -> Vec<ActExternalCanister> {
+    fn build_external_canisters(&self) -> Vec<ExternalCanister> {
         self.kybra_programs
             .iter()
             .map(|program| program.build_external_canisters())

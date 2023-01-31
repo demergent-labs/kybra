@@ -3,7 +3,7 @@ mod errors;
 use crate::py_ast::kybra_types::{
     kybra_program::stable_b_tree_map_nodes::StableBTreeMapNode, KybraExpr, KybraStmt,
 };
-use cdk_framework::{ActDataType, ToActDataType};
+use cdk_framework::{act::node::DataType, ToDataType};
 use num_bigint::{BigInt, Sign};
 use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
 
@@ -99,7 +99,7 @@ impl KybraStmt<'_> {
         }
     }
 
-    fn get_key_type(&self) -> ActDataType {
+    fn get_key_type(&self) -> DataType {
         match &self.stmt_kind.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => KybraExpr {
@@ -107,14 +107,14 @@ impl KybraStmt<'_> {
                     source_map: self.source_map,
                 }
                 .get_key_type()
-                .to_act_data_type(&None),
+                .to_data_type(),
                 _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
             },
             _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
         }
     }
 
-    fn get_value_type(&self) -> ActDataType {
+    fn get_value_type(&self) -> DataType {
         match &self.stmt_kind.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => KybraExpr {
@@ -122,7 +122,7 @@ impl KybraStmt<'_> {
                     source_map: self.source_map,
                 }
                 .get_value_type()
-                .to_act_data_type(&None),
+                .to_data_type(),
                 _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
             },
             _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),

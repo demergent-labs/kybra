@@ -1,11 +1,11 @@
 use rustpython_parser::ast::ExprKind;
 
-use cdk_framework::{ActDataType, ToActDataType};
+use cdk_framework::{act::node::DataType, ToDataType};
 
 use super::KybraExpr;
 
 impl KybraExpr<'_> {
-    pub(super) fn to_async(&self, alias_name: &Option<&String>) -> ActDataType {
+    pub(super) fn to_async(&self) -> DataType {
         match &self.located_expr.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
@@ -20,7 +20,7 @@ impl KybraExpr<'_> {
                     located_expr: slice,
                     source_map: self.source_map,
                 };
-                kybra_expr.to_act_data_type(alias_name)
+                kybra_expr.to_data_type()
             }
             _ => panic!("{}", "Async did not work"),
         }

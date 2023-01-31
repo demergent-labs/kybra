@@ -1,9 +1,9 @@
 use cdk_framework::{
-    nodes::data_type_nodes::{
-        act_funcs::{Func, FuncTypeAlias},
-        ActFunc, LiteralOrTypeAlias,
+    act::node::{
+        data_type::{func::Mode, Func},
+        DataType,
     },
-    ActDataType, ToActDataType,
+    ToDataType,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
@@ -15,7 +15,7 @@ use crate::{
 mod errors;
 
 impl KybraStmt<'_> {
-    pub fn as_func(&self) -> ActDataType {
+    pub fn as_func(&self) -> DataType {
         match &self.stmt_kind.node {
             StmtKind::AnnAssign { target, value, .. } => match &value {
                 Some(value) => match &value.node {
@@ -54,7 +54,7 @@ impl KybraStmt<'_> {
                                                     located_expr: elt,
                                                     source_map: self.source_map,
                                                 }
-                                                .to_act_data_type(&None)
+                                                .to_data_type()
                                             })
                                             .collect(),
                                         _ => todo!(),
@@ -65,7 +65,8 @@ impl KybraStmt<'_> {
                             _ => todo!(),
                         };
                         let return_type = Box::from(if mode == "Oneway" {
-                            None
+                            todo!();
+                            // TODO I am guessing void here but I am not sure
                         } else {
                             match &args[0].node {
                                 ExprKind::Subscript { slice, .. } => match &slice.node {
@@ -73,34 +74,32 @@ impl KybraStmt<'_> {
                                         if elts.len() != 2 {
                                             todo!()
                                         }
-                                        Some(
-                                            KybraExpr {
-                                                located_expr: &elts[1],
-                                                source_map: self.source_map,
-                                            }
-                                            .to_act_data_type(&None),
-                                        )
+                                        KybraExpr {
+                                            located_expr: &elts[1],
+                                            source_map: self.source_map,
+                                        }
+                                        .to_data_type()
                                     }
                                     _ => todo!(),
                                 },
                                 _ => todo!(),
                             }
                         });
-                        ActDataType::Func(ActFunc {
-                            act_type: LiteralOrTypeAlias::TypeAlias(FuncTypeAlias {
-                                func: Func {
-                                    to_vm_value: func::generate_func_to_vm_value(&name),
-                                    list_to_vm_value: func::generate_func_list_to_vm_value(&name),
-                                    from_vm_value: func::generate_func_from_vm_value(&name),
-                                    list_from_vm_value: func::generate_func_list_from_vm_value(
-                                        &name,
-                                    ),
-                                    name,
-                                    params,
-                                    return_type,
-                                    mode,
-                                },
-                            }),
+                        let mode = match mode.as_str() {
+                            "Oneway" => Mode::Oneway,
+                            "Update" => Mode::Update,
+                            "Query" => Mode::Query,
+                            _ => todo!(),
+                        };
+                        DataType::Func(Func {
+                            to_vm_value: func::generate_func_to_vm_value(&name),
+                            list_to_vm_value: func::generate_func_list_to_vm_value(&name),
+                            from_vm_value: func::generate_func_from_vm_value(&name),
+                            list_from_vm_value: func::generate_func_list_from_vm_value(&name),
+                            name: Some(name),
+                            params,
+                            return_type,
+                            mode,
                         })
                     }
                     _ => todo!(),
