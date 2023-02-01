@@ -1,10 +1,7 @@
 use rustpython_parser::ast::ExprKind;
 
 use cdk_framework::{
-    act::node::data_type::{
-        option::{ActOptionLiteral, ActOptionTypeAlias},
-        ActOption, DataType, LiteralOrTypeAlias,
-    },
+    act::node::data_type::{self, option, DataType, LiteralOrTypeAlias},
     ToActDataType,
 };
 
@@ -27,14 +24,14 @@ impl KybraExpr<'_> {
                     source_map: self.source_map,
                 };
                 match alias_name {
-                    Some(alias_name) => DataType::Option(ActOption {
-                        act_type: LiteralOrTypeAlias::TypeAlias(ActOptionTypeAlias {
+                    Some(alias_name) => DataType::Option(data_type::Option {
+                        act_type: LiteralOrTypeAlias::TypeAlias(option::TypeAlias {
                             enclosed_type: Box::from(kybra_expr.to_act_data_type(&None)),
                             name: alias_name.clone().clone(),
                         }),
                     }),
-                    None => DataType::Option(ActOption {
-                        act_type: LiteralOrTypeAlias::Literal(ActOptionLiteral {
+                    None => DataType::Option(data_type::Option {
+                        act_type: LiteralOrTypeAlias::Literal(option::Literal {
                             enclosed_type: Box::from(kybra_expr.to_act_data_type(&None)),
                         }),
                     }),

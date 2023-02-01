@@ -3,7 +3,7 @@ use cdk_framework::act::node::canister_method::{
 };
 use cdk_framework::act::node::data_type::primitive::ActPrimitiveLit;
 use cdk_framework::act::node::data_type::{
-    ActFunc, ActOption, ActPrimitive, ActRecord, ActTuple, ActTypeRef, ActVariant, Array,
+    self, ActFunc, ActPrimitive, ActRecord, ActTuple, ActTypeRef, ActVariant, Array,
 };
 use cdk_framework::act::node::ActNode;
 use cdk_framework::act::{CanisterMethods, DataTypes};
@@ -32,7 +32,7 @@ struct KybraUpdateMethodAstNode {
 struct ActDataTypes {
     pub arrays: Vec<Array>,
     pub funcs: Vec<ActFunc>,
-    pub options: Vec<ActOption>,
+    pub options: Vec<data_type::Option>,
     pub primitives: Vec<ActPrimitive>,
     pub records: Vec<ActRecord>,
     pub tuples: Vec<ActTuple>,
