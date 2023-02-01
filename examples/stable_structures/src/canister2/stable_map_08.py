@@ -1,22 +1,22 @@
-from kybra import InsertError, opt, query, StableBTreeMap, update, Variant
+from kybra import InsertError, null, opt, query, StableBTreeMap, update, Variant
 from kybra import nat64
 
-stable_map_8 = StableBTreeMap[bool, None](
+stable_map_8 = StableBTreeMap[bool, null](
     memory_id=8, max_key_size=100, max_value_size=1_000)
 
 
 class StableMap8InsertResult(Variant, total=False):
-    ok: opt[None]
+    ok: opt[null]
     err: InsertError
 
 
 @query
-def stable_map_8_get(key: bool) -> opt[None]:
+def stable_map_8_get(key: bool) -> opt[null]:
     return stable_map_8.get(key)
 
 
 @update
-def stable_map_8_insert(key: bool, value: None) -> StableMap8InsertResult:
+def stable_map_8_insert(key: bool, value: null) -> StableMap8InsertResult:
     result = stable_map_8.insert(key, value)
 
     if result.err is not None:
@@ -30,7 +30,7 @@ def stable_map_8_insert(key: bool, value: None) -> StableMap8InsertResult:
 
 
 @update
-def stable_map_8_remove(key: bool) -> opt[None]:
+def stable_map_8_remove(key: bool) -> opt[null]:
     return stable_map_8.remove(key)
 
 
@@ -50,12 +50,12 @@ def stable_map_8_keys() -> list[bool]:
 
 
 @query
-def stable_map_8_values() -> list[None]:
+def stable_map_8_values() -> list[null]:
     return stable_map_8.values()
 
 
 @query
-def stable_map_8_items() -> list[tuple[bool, None]]:
+def stable_map_8_items() -> list[tuple[bool, null]]:
     return stable_map_8.items()
 
 

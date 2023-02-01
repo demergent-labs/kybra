@@ -47,6 +47,7 @@ Variant = TypedDict
 blob = bytes
 
 null: TypeAlias = None
+void: TypeAlias = None
 
 reserved = Any
 empty = NoReturn  # TODO in Python 3.11 I believe there is a Never type
@@ -121,26 +122,30 @@ class CanisterResult(Generic[T]):
 #     ok: T
 #     err: str
 
+class GuardResult(Variant, total=False):
+    ok: null
+    err: str
+
 
 class RejectionCode(Variant, total=False):
-    NoError: None
-    SysFatal: None
-    SysTransient: None
-    DestinationInvalid: None
-    CanisterReject: None
-    CanisterError: None
-    Unknown: None
+    NoError: null
+    SysFatal: null
+    SysTransient: null
+    DestinationInvalid: null
+    CanisterReject: null
+    CanisterError: null
+    Unknown: null
 
 
 # TODO we might want this to act more like CanisterResult
 class NotifyResult(Variant, total=False):
-    ok: None
+    ok: null
     err: RejectionCode
 
 
 class StableMemoryError(Variant, total=False):
-    OutOfMemory: None
-    OutOfBounds: None
+    OutOfMemory: null
+    OutOfBounds: null
 
 
 class StableGrowResult(Variant, total=False):

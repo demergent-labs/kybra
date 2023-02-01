@@ -11,6 +11,6 @@ rustpython-parser = { git = "https://github.com/demergent-labs/RustPython", bran
 annotate-snippets = "0.9.1"
 num-bigint = "0.4.3"
 # rustpython = { path = "../../../../RustPython", default-features = false, features = [] }
-cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "417eb2cce3f46c63fc1e0a31f4c345bb63cb4e76" }
+cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "5b015d631b9be0f0706aa4c6c7d8de0298ac0527" }
 # cdk_framework = { path = "../../../../cdk_framework" } # For local rust-analyzer
 # cdk_framework = { path = "../../../../../../../cdk_framework" } # For local deployment in kybra/examples

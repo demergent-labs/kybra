@@ -71,5 +71,14 @@ service : () -> {
   get_notifier_from_notifiers_canister : () -> (
       GetNotifierFromNotifiersCanisterResult,
     );
-  get_stable_func : () -> (func (text) -> (text) query) query;
+  get_stable_func : () -> (func (nat64, text) -> () query) query;
+  null_func_param : (
+      func (opt null, vec null, null, vec vec null, vec opt null) -> (
+          null,
+        ) query,
+    ) -> (
+      func (opt null, vec null, null, vec vec null, vec opt null) -> (
+          null,
+        ) query,
+    ) query;
 }

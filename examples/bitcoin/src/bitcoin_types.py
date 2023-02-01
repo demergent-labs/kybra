@@ -1,4 +1,4 @@
-from kybra import Variant
+from kybra import null, Variant
 from kybra.canisters.management.bitcoin import GetUtxosResult, MillisatoshiPerByte, Satoshi
 
 
@@ -18,5 +18,5 @@ class ExecuteGetUtxosResult(Variant, total=False):
 
 
 class ExecuteSendTransactionResult(Variant, total=False):
-    ok: None
+    ok: null
     err: str

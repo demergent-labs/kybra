@@ -1,10 +1,18 @@
-from kybra import InsertError, opt, query, StableBTreeMap, update, Variant
-from kybra import nat64
+from kybra import (
+    InsertError,
+    nat64,
+    null,
+    opt,
+    query,
+    StableBTreeMap,
+    update,
+    Variant
+)
 
 
 class Reaction(Variant):
-    Happy: None
-    Sad: None
+    Happy: null
+    Sad: null
 
 
 class StableMap3InsertResult(Variant, total=False):

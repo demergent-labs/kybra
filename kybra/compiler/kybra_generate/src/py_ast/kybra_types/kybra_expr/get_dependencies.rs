@@ -84,6 +84,7 @@ impl GetDependencies for KybraExpr<'_> {
                 "reserved" => HashSet::new(),
                 "str" => HashSet::new(),
                 "text" => HashSet::new(),
+                "void" => HashSet::new(),
                 _ => self.add_dependency(id.to_string(), type_alias_lookup, found_type_names),
             },
             ExprKind::List { elts, .. } => elts.iter().fold(HashSet::new(), |acc, elt| {

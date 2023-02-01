@@ -57,27 +57,27 @@ class WithRecord(Record):
 
 
 class KeywordVariant(Variant, total=False):
-    False_: None
-    True_: None
-    and_: None
-    assert_: None
-    class_: None
-    def_: None
-    del_: None
-    elif_: None
-    except_: None
-    finally_: None
-    from_: None
-    global_: None
-    import_: None
-    is_: None
-    lambda_: None
-    nonlocal_: None
-    not_: None
-    or_: None
-    pass_: None
-    raise_: None
-    with_: None
+    False_: null
+    True_: null
+    and_: null
+    assert_: null
+    class_: null
+    def_: null
+    del_: null
+    elif_: null
+    except_: null
+    finally_: null
+    from_: null
+    global_: null
+    import_: null
+    is_: null
+    lambda_: null
+    nonlocal_: null
+    not_: null
+    or_: null
+    pass_: null
+    raise_: null
+    with_: null
 
 
 class RustKeywordRecord(Record):
@@ -92,9 +92,9 @@ class RustKeywordRecord(Record):
 
 
 class RustKeywordVariant(Variant, total=False):
-    type: None
-    pub: None
-    fn: None
+    type: null
+    pub: null
+    fn: null
 
 
 @query

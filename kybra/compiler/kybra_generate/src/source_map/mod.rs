@@ -1,7 +1,9 @@
 use rustpython_parser::ast::Location;
 
 #[derive(Clone)]
-pub struct SourceMap {}
+pub struct SourceMap {
+    pub file_name: String,
+}
 
 pub trait GetSourceInfo {
     fn get_text(&self) -> String;
@@ -55,9 +57,10 @@ impl SourceMap {
         )
     }
 
-    pub fn get_origin(&self, span: Location) -> String {
-        let loc = self.get_loc(span);
-        loc.file.name.to_string()
+    pub fn get_origin(&self, _span: Location) -> String {
+        // let loc = self.get_loc(span);
+        // loc.file.name.to_string()
+        self.file_name.clone()
     }
 
     pub fn get_line_number(&self, span: Location) -> usize {
