@@ -1,9 +1,9 @@
 use cdk_framework::{
     nodes::{
-        ActExternalCanister, ActHeartbeatMethod, ActInitMethod, ActInspectMessageMethod,
-        ActPostUpgradeMethod, ActPreUpgradeMethod,
+        ActCanisterMethod, ActExternalCanister, ActFunctionGuard, ActHeartbeatMethod,
+        ActInitMethod, ActInspectMessageMethod, ActPostUpgradeMethod, ActPreUpgradeMethod,
     },
-    ActCanisterMethod, ActDataType,
+    ActDataType,
 };
 use proc_macro2::TokenStream;
 
@@ -12,6 +12,7 @@ mod to_act;
 pub struct KybraAst {
     pub external_canisters: Vec<ActExternalCanister>,
     pub canister_methods: Vec<ActCanisterMethod>,
+    pub function_guards: Vec<ActFunctionGuard>,
     pub canister_types: Vec<ActDataType>,
     pub init_method: ActInitMethod,
     pub inspect_method: Option<ActInspectMessageMethod>,

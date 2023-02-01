@@ -1,0 +1,6 @@
+service : () -> {
+  accessible : () -> (bool) query;
+  guarded_manual : () -> (bool) query;
+  inaccessible : () -> (bool) query;
+  unguarded : () -> (bool) query;
+}

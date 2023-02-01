@@ -1,6 +1,9 @@
 use cdk_framework::{
-    nodes::{act_canister_method, data_type_nodes, ActExternalCanister},
-    ActCanisterMethod, ActDataType, CanisterMethodType,
+    nodes::{
+        act_canister_method, data_type_nodes,
+        {ActCanisterMethod, ActExternalCanister, ActFunctionGuard},
+    },
+    ActDataType, CanisterMethodType,
 };
 use std::collections::{HashMap, HashSet};
 
@@ -112,6 +115,7 @@ impl PyAst<'_> {
             heartbeat: self.build_heartbeat_method(),
             canister_types: all_types,
             canister_methods: self.build_canister_methods(),
+            function_guards: self.build_function_guards(),
             external_canisters,
             rust_code,
         }
@@ -146,6 +150,14 @@ impl PyAst<'_> {
             .iter()
             .fold(vec![], |acc, kybra_program| {
                 vec![acc, kybra_program.build_canister_method_act_nodes()].concat()
+            })
+    }
+
+    fn build_function_guards(&self) -> Vec<ActFunctionGuard> {
+        self.kybra_programs
+            .iter()
+            .fold(vec![], |acc, kybra_program| {
+                vec![acc, kybra_program.build_function_guard_act_nodes()].concat()
             })
     }
 

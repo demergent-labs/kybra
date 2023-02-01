@@ -58,40 +58,74 @@ TimerId = nat64
 Duration = nat64
 
 
-def query(func: object):
-    return func
+def query(_func: Optional[Callable[..., Any]] = None, *, guard: Optional[str] = None) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]):
+        return func
+    if _func is None:
+        return decorator
+    else:
+        return decorator(_func)
 
 
-def update(func: object):
-    return func
+def update(_func: Optional[Callable[..., Any]] = None, *, guard: Optional[str] = None) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]):
+        return func
+    if _func is None:
+        return decorator
+    else:
+        return decorator(_func)
 
 
 def canister(cls: T) -> T:
     return cls
 
 
-def init(func: object):
-    return func
+def init(_func: Optional[Callable[..., Any]] = None, *, guard: Optional[str] = None) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]):
+        return func
+    if _func is None:
+        return decorator
+    else:
+        return decorator(_func)
 
 
-def heartbeat(func: object):
-    return func
+def heartbeat(_func: Optional[Callable[..., Any]] = None, *, guard: Optional[str] = None) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]):
+        return func
+    if _func is None:
+        return decorator
+    else:
+        return decorator(_func)
 
 
-def pre_upgrade(func: object):
-    return func
+def pre_upgrade(_func: Optional[Callable[..., Any]] = None, *, guard: Optional[str] = None) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]):
+        return func
+    if _func is None:
+        return decorator
+    else:
+        return decorator(_func)
 
 
-def post_upgrade(func: object):
-    return func
+def post_upgrade(_func: Optional[Callable[..., Any]] = None, *, guard: Optional[str] = None) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]):
+        return func
+    if _func is None:
+        return decorator
+    else:
+        return decorator(_func)
 
 
-def inspect_message(func: object):
-    return func
+def inspect_message(_func: Optional[Callable[..., Any]] = None, *, guard: Optional[str] = None) -> Callable[..., Any]:
+    def decorator(func: Callable[..., Any]):
+        return func
+    if _func is None:
+        return decorator
+    else:
+        return decorator(_func)
 
 
 # TODO need service
-
 Query = Callable
 Update = Callable
 Oneway = Callable
@@ -248,7 +282,9 @@ class ic(Generic[T]):
 
     @staticmethod
     def msg_cycles_accept128(max_amount: nat) -> nat:
-        return _kybra_ic._kybra_msg_cycles_accept128(max_amount)  # type: ignore
+        return _kybra_ic._kybra_msg_cycles_accept128(  # type: ignore
+            max_amount
+        )
 
     @staticmethod
     def msg_cycles_available() -> nat64:
@@ -270,11 +306,18 @@ class ic(Generic[T]):
     def notify_raw(
         canister_id: Principal, method: str, args_raw: blob, payment: nat
     ) -> NotifyResult:
-        return _kybra_ic._kybra_notify_raw(canister_id, method, args_raw, payment)  # type: ignore
+        return _kybra_ic._kybra_notify_raw(  # type: ignore
+            canister_id,
+            method,
+            args_raw,
+            payment
+        )
 
     @staticmethod
     def performance_counter(counter_type: nat32) -> nat64:
-        return _kybra_ic._kybra_performance_counter(counter_type)  # type: ignore
+        return _kybra_ic._kybra_performance_counter(  # type: ignore
+            counter_type
+        )
 
     @staticmethod
     def print(x: Any):
@@ -295,7 +338,10 @@ class ic(Generic[T]):
     @staticmethod
     def reply(value: Any):
         first_called_function_name = get_first_called_function_name()
-        _kybra_ic._kybra_reply(first_called_function_name, value)  # type: ignore
+        _kybra_ic._kybra_reply(  # type: ignore
+            first_called_function_name,
+            value
+        )
 
     @staticmethod
     def reply_raw(x: Any):
@@ -311,7 +357,9 @@ class ic(Generic[T]):
 
     @staticmethod
     def set_timer_interval(interval: Duration, func: Callable[[], Any]) -> TimerId:
-        return _kybra_ic._kybra_set_timer_interval(interval, func)  # type: ignore
+        return _kybra_ic._kybra_set_timer_interval(  # type: ignore
+            interval, func
+        )
 
     @staticmethod
     def stable_bytes() -> blob:
@@ -393,7 +441,9 @@ class AsyncInfo:
             f'_kybra_notify_{with_payment}{qualname.replace(".", "_")}_wrapper'
         )
 
-        return getattr(_kybra_ic, notify_function_name)(self.args)  # type: ignore
+        return getattr(
+            _kybra_ic, notify_function_name  # type: ignore
+        )(self.args)
 
 
 # TODO this decorator is removing the static type checking of the self parameter for instance methods
@@ -405,7 +455,11 @@ def method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
 
         return AsyncInfo(
             "call",
-            [the_self.canister_id, func.__qualname__, *selfless_args],  # type: ignore
+            [
+                the_self.canister_id,  # type: ignore
+                func.__qualname__,
+                *selfless_args
+            ],
         )
 
     return intermediate_func  # type: ignore

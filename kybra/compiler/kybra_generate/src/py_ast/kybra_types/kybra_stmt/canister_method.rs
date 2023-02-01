@@ -2,7 +2,7 @@ use cdk_framework::{
     nodes::{data_type_nodes::ActPrimitiveLit, ActFnParam},
     ActDataType, CanisterMethod, CanisterMethodType, ToActDataType,
 };
-use rustpython_parser::ast::{ExprKind, StmtKind};
+use rustpython_parser::ast::{Constant, ExprKind, StmtKind};
 
 use super::KybraStmt;
 use crate::{generators::canister_methods::query_and_update, py_ast::kybra_types::KybraExpr};
@@ -32,6 +32,10 @@ impl KybraStmt<'_> {
                     .iter()
                     .any(|expr_kind| match &expr_kind.node {
                         ExprKind::Name { id, .. } => id == decorator_name,
+                        ExprKind::Call { func, .. } => match &func.node {
+                            ExprKind::Name { id, .. } => id == decorator_name,
+                            _ => false,
+                        },
                         _ => false,
                     })
             }
@@ -108,6 +112,7 @@ impl KybraStmt<'_> {
                     return_type,
                     is_async: self.is_async(),
                     cdk_name: "kybra".to_string(),
+                    function_guard_name: self.get_guard_function_name(),
                 })
             }
             _ => None,
@@ -129,6 +134,38 @@ impl KybraStmt<'_> {
                 kybra_return_type.to_act_data_type(&None)
             }
             None => ActPrimitiveLit::Void.to_act_data_type(&None),
+        }
+    }
+
+    fn get_guard_function_name(&self) -> Option<String> {
+        match &self.stmt_kind.node {
+            StmtKind::FunctionDef { decorator_list, .. } => {
+                decorator_list
+                    .iter()
+                    .fold(None, |_, decorator| match &decorator.node {
+                        ExprKind::Call { keywords, .. } => {
+                            keywords.iter().fold(None, |_, keyword| {
+                                if let Some(arg) = &keyword.node.arg {
+                                    if arg == "guard" {
+                                        match &keyword.node.value.node {
+                                            ExprKind::Constant { value, .. } => match value {
+                                                Constant::Str(string) => Some(string.to_string()),
+                                                _ => None,
+                                            },
+                                            _ => None,
+                                        }
+                                    } else {
+                                        None
+                                    }
+                                } else {
+                                    None
+                                }
+                            })
+                        }
+                        _ => None,
+                    })
+            }
+            _ => None,
         }
     }
 }

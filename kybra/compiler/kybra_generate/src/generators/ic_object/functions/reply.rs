@@ -1,4 +1,4 @@
-use cdk_framework::{ActCanisterMethod, ToTokenStream};
+use cdk_framework::{nodes::ActCanisterMethod, ToTokenStream};
 use quote::quote;
 
 pub fn generate(canister_methods: &Vec<ActCanisterMethod>) -> proc_macro2::TokenStream {

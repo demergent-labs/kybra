@@ -1,4 +1,4 @@
-use cdk_framework::{AbstractCanisterTree, ActCanisterMethod, ActDataType, ToAct};
+use cdk_framework::{nodes::ActCanisterMethod, AbstractCanisterTree, ActDataType, ToAct};
 
 use super::KybraAst;
 use crate::generators::{
@@ -72,6 +72,7 @@ impl ToAct for KybraAst {
             external_canisters,
             keywords: crate::get_python_keywords(),
             header,
+            function_guards: self.function_guards.iter().cloned().collect(),
         }
     }
 }
