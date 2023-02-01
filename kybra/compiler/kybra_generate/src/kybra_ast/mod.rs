@@ -3,9 +3,10 @@ use cdk_framework::act::node::canister_method::{
 };
 use cdk_framework::act::node::data_type::primitive::ActPrimitiveLit;
 use cdk_framework::act::node::data_type::{
-    ActArray, ActFunc, ActOption, ActPrimitive, ActRecord, ActTuple, ActTypeRef, ActVariant,
+    ActFunc, ActOption, ActPrimitive, ActRecord, ActTuple, ActTypeRef, ActVariant, Array,
 };
-use cdk_framework::act::node::{ActDataType, ActNode};
+use cdk_framework::act::node::ActNode;
+use cdk_framework::act::{CanisterMethods, DataTypes};
 use cdk_framework::{AbstractCanisterTree, ToAct, ToActDataType};
 use quote::quote;
 use rustpython_parser::ast::{Located, StmtKind};
@@ -29,7 +30,7 @@ struct KybraUpdateMethodAstNode {
 
 #[derive(Clone)]
 struct ActDataTypes {
-    pub arrays: Vec<ActArray>,
+    pub arrays: Vec<Array>,
     pub funcs: Vec<ActFunc>,
     pub options: Vec<ActOption>,
     pub primitives: Vec<ActPrimitive>,
@@ -165,30 +166,38 @@ impl ToAct for KybraAstNew {
             body: quote!(),
         };
 
-        AbstractCanisterTree {
+        let data_types = DataTypes {
             arrays: deduplicated.arrays,
-            body: quote!(),
-            cdk_name: "kybra".to_string(),
-            external_canisters: vec![],
             funcs: deduplicated.funcs,
-            header: quote!(),
+            options: deduplicated.options,
+            primitives: deduplicated.primitives,
+            records: deduplicated.records,
+            tuples: deduplicated.tuples,
+            type_refs: deduplicated.type_refs,
+            variants: deduplicated.variants,
+        };
+
+        let canister_methods = CanisterMethods {
             heartbeat_method: None,
             init_method,
             inspect_message_method: None,
-            keywords: vec![],
-            options: deduplicated.options,
             post_upgrade_method,
             pre_upgrade_method,
-            primitives: deduplicated.primitives,
             query_methods: vec![],
-            records: deduplicated.records,
+            update_methods: vec![],
+        };
+
+        AbstractCanisterTree {
+            body: quote!(),
+            cdk_name: "kybra".to_string(),
+            external_canisters: vec![],
+            header: quote!(),
+            keywords: vec![],
             try_from_vm_value_impls: quote!(),
             try_into_vm_value_impls: quote!(),
-            tuples: deduplicated.tuples,
-            type_refs: deduplicated.type_refs,
-            update_methods: vec![],
-            variants: deduplicated.variants,
             function_guards: vec![],
+            canister_methods,
+            data_types,
         }
     }
 }

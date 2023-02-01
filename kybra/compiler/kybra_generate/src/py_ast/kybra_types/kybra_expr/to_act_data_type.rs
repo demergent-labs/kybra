@@ -2,7 +2,7 @@ use rustpython_parser::ast::{Constant, ExprKind};
 
 use cdk_framework::{
     act::node::data_type::{
-        primitive::ActPrimitiveLit, type_ref::ActTypeRefLit, ActDataType, ActTypeRef,
+        primitive::ActPrimitiveLit, type_ref::ActTypeRefLit, ActTypeRef, DataType,
         LiteralOrTypeAlias,
     },
     ToActDataType,
@@ -11,7 +11,7 @@ use cdk_framework::{
 use super::KybraExpr;
 
 impl ToActDataType for KybraExpr<'_> {
-    fn to_act_data_type(&self, alias_name: &Option<&String>) -> ActDataType {
+    fn to_act_data_type(&self, alias_name: &Option<&String>) -> DataType {
         match &self.located_expr.node {
             ExprKind::Name { id, .. } => match &id[..] {
                 "blob" => ActPrimitiveLit::Blob.to_act_data_type(alias_name),
@@ -35,7 +35,7 @@ impl ToActDataType for KybraExpr<'_> {
                 "str" => ActPrimitiveLit::String.to_act_data_type(alias_name),
                 "text" => ActPrimitiveLit::String.to_act_data_type(alias_name),
                 "void" => ActPrimitiveLit::Void.to_act_data_type(alias_name),
-                _ => ActDataType::TypeRef(ActTypeRef {
+                _ => DataType::TypeRef(ActTypeRef {
                     act_type: LiteralOrTypeAlias::Literal(ActTypeRefLit {
                         name: id.to_string(),
                     }),
@@ -57,7 +57,7 @@ impl ToActDataType for KybraExpr<'_> {
                 _ => panic!("{}", self.invalid_subscript_value_error()),
             },
             ExprKind::Constant { value, .. } => match value {
-                Constant::Str(string) => ActDataType::TypeRef(ActTypeRef {
+                Constant::Str(string) => DataType::TypeRef(ActTypeRef {
                     act_type: LiteralOrTypeAlias::Literal(ActTypeRefLit {
                         name: string.clone(),
                     }),

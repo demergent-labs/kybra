@@ -3,7 +3,7 @@ mod errors;
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::{KybraExpr, KybraStmt};
-use cdk_framework::act::node::data_type::ActDataType;
+use cdk_framework::act::node::data_type::DataType;
 
 impl KybraStmt<'_> {
     pub fn is_tuple(&self) -> bool {
@@ -17,7 +17,7 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub fn as_tuple(&self) -> ActDataType {
+    pub fn as_tuple(&self) -> DataType {
         match &self.stmt_kind.node {
             StmtKind::Assign { targets, value, .. } => {
                 if targets.len() > 1 {

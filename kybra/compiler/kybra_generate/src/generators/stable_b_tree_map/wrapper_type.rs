@@ -1,9 +1,9 @@
-use cdk_framework::{act::node::ActDataType, ToTokenStream};
+use cdk_framework::{act::node::DataType, ToTokenStream};
 use quote::{format_ident, quote};
 use syn::Ident;
 
 pub fn generate(
-    act_data_type: &ActDataType,
+    act_data_type: &DataType,
     memory_id: u8,
     key_or_value: &str,
 ) -> (Ident, proc_macro2::TokenStream) {

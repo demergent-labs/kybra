@@ -1,7 +1,7 @@
 use cdk_framework::{
     act::node::data_type::{
         func::{Func, FuncTypeAlias},
-        ActDataType, ActFunc, LiteralOrTypeAlias,
+        ActFunc, DataType, LiteralOrTypeAlias,
     },
     ToActDataType,
 };
@@ -15,7 +15,7 @@ use crate::{
 mod errors;
 
 impl KybraStmt<'_> {
-    pub fn as_func(&self) -> ActDataType {
+    pub fn as_func(&self) -> DataType {
         match &self.stmt_kind.node {
             StmtKind::AnnAssign { target, value, .. } => match &value {
                 Some(value) => match &value.node {
@@ -86,7 +86,7 @@ impl KybraStmt<'_> {
                                 _ => todo!(),
                             }
                         });
-                        ActDataType::Func(ActFunc {
+                        DataType::Func(ActFunc {
                             act_type: LiteralOrTypeAlias::TypeAlias(FuncTypeAlias {
                                 func: Func {
                                     to_vm_value: func::generate_func_to_vm_value(&name),

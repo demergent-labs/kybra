@@ -6,7 +6,7 @@ use crate::source_map::SourceMap;
 use cdk_framework::{
     act::node::{
         canister_method::{QueryMethod, UpdateMethod},
-        ActDataType,
+        DataType,
     },
     CanisterMethodType,
 };
@@ -165,7 +165,7 @@ impl KybraProgram<'_> {
         }
     }
 
-    pub fn get_act_data_type_nodes(&self, dependencies: &HashSet<String>) -> Vec<ActDataType> {
+    pub fn get_act_data_type_nodes(&self, dependencies: &HashSet<String>) -> Vec<DataType> {
         match &self.program {
             Mod::Module { body, .. } => body
                 .iter()

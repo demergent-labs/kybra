@@ -1,7 +1,7 @@
 use cdk_framework::{
     act::node::{
         canister_method::{GetAllTypes, QueryMethod, UpdateMethod},
-        data_type, ActDataType, ExternalCanister,
+        data_type, DataType, ExternalCanister,
     },
     CanisterMethodType,
 };
@@ -166,7 +166,7 @@ impl PyAst<'_> {
             })
     }
 
-    fn build_canister_types(&self) -> Vec<ActDataType> {
+    fn build_canister_types(&self) -> Vec<DataType> {
         let dependencies = self.get_dependencies();
         self.kybra_programs
             .iter()

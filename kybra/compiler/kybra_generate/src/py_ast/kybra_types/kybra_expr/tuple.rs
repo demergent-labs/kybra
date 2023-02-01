@@ -4,7 +4,7 @@ use crate::py_ast::traits::GenerateInlineName;
 use cdk_framework::{
     act::node::data_type::{
         tuple::{ActTupleElem, Tuple, TupleLiteral, TupleTypeAlias},
-        ActDataType, ActTuple, LiteralOrTypeAlias,
+        ActTuple, DataType, LiteralOrTypeAlias,
     },
     ToActDataType,
 };
@@ -22,7 +22,7 @@ impl KybraExpr<'_> {
         }
     }
 
-    pub fn to_tuple(&self, alias_name: &Option<&String>) -> ActDataType {
+    pub fn to_tuple(&self, alias_name: &Option<&String>) -> DataType {
         match &self.located_expr.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
@@ -55,7 +55,7 @@ impl KybraExpr<'_> {
                     })
                     .collect();
                 match alias_name {
-                    Some(_) => ActDataType::Tuple(ActTuple {
+                    Some(_) => DataType::Tuple(ActTuple {
                         act_type: LiteralOrTypeAlias::TypeAlias(TupleTypeAlias {
                             tuple: Tuple {
                                 name: alias_name.unwrap().clone(),
@@ -63,7 +63,7 @@ impl KybraExpr<'_> {
                             },
                         }),
                     }),
-                    None => ActDataType::Tuple(ActTuple {
+                    None => DataType::Tuple(ActTuple {
                         act_type: LiteralOrTypeAlias::Literal(TupleLiteral {
                             tuple: Tuple {
                                 name: self.generate_inline_name(),

@@ -2,7 +2,7 @@ use cdk_framework::{
     act::node::{
         canister_method::{ActFnParam, QueryMethod, UpdateMethod},
         data_type::primitive::ActPrimitiveLit,
-        ActDataType,
+        DataType,
     },
     CanisterMethodType, ToActDataType,
 };
@@ -147,7 +147,7 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub fn build_act_return_type(&self) -> ActDataType {
+    pub fn build_act_return_type(&self) -> DataType {
         let returns = match &self.stmt_kind.node {
             StmtKind::FunctionDef { returns, .. } => returns,
             _ => panic!("Unreachable"),

@@ -1,4 +1,4 @@
-use cdk_framework::act::node::ActDataType;
+use cdk_framework::act::node::DataType;
 
 use super::KybraProgram;
 
@@ -6,8 +6,8 @@ use super::KybraProgram;
 #[derive(Clone)]
 pub struct StableBTreeMapNode {
     pub memory_id: u8,
-    pub key_type: ActDataType,
-    pub value_type: ActDataType,
+    pub key_type: DataType,
+    pub value_type: DataType,
     pub max_key_size: u32,
     pub max_value_size: u32,
 }

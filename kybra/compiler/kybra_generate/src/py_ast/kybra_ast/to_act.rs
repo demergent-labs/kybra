@@ -1,5 +1,8 @@
 use cdk_framework::{
-    act::node::canister_method::{QueryMethod, UpdateMethod},
+    act::{
+        node::canister_method::{QueryMethod, UpdateMethod},
+        CanisterMethods, DataTypes,
+    },
     AbstractCanisterTree, ToAct,
 };
 
@@ -63,6 +66,27 @@ impl ToAct for KybraAst {
         let post_upgrade_method = self.post_upgrade.clone();
         let pre_upgrade_method = self.pre_upgrade.clone();
 
+        let data_types = DataTypes {
+            arrays,
+            funcs,
+            options,
+            primitives,
+            records,
+            tuples,
+            type_refs,
+            variants,
+        };
+
+        let canister_methods = CanisterMethods {
+            heartbeat_method,
+            init_method,
+            inspect_message_method,
+            post_upgrade_method,
+            pre_upgrade_method,
+            query_methods,
+            update_methods,
+        };
+
         let external_canisters = self.external_canisters.clone();
 
         let try_into_vm_value_impls = try_into_vm_value_impls::generate();
@@ -71,27 +95,14 @@ impl ToAct for KybraAst {
         AbstractCanisterTree {
             cdk_name: "kybra".to_string(),
             body: self.rust_code.clone(),
-            update_methods,
-            query_methods,
-            heartbeat_method,
-            init_method,
-            inspect_message_method,
-            post_upgrade_method,
-            pre_upgrade_method,
-            arrays,
-            funcs,
-            options,
-            primitives,
-            records,
             try_from_vm_value_impls,
             try_into_vm_value_impls,
-            tuples,
-            type_refs,
-            variants,
             external_canisters,
             keywords: crate::get_python_keywords(),
             header,
             function_guards: vec![],
+            canister_methods,
+            data_types,
         }
     }
 }
