@@ -3,7 +3,7 @@ use cdk_framework::act::node::canister_method::{
 };
 use cdk_framework::act::node::data_type::primitive::ActPrimitiveLit;
 use cdk_framework::act::node::data_type::{
-    self, ActFunc, ActPrimitive, ActRecord, ActTuple, ActTypeRef, ActVariant, Array,
+    self, ActFunc, ActPrimitive, ActRecord, ActTuple, ActVariant, Array, TypeAlias,
 };
 use cdk_framework::act::node::ActNode;
 use cdk_framework::act::{self, CanisterMethods, DataTypes};
@@ -36,7 +36,7 @@ struct ActDataTypes {
     pub primitives: Vec<ActPrimitive>,
     pub records: Vec<ActRecord>,
     pub tuples: Vec<ActTuple>,
-    pub type_refs: Vec<ActTypeRef>,
+    pub type_alias: Vec<TypeAlias>,
     pub variants: Vec<ActVariant>,
 }
 
@@ -66,7 +66,7 @@ trait KybraAstNode {
             primitives: vec![],
             records: vec![],
             tuples: vec![],
-            type_refs: vec![],
+            type_alias: vec![],
             variants: vec![],
         })
     }
@@ -173,7 +173,7 @@ impl ToAct for KybraAstNew {
             primitives: deduplicated.primitives,
             records: deduplicated.records,
             tuples: deduplicated.tuples,
-            type_refs: deduplicated.type_refs,
+            type_refs: deduplicated.type_alias,
             variants: deduplicated.variants,
         };
 
@@ -211,7 +211,7 @@ fn deduplicate(all_things: Vec<Vec<ActDataTypes>>) -> ActDataTypes {
         primitives: vec![],
         records: vec![],
         tuples: vec![],
-        type_refs: vec![],
+        type_alias: vec![],
         variants: vec![],
     }
     // all_things.iter().fold(empty, f)

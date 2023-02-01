@@ -49,10 +49,10 @@ impl ToAct for KybraAst {
             .iter()
             .filter_map(|canister_type| canister_type.as_tuple().cloned())
             .collect();
-        let type_refs = self
+        let type_aliases = self
             .canister_types
             .iter()
-            .filter_map(|canister_type| canister_type.as_type_ref().cloned())
+            .filter_map(|canister_type| canister_type.as_new_type_alias().cloned())
             .collect();
         let variants = self
             .canister_types
@@ -73,7 +73,7 @@ impl ToAct for KybraAst {
             primitives,
             records,
             tuples,
-            type_refs,
+            type_refs: type_aliases,
             variants,
         };
 
