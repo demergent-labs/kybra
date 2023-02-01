@@ -6,7 +6,7 @@ use cdk_framework::act::node::data_type::{
     self, ActFunc, ActPrimitive, ActRecord, ActTuple, ActTypeRef, ActVariant, Array,
 };
 use cdk_framework::act::node::ActNode;
-use cdk_framework::act::{CanisterMethods, DataTypes};
+use cdk_framework::act::{self, CanisterMethods, DataTypes};
 use cdk_framework::{AbstractCanisterTree, ToAct, ToActDataType};
 use quote::quote;
 use rustpython_parser::ast::{Located, StmtKind};
@@ -166,7 +166,7 @@ impl ToAct for KybraAstNew {
             body: quote!(),
         };
 
-        let data_types = DataTypes {
+        let data_types = act::DataTypes {
             arrays: deduplicated.arrays,
             funcs: deduplicated.funcs,
             options: deduplicated.options,
@@ -177,7 +177,7 @@ impl ToAct for KybraAstNew {
             variants: deduplicated.variants,
         };
 
-        let canister_methods = CanisterMethods {
+        let canister_methods = act::CanisterMethods {
             heartbeat_method: None,
             init_method,
             inspect_message_method: None,
@@ -187,7 +187,7 @@ impl ToAct for KybraAstNew {
             update_methods: vec![],
         };
 
-        AbstractCanisterTree {
+        act::AbstractCanisterTree {
             body: quote!(),
             cdk_name: "kybra".to_string(),
             external_canisters: vec![],
