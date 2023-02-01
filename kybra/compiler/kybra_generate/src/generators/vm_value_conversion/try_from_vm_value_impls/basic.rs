@@ -72,8 +72,12 @@ pub fn generate() -> proc_macro2::TokenStream {
                     return Ok(Err(error_message.try_from_vm_value(vm).unwrap()));
                 }
                 let ok = self.get_item("ok", vm);
-                if let Ok(_) = ok {
-                    Ok(Ok(()))
+                if let Ok(value) = ok {
+                    let result: Result<(), CdkActTryFromVmValueError> = value.try_from_vm_value(vm);
+                    match result {
+                        Ok(_) => Ok(Ok(())),
+                        Err(err) => Err(CdkActTryFromVmValueError(format!("Could not convert PyObjectRef to Result<(), String>. Ok value was not (). {:?}", err)))
+                    }
                 }
                 else {
                     Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to Result<(), String>".to_string()))
