@@ -1,5 +1,5 @@
 use cdk_framework::act::node::{
-    canister_methods::{QueryMethod, UpdateMethod},
+    canister_method::{QueryMethod, UpdateMethod},
     ExternalCanister,
 };
 use quote::quote;

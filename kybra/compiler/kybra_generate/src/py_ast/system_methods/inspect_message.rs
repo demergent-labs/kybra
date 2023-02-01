@@ -1,4 +1,4 @@
-use cdk_framework::{act::node::canister_methods::InspectMessageMethod, CanisterMethodType};
+use cdk_framework::{act::node::canister_method::InspectMessageMethod, CanisterMethodType};
 
 use crate::{generators::canister_methods::inspect_message, py_ast::PyAst};
 

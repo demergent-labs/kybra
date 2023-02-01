@@ -5,7 +5,7 @@ use rustpython_parser::ast::Mod;
 use crate::source_map::SourceMap;
 use cdk_framework::{
     act::node::{
-        canister_methods::{QueryMethod, UpdateMethod},
+        canister_method::{QueryMethod, UpdateMethod},
         ActDataType,
     },
     CanisterMethodType,

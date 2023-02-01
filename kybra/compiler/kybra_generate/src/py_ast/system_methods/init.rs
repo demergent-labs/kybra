@@ -1,4 +1,4 @@
-use cdk_framework::{act::node::canister_methods::InitMethod, CanisterMethodType};
+use cdk_framework::{act::node::canister_method::InitMethod, CanisterMethodType};
 
 use crate::{generators::canister_methods::init, py_ast::PyAst};
 

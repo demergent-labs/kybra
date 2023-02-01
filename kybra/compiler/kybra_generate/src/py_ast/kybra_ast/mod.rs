@@ -1,5 +1,5 @@
 use cdk_framework::act::node::{
-    canister_methods::{
+    canister_method::{
         HeartbeatMethod, InitMethod, InspectMessageMethod, PostUpgradeMethod, PreUpgradeMethod,
         QueryMethod, UpdateMethod,
     },

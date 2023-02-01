@@ -1,5 +1,5 @@
 use crate::{generators::canister_methods::heartbeat, py_ast::PyAst};
-use cdk_framework::{act::node::canister_methods::HeartbeatMethod, CanisterMethodType};
+use cdk_framework::{act::node::canister_method::HeartbeatMethod, CanisterMethodType};
 
 impl PyAst<'_> {
     pub fn build_heartbeat_method(&self) -> Option<HeartbeatMethod> {

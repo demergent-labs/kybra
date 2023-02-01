@@ -1,5 +1,5 @@
 use cdk_framework::{
-    act::node::canister_methods::{QueryMethod, UpdateMethod},
+    act::node::canister_method::{QueryMethod, UpdateMethod},
     AbstractCanisterTree, ToAct,
 };
 

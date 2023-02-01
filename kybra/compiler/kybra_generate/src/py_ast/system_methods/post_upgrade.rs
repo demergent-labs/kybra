@@ -1,4 +1,4 @@
-use cdk_framework::{act::node::canister_methods::PostUpgradeMethod, CanisterMethodType};
+use cdk_framework::{act::node::canister_method::PostUpgradeMethod, CanisterMethodType};
 
 use crate::{generators::canister_methods::post_upgrade, py_ast::PyAst};
 

@@ -1,4 +1,4 @@
-use cdk_framework::act::node::canister_methods::{
+use cdk_framework::act::node::canister_method::{
     ActCanisterMethod, InitMethod, PostUpgradeMethod, PreUpgradeMethod, UpdateMethod,
 };
 use cdk_framework::act::node::data_type::primitive::ActPrimitiveLit;

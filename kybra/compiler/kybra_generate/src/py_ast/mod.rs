@@ -1,6 +1,6 @@
 use cdk_framework::{
     act::node::{
-        canister_methods::{GetAllTypes, QueryMethod, UpdateMethod},
+        canister_method::{GetAllTypes, QueryMethod, UpdateMethod},
         data_type, ActDataType, ExternalCanister,
     },
     CanisterMethodType,
