@@ -1,9 +1,8 @@
 use cdk_framework::act::node::canister_method::{
     ActCanisterMethod, InitMethod, PostUpgradeMethod, PreUpgradeMethod, UpdateMethod,
 };
-use cdk_framework::act::node::data_type::primitive::ActPrimitiveLit;
 use cdk_framework::act::node::data_type::{
-    self, ActFunc, ActPrimitive, ActRecord, ActTuple, ActVariant, Array, TypeAlias,
+    self, ActFunc, ActRecord, ActTuple, ActVariant, Array, Primitive, TypeAlias,
 };
 use cdk_framework::act::node::ActNode;
 use cdk_framework::act::{self, CanisterMethods, DataTypes};
@@ -33,7 +32,7 @@ struct ActDataTypes {
     pub arrays: Vec<Array>,
     pub funcs: Vec<ActFunc>,
     pub options: Vec<data_type::Option>,
-    pub primitives: Vec<ActPrimitive>,
+    pub primitives: Vec<Primitive>,
     pub records: Vec<ActRecord>,
     pub tuples: Vec<ActTuple>,
     pub type_alias: Vec<TypeAlias>,
@@ -81,7 +80,7 @@ impl KybraAstNode for KybraUpdateMethodAstNode {
                 is_manual: false,
                 is_async: false,
                 name: self.name.clone(),
-                return_type: ActPrimitiveLit::Bool.to_act_data_type(&None),
+                return_type: Primitive::Bool.to_act_data_type(&None),
                 cdk_name: "kybra".to_string(),
                 function_guard_name: None,
             },
@@ -97,7 +96,7 @@ impl KybraAstNode for KybraQueryMethodAstNode {
                 is_manual: false,
                 is_async: false,
                 name: self.name.clone(),
-                return_type: ActPrimitiveLit::Bool.to_act_data_type(&None),
+                return_type: Primitive::Bool.to_act_data_type(&None),
                 cdk_name: "kybra".to_string(),
                 function_guard_name: None,
             },

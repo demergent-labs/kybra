@@ -1,7 +1,7 @@
 use rustpython_parser::ast::{Constant, ExprKind};
 
 use cdk_framework::{
-    act::node::data_type::{primitive::ActPrimitiveLit, DataType, TypeRef},
+    act::node::data_type::{primitive::Primitive, DataType, TypeRef},
     ToActDataType,
 };
 
@@ -11,27 +11,27 @@ impl ToActDataType for KybraExpr<'_> {
     fn to_act_data_type(&self, alias_name: &Option<&String>) -> DataType {
         match &self.located_expr.node {
             ExprKind::Name { id, .. } => match &id[..] {
-                "blob" => ActPrimitiveLit::Blob.to_act_data_type(alias_name),
-                "empty" => ActPrimitiveLit::Empty.to_act_data_type(alias_name),
-                "float64" => ActPrimitiveLit::Float64.to_act_data_type(alias_name),
-                "float32" => ActPrimitiveLit::Float32.to_act_data_type(alias_name),
-                "int" => ActPrimitiveLit::Int.to_act_data_type(alias_name),
-                "int64" => ActPrimitiveLit::Int64.to_act_data_type(alias_name),
-                "int32" => ActPrimitiveLit::Int32.to_act_data_type(alias_name),
-                "int16" => ActPrimitiveLit::Int16.to_act_data_type(alias_name),
-                "int8" => ActPrimitiveLit::Int8.to_act_data_type(alias_name),
-                "nat" => ActPrimitiveLit::Nat.to_act_data_type(alias_name),
-                "nat64" => ActPrimitiveLit::Nat64.to_act_data_type(alias_name),
-                "nat32" => ActPrimitiveLit::Nat32.to_act_data_type(alias_name),
-                "nat16" => ActPrimitiveLit::Nat16.to_act_data_type(alias_name),
-                "nat8" => ActPrimitiveLit::Nat8.to_act_data_type(alias_name),
-                "null" => ActPrimitiveLit::Null.to_act_data_type(alias_name),
-                "Principal" => ActPrimitiveLit::Principal.to_act_data_type(alias_name),
-                "bool" => ActPrimitiveLit::Bool.to_act_data_type(alias_name),
-                "reserved" => ActPrimitiveLit::Reserved.to_act_data_type(alias_name),
-                "str" => ActPrimitiveLit::String.to_act_data_type(alias_name),
-                "text" => ActPrimitiveLit::String.to_act_data_type(alias_name),
-                "void" => ActPrimitiveLit::Void.to_act_data_type(alias_name),
+                "blob" => Primitive::Blob.to_act_data_type(alias_name),
+                "empty" => Primitive::Empty.to_act_data_type(alias_name),
+                "float64" => Primitive::Float64.to_act_data_type(alias_name),
+                "float32" => Primitive::Float32.to_act_data_type(alias_name),
+                "int" => Primitive::Int.to_act_data_type(alias_name),
+                "int64" => Primitive::Int64.to_act_data_type(alias_name),
+                "int32" => Primitive::Int32.to_act_data_type(alias_name),
+                "int16" => Primitive::Int16.to_act_data_type(alias_name),
+                "int8" => Primitive::Int8.to_act_data_type(alias_name),
+                "nat" => Primitive::Nat.to_act_data_type(alias_name),
+                "nat64" => Primitive::Nat64.to_act_data_type(alias_name),
+                "nat32" => Primitive::Nat32.to_act_data_type(alias_name),
+                "nat16" => Primitive::Nat16.to_act_data_type(alias_name),
+                "nat8" => Primitive::Nat8.to_act_data_type(alias_name),
+                "null" => Primitive::Null.to_act_data_type(alias_name),
+                "Principal" => Primitive::Principal.to_act_data_type(alias_name),
+                "bool" => Primitive::Bool.to_act_data_type(alias_name),
+                "reserved" => Primitive::Reserved.to_act_data_type(alias_name),
+                "str" => Primitive::String.to_act_data_type(alias_name),
+                "text" => Primitive::String.to_act_data_type(alias_name),
+                "void" => Primitive::Void.to_act_data_type(alias_name),
                 _ => DataType::TypeRef(TypeRef {
                     name: id.to_string(),
                 }),

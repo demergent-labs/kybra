@@ -1,7 +1,7 @@
 use cdk_framework::{
     act::node::{
         canister_method::{ActFnParam, QueryMethod, UpdateMethod},
-        data_type::primitive::ActPrimitiveLit,
+        data_type::primitive::Primitive,
         DataType,
     },
     CanisterMethodType, ToActDataType,
@@ -161,7 +161,7 @@ impl KybraStmt<'_> {
                 };
                 kybra_return_type.to_act_data_type(&None)
             }
-            None => ActPrimitiveLit::Void.to_act_data_type(&None),
+            None => Primitive::Void.to_act_data_type(&None),
         }
     }
 }
