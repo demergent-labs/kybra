@@ -144,7 +144,7 @@ impl KybraStmt<'_> {
                     return_type,
                     is_async: self.is_async(),
                     cdk_name: "kybra".to_string(),
-                    function_guard_name: None,
+                    function_guard_name: self.get_guard_function_name(),
                 })
             }
             _ => None,
