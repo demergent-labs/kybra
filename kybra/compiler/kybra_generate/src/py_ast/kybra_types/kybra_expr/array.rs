@@ -23,14 +23,15 @@ impl KybraExpr<'_> {
                     located_expr: slice,
                     source_map: self.source_map,
                 };
+                let act_array = DataType::Array(Array {
+                    enclosed_type: Box::from(kybra_expr.to_act_data_type(&None)),
+                });
                 match alias_name {
                     Some(alias_name) => DataType::TypeAlias(TypeAlias {
                         name: alias_name.clone().clone(),
-                        aliased_type: Box::from(kybra_expr.to_act_data_type(&None)),
+                        aliased_type: Box::from(act_array),
                     }),
-                    None => DataType::Array(Array {
-                        enclosed_type: Box::from(kybra_expr.to_act_data_type(&None)),
-                    }),
+                    None => act_array,
                 }
             }
             _ => panic!("{}", self.not_array_error()),

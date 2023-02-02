@@ -23,14 +23,15 @@ impl KybraExpr<'_> {
                     located_expr: slice,
                     source_map: self.source_map,
                 };
+                let act_option = DataType::Option(data_type::Option {
+                    enclosed_type: Box::from(kybra_expr.to_act_data_type(&None)),
+                });
                 match alias_name {
                     Some(alias_name) => DataType::TypeAlias(TypeAlias {
                         name: alias_name.clone().clone(),
-                        aliased_type: Box::from(kybra_expr.to_act_data_type(&None)),
+                        aliased_type: Box::from(act_option),
                     }),
-                    None => DataType::Option(data_type::Option {
-                        enclosed_type: Box::from(kybra_expr.to_act_data_type(&None)),
-                    }),
+                    None => act_option,
                 }
             }
             _ => panic!("{}", self.not_opt_error()),
