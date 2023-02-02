@@ -1,7 +1,7 @@
 use cdk_framework::{
     act::node::{
         canister_method::{GetAllTypes, QueryMethod, UpdateMethod},
-        data_type, ActFunctionGuard, DataType, ExternalCanister,
+        data_type, DataType, ExternalCanister, FunctionGuard,
     },
     CanisterMethodType,
 };
@@ -159,7 +159,7 @@ impl PyAst<'_> {
             })
     }
 
-    fn build_function_guards(&self) -> Vec<ActFunctionGuard> {
+    fn build_function_guards(&self) -> Vec<FunctionGuard> {
         self.kybra_programs
             .iter()
             .fold(vec![], |acc, kybra_program| {

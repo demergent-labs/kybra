@@ -2,7 +2,7 @@ use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::KybraStmt;
 use cdk_framework::act::node::data_type::{
-    variant::{ActVariantMember, Variant},
+    variant::{Member, Variant},
     DataType,
 };
 
@@ -13,7 +13,7 @@ impl KybraStmt<'_> {
     pub fn as_variant(&self) -> DataType {
         match &self.stmt_kind.node {
             StmtKind::ClassDef { name, body, .. } => {
-                let members: Vec<ActVariantMember> = body
+                let members: Vec<Member> = body
                     .iter()
                     .map(|stmt| {
                         KybraStmt {

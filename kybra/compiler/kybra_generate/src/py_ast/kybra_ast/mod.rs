@@ -3,7 +3,7 @@ use cdk_framework::act::node::{
         HeartbeatMethod, InitMethod, InspectMessageMethod, PostUpgradeMethod, PreUpgradeMethod,
         QueryMethod, UpdateMethod,
     },
-    ActFunctionGuard, DataType, ExternalCanister,
+    DataType, ExternalCanister, FunctionGuard,
 };
 use proc_macro2::TokenStream;
 
@@ -20,7 +20,7 @@ pub struct KybraAst {
     pub post_upgrade: PostUpgradeMethod,
     pub heartbeat: Option<HeartbeatMethod>,
     pub rust_code: TokenStream,
-    pub function_guards: Vec<ActFunctionGuard>,
+    pub function_guards: Vec<FunctionGuard>,
 }
 
 pub trait ToKybraAst {

@@ -1,6 +1,6 @@
 use cdk_framework::{
     act::node::{
-        canister_method::{ActFnParam, QueryMethod, UpdateMethod},
+        canister_method::{FnParam, QueryMethod, UpdateMethod},
         data_type::primitive::Primitive,
         DataType,
     },
@@ -47,7 +47,7 @@ impl KybraStmt<'_> {
         }
     }
 
-    pub fn build_act_params(&self) -> Vec<ActFnParam> {
+    pub fn build_act_params(&self) -> Vec<FnParam> {
         match &self.stmt_kind.node {
             StmtKind::FunctionDef { args, .. } => {
                 args.args
@@ -60,7 +60,7 @@ impl KybraStmt<'_> {
                                 source_map: &self.source_map,
                             };
                             let data_type = kybra_annotation.to_act_data_type(&None);
-                            vec![acc, vec![ActFnParam { name, data_type }]].concat()
+                            vec![acc, vec![FnParam { name, data_type }]].concat()
                         }
                         None => todo!("Param type needs type annotation"),
                     })

@@ -2,7 +2,7 @@ use rustpython_parser::ast::ExprKind;
 
 use crate::py_ast::traits::GenerateInlineName;
 use cdk_framework::{
-    act::node::data_type::{tuple::ActTupleElem, DataType, Tuple},
+    act::node::data_type::{tuple::Elem, DataType, Tuple},
     ToActDataType,
 };
 
@@ -47,7 +47,7 @@ impl KybraExpr<'_> {
                 };
                 let act_elems = kybra_elem_exprs
                     .iter()
-                    .map(|kybra_elem| ActTupleElem {
+                    .map(|kybra_elem| Elem {
                         elem_type: kybra_elem.to_act_data_type(&None),
                     })
                     .collect();

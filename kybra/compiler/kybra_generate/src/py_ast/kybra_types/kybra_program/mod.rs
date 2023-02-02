@@ -6,7 +6,7 @@ use crate::source_map::SourceMap;
 use cdk_framework::{
     act::node::{
         canister_method::{QueryMethod, UpdateMethod},
-        ActFunctionGuard, DataType,
+        DataType, FunctionGuard,
     },
     CanisterMethodType,
 };
@@ -201,7 +201,7 @@ impl KybraProgram<'_> {
         })
     }
 
-    pub fn build_function_guard_act_nodes(&self) -> Vec<ActFunctionGuard> {
+    pub fn build_function_guard_act_nodes(&self) -> Vec<FunctionGuard> {
         let function_guard_names = self.get_guard_function_names();
         match &self.program {
             Mod::Module { body, .. } => body

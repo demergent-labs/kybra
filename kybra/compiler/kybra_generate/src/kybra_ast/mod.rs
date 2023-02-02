@@ -1,5 +1,5 @@
 use cdk_framework::act::node::canister_method::{
-    ActCanisterMethod, InitMethod, PostUpgradeMethod, PreUpgradeMethod, UpdateMethod,
+    CanisterMethod, InitMethod, PostUpgradeMethod, PreUpgradeMethod, UpdateMethod,
 };
 use cdk_framework::act::node::data_type::{
     self, Array, Func, Primitive, Record, Tuple, TypeAlias, Variant,
@@ -29,10 +29,7 @@ struct KybraUpdateMethodAstNode {
 
 #[derive(Clone)]
 struct ActDataTypes {
-    pub arrays: Vec<Array>,
     pub funcs: Vec<Func>,
-    pub options: Vec<data_type::Option>,
-    pub primitives: Vec<Primitive>,
     pub records: Vec<Record>,
     pub tuples: Vec<Tuple>,
     pub type_alias: Vec<TypeAlias>,
@@ -59,10 +56,7 @@ trait KybraAstNode {
     fn to_act(&self) -> Result<ActNode, ActError>;
     fn get_act_data_types(&self) -> Result<ActDataTypes, ActError> {
         Ok(ActDataTypes {
-            arrays: vec![],
             funcs: vec![],
-            options: vec![],
-            primitives: vec![],
             records: vec![],
             tuples: vec![],
             type_alias: vec![],
@@ -73,7 +67,7 @@ trait KybraAstNode {
 
 impl KybraAstNode for KybraUpdateMethodAstNode {
     fn to_act(&self) -> Result<ActNode, ActError> {
-        Ok(ActNode::CanisterMethod(ActCanisterMethod::Update(
+        Ok(ActNode::CanisterMethod(CanisterMethod::Update(
             UpdateMethod {
                 body: quote!(),
                 params: vec![],
@@ -89,7 +83,7 @@ impl KybraAstNode for KybraUpdateMethodAstNode {
 }
 impl KybraAstNode for KybraQueryMethodAstNode {
     fn to_act(&self) -> Result<ActNode, ActError> {
-        Ok(ActNode::CanisterMethod(ActCanisterMethod::Update(
+        Ok(ActNode::CanisterMethod(CanisterMethod::Update(
             UpdateMethod {
                 body: quote!(),
                 params: vec![],
@@ -166,10 +160,7 @@ impl ToAct for KybraAstNew {
         };
 
         let data_types = act::DataTypes {
-            arrays: deduplicated.arrays,
             funcs: deduplicated.funcs,
-            options: deduplicated.options,
-            primitives: deduplicated.primitives,
             records: deduplicated.records,
             tuples: deduplicated.tuples,
             type_aliases: deduplicated.type_alias,
@@ -204,10 +195,7 @@ impl ToAct for KybraAstNew {
 fn deduplicate(all_things: Vec<Vec<ActDataTypes>>) -> ActDataTypes {
     // let empty = ActSubset { arrays: (), funcs: (), options: (), primitives: (), records: (), tuples: (), type_refs: (), variants: () }
     ActDataTypes {
-        arrays: vec![],
         funcs: vec![],
-        options: vec![],
-        primitives: vec![],
         records: vec![],
         tuples: vec![],
         type_alias: vec![],

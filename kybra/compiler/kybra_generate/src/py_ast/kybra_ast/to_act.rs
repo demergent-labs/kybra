@@ -19,25 +19,10 @@ impl ToAct for KybraAst {
         let query_methods: Vec<QueryMethod> = self.query_methods.iter().cloned().collect();
         let update_methods: Vec<UpdateMethod> = self.update_methods.iter().cloned().collect();
 
-        let arrays = self
-            .canister_types
-            .iter()
-            .filter_map(|array| array.as_array().cloned())
-            .collect();
         let funcs = self
             .canister_types
             .iter()
             .filter_map(|func| func.as_func().cloned())
-            .collect();
-        let options = self
-            .canister_types
-            .iter()
-            .filter_map(|option| option.as_option().cloned())
-            .collect();
-        let primitives = self
-            .canister_types
-            .iter()
-            .filter_map(|canister_type| canister_type.as_primitive().cloned())
             .collect();
         let records = self
             .canister_types
@@ -52,7 +37,7 @@ impl ToAct for KybraAst {
         let type_aliases = self
             .canister_types
             .iter()
-            .filter_map(|canister_type| canister_type.as_new_type_alias().cloned())
+            .filter_map(|canister_type| canister_type.as_type_alias().cloned())
             .collect();
         let variants = self
             .canister_types
@@ -67,10 +52,7 @@ impl ToAct for KybraAst {
         let pre_upgrade_method = self.pre_upgrade.clone();
 
         let data_types = DataTypes {
-            arrays,
             funcs,
-            options,
-            primitives,
             records,
             tuples,
             type_aliases,

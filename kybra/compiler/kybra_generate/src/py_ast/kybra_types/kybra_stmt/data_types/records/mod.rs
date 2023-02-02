@@ -2,7 +2,7 @@ use rustpython_parser::ast::{Constant, ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::KybraStmt;
 use cdk_framework::act::node::data_type::{
-    record::{ActRecordMember, Record},
+    record::{Member, Record},
     DataType,
 };
 
@@ -13,7 +13,7 @@ impl KybraStmt<'_> {
     pub fn as_record(&self) -> DataType {
         match &self.stmt_kind.node {
             StmtKind::ClassDef { name, body, .. } => {
-                let members: Vec<ActRecordMember> = body
+                let members: Vec<Member> = body
                     .iter()
                     .filter(|stmt| match &stmt.node {
                         StmtKind::Expr { value } => match &value.node {

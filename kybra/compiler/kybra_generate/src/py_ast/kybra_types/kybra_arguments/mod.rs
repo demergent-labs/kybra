@@ -1,4 +1,4 @@
-use cdk_framework::{act::node::canister_method::ActFnParam, ToActDataType};
+use cdk_framework::{act::node::canister_method::FnParam, ToActDataType};
 use rustpython_parser::ast::Arguments;
 
 use crate::source_map::SourceMap;
@@ -11,7 +11,7 @@ pub struct KybraArguments<'a> {
 }
 
 impl KybraArguments<'_> {
-    pub fn to_act_fn_params(&self) -> Result<Vec<ActFnParam>, String> {
+    pub fn to_act_fn_params(&self) -> Result<Vec<FnParam>, String> {
         if self.arguments.kwarg.is_some() {
             return Err("the dictionary unpacking operator (**) is not supported".to_string());
         }
@@ -45,7 +45,7 @@ impl KybraArguments<'_> {
                         }
                         .to_act_data_type(&None);
 
-                        Ok(ActFnParam {
+                        Ok(FnParam {
                             name: name.to_string(),
                             data_type,
                         })

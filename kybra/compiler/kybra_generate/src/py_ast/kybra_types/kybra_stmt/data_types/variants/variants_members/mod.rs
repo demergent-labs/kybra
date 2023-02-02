@@ -1,13 +1,13 @@
 use rustpython_parser::ast::{ExprKind, StmtKind};
 
 use crate::py_ast::kybra_types::{KybraExpr, KybraStmt};
-use cdk_framework::{act::node::data_type::variant::ActVariantMember, ToActDataType};
+use cdk_framework::{act::node::data_type::variant::Member, ToActDataType};
 
 mod errors;
 mod warnings;
 
 impl KybraStmt<'_> {
-    pub fn as_variant_member(&self) -> ActVariantMember {
+    pub fn as_variant_member(&self) -> Member {
         match &self.stmt_kind.node {
             StmtKind::AnnAssign {
                 target,
@@ -28,7 +28,7 @@ impl KybraStmt<'_> {
                     source_map: self.source_map,
                 }
                 .to_act_data_type(&None);
-                ActVariantMember {
+                Member {
                     member_name,
                     member_type,
                 }
