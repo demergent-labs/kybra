@@ -41,9 +41,9 @@ impl KybraStmt<'_> {
         todo!("self.create_error_message(\"\", \"\", None)")
     }
 
-    pub fn generics_must_be_expressed_as_a_tuple_error(&self) -> ErrorMessage {
-        todo!("self.create_error_message(\"\", \"\", None)")
-    }
+    // pub fn generics_must_be_expressed_as_a_tuple_error(&self) -> ErrorMessage {
+    //     todo!("self.create_error_message(\"\", \"\", None)")
+    // }
 
     pub fn max_key_size_missing_error(&self) -> ErrorMessage {
         todo!("self.create_error_message(\"\", \"\", None)")

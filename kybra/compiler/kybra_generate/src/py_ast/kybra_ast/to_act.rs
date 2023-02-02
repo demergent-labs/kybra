@@ -73,7 +73,7 @@ impl ToAct for KybraAst {
             primitives,
             records,
             tuples,
-            type_refs: type_aliases,
+            type_aliases,
             variants,
         };
 

@@ -2,7 +2,7 @@ use cdk_framework::act::node::canister_method::{
     ActCanisterMethod, InitMethod, PostUpgradeMethod, PreUpgradeMethod, UpdateMethod,
 };
 use cdk_framework::act::node::data_type::{
-    self, ActFunc, ActRecord, ActTuple, ActVariant, Array, Primitive, TypeAlias,
+    self, Array, Func, Primitive, Record, Tuple, TypeAlias, Variant,
 };
 use cdk_framework::act::node::ActNode;
 use cdk_framework::act::{self, CanisterMethods, DataTypes};
@@ -30,13 +30,13 @@ struct KybraUpdateMethodAstNode {
 #[derive(Clone)]
 struct ActDataTypes {
     pub arrays: Vec<Array>,
-    pub funcs: Vec<ActFunc>,
+    pub funcs: Vec<Func>,
     pub options: Vec<data_type::Option>,
     pub primitives: Vec<Primitive>,
-    pub records: Vec<ActRecord>,
-    pub tuples: Vec<ActTuple>,
+    pub records: Vec<Record>,
+    pub tuples: Vec<Tuple>,
     pub type_alias: Vec<TypeAlias>,
-    pub variants: Vec<ActVariant>,
+    pub variants: Vec<Variant>,
 }
 
 #[derive(Debug, Clone)]
@@ -172,7 +172,7 @@ impl ToAct for KybraAstNew {
             primitives: deduplicated.primitives,
             records: deduplicated.records,
             tuples: deduplicated.tuples,
-            type_refs: deduplicated.type_alias,
+            type_aliases: deduplicated.type_alias,
             variants: deduplicated.variants,
         };
 
