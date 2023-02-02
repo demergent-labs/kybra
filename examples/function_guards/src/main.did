@@ -2,5 +2,6 @@ service : () -> {
   accessible : () -> (bool) query;
   guarded_manual : () -> (bool) query;
   inaccessible : () -> (bool) query;
+  inaccessible_update : () -> (bool);
   unguarded : () -> (bool) query;
 }
