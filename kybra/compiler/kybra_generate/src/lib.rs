@@ -51,5 +51,5 @@ pub fn generate_canister(
     }
     .to_kybra_ast()
     .to_act()
-    .to_token_stream(())
+    .to_token_stream(&())
 }

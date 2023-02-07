@@ -1,6 +1,5 @@
-use cdk_framework::{
-    act::node::{ExternalCanister, ExternalCanisterMethod},
-    ToTokenStream,
+use cdk_framework::act::node::{
+    canister_method::HasParams, ExternalCanister, ExternalCanisterMethod,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
@@ -42,7 +41,7 @@ pub fn generate(external_canisters: &Vec<ExternalCanister>) -> Vec<TokenStream> 
 fn generate_param_variables(method: &ExternalCanisterMethod) -> Vec<TokenStream> {
     method.params.iter().enumerate().map(|(index, act_fn_param)| {
         let variable_name = format_ident!("{}", act_fn_param.prefixed_name());
-        let variable_type = act_fn_param.data_type.to_token_stream(&crate::get_python_keywords());
+        let variable_type = method.create_param_type_annotation(index, &crate::get_python_keywords());
         let actual_index = index + 2;
 
         quote! {

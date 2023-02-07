@@ -53,11 +53,11 @@ impl KybraExpr<'_> {
                     .collect();
                 match alias_name {
                     Some(alias_name) => DataType::Tuple(Tuple {
-                        name: alias_name.clone().clone(),
+                        name: Some(alias_name.clone().clone()),
                         elems: act_elems,
                     }),
                     None => DataType::Tuple(Tuple {
-                        name: self.generate_inline_name(),
+                        name: Some(self.generate_inline_name()),
                         elems: act_elems,
                     }),
                 }

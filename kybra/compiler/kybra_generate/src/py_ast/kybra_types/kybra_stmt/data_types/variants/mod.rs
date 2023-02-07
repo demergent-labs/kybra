@@ -24,7 +24,7 @@ impl KybraStmt<'_> {
                     })
                     .collect();
                 DataType::Variant(Variant {
-                    name: name.clone(),
+                    name: Some(name.clone()),
                     members,
                 })
             }

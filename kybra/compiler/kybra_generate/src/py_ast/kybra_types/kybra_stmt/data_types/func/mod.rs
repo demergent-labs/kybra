@@ -88,7 +88,7 @@ impl KybraStmt<'_> {
                             list_to_vm_value: func::generate_func_list_to_vm_value(&name),
                             from_vm_value: func::generate_func_from_vm_value(&name),
                             list_from_vm_value: func::generate_func_list_from_vm_value(&name),
-                            name,
+                            name: Some(name),
                             params,
                             return_type,
                             mode,
