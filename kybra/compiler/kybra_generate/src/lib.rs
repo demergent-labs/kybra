@@ -1,4 +1,4 @@
-use cdk_framework::{ToAct, ToTokenStream};
+use cdk_framework::ToAct;
 use py_ast::{KybraProgram, PyAst};
 use rustpython_parser::parser::{self, Mode};
 use source_map::SourceMap;
@@ -51,5 +51,5 @@ pub fn generate_canister(
     }
     .to_kybra_ast()
     .to_act()
-    .to_token_stream(&())
+    .to_token_stream()
 }
