@@ -20,6 +20,7 @@ impl GetDependencies for KybraStmt<'_> {
                             Some(annotation) => {
                                 let dependencies = KybraExpr {
                                     located_expr: &annotation,
+                                    programs: self.programs,
                                     source_map: self.source_map,
                                 }
                                 .get_dependent_types(type_alias_lookup, found_type_names);
@@ -31,6 +32,7 @@ impl GetDependencies for KybraStmt<'_> {
                 let return_dependencies = match returns {
                     Some(returns) => KybraExpr {
                         located_expr: returns,
+                        programs: self.programs,
                         source_map: self.source_map,
                     }
                     .get_dependent_types(type_alias_lookup, found_type_names),
@@ -45,6 +47,7 @@ impl GetDependencies for KybraStmt<'_> {
                 body.iter().fold(found_type_names.clone(), |acc, member| {
                     let dependency = KybraStmt {
                         stmt_kind: member,
+                        programs: self.programs,
                         source_map: self.source_map,
                     }
                     .get_dependent_types(type_alias_lookup, found_type_names);
@@ -53,6 +56,7 @@ impl GetDependencies for KybraStmt<'_> {
             }
             StmtKind::Assign { value, .. } => KybraExpr {
                 located_expr: value,
+                programs: self.programs,
                 source_map: self.source_map,
             }
             .get_dependent_types(type_alias_lookup, found_type_names),
@@ -62,6 +66,7 @@ impl GetDependencies for KybraStmt<'_> {
                         Some(args) => args.iter().fold(found_type_names.clone(), |acc, arg| {
                             let dependencies = KybraExpr {
                                 located_expr: arg,
+                                programs: self.programs,
                                 source_map: self.source_map,
                             }
                             .get_dependent_types(type_alias_lookup, found_type_names);
@@ -72,6 +77,7 @@ impl GetDependencies for KybraStmt<'_> {
                 } else {
                     KybraExpr {
                         located_expr: annotation,
+                        programs: self.programs,
                         source_map: self.source_map,
                     }
                     .get_dependent_types(type_alias_lookup, found_type_names)

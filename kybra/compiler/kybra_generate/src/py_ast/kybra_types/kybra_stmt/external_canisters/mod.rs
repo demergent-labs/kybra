@@ -21,6 +21,7 @@ impl KybraStmt<'_> {
 
                                 let params = KybraArguments {
                                     arguments: args.as_ref(),
+                                    programs: self.programs,
                                     source_map: self.source_map
                                 }.to_act_fn_params()
                                  .unwrap_or_else(|e| panic!("{}.{} violates Kybra requirements: {}", canister_name, name, e) );
@@ -29,6 +30,7 @@ impl KybraStmt<'_> {
 
                                 let return_type = KybraExpr {
                                     located_expr: expr_kind,
+                                    programs: self.programs,
                                     source_map: self.source_map,
                                 }.to_act_data_type(&None);
 

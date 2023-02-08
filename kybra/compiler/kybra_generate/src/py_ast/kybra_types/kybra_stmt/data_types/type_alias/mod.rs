@@ -45,6 +45,7 @@ impl KybraStmt<'_> {
         };
         KybraExpr {
             located_expr: value,
+            programs: self.programs,
             source_map: self.source_map,
         }
         .to_act_data_type(&Some(&alias_name))

@@ -1,9 +1,11 @@
 use rustpython_parser::ast::{Constant, ExprKind};
 
 use cdk_framework::{
-    act::node::data_type::{primitive::Primitive, DataType, TypeRef},
+    act::node::data_type::{primitive::Primitive, DataType},
     ToActDataType,
 };
+
+use crate::py_ast::kybra_types::kybra_program;
 
 use super::KybraExpr;
 
@@ -32,9 +34,16 @@ impl ToActDataType for KybraExpr<'_> {
                 "str" => Primitive::String.to_act_data_type(alias_name),
                 "text" => Primitive::String.to_act_data_type(alias_name),
                 "void" => Primitive::Void.to_act_data_type(alias_name),
-                _ => DataType::TypeRef(TypeRef {
-                    name: id.to_string(),
-                }),
+                _ => {
+                    match kybra_program::get_act_data_type_node_by_name(
+                        self.programs,
+                        self.source_map,
+                        id.to_string(),
+                    ) {
+                        Ok(data_type) => data_type,
+                        Err(err) => todo!("This is the error, {}", err),
+                    }
+                }
             },
             ExprKind::Subscript { value, slice, .. } => match &value.node {
                 ExprKind::Name { id, .. } => match &id[..] {
@@ -44,6 +53,7 @@ impl ToActDataType for KybraExpr<'_> {
                     "tuple" => self.to_tuple(alias_name),
                     "manual" => KybraExpr {
                         located_expr: slice,
+                        programs: self.programs,
                         source_map: self.source_map,
                     }
                     .to_act_data_type(alias_name),
@@ -52,9 +62,14 @@ impl ToActDataType for KybraExpr<'_> {
                 _ => panic!("{}", self.invalid_subscript_value_error()),
             },
             ExprKind::Constant { value, .. } => match value {
-                Constant::Str(string) => DataType::TypeRef(TypeRef {
-                    name: string.clone(),
-                }),
+                Constant::Str(string) => match kybra_program::get_act_data_type_node_by_name(
+                    self.programs,
+                    self.source_map,
+                    string.clone(),
+                ) {
+                    Ok(data_type) => data_type,
+                    Err(err) => todo!("This is the error, {}", err),
+                },
                 Constant::None => {
                     todo!("{}", self.none_cant_be_a_type_error());
                 }

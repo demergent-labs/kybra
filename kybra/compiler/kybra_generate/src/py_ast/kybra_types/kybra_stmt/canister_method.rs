@@ -57,6 +57,7 @@ impl KybraStmt<'_> {
                             let name = arg.node.arg.clone();
                             let kybra_annotation = KybraExpr {
                                 located_expr: &annotation,
+                                programs: self.programs,
                                 source_map: &self.source_map,
                             };
                             let data_type = kybra_annotation.to_act_data_type(&None);
@@ -74,6 +75,7 @@ impl KybraStmt<'_> {
             StmtKind::FunctionDef { returns, .. } => match returns {
                 Some(returns) => KybraExpr {
                     located_expr: returns,
+                    programs: self.programs,
                     source_map: self.source_map,
                 }
                 .is_manual(),
@@ -161,6 +163,7 @@ impl KybraStmt<'_> {
             Some(return_type) => {
                 let kybra_return_type = KybraExpr {
                     located_expr: &return_type,
+                    programs: self.programs,
                     source_map: &self.source_map,
                 };
                 kybra_return_type.to_act_data_type(&None)

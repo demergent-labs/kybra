@@ -12,6 +12,7 @@ impl KybraProgram<'_> {
                 .filter(|stmt_kind| {
                     KybraStmt {
                         stmt_kind,
+                        programs: &self.programs,
                         source_map: self.source_map,
                     }
                     .is_external_canister()
@@ -19,6 +20,7 @@ impl KybraProgram<'_> {
                 .map(|stmt_kind| {
                     KybraStmt {
                         stmt_kind,
+                        programs: &self.programs,
                         source_map: self.source_map,
                     }
                     .to_act_external_canister()

@@ -16,6 +16,7 @@ impl KybraStmt<'_> {
                     let data_type = match &arg.node.annotation {
                         Some(annotation) => KybraExpr {
                             located_expr: &annotation,
+                            programs: self.programs,
                             source_map: self.source_map,
                         }
                         .to_act_data_type(&None),

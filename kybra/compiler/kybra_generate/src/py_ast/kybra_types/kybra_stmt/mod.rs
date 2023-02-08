@@ -8,7 +8,7 @@ pub mod stable_b_tree_map_nodes;
 mod system_methods;
 mod type_alias;
 
-use rustpython_parser::ast::{Located, StmtKind};
+use rustpython_parser::ast::{Located, Mod, StmtKind};
 
 use crate::source_map::SourceMap;
 
@@ -17,6 +17,7 @@ use super::KybraExpr;
 #[derive(Clone)]
 pub struct KybraStmt<'a> {
     pub stmt_kind: &'a Located<StmtKind>,
+    pub programs: &'a Vec<Mod>,
     pub source_map: &'a SourceMap,
 }
 
@@ -33,6 +34,7 @@ impl KybraStmt<'_> {
                 } else {
                     KybraExpr {
                         located_expr: &targets[0],
+                        programs: self.programs,
                         source_map: self.source_map,
                     }
                     .get_name()
@@ -41,6 +43,7 @@ impl KybraStmt<'_> {
             StmtKind::AugAssign { .. } => todo!(),
             StmtKind::AnnAssign { target, .. } => KybraExpr {
                 located_expr: target,
+                programs: self.programs,
                 source_map: self.source_map,
             }
             .get_name(),

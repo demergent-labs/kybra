@@ -32,16 +32,20 @@ pub fn generate_canister(
             file_name: py_file_name.to_string(),
         })
         .collect();
+    let programs: Vec<_> = py_file_names
+        .iter()
+        .map(|py_file_name| {
+            let source = std::fs::read_to_string(py_file_name).unwrap();
+            parser::parse(&source, Mode::Module, "").unwrap()
+        })
+        .collect();
     let kybra_programs: Vec<KybraProgram> = py_file_names
         .iter()
         .enumerate()
-        .map(|(index, py_file_name)| {
-            let source = std::fs::read_to_string(py_file_name).unwrap();
-
-            KybraProgram {
-                program: parser::parse(&source, Mode::Module, "").unwrap(),
-                source_map: &source_maps[index],
-            }
+        .map(|(index, _)| KybraProgram {
+            program: &programs[index],
+            programs: &&programs,
+            source_map: &source_maps[index],
         })
         .collect();
 

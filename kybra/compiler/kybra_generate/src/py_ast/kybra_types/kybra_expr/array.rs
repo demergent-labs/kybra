@@ -21,6 +21,7 @@ impl KybraExpr<'_> {
                 }
                 let kybra_expr = KybraExpr {
                     located_expr: slice,
+                    programs: self.programs,
                     source_map: self.source_map,
                 };
                 let act_array = DataType::Array(Array {

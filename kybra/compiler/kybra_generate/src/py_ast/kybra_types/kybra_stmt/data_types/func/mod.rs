@@ -49,6 +49,7 @@ impl KybraStmt<'_> {
                                             .map(|elt| {
                                                 KybraExpr {
                                                     located_expr: elt,
+                                                    programs: self.programs,
                                                     source_map: self.source_map,
                                                 }
                                                 .to_act_data_type(&None)
@@ -73,6 +74,7 @@ impl KybraStmt<'_> {
                                         Some(
                                             KybraExpr {
                                                 located_expr: &elts[1],
+                                                programs: self.programs,
                                                 source_map: self.source_map,
                                             }
                                             .to_act_data_type(&None),

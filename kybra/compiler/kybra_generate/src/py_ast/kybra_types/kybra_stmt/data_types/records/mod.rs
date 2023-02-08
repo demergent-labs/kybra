@@ -29,6 +29,7 @@ impl KybraStmt<'_> {
                     .map(|stmt| {
                         KybraStmt {
                             stmt_kind: stmt,
+                            programs: self.programs,
                             source_map: self.source_map,
                         }
                         .as_record_member()

@@ -18,7 +18,8 @@ pub mod stable_b_tree_map_nodes;
 pub use stable_b_tree_map_nodes::StableBTreeMapNode;
 
 pub struct KybraProgram<'a> {
-    pub program: Mod,
+    pub program: &'a Mod,
+    pub programs: &'a Vec<Mod>,
     pub source_map: &'a SourceMap,
 }
 
@@ -30,6 +31,7 @@ impl KybraProgram<'_> {
                 .filter(|stmt_kind| {
                     let kybra_stmt = KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     };
                     kybra_stmt.is_record()
@@ -41,6 +43,7 @@ impl KybraProgram<'_> {
                 .fold(HashMap::new(), |mut acc, stmt_kind| {
                     let kybra_stmt = KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     };
                     let type_alias_name = kybra_stmt.get_name();
@@ -60,12 +63,14 @@ impl KybraProgram<'_> {
                 .filter(|stmt_kind| {
                     let kybra_stmt = KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     };
                     kybra_stmt.is_canister_method_stmt()
                 })
                 .map(|stmt_kind| KybraStmt {
                     stmt_kind,
+                    programs: self.programs,
                     source_map: self.source_map,
                 })
                 .collect(),
@@ -80,12 +85,14 @@ impl KybraProgram<'_> {
                 .filter(|stmt_kind| {
                     let kybra_stmt = KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     };
                     kybra_stmt.is_external_canister()
                 })
                 .map(|stmt_kind| KybraStmt {
                     stmt_kind,
+                    programs: self.programs,
                     source_map: self.source_map,
                 })
                 .collect(),
@@ -100,12 +107,14 @@ impl KybraProgram<'_> {
                 .filter(|stmt_kind| {
                     let kybra_stmt = KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     };
                     kybra_stmt.is_stable_b_tree_map_node()
                 })
                 .map(|stmt_kind| KybraStmt {
                     stmt_kind,
+                    programs: self.programs,
                     source_map: self.source_map,
                 })
                 .collect(),
@@ -120,12 +129,14 @@ impl KybraProgram<'_> {
                 .filter(|stmt_kind| {
                     let kybra_stmt = KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     };
                     kybra_stmt.is_canister_method_type(method_type.clone())
                 })
                 .map(|stmt_kind| KybraStmt {
                     stmt_kind,
+                    programs: self.programs,
                     source_map: self.source_map,
                 })
                 .collect(),
@@ -140,6 +151,7 @@ impl KybraProgram<'_> {
                 .filter_map(|stmt_kind| {
                     KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     }
                     .as_query_method()
@@ -213,6 +225,7 @@ impl KybraProgram<'_> {
                 .map(|stmt_kind| {
                     let kybra_stmt = KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     };
                     match kybra_stmt.as_function_guard() {
@@ -231,6 +244,7 @@ impl KybraProgram<'_> {
                 .filter_map(|stmt_kind| {
                     KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     }
                     .as_update_method()
@@ -247,6 +261,7 @@ impl KybraProgram<'_> {
                 .filter(|stmt_kind| {
                     let kybra_stmt = KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     };
                     match kybra_stmt.get_alias_name() {
@@ -267,6 +282,7 @@ impl KybraProgram<'_> {
                 .map(|stmt_kind| {
                     let kybra_stmt = KybraStmt {
                         stmt_kind,
+                        programs: self.programs,
                         source_map: self.source_map,
                     };
                     kybra_stmt.build_act_data_type()
@@ -275,4 +291,58 @@ impl KybraProgram<'_> {
             _ => vec![],
         }
     }
+}
+
+pub fn get_act_data_type_node_by_name(
+    programs: &Vec<Mod>,
+    source_map: &SourceMap,
+    name: String,
+) -> Result<DataType, String> {
+    let matching_data_types: Vec<_> = programs
+        .iter()
+        .map(|program| match program {
+            Mod::Module { body, .. } => body
+                .iter()
+                .filter(|stmt_kind| {
+                    let kybra_stmt = KybraStmt {
+                        stmt_kind,
+                        programs,
+                        source_map,
+                    };
+                    eprintln!(
+                        "{} == {:?}? {}",
+                        name.clone(),
+                        kybra_stmt.get_alias_name(),
+                        Some(name.clone()) == kybra_stmt.get_alias_name(),
+                    );
+                    match kybra_stmt.get_alias_name() {
+                        Some(alias_name) => alias_name == name,
+                        None => false,
+                    }
+                })
+                .map(|stmt_kind| {
+                    let kybra_stmt = KybraStmt {
+                        stmt_kind,
+                        programs,
+                        source_map,
+                    };
+                    eprintln!(
+                        "This is the name we are looking at: {:?}",
+                        kybra_stmt.get_alias_name()
+                    );
+                    kybra_stmt.build_act_data_type()
+                })
+                .collect(),
+            _ => vec![],
+        })
+        .fold(vec![], |acc, list_of_data_types| {
+            vec![acc, list_of_data_types].concat()
+        });
+    if matching_data_types.len() > 1 {
+        return Err("We found more than one matching data type.".to_string());
+    }
+    if matching_data_types.len() == 0 {
+        return Err("We didn't find a matching data type".to_string());
+    }
+    Ok(matching_data_types[0].clone())
 }

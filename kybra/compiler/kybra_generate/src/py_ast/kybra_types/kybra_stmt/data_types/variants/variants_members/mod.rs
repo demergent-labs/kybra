@@ -25,6 +25,7 @@ impl KybraStmt<'_> {
                 };
                 let member_type = KybraExpr {
                     located_expr: &annotation,
+                    programs: self.programs,
                     source_map: self.source_map,
                 }
                 .to_act_data_type(&None);

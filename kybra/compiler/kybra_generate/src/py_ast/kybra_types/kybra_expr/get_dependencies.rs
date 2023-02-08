@@ -46,12 +46,14 @@ impl GetDependencies for KybraExpr<'_> {
         match &self.located_expr.node {
             ExprKind::Subscript { slice, .. } => KybraExpr {
                 located_expr: slice,
+                programs: self.programs,
                 source_map: self.source_map,
             }
             .get_dependent_types(type_alias_lookup, found_type_names),
             ExprKind::Tuple { elts, .. } => elts.iter().fold(HashSet::new(), |acc, elt| {
                 let dependencies = KybraExpr {
                     located_expr: elt,
+                    programs: self.programs,
                     source_map: self.source_map,
                 }
                 .get_dependent_types(type_alias_lookup, found_type_names);
@@ -90,6 +92,7 @@ impl GetDependencies for KybraExpr<'_> {
             ExprKind::List { elts, .. } => elts.iter().fold(HashSet::new(), |acc, elt| {
                 let dependencies = KybraExpr {
                     located_expr: elt,
+                    programs: self.programs,
                     source_map: self.source_map,
                 }
                 .get_dependent_types(type_alias_lookup, found_type_names);
@@ -99,6 +102,7 @@ impl GetDependencies for KybraExpr<'_> {
                 if self.is_stable_b_tree_map_node() {
                     let kybra_expr = KybraExpr {
                         located_expr: func,
+                        programs: self.programs,
                         source_map: self.source_map,
                     };
                     let key_deps = kybra_expr

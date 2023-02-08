@@ -9,12 +9,13 @@ mod to_act_data_type;
 pub mod to_hash_string;
 mod tuple;
 
-use rustpython_parser::ast::{ExprKind, Located};
+use rustpython_parser::ast::{ExprKind, Located, Mod};
 
 use crate::source_map::SourceMap;
 
 pub struct KybraExpr<'a> {
     pub located_expr: &'a Located<ExprKind>,
+    pub programs: &'a Vec<Mod>,
     pub source_map: &'a SourceMap,
 }
 
@@ -37,6 +38,7 @@ impl KybraExpr<'_> {
                     } else {
                         return KybraExpr {
                             located_expr: slice,
+                            programs: self.programs,
                             source_map: self.source_map,
                         }
                         .is_manual();

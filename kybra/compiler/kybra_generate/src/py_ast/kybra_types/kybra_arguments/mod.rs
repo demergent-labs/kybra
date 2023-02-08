@@ -1,5 +1,5 @@
 use cdk_framework::{act::node::canister_method::FnParam, ToActDataType};
-use rustpython_parser::ast::Arguments;
+use rustpython_parser::ast::{Arguments, Mod};
 
 use crate::source_map::SourceMap;
 
@@ -7,6 +7,7 @@ use super::KybraExpr;
 
 pub struct KybraArguments<'a> {
     pub arguments: &'a Arguments,
+    pub programs: &'a Vec<Mod>,
     pub source_map: &'a SourceMap,
 }
 
@@ -41,6 +42,7 @@ impl KybraArguments<'_> {
                     Some(annotation) => {
                         let data_type = KybraExpr {
                             located_expr: annotation.as_ref(),
+                    programs: &self.programs,
                             source_map: self.source_map,
                         }
                         .to_act_data_type(&None);
