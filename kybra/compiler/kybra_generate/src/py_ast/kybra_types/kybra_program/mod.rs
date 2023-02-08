@@ -309,12 +309,6 @@ pub fn get_act_data_type_node_by_name(
                         programs,
                         source_map,
                     };
-                    eprintln!(
-                        "{} == {:?}? {}",
-                        name.clone(),
-                        kybra_stmt.get_alias_name(),
-                        Some(name.clone()) == kybra_stmt.get_alias_name(),
-                    );
                     match kybra_stmt.get_alias_name() {
                         Some(alias_name) => alias_name == name,
                         None => false,
@@ -326,10 +320,6 @@ pub fn get_act_data_type_node_by_name(
                         programs,
                         source_map,
                     };
-                    eprintln!(
-                        "This is the name we are looking at: {:?}",
-                        kybra_stmt.get_alias_name()
-                    );
                     kybra_stmt.build_act_data_type()
                 })
                 .collect(),
