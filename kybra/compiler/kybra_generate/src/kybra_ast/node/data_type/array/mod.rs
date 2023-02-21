@@ -1,0 +1,57 @@
+use cdk_framework::{act::node::data_type::Array, ToDataType};
+use rustpython_parser::ast::{ExprKind, Located};
+
+use crate::{
+    errors::{CreateMessage, Message, Suggestion},
+    source_map::SourceMapped,
+};
+
+impl SourceMapped<'_, Located<ExprKind>> {
+    pub fn is_array(&self) -> bool {
+        match &self.node.node {
+            ExprKind::Subscript { value, .. } => match &value.node {
+                ExprKind::Name { id, .. } => id == "list",
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+
+    pub(super) fn to_array(&self) -> Result<Array, Message> {
+        match &self.node.node {
+            ExprKind::Subscript { value, slice, .. } => {
+                match &value.node {
+                    ExprKind::Name { id, .. } => {
+                        if id != "list" {
+                            return Err(self.not_array_error());
+                        }
+                    }
+                    _ => return Err(self.not_array_error()),
+                }
+                let kybra_expr = SourceMapped {
+                    node: slice.as_ref(),
+                    source_map: self.source_map.clone(),
+                };
+                Ok(Array {
+                    enclosed_type: Box::from(kybra_expr.to_data_type()),
+                })
+            }
+            _ => Err(self.not_array_error()),
+        }
+    }
+
+    pub fn not_array_error(&self) -> Message {
+        let suggestion = Suggestion {
+            title: "This error should only show up for Kybra developers that used a method wrong. If you see this error, please create an issue for us.".to_string(),
+            source: None,
+            range: None,
+            annotation: None,
+            import_suggestion: None,
+        };
+        self.create_error_message(
+            "This is not an array. Only arrays should reach this point.",
+            "",
+            Some(suggestion),
+        )
+    }
+}
