@@ -6,6 +6,7 @@ use std::fmt;
 
 use crate::source_map::GetSourceInfo;
 
+#[derive(Clone)]
 pub struct Suggestion {
     pub title: String,
     pub source: Option<String>,
@@ -14,7 +15,8 @@ pub struct Suggestion {
     pub import_suggestion: Option<String>,
 }
 
-pub struct Message {
+#[derive(Clone)]
+pub struct Contents {
     pub title: String,
     pub origin: String,
     pub line_number: usize,
@@ -24,27 +26,22 @@ pub struct Message {
     pub suggestion: Option<Suggestion>,
 }
 
-pub struct WarningMessage {
-    pub message: Message,
-}
-
-pub struct ErrorMessage {
-    pub message: Message,
-}
-
-impl ErrorMessage {
-    fn to_string(&self) -> String {
-        self.message.to_string(AnnotationType::Error)
-    }
-}
-
-impl WarningMessage {
-    fn to_string(&self) -> String {
-        self.message.to_string(AnnotationType::Warning)
-    }
+#[derive(Clone)]
+pub enum Message {
+    Error(Contents),
+    Warning(Contents),
 }
 
 impl Message {
+    fn to_string(&self) -> String {
+        match self {
+            Message::Error(contents) => contents.to_string(AnnotationType::Error),
+            Message::Warning(contents) => contents.to_string(AnnotationType::Warning),
+        }
+    }
+}
+
+impl Contents {
     fn to_string(&self, annotation_type: AnnotationType) -> String {
         let error_snippet = Snippet {
             title: Some(Annotation {
@@ -126,13 +123,7 @@ impl Message {
     }
 }
 
-impl fmt::Display for ErrorMessage {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.to_string())
-    }
-}
-
-impl fmt::Display for WarningMessage {
+impl fmt::Display for Message {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.to_string())
     }
@@ -144,17 +135,15 @@ pub trait CreateMessage {
         title: &str,
         annotation: &str,
         suggestion: Option<Suggestion>,
-    ) -> Message;
+    ) -> Contents;
 
     fn create_error_message(
         &self,
         title: &str,
         annotation: &str,
         suggestion: Option<Suggestion>,
-    ) -> ErrorMessage {
-        ErrorMessage {
-            message: self.create_message(title, annotation, suggestion),
-        }
+    ) -> Message {
+        Message::Error(self.create_message(title, annotation, suggestion))
     }
 
     fn create_warning_message(
@@ -162,10 +151,8 @@ pub trait CreateMessage {
         title: &str,
         annotation: &str,
         suggestion: Option<Suggestion>,
-    ) -> WarningMessage {
-        WarningMessage {
-            message: self.create_message(title, annotation, suggestion),
-        }
+    ) -> Message {
+        Message::Warning(self.create_message(title, annotation, suggestion))
     }
 }
 
@@ -178,8 +165,8 @@ where
         title: &str,
         annotation: &str,
         suggestion: Option<Suggestion>,
-    ) -> Message {
-        return Message {
+    ) -> Contents {
+        return Contents {
             title: title.to_string(),
             origin: self.get_origin(),
             line_number: self.get_line_number(),

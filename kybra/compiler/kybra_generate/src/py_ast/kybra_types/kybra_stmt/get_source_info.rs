@@ -15,6 +15,10 @@ impl Locatable for Located<StmtKind> {
     fn get_token_length(&self) -> usize {
         TokenLength::get_token_length(self)
     }
+
+    fn get_location(&self) -> rustpython_parser::ast::Location {
+        self.location
+    }
 }
 
 impl GetSourceInfo for KybraStmt<'_> {

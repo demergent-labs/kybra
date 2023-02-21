@@ -1,4 +1,4 @@
-use rustpython_parser::ast::{ExprKind, Located};
+use rustpython_parser::ast::{ExprKind, Located, Location};
 
 use super::KybraExpr;
 use crate::source_map::{token_length::TokenLength, GetSourceInfo, Locatable};
@@ -14,6 +14,10 @@ impl Locatable for Located<ExprKind> {
 
     fn get_token_length(&self) -> usize {
         TokenLength::get_token_length(self)
+    }
+
+    fn get_location(&self) -> Location {
+        self.location
     }
 }
 

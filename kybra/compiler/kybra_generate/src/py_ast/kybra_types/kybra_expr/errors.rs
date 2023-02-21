@@ -1,18 +1,18 @@
 use rustpython_parser::ast::ExprKind;
 
-use crate::errors::{CreateMessage, ErrorMessage, Suggestion};
+use crate::errors::{CreateMessage, Message, Suggestion};
 
 use super::KybraExpr;
 
 impl KybraExpr<'_> {
-    pub fn invalid_subscript_value_error(&self) -> ErrorMessage {
+    pub fn invalid_subscript_value_error(&self) -> Message {
         let title =
             "Only Async, list, manual, opt, or tuple are allowed subscripts for candid values";
         let annotation = "Invalid subscript here";
         self.create_error_message(title, annotation, None)
     }
 
-    pub fn not_array_error(&self) -> ErrorMessage {
+    pub fn not_array_error(&self) -> Message {
         let suggestion = Suggestion {
             title: "This error should only show up for Kybra developers that used a method wrong. If you see this error, please create an issue for us.".to_string(),
             source: None,
@@ -35,11 +35,11 @@ impl KybraExpr<'_> {
         "This is is not an opt".to_string()
     }
 
-    pub fn none_cant_be_a_type_error(&self) -> ErrorMessage {
+    pub fn none_cant_be_a_type_error(&self) -> Message {
         self.create_error_message("None must not be used as a type, but only as a value. Please specify either kybra.null or kybra.void.", "Ambiguous None here", None)
     }
 
-    pub fn unsupported_type_error(&self) -> ErrorMessage {
+    pub fn unsupported_type_error(&self) -> Message {
         let expression_name = match &self.located_expr.node {
             ExprKind::BoolOp { .. } => "boolean operators",
             ExprKind::NamedExpr { .. } => "named expressions",

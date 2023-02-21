@@ -1,30 +1,30 @@
 use rustpython_parser::ast::StmtKind;
 
 use crate::{
-    errors::{CreateMessage, ErrorMessage},
+    errors::{CreateMessage, Message},
     py_ast::kybra_types::KybraStmt,
 };
 
 impl KybraStmt<'_> {
-    pub fn invalid_class_error(&self) -> ErrorMessage {
+    pub fn invalid_class_error(&self) -> Message {
         let title = "For a class to be included in your canister definition it must be either a Record or a Variant.";
         let annotation = "illegal class here";
         self.create_error_message(title, annotation, None)
     }
 
-    pub fn invalid_assign_error(&self) -> ErrorMessage {
+    pub fn invalid_assign_error(&self) -> Message {
         let title = "For a global assignment to be included in your canister definition it must be be either a Tuple or a Type Alias";
         let annotation = "illegal assignment here";
         self.create_error_message(title, annotation, None)
     }
 
-    pub fn invalid_annotation_assign_error(&self) -> ErrorMessage {
+    pub fn invalid_annotation_assign_error(&self) -> Message {
         let title = "For a global annotation assignment to be included in your canister definition it must be be either a Func or a Type Alias";
         let annotation = "illegal annotation assignment here";
         self.create_error_message(title, annotation, None)
     }
 
-    pub fn unsupported_type_error(&self) -> ErrorMessage {
+    pub fn unsupported_type_error(&self) -> Message {
         let stmt_kind_name = match &self.stmt_kind.node {
             StmtKind::FunctionDef { .. } => "Function Def",
             StmtKind::AsyncFunctionDef { .. } => "Async Function Def",
