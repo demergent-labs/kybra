@@ -1,5 +1,5 @@
 use cdk_framework::{act::node::DataType, ToDataType};
-use rustpython_parser::ast::{Constant, ExprKind, Located};
+use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use crate::source_map::SourceMapped;
 
@@ -75,6 +75,13 @@ impl ToDataType for SourceMapped<'_, Located<ExprKind>> {
     }
 }
 
+impl ToDataType for SourceMapped<'_, Located<StmtKind>> {
+    fn to_data_type(&self) -> DataType {
+        if self.is_record() {
+            match self.to_record() {
+                Ok(record) => DataType::Record(record),
+                Err(error) => panic!("{}", error),
+            }
         } else {
             panic!();
         }

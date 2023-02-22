@@ -1,8 +1,10 @@
+pub mod errors;
+
 use cdk_framework::{
     act::node::data_type::{tuple::Member, Tuple},
     ToDataType,
 };
-use rustpython_parser::ast::{ExprKind, Located};
+use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
     errors::{CreateMessage, Message},
@@ -63,5 +65,42 @@ impl SourceMapped<'_, Located<ExprKind>> {
 
     pub fn not_tuple_error(&self) -> Message {
         self.create_error_message("This is is not a tuple", "", None)
+    }
+}
+
+impl SourceMapped<'_, Located<StmtKind>> {
+    pub fn is_tuple(&self) -> bool {
+        match &self.node.node {
+            StmtKind::Assign { value, .. } => SourceMapped {
+                node: value.as_ref(),
+                source_map: self.source_map.clone(),
+            }
+            .is_tuple(),
+            _ => false,
+        }
+    }
+
+    pub fn as_tuple(&self) -> Option<Tuple> {
+        self.to_tuple().ok()
+    }
+
+    pub fn to_tuple(&self) -> Result<Tuple, Message> {
+        match &self.node.node {
+            StmtKind::Assign { targets, value, .. } => {
+                if targets.len() > 1 {
+                    return Err(self.multiple_targets_error());
+                }
+                let tuple_name = match &targets[0].node {
+                    ExprKind::Name { id, .. } => id,
+                    _ => return Err(self.invalid_target_error()),
+                };
+                SourceMapped {
+                    node: value.as_ref(),
+                    source_map: self.source_map.clone(),
+                }
+                .to_tuple(Some(tuple_name.clone()))
+            }
+            _ => panic!("{}", self.not_a_tuple_error()),
+        }
     }
 }
