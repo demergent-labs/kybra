@@ -1,0 +1,9 @@
+[book]
+authors = ["Jordan Last"]
+language = "en"
+multilingual = false
+src = "src"
+title = "The Kybra Book"
+
+[watch]
+exclude = ["src/*"]
