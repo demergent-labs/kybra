@@ -11,7 +11,7 @@ use crate::{
     source_map::SourceMapped,
 };
 
-impl SourceMapped<'_, Located<ExprKind>> {
+impl SourceMapped<&Located<ExprKind>> {
     pub fn is_tuple(&self) -> bool {
         match &self.node.node {
             ExprKind::Subscript { value, .. } => match &value.node {
@@ -68,7 +68,7 @@ impl SourceMapped<'_, Located<ExprKind>> {
     }
 }
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn is_tuple(&self) -> bool {
         match &self.node.node {
             StmtKind::Assign { value, .. } => SourceMapped {

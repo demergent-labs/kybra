@@ -7,7 +7,7 @@ pub mod data_type;
 pub mod external_canister;
 pub mod guard_function;
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn get_name(&self) -> Option<String> {
         match &self.node.node {
             StmtKind::FunctionDef { name, .. } => Some(name.clone()),
@@ -35,7 +35,7 @@ impl SourceMapped<'_, Located<StmtKind>> {
     }
 }
 
-impl SourceMapped<'_, Located<ExprKind>> {
+impl SourceMapped<&Located<ExprKind>> {
     pub fn get_name(&self) -> Option<String> {
         match &self.node.node {
             ExprKind::Name { id, .. } => Some(id.clone()),

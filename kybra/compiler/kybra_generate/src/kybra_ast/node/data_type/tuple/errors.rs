@@ -5,7 +5,7 @@ use crate::{
     source_map::SourceMapped,
 };
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn multiple_targets_error(&self) -> Message {
         Message::Error(self.create_message("", "", None))
     }

@@ -6,7 +6,7 @@ use crate::{
 };
 
 // TODO this is a standin error because I need funcs to not have todo!() in them right now
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub(super) fn todo_func_error(&self) -> Message {
         self.create_error_message("Not a func", "", None)
     }

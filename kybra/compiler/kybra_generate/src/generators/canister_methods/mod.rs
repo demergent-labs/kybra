@@ -53,7 +53,7 @@ pub fn generate_call_to_py_function(statement: &KybraStmt) -> proc_macro2::Token
 }
 
 pub fn generate_call_to_py_function_cdk_refactor_name(
-    statement: &SourceMapped<Located<StmtKind>>,
+    statement: &SourceMapped<&Located<StmtKind>>,
 ) -> TokenStream {
     match statement.node.node {
         rustpython_parser::ast::StmtKind::FunctionDef { .. } => {

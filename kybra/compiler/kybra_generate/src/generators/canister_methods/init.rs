@@ -52,7 +52,7 @@ pub fn generate_init_method_body(
 }
 
 pub fn generate_init_method_body_cdk_refactor_name(
-    init_function_def_option: Option<&SourceMapped<Located<StmtKind>>>,
+    init_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
     entry_module_name: &String,
 ) -> TokenStream {
     let call_to_init_py_function = match init_function_def_option {

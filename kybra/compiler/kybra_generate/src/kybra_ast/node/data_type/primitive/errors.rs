@@ -5,7 +5,7 @@ use crate::{
     source_map::SourceMapped,
 };
 
-impl SourceMapped<'_, Located<ExprKind>> {
+impl SourceMapped<&Located<ExprKind>> {
     pub fn not_a_primitive_error(&self) -> Message {
         self.create_error_message("Not a primitive", "TODO", None)
     }

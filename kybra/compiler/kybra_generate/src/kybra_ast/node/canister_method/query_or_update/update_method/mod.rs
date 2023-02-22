@@ -6,7 +6,7 @@ use crate::{
     source_map::SourceMapped,
 };
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn as_update_method(&self) -> Option<UpdateMethod> {
         if !self.is_canister_method_type(CanisterMethodType::Update) {
             return None;

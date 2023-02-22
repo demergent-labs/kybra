@@ -15,8 +15,8 @@ pub struct SourceMap {
     pub file_name: String,
 }
 
-pub struct SourceMapped<'a, T> {
-    pub node: &'a T,
+pub struct SourceMapped<T> {
+    pub node: T,
     pub source_map: SourceMap,
 }
 
@@ -33,7 +33,7 @@ pub trait GetSourceInfo {
     fn get_line_number(&self) -> usize;
 }
 
-impl<T> GetSourceInfo for SourceMapped<'_, T>
+impl<T> GetSourceInfo for SourceMapped<&T>
 where
     T: Locatable,
     T: WhatIsIt,

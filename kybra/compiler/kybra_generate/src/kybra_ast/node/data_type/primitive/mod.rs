@@ -5,7 +5,7 @@ use rustpython_parser::ast::{ExprKind, Located};
 
 use crate::{errors::Message, source_map::SourceMapped};
 
-impl SourceMapped<'_, Located<ExprKind>> {
+impl SourceMapped<&Located<ExprKind>> {
     pub fn is_primitive(&self) -> bool {
         match &self.node.node {
             ExprKind::Name { id, .. } => match &id[..] {

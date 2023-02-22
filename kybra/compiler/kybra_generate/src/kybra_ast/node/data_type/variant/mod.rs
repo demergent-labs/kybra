@@ -6,7 +6,7 @@ use cdk_framework::act::node::data_type::variant::{Member, Variant};
 mod errors;
 mod variants_members;
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn as_variant(&self) -> Option<Variant> {
         match &self.node.node {
             StmtKind::ClassDef { name, body, .. } => {

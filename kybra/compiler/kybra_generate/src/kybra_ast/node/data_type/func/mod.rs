@@ -10,7 +10,7 @@ use crate::{
 
 mod errors;
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     // TODO make sure we are erroring instead of just noneing todo!()
     pub fn to_func(&self) -> Result<Func, Message> {
         match &self.node.node {

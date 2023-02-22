@@ -6,7 +6,7 @@ use crate::{
     source_map::SourceMapped,
 };
 
-impl SourceMapped<'_, Located<ExprKind>> {
+impl SourceMapped<&Located<ExprKind>> {
     pub fn is_array(&self) -> bool {
         match &self.node.node {
             ExprKind::Subscript { value, .. } => match &value.node {

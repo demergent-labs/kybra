@@ -14,7 +14,7 @@ pub mod type_alias;
 pub mod type_ref;
 pub mod variant;
 
-impl ToDataType for SourceMapped<'_, Located<ExprKind>> {
+impl ToDataType for SourceMapped<&Located<ExprKind>> {
     fn to_data_type(&self) -> DataType {
         if self.is_primitive() {
             match self.to_primitive() {
@@ -75,7 +75,7 @@ impl ToDataType for SourceMapped<'_, Located<ExprKind>> {
     }
 }
 
-impl ToDataType for SourceMapped<'_, Located<StmtKind>> {
+impl ToDataType for SourceMapped<&Located<StmtKind>> {
     fn to_data_type(&self) -> DataType {
         if self.is_record() {
             match self.to_record() {

@@ -51,7 +51,7 @@ pub fn generate_post_upgrade_method_body(
 }
 
 pub fn generate_post_upgrade_method_body_cdk_refactor_name(
-    post_upgrade_function_def_option: Option<&SourceMapped<Located<StmtKind>>>,
+    post_upgrade_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
     entry_module_name: &String,
 ) -> TokenStream {
     let call_to_post_upgrade_py_function = match &post_upgrade_function_def_option {

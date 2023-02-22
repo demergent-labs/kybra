@@ -6,7 +6,7 @@ use cdk_framework::{act::node::data_type::variant::Member, ToDataType};
 mod errors;
 mod warnings;
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn as_variant_member(&self) -> Member {
         match &self.node.node {
             StmtKind::AnnAssign {

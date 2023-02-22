@@ -12,7 +12,10 @@ use cdk_framework::{
     },
     AbstractCanisterTree,
 };
-use rustpython_parser::ast::{Located, Mod, StmtKind};
+use rustpython_parser::{
+    ast::{Located, Mod, StmtKind},
+    parser::{self, Mode},
+};
 
 use crate::{
     generators::{
@@ -22,17 +25,47 @@ use crate::{
         vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
     },
     py_ast::kybra_types::StableBTreeMapNode,
-    source_map::SourceMapped,
+    source_map::{SourceMap, SourceMapped},
 };
 
 pub mod node;
 
-pub struct NewPyAst<'a> {
-    pub programs: Vec<SourceMapped<'a, Mod>>,
+pub struct NewPyAst {
+    pub programs: Vec<SourceMapped<Mod>>,
     pub entry_module_name: String,
 }
 
-impl ToAct for NewPyAst<'_> {
+impl NewPyAst {
+    pub fn new(py_file_names: &Vec<&str>, entry_module_name: &str) -> NewPyAst {
+        let mut mods: Vec<_> = py_file_names
+            .iter()
+            .enumerate()
+            .map(|(_, py_file_name)| {
+                let source = std::fs::read_to_string(py_file_name).unwrap();
+
+                parser::parse(&source, Mode::Module, "").unwrap()
+            })
+            .collect();
+
+        NewPyAst {
+            programs: mods
+                .drain(..)
+                .enumerate()
+                .map(|(index, my_mod)| {
+                    let source = std::fs::read_to_string(py_file_names[index]).unwrap();
+
+                    SourceMapped {
+                        source_map: SourceMap::new(source.clone(), py_file_names[index]),
+                        node: my_mod,
+                    }
+                })
+                .collect(),
+            entry_module_name: entry_module_name.to_string(),
+        }
+    }
+}
+
+impl ToAct for NewPyAst {
     fn to_act(&self) -> AbstractCanisterTree {
         let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes();
         let external_canisters = self.build_external_canisters();
@@ -75,10 +108,10 @@ impl ToAct for NewPyAst<'_> {
     }
 }
 
-impl NewPyAst<'_> {
+impl NewPyAst {
     fn build_update_methods(&self) -> Vec<UpdateMethod> {
         self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let update_methods = match kybra_program.node {
+            let update_methods = match &kybra_program.node {
                 Mod::Module { body, .. } => body
                     .iter()
                     .filter_map(|stmt_kind| {
@@ -97,7 +130,7 @@ impl NewPyAst<'_> {
 
     fn build_query_methods(&self) -> Vec<QueryMethod> {
         self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let query_methods = match kybra_program.node {
+            let query_methods = match &kybra_program.node {
                 Mod::Module { body, .. } => body
                     .iter()
                     .filter_map(|stmt_kind| {
@@ -181,7 +214,7 @@ impl NewPyAst<'_> {
 
     fn build_funcs(&self) -> Vec<Func> {
         self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let funcs = match kybra_program.node {
+            let funcs = match &kybra_program.node {
                 Mod::Module { body, .. } => body
                     .iter()
                     .filter_map(|stmt_kind| {
@@ -200,7 +233,7 @@ impl NewPyAst<'_> {
 
     fn build_records(&self) -> Vec<Record> {
         self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let records = match kybra_program.node {
+            let records = match &kybra_program.node {
                 Mod::Module { body, .. } => body
                     .iter()
                     .filter_map(|stmt_kind| {
@@ -219,7 +252,7 @@ impl NewPyAst<'_> {
 
     fn build_tuples(&self) -> Vec<Tuple> {
         self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let tuples = match kybra_program.node {
+            let tuples = match &kybra_program.node {
                 Mod::Module { body, .. } => body
                     .iter()
                     .filter_map(|stmt_kind| {
@@ -238,7 +271,7 @@ impl NewPyAst<'_> {
 
     fn build_type_aliases(&self) -> Vec<TypeAlias> {
         self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let type_aliases = match kybra_program.node {
+            let type_aliases = match &kybra_program.node {
                 Mod::Module { body, .. } => body
                     .iter()
                     .filter_map(|stmt_kind| {
@@ -257,7 +290,7 @@ impl NewPyAst<'_> {
 
     fn build_variants(&self) -> Vec<Variant> {
         self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let variants = match kybra_program.node {
+            let variants = match &kybra_program.node {
                 Mod::Module { body, .. } => body
                     .iter()
                     .filter_map(|stmt_kind| {
@@ -279,11 +312,11 @@ impl NewPyAst<'_> {
     }
 }
 
-impl NewPyAst<'_> {
+impl NewPyAst {
     fn get_function_def_of_type(
         &self,
         method_type: CanisterMethodType,
-    ) -> Vec<SourceMapped<Located<StmtKind>>> {
+    ) -> Vec<SourceMapped<&Located<StmtKind>>> {
         self.programs.iter().fold(vec![], |mut acc, program| {
             let thing = match &program.node {
                 Mod::Module { body, .. } => body

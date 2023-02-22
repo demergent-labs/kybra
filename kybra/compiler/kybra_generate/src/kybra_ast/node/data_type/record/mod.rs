@@ -6,7 +6,7 @@ use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use crate::{errors::Message, source_map::SourceMapped};
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn is_record(&self) -> bool {
         match &self.node.node {
             StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {

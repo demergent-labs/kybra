@@ -2,7 +2,7 @@ use crate::source_map::SourceMapped;
 use cdk_framework::act::node::canister_method::{CanisterMethodType, QueryMethod};
 use rustpython_parser::ast::{Located, StmtKind};
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn as_query_method(&self) -> Option<QueryMethod> {
         if !self.is_canister_method_type(CanisterMethodType::Query) {
             return None;

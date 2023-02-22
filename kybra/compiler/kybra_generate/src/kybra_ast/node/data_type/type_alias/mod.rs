@@ -3,7 +3,7 @@ use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::source_map::SourceMapped;
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn is_type_alias(&self) -> bool {
         match &self.node.node {
             StmtKind::Assign { value: _, .. } => {

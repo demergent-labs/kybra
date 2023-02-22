@@ -5,7 +5,7 @@ use crate::{
     source_map::{GetSourceInfo, SourceMapped},
 };
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub(super) fn variant_default_value_warning(&self) -> Message {
         Message::Warning(Contents {
             title: "WARNING: Default values are not supported and will be ignored".to_string(),

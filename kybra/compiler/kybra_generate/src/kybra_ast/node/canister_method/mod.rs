@@ -20,7 +20,7 @@ use crate::source_map::SourceMapped;
 pub use query_or_update::query_method;
 pub use query_or_update::update_method;
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn is_canister_method_type(&self, canister_method_type: CanisterMethodType) -> bool {
         self.is_decorator_same_as(match canister_method_type {
             CanisterMethodType::Heartbeat => "heartbeat",

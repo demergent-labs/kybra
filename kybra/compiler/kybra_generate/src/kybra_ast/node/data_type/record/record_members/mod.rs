@@ -6,7 +6,7 @@ use cdk_framework::{act::node::data_type::record::Member, ToDataType};
 mod errors;
 mod warnings;
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn as_record_member(&self) -> Member {
         match &self.node.node {
             StmtKind::AnnAssign {

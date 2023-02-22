@@ -5,7 +5,7 @@ use crate::{
     source_map::SourceMapped,
 };
 
-impl SourceMapped<'_, Located<ExprKind>> {
+impl SourceMapped<&Located<ExprKind>> {
     pub fn invalid_subscript_value_error(&self) -> Message {
         let title =
             "Only Async, list, manual, opt, or tuple are allowed subscripts for candid values";

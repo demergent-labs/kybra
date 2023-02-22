@@ -11,7 +11,7 @@ use crate::{generators::tuple, source_map::SourceMapped};
 pub mod query_method;
 pub mod update_method;
 
-impl SourceMapped<'_, Located<StmtKind>> {
+impl SourceMapped<&Located<StmtKind>> {
     pub fn generate_body(&self) -> TokenStream {
         let act_params = self.build_act_params();
 
@@ -65,7 +65,7 @@ impl SourceMapped<'_, Located<StmtKind>> {
         match &self.node.node {
             StmtKind::FunctionDef { returns, .. } => match returns {
                 Some(returns) => SourceMapped {
-                    node: &**returns,
+                    node: returns.as_ref(),
                     source_map: self.source_map.clone(),
                 }
                 .is_manual(),
@@ -190,7 +190,7 @@ impl SourceMapped<'_, Located<StmtKind>> {
     }
 }
 
-impl SourceMapped<'_, Located<ExprKind>> {
+impl SourceMapped<&Located<ExprKind>> {
     pub fn is_manual(&self) -> bool {
         match &self.node.node {
             ExprKind::Subscript { value, slice, .. } => match &value.node {
@@ -199,7 +199,7 @@ impl SourceMapped<'_, Located<ExprKind>> {
                         return true;
                     } else {
                         return SourceMapped {
-                            node: &**slice,
+                            node: slice.as_ref(),
                             source_map: self.source_map.clone(),
                         }
                         .is_manual();
