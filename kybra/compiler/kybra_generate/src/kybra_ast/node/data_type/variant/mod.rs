@@ -8,6 +8,9 @@ mod variants_members;
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn as_variant(&self) -> Option<Variant> {
+        if !self.is_variant() {
+            return None;
+        }
         match &self.node.node {
             StmtKind::ClassDef { name, body, .. } => {
                 let members: Vec<Member> = body

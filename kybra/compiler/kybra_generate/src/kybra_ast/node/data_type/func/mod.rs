@@ -13,6 +13,9 @@ mod errors;
 impl SourceMapped<&Located<StmtKind>> {
     // TODO make sure we are erroring instead of just noneing todo!()
     pub fn to_func(&self) -> Result<Func, Message> {
+        if !self.is_func() {
+            return Err(self.todo_func_error());
+        }
         match &self.node.node {
             StmtKind::AnnAssign { target, value, .. } => match &value {
                 Some(value) => match &value.node {

@@ -11,14 +11,17 @@ impl SourceMapped<&Located<ExprKind>> {
         match &self.node.node {
             ExprKind::Name { .. } => true,
             ExprKind::Constant { value, .. } => match value {
-                Constant::Str(_) => true,
+                Constant::Str(_) => false, // TODO We need to figure this out
                 _ => false,
             },
             _ => false,
         }
     }
 
-    pub(super) fn to_type_ref(&self) -> Result<TypeRef, Message> {
+    pub fn to_type_ref(&self) -> Result<TypeRef, Message> {
+        if !self.is_type_ref() {
+            return Err(self.not_type_ref_error());
+        }
         match &self.node.node {
             ExprKind::Name { id, .. } => Ok(TypeRef {
                 name: id.to_string(),

@@ -28,6 +28,9 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn as_record(&self) -> Option<Record> {
+        if !self.is_record() {
+            return None;
+        }
         match &self.node.node {
             StmtKind::ClassDef { name, body, .. } => {
                 let members: Vec<Member> = body

@@ -85,6 +85,9 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn to_tuple(&self) -> Result<Tuple, Message> {
+        if !self.is_tuple() {
+            return Err(self.not_a_tuple_error());
+        }
         match &self.node.node {
             StmtKind::Assign { targets, value, .. } => {
                 if targets.len() > 1 {

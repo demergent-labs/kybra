@@ -1,4 +1,7 @@
-use cdk_framework::{act::node::DataType, ToDataType};
+use cdk_framework::{
+    act::node::{data_type::Primitive, DataType},
+    ToDataType,
+};
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use crate::source_map::SourceMapped;
@@ -13,6 +16,39 @@ pub mod tuple;
 pub mod type_alias;
 pub mod type_ref;
 pub mod variant;
+
+impl SourceMapped<&Located<ExprKind>> {
+    pub fn is_data_type(&self) -> bool {
+        self.is_primitive()
+            || self.is_array()
+            || self.is_opt()
+            || self.is_tuple()
+            || self.is_type_ref()
+            || self.is_subscript_slice_data_type()
+    }
+
+    fn is_subscript_slice_data_type(&self) -> bool {
+        match &self.node.node {
+            ExprKind::Subscript { value, slice, .. } => match &value.node {
+                ExprKind::Name { id, .. } => match &id[..] {
+                    "Async" => SourceMapped {
+                        node: slice.as_ref(),
+                        source_map: self.source_map.clone(),
+                    }
+                    .is_data_type(),
+                    "manual" => SourceMapped {
+                        node: slice.as_ref(),
+                        source_map: self.source_map.clone(),
+                    }
+                    .is_data_type(),
+                    _ => false,
+                },
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+}
 
 impl ToDataType for SourceMapped<&Located<ExprKind>> {
     fn to_data_type(&self) -> DataType {
@@ -61,7 +97,9 @@ impl ToDataType for SourceMapped<&Located<ExprKind>> {
                 },
                 ExprKind::Constant { value, .. } => match value {
                     Constant::None => {
-                        todo!("{}", self.none_cant_be_a_type_error());
+                        // TODO the problem is that we need to have None in the actual null and void type alias
+                        eprintln!("{}", self.none_cant_be_a_type_error());
+                        Primitive::Null.to_data_type()
                     }
                     _ => {
                         todo!()

@@ -6,9 +6,13 @@ use crate::source_map::SourceMapped;
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_type_alias(&self) -> bool {
         match &self.node.node {
-            StmtKind::Assign { value: _, .. } => {
-                // TODO we should make sure that the thing on the other end of the assign is able to be a type
-                true
+            StmtKind::Assign { value, .. } => {
+                SourceMapped {
+                    node: value.as_ref(),
+                    source_map: self.source_map.clone(),
+                }
+                .is_data_type()
+                    && false // TODO fix this
             }
             StmtKind::AnnAssign { annotation, .. } => match &annotation.node {
                 ExprKind::Name { id, .. } => id == "TypeAlias",
@@ -19,6 +23,9 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn as_type_alias(&self) -> Option<TypeAlias> {
+        if !self.is_type_alias() {
+            return None;
+        }
         let (alias_name, value) = match &self.node.node {
             StmtKind::Assign { targets, value, .. } => {
                 if targets.len() > 1 {

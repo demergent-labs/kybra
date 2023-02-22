@@ -18,6 +18,9 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     pub(super) fn to_opt(&self) -> Result<Opt, Message> {
+        if !self.is_opt() {
+            return Err(self.not_opt_error());
+        }
         match &self.node.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
