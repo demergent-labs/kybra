@@ -34,8 +34,6 @@ pub struct NewPyAst<'a> {
 
 impl ToAct for NewPyAst<'_> {
     fn to_act(&self) -> AbstractCanisterTree {
-        let query_methods = self.build_query_methods();
-        let update_methods = self.build_update_methods();
         let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes();
         let external_canisters = self.build_external_canisters();
 
@@ -45,8 +43,8 @@ impl ToAct for NewPyAst<'_> {
             inspect_message_method: self.build_inspect_method(),
             post_upgrade_method: self.build_post_upgrade_method(),
             pre_upgrade_method: self.build_pre_upgrade_method(),
-            query_methods,
-            update_methods,
+            query_methods: self.build_query_methods(),
+            update_methods: self.build_update_methods(),
         };
 
         let data_types = DataTypes {

@@ -1,5 +1,6 @@
 use cdk_framework::act::ToAct;
 use kybra_ast::NewPyAst;
+use proc_macro2::TokenStream;
 use py_ast::{kybra_types::KybraProgram, PyAst};
 use rustpython_parser::parser::{self, Mode};
 use source_map::{SourceMap, SourceMapped};
@@ -24,10 +25,7 @@ pub fn get_python_keywords() -> Vec<String> {
         .collect()
 }
 
-pub fn generate_canister(
-    py_file_names: &Vec<&str>,
-    entry_module_name: &str,
-) -> proc_macro2::token_stream::TokenStream {
+pub fn generate_canister(py_file_names: &Vec<&str>, entry_module_name: &str) -> TokenStream {
     let kybra_programs: Vec<KybraProgram> = py_file_names
         .iter()
         .enumerate()

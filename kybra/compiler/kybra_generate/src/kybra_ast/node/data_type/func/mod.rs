@@ -1,45 +1,47 @@
 use cdk_framework::{
-    act::node::data_type::{func::Mode, Func},
+    act::node::data_type::{func::Mode, Func, Primitive},
     ToDataType,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{generators::func, py_ast::kybra_types::KybraExpr, source_map::SourceMapped};
+use crate::{
+    errors::Message, generators::func, py_ast::kybra_types::KybraExpr, source_map::SourceMapped,
+};
 
 mod errors;
 
 impl SourceMapped<'_, Located<StmtKind>> {
     // TODO make sure we are erroring instead of just noneing todo!()
-    pub fn as_func(&self) -> Option<Func> {
+    pub fn to_func(&self) -> Result<Func, Message> {
         match &self.node.node {
             StmtKind::AnnAssign { target, value, .. } => match &value {
                 Some(value) => match &value.node {
                     ExprKind::Call { args, .. } => {
                         let name = match &target.node {
                             ExprKind::Name { id, .. } => id.clone(),
-                            _ => todo!(),
+                            _ => return Err(self.todo_func_error()),
                         };
                         if args.len() != 1 {
-                            todo!()
+                            return Err(self.todo_func_error());
                         }
                         let mode = match &args[0].node {
                             ExprKind::Subscript { value, .. } => match &value.node {
                                 ExprKind::Name { id, .. } => {
                                     if !["Oneway", "Update", "Query"].contains(&id.as_str()) {
-                                        todo!()
+                                        return Err(self.todo_func_error());
                                     }
                                     id
                                 }
-                                _ => todo!(),
+                                _ => return Err(self.todo_func_error()),
                             },
-                            _ => todo!(),
+                            _ => return Err(self.todo_func_error()),
                         }
                         .to_string();
                         let params = match &args[0].node {
                             ExprKind::Subscript { slice, .. } => match &slice.node {
                                 ExprKind::Tuple { elts, .. } => {
                                     if elts.len() != 2 {
-                                        todo!()
+                                        return Err(self.todo_func_error());
                                     }
                                     match &elts[0].node {
                                         ExprKind::List { elts, .. } => elts
@@ -52,22 +54,22 @@ impl SourceMapped<'_, Located<StmtKind>> {
                                                 .to_data_type()
                                             })
                                             .collect(),
-                                        _ => todo!(),
+                                        _ => return Err(self.todo_func_error()),
                                     }
                                 }
-                                _ => todo!(),
+                                _ => return Err(self.todo_func_error()),
                             },
-                            _ => todo!(),
+                            _ => return Err(self.todo_func_error()),
                         };
                         let return_type = Box::from(if mode == "Oneway" {
-                            todo!();
+                            Primitive::Void.to_data_type()
                             // TODO I am guessing void here but I am not sure
                         } else {
                             match &args[0].node {
                                 ExprKind::Subscript { slice, .. } => match &slice.node {
                                     ExprKind::Tuple { elts, .. } => {
                                         if elts.len() != 2 {
-                                            todo!()
+                                            return Err(self.todo_func_error());
                                         }
                                         SourceMapped {
                                             node: &elts[1],
@@ -75,18 +77,18 @@ impl SourceMapped<'_, Located<StmtKind>> {
                                         }
                                         .to_data_type()
                                     }
-                                    _ => todo!(),
+                                    _ => return Err(self.todo_func_error()),
                                 },
-                                _ => todo!(),
+                                _ => return Err(self.todo_func_error()),
                             }
                         });
                         let mode = match mode.as_str() {
                             "Oneway" => Mode::Oneway,
                             "Update" => Mode::Update,
                             "Query" => Mode::Query,
-                            _ => todo!(),
+                            _ => return Err(self.todo_func_error()),
                         };
-                        Some(Func {
+                        Ok(Func {
                             to_vm_value: func::generate_func_to_vm_value(&name),
                             list_to_vm_value: func::generate_func_list_to_vm_value(&name),
                             from_vm_value: func::generate_func_from_vm_value(&name),
@@ -97,12 +99,16 @@ impl SourceMapped<'_, Located<StmtKind>> {
                             mode,
                         })
                     }
-                    _ => None,
+                    _ => return Err(self.todo_func_error()),
                 },
-                None => todo!(),
+                None => return Err(self.todo_func_error()),
             },
-            _ => None,
+            _ => return Err(self.todo_func_error()),
         }
+    }
+
+    pub fn as_func(&self) -> Option<Func> {
+        self.to_func().ok()
     }
 
     pub fn is_func(&self) -> bool {

@@ -17,7 +17,7 @@ impl SourceMapped<'_, Located<ExprKind>> {
         }
     }
 
-    pub(super) fn to_array(&self) -> Result<Array, Message> {
+    pub fn to_array(&self) -> Result<Array, Message> {
         match &self.node.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
