@@ -2,7 +2,6 @@
 
 -   [The Kybra Book](./the_kybra_book.md)
 -   [Kybra (Beta)](./kybra.md)
--   [Quick Start](./quick_start.md)
 -   [Examples](./examples.md)
 -   [Installation](./installation.md)
 -   [Hello World](./hello_world.md)
