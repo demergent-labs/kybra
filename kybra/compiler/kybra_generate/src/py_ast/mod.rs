@@ -98,7 +98,7 @@ impl PyAst {
             pre_upgrade: self.build_pre_upgrade_method(),
             post_upgrade: self.build_post_upgrade_method(),
             inspect_method: self.build_inspect_method(),
-            heartbeat: self.build_heartbeat_method(),
+            heartbeat: None,
             function_guards: self.build_function_guards(),
             external_canisters,
             rust_code,

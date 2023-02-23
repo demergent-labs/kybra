@@ -2,8 +2,8 @@ use cdk_framework::{
     act::{
         node::{
             canister_method::{
-                CanisterMethodType, HeartbeatMethod, InitMethod, InspectMessageMethod,
-                PostUpgradeMethod, PreUpgradeMethod, QueryMethod, UpdateMethod,
+                CanisterMethodType, InitMethod, InspectMessageMethod, PostUpgradeMethod,
+                PreUpgradeMethod, QueryMethod, UpdateMethod,
             },
             data_type::{Func, Record, Tuple, TypeAlias, Variant},
             ExternalCanister, GuardFunction,
@@ -153,10 +153,6 @@ impl NewPyAst {
 
     fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
         vec![]
-    }
-
-    fn build_heartbeat_method(&self) -> Option<HeartbeatMethod> {
-        None
     }
 
     fn build_init_method(&self) -> InitMethod {
