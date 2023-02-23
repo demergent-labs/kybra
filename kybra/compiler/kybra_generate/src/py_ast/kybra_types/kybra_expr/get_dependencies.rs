@@ -95,23 +95,23 @@ impl GetDependencies for KybraExpr<'_> {
                 .get_dependent_types(type_alias_lookup, found_type_names);
                 acc.union(&dependencies).cloned().collect()
             }),
-            ExprKind::Call { func, .. } => {
-                if self.is_stable_b_tree_map_node() {
-                    let kybra_expr = KybraExpr {
-                        located_expr: func,
-                        source_map: self.source_map.clone(),
-                    };
-                    let key_deps = kybra_expr
-                        .get_key_type()
-                        .get_dependent_types(type_alias_lookup, found_type_names);
-                    let value_deps = kybra_expr
-                        .get_value_type()
-                        .get_dependent_types(type_alias_lookup, found_type_names);
-                    key_deps.union(&value_deps).cloned().collect()
-                } else {
-                    HashSet::new()
-                }
-            }
+            // ExprKind::Call { func, .. } => {
+            //     if self.is_stable_b_tree_map_node() {
+            //         let kybra_expr = KybraExpr {
+            //             located_expr: func,
+            //             source_map: self.source_map.clone(),
+            //         };
+            //         let key_deps = kybra_expr
+            //             .get_key_type()
+            //             .get_dependent_types(type_alias_lookup, found_type_names);
+            //         let value_deps = kybra_expr
+            //             .get_value_type()
+            //             .get_dependent_types(type_alias_lookup, found_type_names);
+            //         key_deps.union(&value_deps).cloned().collect()
+            //     } else {
+            //         HashSet::new()
+            //     }
+            // }
             _ => HashSet::new(),
         }
     }

@@ -11,8 +11,8 @@ use cdk_framework::act::node::{
 use super::KybraStmt;
 
 mod build_external_canisters;
-pub mod stable_b_tree_map_nodes;
-pub use stable_b_tree_map_nodes::StableBTreeMapNode;
+// pub mod stable_b_tree_map_nodes;
+// pub use stable_b_tree_map_nodes::StableBTreeMapNode;
 
 pub struct KybraProgram {
     pub program: Mod,
@@ -90,25 +90,25 @@ impl KybraProgram {
     //     }
     // }
 
-    pub fn get_kybra_stable_b_tree_node_stmts(&self) -> Vec<KybraStmt> {
-        match &self.program {
-            Mod::Module { body, .. } => body
-                .iter()
-                .filter(|stmt_kind| {
-                    let kybra_stmt = KybraStmt {
-                        stmt_kind,
-                        source_map: self.source_map.clone(),
-                    };
-                    kybra_stmt.is_stable_b_tree_map_node()
-                })
-                .map(|stmt_kind| KybraStmt {
-                    stmt_kind,
-                    source_map: self.source_map.clone(),
-                })
-                .collect(),
-            _ => vec![],
-        }
-    }
+    // pub fn get_kybra_stable_b_tree_node_stmts(&self) -> Vec<KybraStmt> {
+    //     match &self.program {
+    //         Mod::Module { body, .. } => body
+    //             .iter()
+    //             .filter(|stmt_kind| {
+    //                 let kybra_stmt = KybraStmt {
+    //                     stmt_kind,
+    //                     source_map: self.source_map.clone(),
+    //                 };
+    //                 kybra_stmt.is_stable_b_tree_map_node()
+    //             })
+    //             .map(|stmt_kind| KybraStmt {
+    //                 stmt_kind,
+    //                 source_map: self.source_map.clone(),
+    //             })
+    //             .collect(),
+    //         _ => vec![],
+    //     }
+    // }
 
     pub fn get_function_defs_of_type(&self, method_type: CanisterMethodType) -> Vec<KybraStmt> {
         match &self.program {

@@ -12,7 +12,6 @@ use crate::{
         body, header,
         vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
     },
-    py_ast::kybra_types::StableBTreeMapNode,
     source_map::{SourceMap, SourceMapped},
 };
 
@@ -107,9 +106,5 @@ impl NewPyAst {
             };
             vec![acc, update_methods].concat()
         })
-    }
-
-    fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
-        vec![]
     }
 }

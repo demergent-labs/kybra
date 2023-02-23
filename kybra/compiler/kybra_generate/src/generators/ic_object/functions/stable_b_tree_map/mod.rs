@@ -1,3 +1,5 @@
+use crate::kybra_ast::node::stable_b_tree_map_nodes::StableBTreeMapNode;
+
 pub mod contains_key;
 pub mod get;
 pub mod insert;
@@ -7,8 +9,6 @@ pub mod keys;
 pub mod len;
 pub mod remove;
 pub mod values;
-
-use crate::py_ast::kybra_types::StableBTreeMapNode;
 
 pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> proc_macro2::TokenStream {
     let contains_key = contains_key::generate(stable_b_tree_map_nodes);

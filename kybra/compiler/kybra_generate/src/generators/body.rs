@@ -7,7 +7,7 @@ use crate::{
     generators::{
         async_result_handler, ic_object, rng_seed, stable_b_tree_map, unwrap_rust_python_result,
     },
-    py_ast::kybra_types::StableBTreeMapNode,
+    kybra_ast::node::stable_b_tree_map_nodes::StableBTreeMapNode,
 };
 
 pub fn generate(

@@ -6,10 +6,7 @@ use std::collections::{HashMap, HashSet};
 
 use crate::{
     generators::body,
-    py_ast::{
-        kybra_types::{KybraStmt, StableBTreeMapNode},
-        traits::GetDependencies,
-    },
+    py_ast::{kybra_types::KybraStmt, traits::GetDependencies},
 };
 
 pub use self::kybra_ast::KybraAst;
@@ -31,7 +28,7 @@ impl PyAst {
     pub fn get_dependencies(&self) -> HashSet<String> {
         let kybra_canister_method_stmts = self.get_kybra_canister_method_stmts();
         let kybra_canister_stmts: Vec<KybraStmt> = vec![];
-        let stable_b_tree_nodes = self.get_kybra_stable_b_tree_node_stmts();
+        let stable_b_tree_nodes: Vec<KybraStmt> = vec![];
         let type_alias_lookup = self.generate_type_alias_lookup();
 
         let canister_method_dependencies = kybra_canister_method_stmts.iter().fold(
@@ -84,7 +81,7 @@ impl PyAst {
         let query_methods = self.build_query_methods();
         let external_canisters = vec![];
         let canister_types = self.build_canister_types();
-        let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes();
+        let stable_b_tree_map_nodes = vec![];
 
         let rust_code = body::generate(
             &update_methods,
@@ -132,13 +129,13 @@ impl PyAst {
     //         })
     // }
 
-    fn get_kybra_stable_b_tree_node_stmts(&self) -> Vec<KybraStmt> {
-        self.kybra_programs
-            .iter()
-            .fold(vec![], |acc, kybra_program| {
-                vec![acc, kybra_program.get_kybra_stable_b_tree_node_stmts()].concat()
-            })
-    }
+    // fn get_kybra_stable_b_tree_node_stmts(&self) -> Vec<KybraStmt> {
+    //     self.kybra_programs
+    //         .iter()
+    //         .fold(vec![], |acc, kybra_program| {
+    //             vec![acc, kybra_program.get_kybra_stable_b_tree_node_stmts()].concat()
+    //         })
+    // }
 
     fn build_update_methods(&self) -> Vec<UpdateMethod> {
         self.kybra_programs
@@ -182,13 +179,13 @@ impl PyAst {
     //         })
     // }
 
-    fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
-        self.kybra_programs
-            .iter()
-            .map(|program| program.build_stable_b_tree_map_nodes())
-            .collect::<Vec<_>>()
-            .concat()
-    }
+    // fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
+    //     self.kybra_programs
+    //         .iter()
+    //         .map(|program| program.build_stable_b_tree_map_nodes())
+    //         .collect::<Vec<_>>()
+    //         .concat()
+    // }
 
     // fn build_external_canisters(&self) -> Vec<ExternalCanister> {
     //     self.kybra_programs

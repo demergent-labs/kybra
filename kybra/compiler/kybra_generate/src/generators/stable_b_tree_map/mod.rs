@@ -1,6 +1,7 @@
+use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::py_ast::kybra_types::StableBTreeMapNode;
+use crate::kybra_ast::node::StableBTreeMapNode;
 
 pub mod bounded_storable_impl;
 pub mod ref_cell_ident;
@@ -8,7 +9,7 @@ pub mod storable_impl;
 pub mod try_into_vm_value_impl;
 pub mod wrapper_type;
 
-pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> proc_macro2::TokenStream {
+pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStream {
     let stable_b_tree_maps_and_impls =
         generate_global_stable_b_tree_maps_and_impls(stable_b_tree_map_nodes);
     let stable_b_tree_maps: Vec<proc_macro2::TokenStream> = stable_b_tree_maps_and_impls

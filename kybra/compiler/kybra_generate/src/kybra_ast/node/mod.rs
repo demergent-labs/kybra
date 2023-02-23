@@ -7,6 +7,9 @@ pub mod data_type;
 pub mod external_canister;
 pub mod guard_function;
 pub mod param;
+pub mod stable_b_tree_map_nodes;
+
+pub use stable_b_tree_map_nodes::StableBTreeMapNode;
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn get_name(&self) -> Option<String> {
