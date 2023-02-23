@@ -157,7 +157,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    fn get_guard_function_name(&self) -> Option<String> {
+    pub fn get_guard_function_name(&self) -> Option<String> {
         match &self.node.node {
             StmtKind::FunctionDef { decorator_list, .. } => {
                 decorator_list

@@ -1,6 +1,6 @@
 use cdk_framework::act::node::{
     canister_method::{InitMethod, PostUpgradeMethod, PreUpgradeMethod, QueryMethod, UpdateMethod},
-    DataType, ExternalCanister, GuardFunction,
+    DataType, ExternalCanister,
 };
 use std::collections::{HashMap, HashSet};
 
@@ -107,7 +107,7 @@ impl PyAst {
             },
             inspect_method: None,
             heartbeat: None,
-            function_guards: self.build_function_guards(),
+            function_guards: vec![],
             external_canisters,
             rust_code,
             query_methods,
@@ -148,13 +148,13 @@ impl PyAst {
             })
     }
 
-    fn build_function_guards(&self) -> Vec<GuardFunction> {
-        self.kybra_programs
-            .iter()
-            .fold(vec![], |acc, kybra_program| {
-                vec![acc, kybra_program.build_function_guard_act_nodes()].concat()
-            })
-    }
+    // fn build_function_guards(&self) -> Vec<GuardFunction> {
+    //     self.kybra_programs
+    //         .iter()
+    //         .fold(vec![], |acc, kybra_program| {
+    //             vec![acc, kybra_program.build_function_guard_act_nodes()].concat()
+    //         })
+    // }
 
     fn build_query_methods(&self) -> Vec<QueryMethod> {
         self.kybra_programs

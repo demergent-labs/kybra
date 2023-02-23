@@ -246,7 +246,35 @@ impl NewPyAst {
     }
 
     fn build_guard_functions(&self) -> Vec<GuardFunction> {
-        vec![]
+        let function_guard_names = self.get_guard_function_names();
+        self.programs.iter().fold(vec![], |acc, kybra_program| {
+            vec![
+                acc,
+                match &kybra_program.node {
+                    Mod::Module { body, .. } => body
+                        .iter()
+                        .filter(|stmt_kind| match &stmt_kind.node {
+                            StmtKind::FunctionDef { name, .. } => {
+                                function_guard_names.contains(name)
+                            }
+                            _ => false,
+                        })
+                        .map(|stmt_kind| {
+                            let kybra_stmt = SourceMapped {
+                                node: stmt_kind,
+                                source_map: kybra_program.source_map.clone(),
+                            };
+                            match kybra_stmt.as_function_guard() {
+                                Some(function_guard) => function_guard,
+                                None => panic!("Unreachable"),
+                            }
+                        })
+                        .collect(),
+                    _ => vec![],
+                },
+            ]
+            .concat()
+        })
     }
 }
 
