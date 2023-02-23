@@ -4,7 +4,7 @@ use crate::{generators::canister_methods::heartbeat, kybra_ast::NewPyAst};
 
 impl NewPyAst {
     pub fn build_heartbeat_method(&self) -> Option<HeartbeatMethod> {
-        let heartbeat_function_defs = self.get_function_def_of_type(CanisterMethodType::Heartbeat);
+        let heartbeat_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Heartbeat);
 
         if heartbeat_function_defs.len() > 1 {
             todo!();

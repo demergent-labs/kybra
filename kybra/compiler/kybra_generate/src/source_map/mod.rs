@@ -15,6 +15,7 @@ pub struct SourceMap {
     pub file_name: String,
 }
 
+#[derive(Clone)]
 pub struct SourceMapped<T> {
     pub node: T,
     pub source_map: SourceMap,

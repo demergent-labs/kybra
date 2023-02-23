@@ -5,7 +5,7 @@ use crate::{generators::canister_methods::post_upgrade, kybra_ast::NewPyAst};
 impl NewPyAst {
     pub fn build_post_upgrade_method(&self) -> PostUpgradeMethod {
         let post_upgrade_function_defs =
-            self.get_function_def_of_type(CanisterMethodType::PostUpgrade);
+            self.get_canister_stmt_of_type(CanisterMethodType::PostUpgrade);
 
         if post_upgrade_function_defs.len() > 1 {
             todo!();

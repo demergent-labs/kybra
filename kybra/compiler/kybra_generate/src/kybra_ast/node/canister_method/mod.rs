@@ -12,13 +12,44 @@ use cdk_framework::ToDataType;
 use proc_macro2::TokenStream;
 use rustpython_parser::ast::ExprKind;
 use rustpython_parser::ast::Located;
+use rustpython_parser::ast::Mod;
 use rustpython_parser::ast::StmtKind;
 
 use crate::generators::canister_methods;
+use crate::kybra_ast::NewPyAst;
 use crate::source_map::SourceMapped;
 
 pub use query_or_update::query_method;
 pub use query_or_update::update_method;
+
+impl NewPyAst {
+    fn get_canister_stmt_of_type(
+        &self,
+        method_type: CanisterMethodType,
+    ) -> Vec<SourceMapped<&Located<StmtKind>>> {
+        self.programs.iter().fold(vec![], |mut acc, program| {
+            let thing = match &program.node {
+                Mod::Module { body, .. } => body
+                    .iter()
+                    .filter(|stmt_kind| {
+                        SourceMapped {
+                            node: *stmt_kind,
+                            source_map: program.source_map.clone(),
+                        }
+                        .is_canister_method_type(method_type.clone())
+                    })
+                    .map(|stmt_kind| SourceMapped {
+                        node: stmt_kind,
+                        source_map: program.source_map.clone(),
+                    })
+                    .collect(),
+                _ => vec![],
+            };
+            acc.extend(thing);
+            acc
+        })
+    }
+}
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_canister_method_type(&self, canister_method_type: CanisterMethodType) -> bool {

@@ -4,7 +4,7 @@ use crate::{generators::canister_methods::init, kybra_ast::NewPyAst};
 
 impl NewPyAst {
     pub fn build_init_method(&self) -> InitMethod {
-        let init_function_defs = self.get_function_def_of_type(CanisterMethodType::Init);
+        let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
 
         if init_function_defs.len() > 1 {
             todo!();

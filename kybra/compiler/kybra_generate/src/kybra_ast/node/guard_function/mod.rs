@@ -5,23 +5,47 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use rustpython_parser::ast::{Located, Mod, StmtKind};
 
-use crate::{kybra_ast::NewPyAst, source_map::SourceMapped};
+use crate::{
+    errors::{CreateMessage, Message},
+    kybra_ast::NewPyAst,
+    source_map::SourceMapped,
+};
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_function_guard(&self) -> Option<GuardFunction> {
+    pub fn is_guard_function(&self, guard_function_names: &Vec<String>) -> bool {
+        match &self.node.node {
+            StmtKind::FunctionDef { name, .. } => guard_function_names.contains(name),
+            _ => false,
+        }
+    }
+    pub fn as_guard_function(&self, guard_function_names: &Vec<String>) -> Option<GuardFunction> {
+        self.to_guard_function(guard_function_names).ok()
+    }
+
+    pub fn to_guard_function(
+        &self,
+        guard_function_names: &Vec<String>,
+    ) -> Result<GuardFunction, Message> {
+        if !self.is_guard_function(guard_function_names) {
+            return Err(self.create_error_message("Not a guard function", "", None));
+        }
         match &self.node.node {
             StmtKind::FunctionDef { name, .. } => {
-                let body = self.generate_function_guard_body(name);
+                let body = self.generate_guard_function_body(name);
                 if self.has_params() {
-                    todo!("{}", "Function guards can't have parameters")
+                    return Err(self.create_error_message(
+                        "Guards functions can't have parameters",
+                        "",
+                        None,
+                    ));
                 }
 
-                Some(GuardFunction {
+                Ok(GuardFunction {
                     body,
                     name: name.clone(),
                 })
             }
-            _ => None,
+            _ => return Err(self.create_error_message("Not a guard function", "", None)),
         }
     }
 
@@ -32,7 +56,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    fn generate_function_guard_body(&self, function_name: &String) -> TokenStream {
+    fn generate_guard_function_body(&self, function_name: &String) -> TokenStream {
         quote! {
             unsafe{
                 let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();

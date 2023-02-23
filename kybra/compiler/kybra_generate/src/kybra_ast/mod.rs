@@ -1,7 +1,7 @@
 use cdk_framework::{
     act::{
         node::{
-            canister_method::{CanisterMethodType, QueryMethod, UpdateMethod},
+            canister_method::{QueryMethod, UpdateMethod},
             data_type::{Func, Record, Tuple, TypeAlias, Variant},
             ExternalCanister, GuardFunction,
         },
@@ -104,17 +104,14 @@ impl NewPyAst {
 }
 
 impl NewPyAst {
-    fn build_update_methods(&self) -> Vec<UpdateMethod> {
+    fn get_stmt_kinds(&self) -> Vec<SourceMapped<&Located<StmtKind>>> {
         self.programs.iter().fold(vec![], |acc, kybra_program| {
             let update_methods = match &kybra_program.node {
                 Mod::Module { body, .. } => body
                     .iter()
-                    .filter_map(|stmt_kind| {
-                        SourceMapped {
-                            node: stmt_kind,
-                            source_map: kybra_program.source_map.clone(),
-                        }
-                        .as_update_method()
+                    .map(|stmt_kind| SourceMapped {
+                        node: stmt_kind,
+                        source_map: kybra_program.source_map.clone(),
                     })
                     .collect(),
                 _ => vec![],
@@ -123,23 +120,18 @@ impl NewPyAst {
         })
     }
 
+    fn build_update_methods(&self) -> Vec<UpdateMethod> {
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_update_method())
+            .collect()
+    }
+
     fn build_query_methods(&self) -> Vec<QueryMethod> {
-        self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let query_methods = match &kybra_program.node {
-                Mod::Module { body, .. } => body
-                    .iter()
-                    .filter_map(|stmt_kind| {
-                        SourceMapped {
-                            node: stmt_kind,
-                            source_map: kybra_program.source_map.clone(),
-                        }
-                        .as_query_method()
-                    })
-                    .collect(),
-                _ => vec![],
-            };
-            vec![acc, query_methods].concat()
-        })
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_query_method())
+            .collect()
     }
 
     fn build_external_canisters(&self) -> Vec<ExternalCanister> {
@@ -151,158 +143,47 @@ impl NewPyAst {
     }
 
     fn build_funcs(&self) -> Vec<Func> {
-        self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let funcs = match &kybra_program.node {
-                Mod::Module { body, .. } => body
-                    .iter()
-                    .filter_map(|stmt_kind| {
-                        SourceMapped {
-                            node: stmt_kind,
-                            source_map: kybra_program.source_map.clone(),
-                        }
-                        .as_func()
-                    })
-                    .collect(),
-                _ => vec![],
-            };
-            vec![acc, funcs].concat()
-        })
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_func())
+            .collect()
     }
 
     fn build_records(&self) -> Vec<Record> {
-        self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let records = match &kybra_program.node {
-                Mod::Module { body, .. } => body
-                    .iter()
-                    .filter_map(|stmt_kind| {
-                        SourceMapped {
-                            node: stmt_kind,
-                            source_map: kybra_program.source_map.clone(),
-                        }
-                        .as_record()
-                    })
-                    .collect(),
-                _ => vec![],
-            };
-            vec![acc, records].concat()
-        })
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_record())
+            .collect()
     }
 
     fn build_tuples(&self) -> Vec<Tuple> {
-        self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let tuples = match &kybra_program.node {
-                Mod::Module { body, .. } => body
-                    .iter()
-                    .filter_map(|stmt_kind| {
-                        SourceMapped {
-                            node: stmt_kind,
-                            source_map: kybra_program.source_map.clone(),
-                        }
-                        .as_tuple()
-                    })
-                    .collect(),
-                _ => vec![],
-            };
-            vec![acc, tuples].concat()
-        })
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_tuple())
+            .collect()
     }
 
     fn build_type_aliases(&self) -> Vec<TypeAlias> {
-        self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let type_aliases = match &kybra_program.node {
-                Mod::Module { body, .. } => body
-                    .iter()
-                    .filter_map(|stmt_kind| {
-                        SourceMapped {
-                            node: stmt_kind,
-                            source_map: kybra_program.source_map.clone(),
-                        }
-                        .as_type_alias()
-                    })
-                    .collect(),
-                _ => vec![],
-            };
-            vec![acc, type_aliases].concat()
-        })
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_type_alias())
+            .collect()
     }
 
     fn build_variants(&self) -> Vec<Variant> {
-        self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let variants = match &kybra_program.node {
-                Mod::Module { body, .. } => body
-                    .iter()
-                    .filter_map(|stmt_kind| {
-                        SourceMapped {
-                            node: stmt_kind,
-                            source_map: kybra_program.source_map.clone(),
-                        }
-                        .as_variant()
-                    })
-                    .collect(),
-                _ => vec![],
-            };
-            vec![acc, variants].concat()
-        })
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_variant())
+            .collect()
     }
 
     fn build_guard_functions(&self) -> Vec<GuardFunction> {
-        let function_guard_names = self.get_guard_function_names();
-        self.programs.iter().fold(vec![], |acc, kybra_program| {
-            vec![
-                acc,
-                match &kybra_program.node {
-                    Mod::Module { body, .. } => body
-                        .iter()
-                        .filter(|stmt_kind| match &stmt_kind.node {
-                            StmtKind::FunctionDef { name, .. } => {
-                                function_guard_names.contains(name)
-                            }
-                            _ => false,
-                        })
-                        .map(|stmt_kind| {
-                            let kybra_stmt = SourceMapped {
-                                node: stmt_kind,
-                                source_map: kybra_program.source_map.clone(),
-                            };
-                            match kybra_stmt.as_function_guard() {
-                                Some(function_guard) => function_guard,
-                                None => panic!("Unreachable"),
-                            }
-                        })
-                        .collect(),
-                    _ => vec![],
-                },
-            ]
-            .concat()
-        })
-    }
-}
-
-impl NewPyAst {
-    fn get_function_def_of_type(
-        &self,
-        method_type: CanisterMethodType,
-    ) -> Vec<SourceMapped<&Located<StmtKind>>> {
-        self.programs.iter().fold(vec![], |mut acc, program| {
-            let thing = match &program.node {
-                Mod::Module { body, .. } => body
-                    .iter()
-                    .filter(|stmt_kind| {
-                        SourceMapped {
-                            node: *stmt_kind,
-                            source_map: program.source_map.clone(),
-                        }
-                        .is_canister_method_type(method_type.clone())
-                    })
-                    .map(|stmt_kind| SourceMapped {
-                        node: stmt_kind,
-                        source_map: program.source_map.clone(),
-                    })
-                    .collect(),
-                _ => vec![],
-            };
-            acc.extend(thing);
-            acc
-        })
+        let guard_function_names = self.get_guard_function_names();
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| {
+                source_mapped_stmt_kind.as_guard_function(&guard_function_names)
+            })
+            .collect()
     }
 }

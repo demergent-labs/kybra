@@ -5,7 +5,7 @@ use crate::{generators::canister_methods::inspect_message, kybra_ast::NewPyAst};
 impl NewPyAst {
     pub fn build_inspect_method(&self) -> Option<InspectMessageMethod> {
         let inspect_message_function_defs =
-            self.get_function_def_of_type(CanisterMethodType::InspectMessage);
+            self.get_canister_stmt_of_type(CanisterMethodType::InspectMessage);
 
         if inspect_message_function_defs.len() > 1 {
             todo!();
