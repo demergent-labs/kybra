@@ -1,7 +1,7 @@
 use cdk_framework::{
     act::{
         node::canister_method::{QueryMethod, UpdateMethod},
-        CanisterMethods, DataTypes, ToAct,
+        CanisterMethods, DataTypes,
     },
     AbstractCanisterTree,
 };
@@ -12,8 +12,8 @@ use crate::generators::{
     vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
 };
 
-impl ToAct for KybraAst {
-    fn to_act(&self) -> AbstractCanisterTree {
+impl KybraAst {
+    pub fn to_act(&self) -> AbstractCanisterTree {
         let header = header::generate();
 
         let query_methods: Vec<QueryMethod> = self.query_methods.iter().cloned().collect();

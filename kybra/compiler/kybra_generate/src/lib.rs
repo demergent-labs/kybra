@@ -1,4 +1,3 @@
-use cdk_framework::act::ToAct;
 use kybra_ast::NewPyAst;
 use proc_macro2::TokenStream;
 use py_ast::PyAst;

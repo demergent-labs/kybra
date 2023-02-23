@@ -36,6 +36,10 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
+    pub fn as_primitive(&self) -> Option<Primitive> {
+        self.to_primitive().ok()
+    }
+
     pub fn to_primitive(&self) -> Result<Primitive, Message> {
         match &self.node.node {
             ExprKind::Name { id, .. } => match &id[..] {

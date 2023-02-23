@@ -8,7 +8,7 @@ use cdk_framework::{
             data_type::{Func, Record, Tuple, TypeAlias, Variant},
             ExternalCanister, GuardFunction,
         },
-        CanisterMethods, DataTypes, ToAct,
+        CanisterMethods, DataTypes,
     },
     AbstractCanisterTree,
 };
@@ -65,8 +65,8 @@ impl NewPyAst {
     }
 }
 
-impl ToAct for NewPyAst {
-    fn to_act(&self) -> AbstractCanisterTree {
+impl NewPyAst {
+    pub fn to_act(&self) -> AbstractCanisterTree {
         let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes();
         let external_canisters = self.build_external_canisters();
 

@@ -52,6 +52,7 @@ impl SourceMapped<&Located<ExprKind>> {
 
 impl ToDataType for SourceMapped<&Located<ExprKind>> {
     fn to_data_type(&self) -> DataType {
+        // TODO make these ifs that return instead of else if
         if self.is_primitive() {
             match self.to_primitive() {
                 Ok(primitive) => DataType::Primitive(primitive),

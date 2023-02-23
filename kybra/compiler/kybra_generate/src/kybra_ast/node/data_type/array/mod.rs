@@ -17,6 +17,10 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
+    pub fn as_array(&self) -> Option<Array> {
+        self.to_array().ok()
+    }
+
     pub fn to_array(&self) -> Result<Array, Message> {
         if !self.is_array() {
             return Err(self.not_array_error());

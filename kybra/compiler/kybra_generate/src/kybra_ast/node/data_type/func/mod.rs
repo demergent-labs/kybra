@@ -11,7 +11,6 @@ use crate::{
 mod errors;
 
 impl SourceMapped<&Located<StmtKind>> {
-    // TODO make sure we are erroring instead of just noneing todo!()
     pub fn to_func(&self) -> Result<Func, Message> {
         if !self.is_func() {
             return Err(self.todo_func_error());
@@ -139,6 +138,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
+    // TODO are we using this anywhere?
     pub fn get_func_args(&self) -> Option<&Vec<Located<ExprKind>>> {
         if !self.is_func() {
             return None;
