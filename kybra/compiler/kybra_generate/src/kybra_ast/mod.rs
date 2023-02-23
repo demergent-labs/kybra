@@ -1,7 +1,7 @@
 use cdk_framework::{
     act::{
         node::{
-            canister_method::{CanisterMethodType, PreUpgradeMethod, QueryMethod, UpdateMethod},
+            canister_method::{CanisterMethodType, QueryMethod, UpdateMethod},
             data_type::{Func, Record, Tuple, TypeAlias, Variant},
             ExternalCanister, GuardFunction,
         },
@@ -148,10 +148,6 @@ impl NewPyAst {
 
     fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
         vec![]
-    }
-
-    fn build_pre_upgrade_method(&self) -> Option<PreUpgradeMethod> {
-        None
     }
 
     fn build_funcs(&self) -> Vec<Func> {

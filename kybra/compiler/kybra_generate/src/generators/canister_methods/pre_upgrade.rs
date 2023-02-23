@@ -1,10 +1,12 @@
+use proc_macro2::TokenStream;
 use quote::quote;
+use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::py_ast::kybra_types::KybraStmt;
+use crate::source_map::SourceMapped;
 
 pub fn generate_pre_upgrade_method_body(
-    pre_upgrade_function_def_option: Option<&KybraStmt>,
-) -> proc_macro2::TokenStream {
+    pre_upgrade_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
+) -> TokenStream {
     let call_to_pre_upgrade_py_function = match pre_upgrade_function_def_option {
         Some(pre_upgrade_function_def) => pre_upgrade_function_def.generate_call_to_py_function(),
         None => quote!(),

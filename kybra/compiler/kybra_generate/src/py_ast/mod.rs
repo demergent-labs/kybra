@@ -1,7 +1,5 @@
 use cdk_framework::act::node::{
-    canister_method::{
-        CanisterMethodType, InitMethod, PostUpgradeMethod, QueryMethod, UpdateMethod,
-    },
+    canister_method::{InitMethod, PostUpgradeMethod, PreUpgradeMethod, QueryMethod, UpdateMethod},
     DataType, ExternalCanister, GuardFunction,
 };
 use std::collections::{HashMap, HashSet};
@@ -100,7 +98,9 @@ impl PyAst {
                 params: vec![],
                 body: quote::quote!(),
             },
-            pre_upgrade: self.build_pre_upgrade_method(),
+            pre_upgrade: PreUpgradeMethod {
+                body: quote::quote!(),
+            },
             post_upgrade: PostUpgradeMethod {
                 params: vec![],
                 body: quote::quote!(),
@@ -173,14 +173,14 @@ impl PyAst {
             })
     }
 
-    fn get_function_def_of_type(&self, method_type: CanisterMethodType) -> Vec<KybraStmt> {
-        self.kybra_programs
-            .iter()
-            .fold(vec![], |mut acc, kybra_program| {
-                acc.extend(kybra_program.get_function_defs_of_type(method_type.clone()));
-                acc
-            })
-    }
+    // fn get_function_def_of_type(&self, method_type: CanisterMethodType) -> Vec<KybraStmt> {
+    //     self.kybra_programs
+    //         .iter()
+    //         .fold(vec![], |mut acc, kybra_program| {
+    //             acc.extend(kybra_program.get_function_defs_of_type(method_type.clone()));
+    //             acc
+    //         })
+    // }
 
     fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
         self.kybra_programs
