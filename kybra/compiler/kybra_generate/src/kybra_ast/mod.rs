@@ -2,8 +2,8 @@ use cdk_framework::{
     act::{
         node::{
             canister_method::{
-                CanisterMethodType, InitMethod, InspectMessageMethod, PostUpgradeMethod,
-                PreUpgradeMethod, QueryMethod, UpdateMethod,
+                CanisterMethodType, InspectMessageMethod, PostUpgradeMethod, PreUpgradeMethod,
+                QueryMethod, UpdateMethod,
             },
             data_type::{Func, Record, Tuple, TypeAlias, Variant},
             ExternalCanister, GuardFunction,
@@ -20,7 +20,7 @@ use rustpython_parser::{
 use crate::{
     generators::{
         body,
-        canister_methods::{init, post_upgrade},
+        canister_methods::post_upgrade,
         header,
         vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
     },
@@ -153,28 +153,6 @@ impl NewPyAst {
 
     fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
         vec![]
-    }
-
-    fn build_init_method(&self) -> InitMethod {
-        let init_function_defs = self.get_function_def_of_type(CanisterMethodType::Init);
-
-        if init_function_defs.len() > 1 {
-            todo!();
-        }
-
-        let init_function_def_option = init_function_defs.get(0);
-
-        let params = match init_function_def_option {
-            Some(init_function_def) => init_function_def.build_params(),
-            None => vec![],
-        };
-
-        let body = init::generate_init_method_body_cdk_refactor_name(
-            init_function_def_option,
-            &self.entry_module_name,
-        );
-
-        InitMethod { params, body }
     }
 
     fn build_inspect_method(&self) -> Option<InspectMessageMethod> {
