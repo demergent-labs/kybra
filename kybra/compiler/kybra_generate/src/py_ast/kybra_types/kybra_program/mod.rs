@@ -70,25 +70,25 @@ impl KybraProgram {
         }
     }
 
-    pub fn get_kybra_canister_stmts(&self) -> Vec<KybraStmt> {
-        match &self.program {
-            Mod::Module { body, .. } => body
-                .iter()
-                .filter(|stmt_kind| {
-                    let kybra_stmt = KybraStmt {
-                        stmt_kind,
-                        source_map: self.source_map.clone(),
-                    };
-                    kybra_stmt.is_external_canister()
-                })
-                .map(|stmt_kind| KybraStmt {
-                    stmt_kind,
-                    source_map: self.source_map.clone(),
-                })
-                .collect(),
-            _ => vec![],
-        }
-    }
+    // pub fn get_kybra_canister_stmts(&self) -> Vec<KybraStmt> {
+    //     match &self.program {
+    //         Mod::Module { body, .. } => body
+    //             .iter()
+    //             .filter(|stmt_kind| {
+    //                 let kybra_stmt = KybraStmt {
+    //                     stmt_kind,
+    //                     source_map: self.source_map.clone(),
+    //                 };
+    //                 kybra_stmt.is_external_canister()
+    //             })
+    //             .map(|stmt_kind| KybraStmt {
+    //                 stmt_kind,
+    //                 source_map: self.source_map.clone(),
+    //             })
+    //             .collect(),
+    //         _ => vec![],
+    //     }
+    // }
 
     pub fn get_kybra_stable_b_tree_node_stmts(&self) -> Vec<KybraStmt> {
         match &self.program {

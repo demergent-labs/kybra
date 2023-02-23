@@ -1,5 +1,5 @@
 use cdk_framework::{
-    act::{node::ExternalCanister, CanisterMethods, DataTypes},
+    act::{CanisterMethods, DataTypes},
     AbstractCanisterTree,
 };
 use rustpython_parser::{
@@ -107,10 +107,6 @@ impl NewPyAst {
             };
             vec![acc, update_methods].concat()
         })
-    }
-
-    fn build_external_canisters(&self) -> Vec<ExternalCanister> {
-        vec![]
     }
 
     fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
