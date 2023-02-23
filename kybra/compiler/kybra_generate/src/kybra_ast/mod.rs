@@ -1,9 +1,7 @@
 use cdk_framework::{
     act::{
         node::{
-            canister_method::{
-                CanisterMethodType, PostUpgradeMethod, PreUpgradeMethod, QueryMethod, UpdateMethod,
-            },
+            canister_method::{CanisterMethodType, PreUpgradeMethod, QueryMethod, UpdateMethod},
             data_type::{Func, Record, Tuple, TypeAlias, Variant},
             ExternalCanister, GuardFunction,
         },
@@ -18,9 +16,7 @@ use rustpython_parser::{
 
 use crate::{
     generators::{
-        body,
-        canister_methods::post_upgrade,
-        header,
+        body, header,
         vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
     },
     py_ast::kybra_types::StableBTreeMapNode,
@@ -152,29 +148,6 @@ impl NewPyAst {
 
     fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
         vec![]
-    }
-
-    fn build_post_upgrade_method(&self) -> PostUpgradeMethod {
-        let post_upgrade_function_defs =
-            self.get_function_def_of_type(CanisterMethodType::PostUpgrade);
-
-        if post_upgrade_function_defs.len() > 1 {
-            todo!();
-        }
-
-        let post_upgrade_function_def_option = post_upgrade_function_defs.get(0);
-
-        let params = match &post_upgrade_function_def_option {
-            Some(post_upgrade_function_def) => post_upgrade_function_def.build_params(),
-            None => vec![],
-        };
-
-        let body = post_upgrade::generate_post_upgrade_method_body_cdk_refactor_name(
-            post_upgrade_function_def_option,
-            &self.entry_module_name,
-        );
-
-        PostUpgradeMethod { params, body }
     }
 
     fn build_pre_upgrade_method(&self) -> Option<PreUpgradeMethod> {

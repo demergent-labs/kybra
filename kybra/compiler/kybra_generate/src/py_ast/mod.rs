@@ -1,5 +1,7 @@
 use cdk_framework::act::node::{
-    canister_method::{CanisterMethodType, InitMethod, QueryMethod, UpdateMethod},
+    canister_method::{
+        CanisterMethodType, InitMethod, PostUpgradeMethod, QueryMethod, UpdateMethod,
+    },
     DataType, ExternalCanister, GuardFunction,
 };
 use std::collections::{HashMap, HashSet};
@@ -99,7 +101,10 @@ impl PyAst {
                 body: quote::quote!(),
             },
             pre_upgrade: self.build_pre_upgrade_method(),
-            post_upgrade: self.build_post_upgrade_method(),
+            post_upgrade: PostUpgradeMethod {
+                params: vec![],
+                body: quote::quote!(),
+            },
             inspect_method: None,
             heartbeat: None,
             function_guards: self.build_function_guards(),
