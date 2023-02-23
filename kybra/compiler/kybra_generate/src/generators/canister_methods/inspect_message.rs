@@ -1,8 +1,11 @@
-use crate::py_ast::kybra_types::KybraStmt;
+use proc_macro2::TokenStream;
+use rustpython_parser::ast::{Located, StmtKind};
+
+use crate::source_map::SourceMapped;
 
 pub fn generate_inspect_message_method_body(
-    inspect_method_function_def: &KybraStmt,
-) -> proc_macro2::TokenStream {
+    inspect_method_function_def: &SourceMapped<&Located<StmtKind>>,
+) -> TokenStream {
     let call_to_inspect_message_py_function =
         inspect_method_function_def.generate_call_to_py_function();
 
