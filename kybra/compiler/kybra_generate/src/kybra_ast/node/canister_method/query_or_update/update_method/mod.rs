@@ -3,8 +3,18 @@ use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::{
     errors::{CreateMessage, Message},
+    kybra_ast::NewPyAst,
     source_map::SourceMapped,
 };
+
+impl NewPyAst {
+    pub fn build_update_methods(&self) -> Vec<UpdateMethod> {
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_update_method())
+            .collect()
+    }
+}
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn as_update_method(&self) -> Option<UpdateMethod> {

@@ -1,10 +1,19 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{py_ast::kybra_types::KybraStmt, source_map::SourceMapped};
+use crate::{kybra_ast::NewPyAst, py_ast::kybra_types::KybraStmt, source_map::SourceMapped};
 use cdk_framework::act::node::data_type::variant::{Member, Variant};
 
 mod errors;
 mod variants_members;
+
+impl NewPyAst {
+    pub fn build_variants(&self) -> Vec<Variant> {
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_variant())
+            .collect()
+    }
+}
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn as_variant(&self) -> Option<Variant> {

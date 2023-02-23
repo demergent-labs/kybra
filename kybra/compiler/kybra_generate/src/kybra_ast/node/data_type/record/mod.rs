@@ -4,7 +4,16 @@ mod record_members;
 use cdk_framework::act::node::data_type::{record::Member, Record};
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
-use crate::{errors::Message, source_map::SourceMapped};
+use crate::{errors::Message, kybra_ast::NewPyAst, source_map::SourceMapped};
+
+impl NewPyAst {
+    pub fn build_records(&self) -> Vec<Record> {
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_record())
+            .collect()
+    }
+}
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_record(&self) -> bool {

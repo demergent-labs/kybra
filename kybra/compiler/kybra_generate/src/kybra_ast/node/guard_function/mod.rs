@@ -98,6 +98,16 @@ impl SourceMapped<Mod> {
 }
 
 impl NewPyAst {
+    pub fn build_guard_functions(&self) -> Vec<GuardFunction> {
+        let guard_function_names = self.get_guard_function_names();
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| {
+                source_mapped_stmt_kind.as_guard_function(&guard_function_names)
+            })
+            .collect()
+    }
+
     pub fn get_guard_function_names(&self) -> Vec<String> {
         let guard_function_names =
             self.programs

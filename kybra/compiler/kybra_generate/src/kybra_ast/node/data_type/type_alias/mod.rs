@@ -1,7 +1,16 @@
 use cdk_framework::{act::node::data_type::TypeAlias, ToDataType};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::source_map::SourceMapped;
+use crate::{kybra_ast::NewPyAst, source_map::SourceMapped};
+
+impl NewPyAst {
+    pub fn build_type_aliases(&self) -> Vec<TypeAlias> {
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_type_alias())
+            .collect()
+    }
+}
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_type_alias(&self) -> bool {

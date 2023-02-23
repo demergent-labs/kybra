@@ -5,10 +5,20 @@ use cdk_framework::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::Message, generators::func, py_ast::kybra_types::KybraExpr, source_map::SourceMapped,
+    errors::Message, generators::func, kybra_ast::NewPyAst, py_ast::kybra_types::KybraExpr,
+    source_map::SourceMapped,
 };
 
 mod errors;
+
+impl NewPyAst {
+    pub fn build_funcs(&self) -> Vec<Func> {
+        self.get_stmt_kinds()
+            .iter()
+            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_func())
+            .collect()
+    }
+}
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn to_func(&self) -> Result<Func, Message> {
