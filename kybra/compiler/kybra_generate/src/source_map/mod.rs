@@ -1,11 +1,11 @@
 pub mod token_length;
 
 use regex::Regex;
-use rustpython_parser::ast::Location;
+use rustpython_parser::ast::{Located, Location};
 
 use crate::py_ast::what_is_it::WhatIsIt;
 
-use self::token_length::{REGULAR_CHARACTERS, SPECIAL_CHARACTERS};
+use self::token_length::{TokenLength, REGULAR_CHARACTERS, SPECIAL_CHARACTERS};
 
 #[derive(Clone)]
 pub struct SourceMap {
@@ -85,6 +85,27 @@ pub trait Locatable {
     fn get_start_col(&self) -> usize;
     fn get_token_length(&self) -> usize;
     fn get_location(&self) -> Location;
+}
+
+impl<T> Locatable for Located<T>
+where
+    T: TokenLength,
+{
+    fn get_start_row(&self) -> usize {
+        self.location.row()
+    }
+
+    fn get_start_col(&self) -> usize {
+        self.location.column()
+    }
+
+    fn get_token_length(&self) -> usize {
+        TokenLength::get_token_length(self)
+    }
+
+    fn get_location(&self) -> Location {
+        self.location
+    }
 }
 
 impl SourceMap {

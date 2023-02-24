@@ -1,20 +1,21 @@
 use rustpython_parser::ast::{
     AliasData, ArgData, Arguments, Boolop, Cmpop, Comprehension, Constant, ExcepthandlerKind,
-    ExprContext, ExprKind, KeywordData, Located, MatchCase, Operator, PatternKind, StmtKind,
+    ExprContext, ExprKind, KeywordData, Located, MatchCase, Mod, Operator, PatternKind, StmtKind,
     TypeIgnore, Unaryop, Withitem,
 };
 
-use crate::source_map::token_length::TokenLength;
-
-use super::{KybraProgram, PyAst};
+use crate::{
+    kybra_ast::NewPyAst,
+    source_map::{token_length::TokenLength, SourceMapped},
+};
 
 pub trait Analyze {
     fn analyze(&self);
 }
 
-impl PyAst {
-    pub fn analyze(&self) -> &PyAst {
-        let kps: &Vec<KybraProgram> = &self.kybra_programs;
+impl NewPyAst {
+    pub fn analyze(&self) -> &NewPyAst {
+        let kps: &Vec<SourceMapped<Mod>> = &self.programs;
         for kybra_program in kps {
             kybra_program.analyze()
         }
@@ -22,7 +23,7 @@ impl PyAst {
     }
 }
 
-impl Analyze for KybraProgram {
+impl Analyze for SourceMapped<Mod> {
     fn analyze(&self) {
         eprintln!("#########################");
         eprintln!("### This is a kybra file: {}", self.source_map.file_name);
@@ -33,9 +34,9 @@ impl Analyze for KybraProgram {
         {
             eprintln!(
                 "{} is the length of this program",
-                self.program.get_token_length()
+                self.node.get_token_length()
             );
-            match &self.program {
+            match &self.node {
                 rustpython_parser::ast::Mod::Module { body, type_ignores } => {
                     give_analysis("Module", 2);
                     give_analysis("body", 3);

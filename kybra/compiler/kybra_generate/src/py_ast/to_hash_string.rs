@@ -1,18 +1,19 @@
-use super::KybraExpr;
 use rustpython_parser::ast::{
     ArgData, Arguments, Boolop, Cmpop, Comprehension, Constant, ExprContext, ExprKind, KeywordData,
     Located, Operator, Unaryop,
 };
 
+use crate::source_map::SourceMapped;
+
 pub trait ToHashString {
     fn to_hashable_string(&self) -> String;
 }
 
-impl ToHashString for KybraExpr<'_> {
+impl ToHashString for SourceMapped<Located<ExprKind>> {
     fn to_hashable_string(&self) -> String {
         format!(
             "Kybra Expression: {} from {}",
-            self.located_expr.to_hashable_string(),
+            self.node.to_hashable_string(),
             "main.py"
         ) // TODO Add the source file for an even better hash
     }

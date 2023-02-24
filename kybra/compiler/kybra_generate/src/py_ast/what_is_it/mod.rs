@@ -2,7 +2,7 @@ use rustpython_parser::ast::{
     ArgData, Arguments, Constant, ExprContext, ExprKind, KeywordData, Located, StmtKind,
 };
 
-use super::kybra_types::KybraStmt;
+use crate::source_map::SourceMapped;
 
 pub trait WhatIsIt {
     fn what_is_it(&self) -> ();
@@ -12,9 +12,12 @@ pub trait ToDisplayString {
     fn to_display_string(&self) -> String;
 }
 
-impl WhatIsIt for KybraStmt<'_> {
+impl<T> WhatIsIt for SourceMapped<T>
+where
+    T: WhatIsIt,
+{
     fn what_is_it(&self) -> () {
-        self.stmt_kind.what_is_it();
+        self.node.what_is_it()
     }
 }
 
@@ -301,7 +304,7 @@ impl ToDisplayString for StmtKind {
     fn to_display_string(&self) -> String {
         let stmt_kind = match &self {
             StmtKind::FunctionDef { .. } => "function def".to_string(),
-            StmtKind::AsyncFunctionDef { .. } => "asyc function def".to_string(),
+            StmtKind::AsyncFunctionDef { .. } => "async function def".to_string(),
             StmtKind::ClassDef { .. } => "class def".to_string(),
             StmtKind::Return { .. } => "return".to_string(),
             StmtKind::Delete { .. } => "delete".to_string(),

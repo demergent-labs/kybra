@@ -1,11 +1,12 @@
+use rustpython_parser::ast::{Located, StmtKind};
+
 use crate::{
-    errors::{CreateMessage, ErrorMessage},
-    py_ast::kybra_types::KybraStmt,
-    source_map::GetSourceInfo,
+    errors::{CreateMessage, Message},
+    source_map::{GetSourceInfo, SourceMapped},
 };
 
-impl KybraStmt<'_> {
-    pub fn test_error(&self) -> ErrorMessage {
+impl SourceMapped<&Located<StmtKind>> {
+    pub fn test_error(&self) -> Message {
         eprintln!("FINAL RANGE: {:?}", self.get_range());
         // eprintln!("ALL TOKENS: {:?}", self.source_map.token_lines);
         eprintln!("FINAL SOURCE: {:?}", self.get_source());
