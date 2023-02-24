@@ -11,7 +11,7 @@ impl SourceMapped<&Located<ExprKind>> {
         match &self.node.node {
             ExprKind::Name { .. } => true,
             ExprKind::Constant { value, .. } => match value {
-                Constant::Str(_) => false, // TODO We need to figure this out
+                Constant::Str(_) => true,
                 _ => false,
             },
             _ => false,

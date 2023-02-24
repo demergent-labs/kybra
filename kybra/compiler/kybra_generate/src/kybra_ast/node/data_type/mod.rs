@@ -103,7 +103,7 @@ impl ToDataType for SourceMapped<&Located<ExprKind>> {
                         Primitive::Null.to_data_type()
                     }
                     _ => {
-                        todo!()
+                        todo!("{}", self.unsupported_type_error())
                     }
                 },
                 _ => {
