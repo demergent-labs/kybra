@@ -1,9 +1,8 @@
-use kybra_ast::NewPyAst;
 use proc_macro2::TokenStream;
+use py_ast::PyAst;
 
 mod errors;
 mod generators;
-pub mod kybra_ast;
 pub mod py_ast;
 pub mod source_map;
 
@@ -22,7 +21,7 @@ pub fn get_python_keywords() -> Vec<String> {
 }
 
 pub fn generate_canister(py_file_names: &Vec<&str>, entry_module_name: &str) -> TokenStream {
-    NewPyAst::new(py_file_names, entry_module_name)
+    PyAst::new(py_file_names, entry_module_name)
         .to_act()
         .to_token_stream()
 }

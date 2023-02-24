@@ -1,6 +1,6 @@
 use quote::quote;
 
-use crate::{generators::stable_b_tree_map, kybra_ast::node::StableBTreeMapNode};
+use crate::{generators::stable_b_tree_map, py_ast::node::StableBTreeMapNode};
 
 pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> proc_macro2::TokenStream {
     let match_arms = generate_match_arms(stable_b_tree_map_nodes);

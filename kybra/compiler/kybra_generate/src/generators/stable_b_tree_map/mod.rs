@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::kybra_ast::node::StableBTreeMapNode;
+use crate::py_ast::node::StableBTreeMapNode;
 
 pub mod bounded_storable_impl;
 pub mod ref_cell_ident;

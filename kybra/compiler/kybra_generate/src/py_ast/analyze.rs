@@ -5,7 +5,7 @@ use rustpython_parser::ast::{
 };
 
 use crate::{
-    kybra_ast::NewPyAst,
+    py_ast::PyAst,
     source_map::{token_length::TokenLength, SourceMapped},
 };
 
@@ -13,8 +13,8 @@ pub trait Analyze {
     fn analyze(&self);
 }
 
-impl NewPyAst {
-    pub fn analyze(&self) -> &NewPyAst {
+impl PyAst {
+    pub fn analyze(&self) -> &PyAst {
         let kps: &Vec<SourceMapped<Mod>> = &self.programs;
         for kybra_program in kps {
             kybra_program.analyze()
