@@ -88,6 +88,8 @@ pub fn generate() -> proc_macro2::TokenStream {
 
         impl<T> KybraTryFromVec for Vec<T> {}
 
+        impl<T> KybraTryFromVec for Box<T> {}
+
         impl KybraTryFromVec for () {}
 
         impl<T> KybraTryFromVec for Option<T> {}

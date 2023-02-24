@@ -50,6 +50,8 @@ pub fn generate() -> proc_macro2::TokenStream {
 
         impl<T> KybraTryIntoVec for Option<T> {}
 
+        impl<T> KybraTryIntoVec for Box<T> {}
+
         impl<T> KybraTryIntoVec for Vec<T> {}
 
         impl<T> CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for Vec<T>
