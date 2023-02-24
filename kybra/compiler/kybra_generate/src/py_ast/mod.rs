@@ -15,11 +15,8 @@ use crate::{
     source_map::{SourceMap, SourceMapped},
 };
 
-pub mod analyze;
-pub mod errors;
+pub mod debug;
 pub mod node;
-pub mod to_hash_string;
-pub mod what_is_it;
 
 pub struct PyAst {
     pub programs: Vec<SourceMapped<Mod>>,

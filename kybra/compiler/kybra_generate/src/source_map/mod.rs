@@ -3,7 +3,7 @@ pub mod token_length;
 use regex::Regex;
 use rustpython_parser::ast::{Located, Location};
 
-use crate::py_ast::what_is_it::WhatIsIt;
+use crate::py_ast::debug::WhatIsIt;
 
 use self::token_length::{TokenLength, REGULAR_CHARACTERS, SPECIAL_CHARACTERS};
 
