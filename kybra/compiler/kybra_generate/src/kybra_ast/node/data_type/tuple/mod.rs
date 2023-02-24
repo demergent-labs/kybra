@@ -6,11 +6,7 @@ use cdk_framework::{
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{
-    errors::{CreateMessage, Message},
-    kybra_ast::NewPyAst,
-    source_map::SourceMapped,
-};
+use crate::{errors::Message, kybra_ast::NewPyAst, source_map::SourceMapped};
 
 impl NewPyAst {
     pub fn build_tuples(&self) -> Vec<Tuple> {
@@ -71,10 +67,6 @@ impl SourceMapped<&Located<ExprKind>> {
             }
             _ => Err(self.not_tuple_error()),
         }
-    }
-
-    pub fn not_tuple_error(&self) -> Message {
-        self.create_error_message("This is is not a tuple", "", None)
     }
 }
 
