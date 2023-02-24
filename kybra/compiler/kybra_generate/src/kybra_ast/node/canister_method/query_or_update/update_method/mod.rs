@@ -3,6 +3,7 @@ use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::{
     errors::{CreateMessage, Message},
+    generators::canister_methods::query_and_update,
     kybra_ast::NewPyAst,
     source_map::SourceMapped,
 };
@@ -23,11 +24,11 @@ impl SourceMapped<&Located<StmtKind>> {
         }
         match &self.node.node {
             StmtKind::FunctionDef { name, .. } => Some(UpdateMethod {
-                body: self.generate_body(),
-                params: self.build_act_params(),
+                body: query_and_update::generate_body(self),
+                params: self.build_params(),
                 is_manual: self.is_manual(),
                 name: name.clone(),
-                return_type: self.build_act_return_type(),
+                return_type: self.build_return_type(),
                 is_async: self.is_async(),
                 cdk_name: "kybra".to_string(),
                 guard_function_name: self.get_guard_function_name(),

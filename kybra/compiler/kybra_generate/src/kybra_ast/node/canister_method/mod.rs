@@ -87,19 +87,17 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::FunctionDef { args, .. } => args
                 .args
                 .iter()
-                .map(|arg| {
-                    let data_type = match &arg.node.annotation {
-                        Some(annotation) => SourceMapped {
+                .map(|arg| match &arg.node.annotation {
+                    Some(annotation) => {
+                        let name = arg.node.arg.clone();
+                        let type_ = SourceMapped {
                             node: annotation.as_ref(),
                             source_map: self.source_map.clone(),
                         }
-                        .to_data_type(),
-                        None => panic!("{}", self.missing_type_annotation_error()),
-                    };
-                    Param {
-                        name: arg.node.arg.clone(),
-                        type_: data_type,
+                        .to_data_type();
+                        Param { name, type_ }
                     }
+                    None => panic!("{}", self.missing_type_annotation_error()),
                 })
                 .collect(),
             _ => panic!("{}", self.not_a_function_def_error()),
@@ -114,6 +112,6 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn generate_call_to_py_function(&self) -> TokenStream {
-        canister_methods::generate_call_to_py_function_cdk_refactor_name(self)
+        canister_methods::generate_call_to_py_function(self)
     }
 }

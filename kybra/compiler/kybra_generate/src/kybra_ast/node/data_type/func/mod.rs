@@ -4,10 +4,7 @@ use cdk_framework::{
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{
-    errors::Message, generators::func, kybra_ast::NewPyAst, py_ast::kybra_types::KybraExpr,
-    source_map::SourceMapped,
-};
+use crate::{errors::Message, generators::func, kybra_ast::NewPyAst, source_map::SourceMapped};
 
 mod errors;
 
@@ -59,8 +56,8 @@ impl SourceMapped<&Located<StmtKind>> {
                                         ExprKind::List { elts, .. } => elts
                                             .iter()
                                             .map(|elt| {
-                                                KybraExpr {
-                                                    located_expr: elt,
+                                                SourceMapped {
+                                                    node: elt,
                                                     source_map: self.source_map.clone(),
                                                 }
                                                 .to_data_type()

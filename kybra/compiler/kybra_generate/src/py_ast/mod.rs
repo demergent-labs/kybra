@@ -1,13 +1,6 @@
-use cdk_framework::act::node::{
-    canister_method::{InitMethod, PostUpgradeMethod, PreUpgradeMethod, QueryMethod, UpdateMethod},
-    DataType,
-};
-use std::collections::{HashMap, HashSet};
+use cdk_framework::act::node::canister_method::{InitMethod, PostUpgradeMethod, PreUpgradeMethod};
 
-use crate::{
-    generators::body,
-    py_ast::{kybra_types::KybraStmt, traits::GetDependencies},
-};
+use crate::generators::body;
 
 pub use self::kybra_ast::KybraAst;
 use self::kybra_types::KybraProgram;
@@ -25,62 +18,62 @@ pub struct PyAst {
 }
 
 impl PyAst {
-    pub fn get_dependencies(&self) -> HashSet<String> {
-        let kybra_canister_method_stmts = self.get_kybra_canister_method_stmts();
-        let kybra_canister_stmts: Vec<KybraStmt> = vec![];
-        let stable_b_tree_nodes: Vec<KybraStmt> = vec![];
-        let type_alias_lookup = self.generate_type_alias_lookup();
+    // pub fn get_dependencies(&self) -> HashSet<String> {
+    //     let kybra_canister_method_stmts = vec![];
+    //     let kybra_canister_stmts: Vec<KybraStmt> = vec![];
+    //     let stable_b_tree_nodes: Vec<KybraStmt> = vec![];
+    //     let type_alias_lookup = vec![];
 
-        let canister_method_dependencies = kybra_canister_method_stmts.iter().fold(
-            HashSet::new(),
-            |acc, kybra_canister_method_stmt| {
-                acc.union(&kybra_canister_method_stmt.get_dependent_types(&type_alias_lookup, &acc))
-                    .cloned()
-                    .collect()
-            },
-        );
-        let canister_dependencies =
-            kybra_canister_stmts
-                .iter()
-                .fold(HashSet::new(), |acc, kybra_canister_stmt| {
-                    acc.union(&kybra_canister_stmt.get_dependent_types(&type_alias_lookup, &acc))
-                        .cloned()
-                        .collect()
-                });
-        let stable_b_tree_map_dependencies =
-            stable_b_tree_nodes
-                .iter()
-                .fold(HashSet::new(), |acc, stable_b_tree_map_node| {
-                    acc.union(&stable_b_tree_map_node.get_dependent_types(&type_alias_lookup, &acc))
-                        .cloned()
-                        .collect()
-                });
+    //     let canister_method_dependencies = kybra_canister_method_stmts.iter().fold(
+    //         HashSet::new(),
+    //         |acc, kybra_canister_method_stmt| {
+    //             acc.union(&kybra_canister_method_stmt.get_dependent_types(&type_alias_lookup, &acc))
+    //                 .cloned()
+    //                 .collect()
+    //         },
+    //     );
+    //     let canister_dependencies =
+    //         kybra_canister_stmts
+    //             .iter()
+    //             .fold(HashSet::new(), |acc, kybra_canister_stmt| {
+    //                 acc.union(&kybra_canister_stmt.get_dependent_types(&type_alias_lookup, &acc))
+    //                     .cloned()
+    //                     .collect()
+    //             });
+    //     let stable_b_tree_map_dependencies =
+    //         stable_b_tree_nodes
+    //             .iter()
+    //             .fold(HashSet::new(), |acc, stable_b_tree_map_node| {
+    //                 acc.union(&stable_b_tree_map_node.get_dependent_types(&type_alias_lookup, &acc))
+    //                     .cloned()
+    //                     .collect()
+    //             });
 
-        canister_method_dependencies
-            .union(
-                &canister_dependencies
-                    .union(&stable_b_tree_map_dependencies)
-                    .cloned()
-                    .collect(),
-            )
-            .cloned()
-            .collect()
-    }
+    //     canister_method_dependencies
+    //         .union(
+    //             &canister_dependencies
+    //                 .union(&stable_b_tree_map_dependencies)
+    //                 .cloned()
+    //                 .collect(),
+    //         )
+    //         .cloned()
+    //         .collect()
+    // }
 
-    pub fn generate_type_alias_lookup(&self) -> HashMap<String, KybraStmt> {
-        self.kybra_programs
-            .iter()
-            .fold(HashMap::new(), |mut acc, kybra_program| {
-                acc.extend(kybra_program.generate_type_alias_lookup());
-                acc
-            })
-    }
+    // pub fn generate_type_alias_lookup(&self) -> HashMap<String, KybraStmt> {
+    //     self.kybra_programs
+    //         .iter()
+    //         .fold(HashMap::new(), |mut acc, kybra_program| {
+    //             acc.extend(kybra_program.generate_type_alias_lookup());
+    //             acc
+    //         })
+    // }
 
     pub fn to_kybra_ast(&self) -> KybraAst {
-        let update_methods = self.build_update_methods();
-        let query_methods = self.build_query_methods();
+        let update_methods = vec![];
+        let query_methods = vec![];
         let external_canisters = vec![];
-        let canister_types = self.build_canister_types();
+        let canister_types = vec![];
         let stable_b_tree_map_nodes = vec![];
 
         let rust_code = body::generate(
@@ -113,13 +106,13 @@ impl PyAst {
         }
     }
 
-    fn get_kybra_canister_method_stmts(&self) -> Vec<KybraStmt> {
-        self.kybra_programs
-            .iter()
-            .fold(vec![], |acc, kybra_program| {
-                vec![acc, kybra_program.get_kybra_canister_method_stmts()].concat()
-            })
-    }
+    // fn get_kybra_canister_method_stmts(&self) -> Vec<KybraStmt> {
+    //     self.kybra_programs
+    //         .iter()
+    //         .fold(vec![], |acc, kybra_program| {
+    //             vec![acc, kybra_program.get_kybra_canister_method_stmts()].concat()
+    //         })
+    // }
 
     // fn get_kybra_canister_stmts(&self) -> Vec<KybraStmt> {
     //     self.kybra_programs
@@ -137,13 +130,13 @@ impl PyAst {
     //         })
     // }
 
-    fn build_update_methods(&self) -> Vec<UpdateMethod> {
-        self.kybra_programs
-            .iter()
-            .fold(vec![], |acc, kybra_program| {
-                vec![acc, kybra_program.build_update_method_act_nodes()].concat()
-            })
-    }
+    // fn build_update_methods(&self) -> Vec<UpdateMethod> {
+    //     self.kybra_programs
+    //         .iter()
+    //         .fold(vec![], |acc, kybra_program| {
+    //             vec![acc, kybra_program.build_update_method_act_nodes()].concat()
+    //         })
+    // }
 
     // fn build_function_guards(&self) -> Vec<GuardFunction> {
     //     self.kybra_programs
@@ -153,22 +146,22 @@ impl PyAst {
     //         })
     // }
 
-    fn build_query_methods(&self) -> Vec<QueryMethod> {
-        self.kybra_programs
-            .iter()
-            .fold(vec![], |acc, kybra_program| {
-                vec![acc, kybra_program.build_query_method_act_nodes()].concat()
-            })
-    }
+    // fn build_query_methods(&self) -> Vec<QueryMethod> {
+    //     self.kybra_programs
+    //         .iter()
+    //         .fold(vec![], |acc, kybra_program| {
+    //             vec![acc, kybra_program.build_query_method_act_nodes()].concat()
+    //         })
+    // }
 
-    fn build_canister_types(&self) -> Vec<DataType> {
-        let dependencies = self.get_dependencies();
-        self.kybra_programs
-            .iter()
-            .fold(vec![], |acc, kybra_program| {
-                vec![acc, kybra_program.get_act_data_type_nodes(&dependencies)].concat()
-            })
-    }
+    // fn build_canister_types(&self) -> Vec<DataType> {
+    //     let dependencies = self.get_dependencies();
+    //     self.kybra_programs
+    //         .iter()
+    //         .fold(vec![], |acc, kybra_program| {
+    //             vec![acc, kybra_program.get_act_data_type_nodes(&dependencies)].concat()
+    //         })
+    // }
 
     // fn get_function_def_of_type(&self, method_type: CanisterMethodType) -> Vec<KybraStmt> {
     //     self.kybra_programs

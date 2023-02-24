@@ -1,6 +1,6 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{py_ast::kybra_types::KybraExpr, source_map::SourceMapped};
+use crate::source_map::SourceMapped;
 use cdk_framework::{act::node::data_type::variant::Member, ToDataType};
 
 mod errors;
@@ -23,8 +23,8 @@ impl SourceMapped<&Located<StmtKind>> {
                     ExprKind::Name { id, .. } => id.clone(),
                     _ => panic!("{}", self.variant_target_must_be_a_name_error()),
                 };
-                let type_ = KybraExpr {
-                    located_expr: &annotation,
+                let type_ = SourceMapped {
+                    node: annotation.as_ref(),
                     source_map: self.source_map.clone(),
                 }
                 .to_data_type();

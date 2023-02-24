@@ -1,11 +1,12 @@
 use cdk_framework::act::node::{data_type::Primitive, DataType};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
+use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{generators::tuple, py_ast::kybra_types::KybraStmt};
+use crate::{generators::tuple, source_map::SourceMapped};
 
-pub fn generate_body(kybra_statement: &KybraStmt) -> TokenStream {
-    let act_params = kybra_statement.build_act_params();
+pub fn generate_body(kybra_statement: &SourceMapped<&Located<StmtKind>>) -> TokenStream {
+    let act_params = kybra_statement.build_params();
 
     let name = match kybra_statement.get_name() {
         Some(name) => name,
@@ -53,14 +54,14 @@ pub fn generate_body(kybra_statement: &KybraStmt) -> TokenStream {
     }
 }
 
-fn generate_return_expression(kybra_statement: &KybraStmt) -> TokenStream {
+fn generate_return_expression(kybra_statement: &SourceMapped<&Located<StmtKind>>) -> TokenStream {
     if kybra_statement.is_manual() {
         return quote! {
             ic_cdk::api::call::ManualReply::empty()
         };
     }
 
-    let return_type = kybra_statement.build_act_return_type();
+    let return_type = kybra_statement.build_return_type();
     if type_is_null_or_void(return_type) {
         return quote! {
             return;
