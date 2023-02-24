@@ -1,5 +1,8 @@
 use cdk_framework::{
-    act::node::data_type::{func::Mode, Func, Primitive},
+    act::node::{
+        data_type::{func::Mode, Func, Primitive},
+        DataType,
+    },
     ToDataType,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
@@ -17,6 +20,119 @@ impl PyAst {
     }
 }
 
+impl SourceMapped<&Located<ExprKind>> {
+    pub fn is_func(&self) -> bool {
+        match &self.node.node {
+            ExprKind::Call { func, .. } => match &func.node {
+                ExprKind::Name { id, .. } => id == "Func",
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+
+    pub fn to_func(&self, func_name: Option<String>) -> Result<Func, Message> {
+        match &self.node.node {
+            ExprKind::Call { args, .. } => {
+                if args.len() != 1 {
+                    return Err(self.todo_func_error());
+                }
+                let mode = self.get_func_mode()?;
+                let params = self.get_func_params()?;
+                let return_type = Box::from(self.get_func_return_type(mode.clone())?);
+                let name = match func_name.clone() {
+                    Some(name) => name,
+                    None => return Err(self.inline_func_not_supported()),
+                };
+                Ok(Func {
+                    to_vm_value: func::generate_func_to_vm_value(&name),
+                    list_to_vm_value: func::generate_func_list_to_vm_value(&name),
+                    from_vm_value: func::generate_func_from_vm_value(&name),
+                    list_from_vm_value: func::generate_func_list_from_vm_value(&name),
+                    name: func_name,
+                    params,
+                    return_type,
+                    mode,
+                })
+            }
+            _ => return Err(self.not_a_func_error()),
+        }
+    }
+
+    fn get_func_mode(&self) -> Result<Mode, Message> {
+        match &self.node.node {
+            ExprKind::Call { args, .. } => match &args[0].node {
+                ExprKind::Subscript { value, .. } => match &value.node {
+                    ExprKind::Name { id, .. } => Ok(match id.as_str() {
+                        "Oneway" => Mode::Oneway,
+                        "Update" => Mode::Update,
+                        "Query" => Mode::Query,
+                        _ => return Err(self.todo_func_error()),
+                    }),
+                    _ => Err(self.todo_func_error()),
+                },
+                _ => Err(self.todo_func_error()),
+            },
+            _ => Err(self.not_a_func_error()),
+        }
+    }
+
+    fn get_func_params(&self) -> Result<Vec<DataType>, Message> {
+        match &self.node.node {
+            ExprKind::Call { args, .. } => match &args[0].node {
+                ExprKind::Subscript { slice, .. } => match &slice.node {
+                    ExprKind::Tuple { elts, .. } => {
+                        if elts.len() != 2 {
+                            return Err(self.todo_func_error());
+                        }
+                        match &elts[0].node {
+                            ExprKind::List { elts, .. } => Ok(elts
+                                .iter()
+                                .map(|elt| {
+                                    SourceMapped {
+                                        node: elt,
+                                        source_map: self.source_map.clone(),
+                                    }
+                                    .to_data_type()
+                                })
+                                .collect()),
+                            _ => Err(self.todo_func_error()),
+                        }
+                    }
+                    _ => Err(self.todo_func_error()),
+                },
+                _ => Err(self.todo_func_error()),
+            },
+            _ => Err(self.not_a_func_error()),
+        }
+    }
+
+    fn get_func_return_type(&self, mode: Mode) -> Result<DataType, Message> {
+        match &self.node.node {
+            ExprKind::Call { args, .. } => match mode {
+                Mode::Oneway => Ok(Primitive::Void.to_data_type()),
+                _ => match &args[0].node {
+                    ExprKind::Subscript { slice, .. } => match &slice.node {
+                        ExprKind::Tuple { elts, .. } => {
+                            if elts.len() != 2 {
+                                return Err(self.todo_func_error());
+                            }
+                            Ok(SourceMapped {
+                                node: &elts[1],
+                                source_map: self.source_map.clone(),
+                            }
+                            .to_data_type())
+                        }
+                        _ => return Err(self.todo_func_error()),
+                    },
+                    _ => return Err(self.todo_func_error()),
+                },
+            },
+            _ => Err(self.not_a_func_error()),
+        }
+    }
+}
+
 impl SourceMapped<&Located<StmtKind>> {
     pub fn to_func(&self) -> Result<Func, Message> {
         if !self.is_func() {
@@ -24,92 +140,17 @@ impl SourceMapped<&Located<StmtKind>> {
         }
         match &self.node.node {
             StmtKind::AnnAssign { target, value, .. } => match &value {
-                Some(value) => match &value.node {
-                    ExprKind::Call { args, .. } => {
-                        let name = match &target.node {
-                            ExprKind::Name { id, .. } => id.clone(),
-                            _ => return Err(self.todo_func_error()),
-                        };
-                        if args.len() != 1 {
-                            return Err(self.todo_func_error());
-                        }
-                        let mode = match &args[0].node {
-                            ExprKind::Subscript { value, .. } => match &value.node {
-                                ExprKind::Name { id, .. } => {
-                                    if !["Oneway", "Update", "Query"].contains(&id.as_str()) {
-                                        return Err(self.todo_func_error());
-                                    }
-                                    id
-                                }
-                                _ => return Err(self.todo_func_error()),
-                            },
-                            _ => return Err(self.todo_func_error()),
-                        }
-                        .to_string();
-                        let params = match &args[0].node {
-                            ExprKind::Subscript { slice, .. } => match &slice.node {
-                                ExprKind::Tuple { elts, .. } => {
-                                    if elts.len() != 2 {
-                                        return Err(self.todo_func_error());
-                                    }
-                                    match &elts[0].node {
-                                        ExprKind::List { elts, .. } => elts
-                                            .iter()
-                                            .map(|elt| {
-                                                SourceMapped {
-                                                    node: elt,
-                                                    source_map: self.source_map.clone(),
-                                                }
-                                                .to_data_type()
-                                            })
-                                            .collect(),
-                                        _ => return Err(self.todo_func_error()),
-                                    }
-                                }
-                                _ => return Err(self.todo_func_error()),
-                            },
-                            _ => return Err(self.todo_func_error()),
-                        };
-                        let return_type = Box::from(if mode == "Oneway" {
-                            Primitive::Void.to_data_type()
-                            // TODO I am guessing void here but I am not sure
-                        } else {
-                            match &args[0].node {
-                                ExprKind::Subscript { slice, .. } => match &slice.node {
-                                    ExprKind::Tuple { elts, .. } => {
-                                        if elts.len() != 2 {
-                                            return Err(self.todo_func_error());
-                                        }
-                                        SourceMapped {
-                                            node: &elts[1],
-                                            source_map: self.source_map.clone(),
-                                        }
-                                        .to_data_type()
-                                    }
-                                    _ => return Err(self.todo_func_error()),
-                                },
-                                _ => return Err(self.todo_func_error()),
-                            }
-                        });
-                        let mode = match mode.as_str() {
-                            "Oneway" => Mode::Oneway,
-                            "Update" => Mode::Update,
-                            "Query" => Mode::Query,
-                            _ => return Err(self.todo_func_error()),
-                        };
-                        Ok(Func {
-                            to_vm_value: func::generate_func_to_vm_value(&name),
-                            list_to_vm_value: func::generate_func_list_to_vm_value(&name),
-                            from_vm_value: func::generate_func_from_vm_value(&name),
-                            list_from_vm_value: func::generate_func_list_from_vm_value(&name),
-                            name: Some(name),
-                            params,
-                            return_type,
-                            mode,
-                        })
+                Some(value) => {
+                    let name = match &target.node {
+                        ExprKind::Name { id, .. } => Some(id.clone()),
+                        _ => None,
+                    };
+                    Ok(SourceMapped {
+                        node: value.as_ref(),
+                        source_map: self.source_map.clone(),
                     }
-                    _ => return Err(self.todo_func_error()),
-                },
+                    .to_func(name)?)
+                }
                 None => return Err(self.todo_func_error()),
             },
             _ => return Err(self.todo_func_error()),
@@ -130,13 +171,11 @@ impl SourceMapped<&Located<StmtKind>> {
                     _ => false,
                 };
                 let is_func = match &value {
-                    Some(value) => match &value.node {
-                        ExprKind::Call { func, .. } => match &func.node {
-                            ExprKind::Name { id, .. } => id == "Func",
-                            _ => false,
-                        },
-                        _ => false,
-                    },
+                    Some(value) => SourceMapped {
+                        node: value.as_ref(),
+                        source_map: self.source_map.clone(),
+                    }
+                    .is_func(),
                     None => false,
                 };
                 is_type_alias && is_func

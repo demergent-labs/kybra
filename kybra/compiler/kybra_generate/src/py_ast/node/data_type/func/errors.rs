@@ -1,4 +1,4 @@
-use rustpython_parser::ast::{Located, StmtKind};
+use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
     errors::{CreateMessage, Message},
@@ -7,7 +7,20 @@ use crate::{
 
 // TODO this is a standin error because I need funcs to not have todo!() in them right now
 impl SourceMapped<&Located<StmtKind>> {
-    pub(super) fn todo_func_error(&self) -> Message {
+    pub fn todo_func_error(&self) -> Message {
         self.create_error_message("Not a func", "", None)
+    }
+}
+impl SourceMapped<&Located<ExprKind>> {
+    pub fn todo_func_error(&self) -> Message {
+        self.create_error_message("Not a func", "", None)
+    }
+
+    pub fn not_a_func_error(&self) -> Message {
+        self.create_error_message("Not a func", "", None)
+    }
+
+    pub fn inline_func_not_supported(&self) -> Message {
+        self.create_error_message("Inline Func Not supported", "", None)
     }
 }

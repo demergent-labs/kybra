@@ -6,7 +6,7 @@ use std::fmt;
 
 use crate::source_map::GetSourceInfo;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Suggestion {
     pub title: String,
     pub source: Option<String>,
@@ -15,7 +15,7 @@ pub struct Suggestion {
     pub import_suggestion: Option<String>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Contents {
     pub title: String,
     pub origin: String,
@@ -26,7 +26,7 @@ pub struct Contents {
     pub suggestion: Option<Suggestion>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Message {
     Error(Contents),
     Warning(Contents),

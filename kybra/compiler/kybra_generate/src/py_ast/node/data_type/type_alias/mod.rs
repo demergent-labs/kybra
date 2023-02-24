@@ -14,6 +14,9 @@ impl PyAst {
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_type_alias(&self) -> bool {
+        if self.is_func() {
+            return false;
+        }
         match &self.node.node {
             StmtKind::Assign { value, .. } => {
                 SourceMapped {
