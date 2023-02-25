@@ -1,7 +1,7 @@
-from kybra import blob, nat32, nat64, null, opt, Record, Variant
+from kybra import alias, blob, nat32, nat64, null, opt, Record, Variant
 
-BitcoinAddress = str
-BlockHash = blob
+BitcoinAddress = alias[str]
+BlockHash = alias[blob]
 
 
 class BitcoinNetwork(Variant, total=False):
