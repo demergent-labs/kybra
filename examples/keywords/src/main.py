@@ -1,8 +1,30 @@
-from kybra import blob, float32, float64, ic, int8, int16, int32, int64, nat, nat8, nat16, nat32, nat64, null, opt, Principal, query, Record, reserved, text, Variant
-from typing import TypeAlias
+from kybra import (
+    alias,
+    blob,
+    float32,
+    float64,
+    ic,
+    int8,
+    int16,
+    int32,
+    int64,
+    nat,
+    nat8,
+    nat16,
+    nat32,
+    nat64,
+    null,
+    opt,
+    Principal,
+    query,
+    Record,
+    reserved,
+    text,
+    Variant
+)
 
-MyTypeAlias: TypeAlias = opt[blob]
-MyAlias = list[int16]
+MyTypeAlias = alias[opt[blob]]
+MyAlias = alias[list[int16]]
 
 
 class SimpleRecord(Record):

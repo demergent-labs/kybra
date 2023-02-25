@@ -1,5 +1,6 @@
 import sys
 from typing import (
+    Annotated,
     Any,
     Callable,
     Generator,
@@ -40,6 +41,8 @@ text = str
 T = TypeVar("T")
 opt = Optional[T]
 manual = Optional[T]
+alias = Annotated[T, None]
+
 
 Record = TypedDict
 Variant = TypedDict

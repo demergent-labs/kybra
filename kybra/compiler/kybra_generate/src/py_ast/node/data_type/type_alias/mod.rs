@@ -12,24 +12,32 @@ impl PyAst {
     }
 }
 
+impl SourceMapped<&Located<ExprKind>> {
+    pub fn is_type_alias(&self) -> bool {
+        match &self.node.node {
+            ExprKind::Subscript { value, .. } => match &value.node {
+                ExprKind::Name { id, .. } => match &id[..] {
+                    "alias" => true,
+                    _ => false,
+                },
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+}
+
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_type_alias(&self) -> bool {
         if self.is_func() {
             return false;
         }
         match &self.node.node {
-            StmtKind::Assign { value, .. } => {
-                SourceMapped {
-                    node: value.as_ref(),
-                    source_map: self.source_map.clone(),
-                }
-                .is_data_type()
-                    && false // TODO fix this
+            StmtKind::Assign { value, .. } => SourceMapped {
+                node: value.as_ref(),
+                source_map: self.source_map.clone(),
             }
-            StmtKind::AnnAssign { annotation, .. } => match &annotation.node {
-                ExprKind::Name { id, .. } => id == "TypeAlias",
-                _ => false,
-            },
+            .is_type_alias(),
             _ => false,
         }
     }
@@ -47,16 +55,9 @@ impl SourceMapped<&Located<StmtKind>> {
                     ExprKind::Name { id, .. } => id.clone(),
                     _ => panic!("{}", self.invalid_target_error()),
                 };
-                (alias_name, value)
-            }
-            StmtKind::AnnAssign { target, value, .. } => {
-                let alias_name = match &target.node {
-                    ExprKind::Name { id, .. } => id.clone(),
-                    _ => panic!("{}", self.invalid_target_error()),
-                };
-                let value = match value {
-                    Some(value) => value,
-                    None => todo!(),
+                let value = match &value.node {
+                    ExprKind::Subscript { slice, .. } => slice,
+                    _ => todo!(),
                 };
                 (alias_name, value)
             }
