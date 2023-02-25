@@ -57,8 +57,8 @@ empty = NoReturn  # TODO in Python 3.11 I believe there is a Never type
 
 Async = Generator[Any, Any, T]
 
-TimerId = nat64
-Duration = nat64
+TimerId = alias[nat64]
+Duration = alias[nat64]
 
 
 def query(_func: Optional[Callable[..., Any]] = None, *, guard: Optional[str] = None) -> Callable[..., Any]:

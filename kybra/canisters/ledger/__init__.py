@@ -1,4 +1,5 @@
 from kybra import (
+    alias,
     blob,
     Canister,
     Func,
@@ -28,19 +29,19 @@ class TimeStamp(Record):
 
 # AccountIdentifier is a 32-byte array.
 # The first 4 bytes is big-endian encoding of a CRC32 checksum of the last 28 bytes.
-AccountIdentifier = blob
+AccountIdentifier = alias[blob]
 
 # Subaccount is an arbitrary 32-byte byte array.
 # Ledger uses subaccounts to compute the source address, which enables one
 # principal to control multiple ledger accounts.
-SubAccount = blob
+SubAccount = alias[blob]
 
 # Sequence number of a block produced by the ledger.
-BlockIndex = nat64
+BlockIndex = alias[nat64]
 
 # An arbitrary number associated with a transaction.
 # The caller can set it in a `transfer` call as a correlation identifier.
-Memo = nat64
+Memo = alias[nat64]
 
 # Arguments for the `transfer` call.
 
@@ -285,7 +286,7 @@ class DecimalsResult(Record):
     decimals: nat32
 
 
-Address = str
+Address = alias[str]
 
 
 class Ledger(Canister):

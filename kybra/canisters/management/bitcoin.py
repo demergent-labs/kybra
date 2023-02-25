@@ -20,7 +20,7 @@ class GetCurrentFeePercentilesArgs(Record):
     network: BitcoinNetwork
 
 
-Page = blob
+Page = alias[blob]
 
 
 class UtxosFilter(Variant, total=False):
@@ -39,7 +39,7 @@ class Outpoint(Record):
     vout: nat32
 
 
-Satoshi = nat64
+Satoshi = alias[nat64]
 
 
 class Utxo(Record):
@@ -55,7 +55,7 @@ class GetUtxosResult(Record):
     utxos: list[Utxo]
 
 
-MillisatoshiPerByte = nat64
+MillisatoshiPerByte = alias[nat64]
 
 
 class SendTransactionArgs(Record):
