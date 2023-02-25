@@ -599,7 +599,208 @@ URLs:
 <p>State changes must go through a process called consensus. The consensus process ensures that state changes are <a href="https://en.wikipedia.org/wiki/Byzantine_fault">Byzantine Fault Tolerant</a>. This process takes a few seconds to complete.</p>
 <p>Operations on canister state are exposed to users through canister methods. These methods can be invoked through HTTP requests. Query methods allow state to be read and are low-latency. Update methods allow state to be changed and are higher-latency. Update methods take a few seconds to complete because of the consensus process.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="query-methods"><a class="header" href="#query-methods">Query Methods</a></h1>
+<h2 id="tldr"><a class="header" href="#tldr">TLDR</a></h2>
+<ul>
+<li>Decorate functions with <code>@query</code></li>
+<li>Read-only</li>
+<li>Executed on a single node</li>
+<li>No consensus</li>
+<li>Latency on the order of ~100 milliseconds</li>
+<li>5 billion Wasm instruction limit</li>
+<li>4 GiB heap limit</li>
+<li>~32k queries per second per canister</li>
+</ul>
+<p>The most basic way to expose your canister's functionality publicly is through a query method. Here's an example of a simple query method:</p>
+<pre><code class="language-python">from kybra import query
+
+@query
+def get_string() -&gt; str:
+    return 'This is a query method!'
+</code></pre>
+<p><code>get_string</code> can be called from the outside world through the IC's HTTP API. You'll usually invoke this API from the <a href="./deployment.html#interacting-with-your-canister"><code>dfx command line</code>, <code>dfx web UI</code>, or an agent</a>.</p>
+<p>From the <code>dfx command line</code> you can call it like this:</p>
+<pre><code class="language-bash">dfx canister call my_canister get_string
+</code></pre>
+<p>Query methods are read-only. They do not persist any state changes. Take a look at the following example:</p>
+<pre><code class="language-python">from kybra import query, void
+
+db = {}
+
+@query
+def set(key: str, value: str) -&gt; void:
+    db[key] = value
+</code></pre>
+<p>Calling <code>set</code> will perform the operation of setting the <code>key</code> property on the <code>db</code> object to <code>value</code>, but after the call finishes that change will be discarded.</p>
+<p>This is because query methods are executed on a single node machine and do not go through <a href="https://internetcomputer.org/how-it-works/consensus/">consensus</a>. This results in lower latencies, perhaps on the order of 100 milliseconds.</p>
+<p>There is a limit to how much computation can be done in a single call to a query method. The current query call limit is <a href="https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits">5 billion Wasm instructions</a>. Here's an example of a query method that runs the risk of reaching the limit:</p>
+<pre><code class="language-python">from kybra import nat32, query
+
+@query
+def pyramid(levels: nat32) -&gt; str:
+    levels_array = [0 for _ in range(levels)]
+    asterisk_array = [ ['*' for _ in range(i + 1)] + ['\n'] for i in range(len(levels_array)) ]
+    flattened_array = [element for subarray in asterisk_array for element in subarray]
+
+    return ''.join(flattened_array)
+</code></pre>
+<p>From the <code>dfx command line</code> you can call <code>pyramid</code> like this:</p>
+<pre><code class="language-bash">dfx canister call my_canister pyramid '(600)'
+</code></pre>
+<p>With an argument of <code>600</code>, <code>pyramid</code> will fail with an error <code>...exceeded the instruction limit for single message execution</code>.</p>
+<p>Keep in mind that each query method invocation has up to 4 GiB of heap available.</p>
+<p>In terms of query scalability, an individual canister <a href="https://forum.dfinity.org/t/what-is-the-theroretical-number-for-txns-per-second-on-internet-computer-right-now/14039/6">likely has an upper bound of ~36k queries per second</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="update-methods"><a class="header" href="#update-methods">Update Methods</a></h1>
+<h2 id="tldr-1"><a class="header" href="#tldr-1">TLDR</a></h2>
+<ul>
+<li>Annotate functions with <code>@update</code></li>
+<li>Read-write</li>
+<li>Executed on many nodes</li>
+<li>Consensus</li>
+<li>Latency ~2-5 seconds</li>
+<li>20 billion Wasm instruction limit</li>
+<li>4 GiB heap limit</li>
+<li>48 GiB stable memory limit</li>
+<li>~900 updates per second per canister</li>
+</ul>
+<p>Update methods are similar to query methods, but state changes can be persisted. Here's an example of a simple update method:</p>
+<pre><code class="language-python">from kybra import nat64, update
+
+counter = 0
+
+@update
+def increment() -&gt; nat64:
+    global counter
+    counter += 1
+    return counter
+</code></pre>
+<p>Calling <code>increment</code> will increase the value of <code>counter</code> by 1 and then return its current value. Because <code>counter</code> is a global variable, the change will be persisted to the heap, and subsequent query and update calls will have access to the new <code>counter</code> value.</p>
+<p>Because the Internet Computer (IC) persists changes with certain fault tolerance guarantees, update calls are executed on many nodes and go through <a href="https://internetcomputer.org/how-it-works/consensus/">consensus</a>. This leads to latencies of ~2-5 seconds per update call.</p>
+<p>Due to the latency and other expenses involved with update methods, it is best to use them only when necessary. Look at the following example:</p>
+<pre><code class="language-python">from kybra import query, update, void
+
+message = ''
+
+@query
+def get_message() -&gt; str:
+    return message
+
+@update
+def set_message(new_message: str) -&gt; void:
+    global message
+    message = new_message
+</code></pre>
+<p>You'll notice that we use an update method, <code>set_message</code>, only to perform the change to the global <code>message</code> variable. We use <code>get_message</code>, a query method, to read the message.</p>
+<p>Keep in mind that the heap is limited to 4 GiB, and thus there is an upper bound to global variable storage capacity. You can imagine how a simple database like the following would eventually run out of memory with too many entries:</p>
+<pre><code class="language-python">from kybra import opt, query, update, void
+
+db: dict[str, str] = {}
+
+@query
+def get(key: str) -&gt; opt[str]:
+    return db.get(key)
+
+@update
+def set(key: str, value: str) -&gt; void:
+    db[key] = value
+</code></pre>
+<p>If you need more than 4 GiB of storage, consider taking advantage of the 48 GiB of stable memory. Stable structures like <code>StableBTreeMap</code> give you a nice API for interacting with stable memory. These data structures will be <a href="./stable_structures.html">covered in more detail later</a>. Here's a simple example:</p>
+<pre><code class="language-python">from kybra import opt, query, StableBTreeMap, update, void
+
+db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
+
+@query
+def get(key: str) -&gt; opt[str]:
+    return db.get(key)
+
+@update
+def set(key: str, value: str) -&gt; void:
+    db.insert(key, value)
+</code></pre>
+<p>So far we have only seen how state changes can be persisted. State changes can also be discarded by implicit or explicit traps. A trap is an immediate stop to execution with the ability to provide a message to the execution environment.</p>
+<p>Traps can be useful for ensuring that multiple operations are either all completed or all disregarded, or in other words atomic. Keep in mind that these guarantees do not hold once cross-canister calls are introduced, but that's a more advanced topic <a href="./cross_canister.html">covered later</a>.</p>
+<p>Here's an example of how to trap and ensure atomic changes to your database:</p>
+<pre><code class="language-python">from kybra import ic, opt, query, Record, StableBTreeMap, update, void
+
+class Entry(Record):
+    key: str
+    value: str
+
+db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
+
+@query
+def get(key: str) -&gt; opt[str]:
+    return db.get(key)
+
+@update
+def set(key: str, value: str) -&gt; void:
+    db.insert(key, value)
+
+@update
+def set_many(entries: list[Entry]) -&gt; void:
+    ...
+</code></pre>
+<pre><code class="language-typescript">import { ic, ok, Opt, $query, Record, StableBTreeMap, $update } from 'azle';
+
+type Entry = Record&lt;{
+    key: string;
+    value: string;
+}&gt;;
+
+let db = new StableBTreeMap&lt;string, string&gt;(0, 10, 10);
+
+$query;
+export function get(key: string): Opt&lt;string&gt; {
+    return db.get(key);
+}
+
+$update;
+export function set(key: string, value: string): void {
+    db.insert(key, value);
+}
+
+$update;
+export function set_many(entries: Entry[]): void {
+    entries.forEach((entry) =&gt; {
+        const result = db.insert(entry.key, entry.value);
+
+        if (!ok(result)) {
+            ic.trap(JSON.stringify(result.err));
+        }
+    });
+}
+</code></pre>
+<p>In addition to <code>ic.trap</code>, an explicit JavaScript <code>throw</code> or any unhandled exception will also trap.</p>
+<p>There is a limit to how much computation can be done in a single call to an update method. The current update call limit is <a href="https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits">20 billion Wasm instructions</a>. If we modify our database example, we can introduce an update method that runs the risk reaching the limit:</p>
+<pre><code class="language-typescript">import { ic, nat64, ok, Opt, $query, StableBTreeMap, $update } from 'azle';
+
+let db = new StableBTreeMap&lt;string, string&gt;(0, 1_000, 1_000);
+
+$query;
+export function get(key: string): Opt&lt;string&gt; {
+    return db.get(key);
+}
+
+$update;
+export function set(key: string, value: string): void {
+    db.insert(key, value);
+}
+
+$update;
+export function set_many(num_entries: nat64): void {
+    for (let i = 0; i &lt; num_entries; i++) {
+        const result = db.insert(i.toString(), i.toString());
+
+        if (!ok(result)) {
+            ic.trap(JSON.stringify(result.err));
+        }
+    }
+}
+</code></pre>
+<p>From the <code>dfx command line</code> you can call <code>set_many</code> like this:</p>
+<pre><code class="language-bash">dfx canister call my_canister set_many '(100_000)'
+</code></pre>
+<p>With an argument of <code>100_000</code>, <code>set_many</code> will fail with an error <code>...exceeded the instruction limit for single message execution</code>.</p>
+<p>In terms of update scalability, an individual canister <a href="https://forum.dfinity.org/t/what-is-the-theroretical-number-for-txns-per-second-on-internet-computer-right-now/14039/6">likely has an upper bound of ~900 updates per second</a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="candid"><a class="header" href="#candid">Candid</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="stable-structures"><a class="header" href="#stable-structures">Stable Structures</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="cross-canister"><a class="header" href="#cross-canister">Cross-canister</a></h1>
