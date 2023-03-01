@@ -3,7 +3,6 @@ use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::{
     errors::{CreateMessage, Message},
-    generators::canister_methods::query_and_update,
     py_ast::PyAst,
     source_map::SourceMapped,
 };
@@ -22,19 +21,9 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_canister_method_type(CanisterMethodType::Update) {
             return None;
         }
-        match &self.node.node {
-            StmtKind::FunctionDef { name, .. } => Some(UpdateMethod {
-                body: query_and_update::generate_body(self),
-                params: self.build_params(),
-                is_manual: self.is_manual(),
-                name: name.clone(),
-                return_type: self.build_return_type(),
-                is_async: self.is_async(),
-                cdk_name: "kybra".to_string(),
-                guard_function_name: self.get_guard_function_name(),
-            }),
-            _ => None,
-        }
+        Some(UpdateMethod {
+            definition: self.as_query_or_update_definition()?,
+        })
     }
 
     pub fn to_update_method(&self) -> Result<UpdateMethod, Message> {

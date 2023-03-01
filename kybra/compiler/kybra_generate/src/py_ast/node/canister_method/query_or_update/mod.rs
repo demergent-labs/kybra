@@ -1,10 +1,14 @@
 use cdk_framework::{
-    act::node::{data_type::Primitive, DataType},
+    act::node::{
+        canister_method::{CanisterMethodType, QueryOrUpdateDefinition},
+        data_type::Primitive,
+        DataType,
+    },
     ToDataType,
 };
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
-use crate::source_map::SourceMapped;
+use crate::{generators::canister_methods::query_and_update, source_map::SourceMapped};
 
 pub mod query_method;
 pub mod update_method;
@@ -109,6 +113,29 @@ impl SourceMapped<&Located<ExprKind>> {
                 _ => false,
             },
             _ => false,
+        }
+    }
+}
+
+impl SourceMapped<&Located<StmtKind>> {
+    pub fn as_query_or_update_definition(&self) -> Option<QueryOrUpdateDefinition> {
+        if !self.is_canister_method_type(CanisterMethodType::Query)
+            && !self.is_canister_method_type(CanisterMethodType::Update)
+        {
+            return None;
+        }
+        match &self.node.node {
+            StmtKind::FunctionDef { name, .. } => Some(QueryOrUpdateDefinition {
+                body: query_and_update::generate_body(self),
+                params: self.build_params(),
+                is_manual: self.is_manual(),
+                name: name.clone(),
+                return_type: self.build_return_type(),
+                is_async: self.is_async(),
+                cdk_name: "kybra".to_string(),
+                guard_function_name: self.get_guard_function_name(),
+            }),
+            _ => None,
         }
     }
 }
