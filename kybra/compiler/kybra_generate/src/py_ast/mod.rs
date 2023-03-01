@@ -19,7 +19,7 @@ pub mod debug;
 pub mod node;
 
 pub struct PyAst {
-    pub programs: Vec<SourceMapped<Mod>>,
+    pub source_mapped_mods: Vec<SourceMapped<Mod>>,
     pub entry_module_name: String,
 }
 
@@ -77,7 +77,7 @@ impl PyAst {
             .collect();
 
         PyAst {
-            programs: mods
+            source_mapped_mods: mods
                 .drain(..)
                 .enumerate()
                 .map(|(index, my_mod)| {
@@ -94,18 +94,20 @@ impl PyAst {
     }
 
     fn get_stmt_kinds(&self) -> Vec<SourceMapped<&Located<StmtKind>>> {
-        self.programs.iter().fold(vec![], |acc, kybra_program| {
-            let update_methods = match &kybra_program.node {
-                Mod::Module { body, .. } => body
-                    .iter()
-                    .map(|stmt_kind| SourceMapped {
-                        node: stmt_kind,
-                        source_map: kybra_program.source_map.clone(),
-                    })
-                    .collect(),
-                _ => vec![],
-            };
-            vec![acc, update_methods].concat()
-        })
+        self.source_mapped_mods
+            .iter()
+            .fold(vec![], |acc, source_mapped_mod| {
+                let source_mapped_stmt_kinds = match &source_mapped_mod.node {
+                    Mod::Module { body, .. } => body
+                        .iter()
+                        .map(|stmt_kind| SourceMapped {
+                            node: stmt_kind,
+                            source_map: source_mapped_mod.source_map.clone(),
+                        })
+                        .collect(),
+                    _ => vec![],
+                };
+                vec![acc, source_mapped_stmt_kinds].concat()
+            })
     }
 }

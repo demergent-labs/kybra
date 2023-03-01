@@ -110,7 +110,7 @@ impl PyAst {
 
     pub fn get_guard_function_names(&self) -> Vec<String> {
         let guard_function_names =
-            self.programs
+            self.source_mapped_mods
                 .iter()
                 .fold(HashSet::new(), |mut acc, kybra_program| {
                     acc.extend(kybra_program.get_guard_function_names());

@@ -15,7 +15,7 @@ pub trait Analyze {
 
 impl PyAst {
     pub fn analyze(&self) -> &PyAst {
-        let kps: &Vec<SourceMapped<Mod>> = &self.programs;
+        let kps: &Vec<SourceMapped<Mod>> = &self.source_mapped_mods;
         for kybra_program in kps {
             kybra_program.analyze()
         }

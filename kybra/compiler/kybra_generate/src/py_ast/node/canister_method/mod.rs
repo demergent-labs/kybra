@@ -27,27 +27,29 @@ impl PyAst {
         &self,
         method_type: CanisterMethodType,
     ) -> Vec<SourceMapped<&Located<StmtKind>>> {
-        self.programs.iter().fold(vec![], |mut acc, program| {
-            let thing = match &program.node {
-                Mod::Module { body, .. } => body
-                    .iter()
-                    .filter(|stmt_kind| {
-                        SourceMapped {
-                            node: *stmt_kind,
+        self.source_mapped_mods
+            .iter()
+            .fold(vec![], |mut acc, program| {
+                let thing = match &program.node {
+                    Mod::Module { body, .. } => body
+                        .iter()
+                        .filter(|stmt_kind| {
+                            SourceMapped {
+                                node: *stmt_kind,
+                                source_map: program.source_map.clone(),
+                            }
+                            .is_canister_method_type(method_type.clone())
+                        })
+                        .map(|stmt_kind| SourceMapped {
+                            node: stmt_kind,
                             source_map: program.source_map.clone(),
-                        }
-                        .is_canister_method_type(method_type.clone())
-                    })
-                    .map(|stmt_kind| SourceMapped {
-                        node: stmt_kind,
-                        source_map: program.source_map.clone(),
-                    })
-                    .collect(),
-                _ => vec![],
-            };
-            acc.extend(thing);
-            acc
-        })
+                        })
+                        .collect(),
+                    _ => vec![],
+                };
+                acc.extend(thing);
+                acc
+            })
     }
 }
 
