@@ -13,7 +13,7 @@ impl PyAst {
 
         let pre_upgrade_function_def_option = pre_upgrade_function_defs.get(0);
 
-        let body = pre_upgrade::generate_pre_upgrade_method_body(pre_upgrade_function_def_option);
+        let body = pre_upgrade::generate(pre_upgrade_function_def_option);
 
         Some(PreUpgradeMethod { body })
     }

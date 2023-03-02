@@ -4,7 +4,7 @@ use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::source_map::SourceMapped;
 
-pub fn generate_init_method_body(
+pub fn generate(
     init_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
     entry_module_name: &String,
 ) -> TokenStream {

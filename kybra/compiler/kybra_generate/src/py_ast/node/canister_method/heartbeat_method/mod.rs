@@ -13,7 +13,7 @@ impl PyAst {
         let heartbeat_function_def_option = heartbeat_function_defs.get(0);
 
         if let Some(heartbeat_function_def) = heartbeat_function_def_option {
-            let body = heartbeat::generate_heartbeat_method_body(heartbeat_function_def);
+            let body = heartbeat::generate(heartbeat_function_def);
             Some(HeartbeatMethod { body })
         } else {
             None

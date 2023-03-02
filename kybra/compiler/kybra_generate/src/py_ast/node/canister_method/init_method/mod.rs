@@ -17,8 +17,7 @@ impl PyAst {
             None => vec![],
         };
 
-        let body =
-            init::generate_init_method_body(init_function_def_option, &self.entry_module_name);
+        let body = init::generate(init_function_def_option, &self.entry_module_name);
 
         InitMethod { params, body }
     }

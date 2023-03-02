@@ -4,7 +4,7 @@ use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::source_map::SourceMapped;
 
-pub fn generate_pre_upgrade_method_body(
+pub fn generate(
     pre_upgrade_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
 ) -> TokenStream {
     let call_to_pre_upgrade_py_function = match pre_upgrade_function_def_option {

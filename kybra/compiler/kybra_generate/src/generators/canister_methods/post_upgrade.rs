@@ -4,7 +4,7 @@ use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::source_map::SourceMapped;
 
-pub fn generate_post_upgrade_method_body_cdk_refactor_name(
+pub fn generate(
     post_upgrade_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
     entry_module_name: &String,
 ) -> TokenStream {

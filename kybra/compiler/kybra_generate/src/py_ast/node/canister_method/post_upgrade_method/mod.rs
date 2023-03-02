@@ -18,10 +18,8 @@ impl PyAst {
             None => vec![],
         };
 
-        let body = post_upgrade::generate_post_upgrade_method_body_cdk_refactor_name(
-            post_upgrade_function_def_option,
-            &self.entry_module_name,
-        );
+        let body =
+            post_upgrade::generate(post_upgrade_function_def_option, &self.entry_module_name);
 
         PostUpgradeMethod { params, body }
     }

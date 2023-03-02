@@ -3,9 +3,7 @@ use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::source_map::SourceMapped;
 
-pub fn generate_heartbeat_method_body(
-    heartbeat_function_def: &SourceMapped<&Located<StmtKind>>,
-) -> TokenStream {
+pub fn generate(heartbeat_function_def: &SourceMapped<&Located<StmtKind>>) -> TokenStream {
     let function_name = heartbeat_function_def.get_function_name();
 
     quote::quote! {
