@@ -1,3 +1,4 @@
+use errors::KybraResult;
 use proc_macro2::TokenStream;
 use py_ast::PyAst;
 
@@ -20,8 +21,11 @@ pub fn get_python_keywords() -> Vec<String> {
         .collect()
 }
 
-pub fn generate_canister(py_file_names: &Vec<&str>, entry_module_name: &str) -> TokenStream {
-    PyAst::new(py_file_names, entry_module_name)
-        .to_act()
-        .to_token_stream()
+pub fn generate_canister(
+    py_file_names: &Vec<&str>,
+    entry_module_name: &str,
+) -> KybraResult<TokenStream> {
+    Ok(PyAst::new(py_file_names, entry_module_name)
+        .to_act()?
+        .to_token_stream())
 }

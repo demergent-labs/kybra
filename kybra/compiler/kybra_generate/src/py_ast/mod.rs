@@ -10,6 +10,7 @@ use rustpython_parser::{
 };
 
 use crate::{
+    errors::KybraResult,
     generators::{
         body, header,
         vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
@@ -26,16 +27,16 @@ pub struct PyAst {
 }
 
 impl PyAst {
-    pub fn to_act(&self) -> AbstractCanisterTree {
+    pub fn to_act(&self) -> KybraResult<AbstractCanisterTree> {
         let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes();
         let external_canisters = self.build_external_canisters();
 
         let canister_methods = CanisterMethods {
-            heartbeat_method: self.build_heartbeat_method(),
-            init_method: self.build_init_method(),
-            inspect_message_method: self.build_inspect_method(),
-            post_upgrade_method: self.build_post_upgrade_method(),
-            pre_upgrade_method: self.build_pre_upgrade_method(),
+            heartbeat_method: self.build_heartbeat_method()?,
+            init_method: self.build_init_method()?,
+            inspect_message_method: self.build_inspect_method()?,
+            post_upgrade_method: self.build_post_upgrade_method()?,
+            pre_upgrade_method: self.build_pre_upgrade_method()?,
             query_methods: self.build_query_methods(),
             update_methods: self.build_update_methods(),
         };
@@ -48,7 +49,7 @@ impl PyAst {
             variants: self.build_variants(),
         };
 
-        AbstractCanisterTree {
+        Ok(AbstractCanisterTree {
             cdk_name: "kybra".to_string(),
             header: header::generate(),
             body: body::generate(
@@ -64,7 +65,7 @@ impl PyAst {
             try_from_vm_value_impls: try_into_vm_value_impls::generate(),
             try_into_vm_value_impls: try_from_vm_value_impls::generate(),
             keywords: crate::get_python_keywords(),
-        }
+        })
     }
 
     pub fn new(py_file_names: &Vec<&str>, entry_module_name: &str) -> PyAst {

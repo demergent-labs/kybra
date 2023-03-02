@@ -13,7 +13,17 @@ fn main() {
     let py_file_names_string = std::fs::read_to_string(py_file_names_path).unwrap();
     let py_file_names: Vec<&str> = py_file_names_string.split(",").collect();
 
-    let lib_file = generate_canister(&py_file_names, &py_entry_module_name).to_string();
+    let lib_file = match generate_canister(&py_file_names, &py_entry_module_name) {
+        Ok(canister) => canister,
+        Err(errors) => {
+            eprintln!("Canister Compilation failed:");
+            for error in errors {
+                eprintln!("{}", error)
+            }
+            return;
+        }
+    }
+    .to_string();
 
     let mut f = File::create(output_file_path).expect("Unable to create file");
     f.write_all(lib_file.as_bytes())

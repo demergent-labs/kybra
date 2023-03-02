@@ -6,6 +6,8 @@ use std::fmt;
 
 use crate::source_map::GetSourceInfo;
 
+pub type KybraResult<T> = Result<T, Vec<Message>>;
+
 #[derive(Clone, Debug)]
 pub struct Suggestion {
     pub title: String,
