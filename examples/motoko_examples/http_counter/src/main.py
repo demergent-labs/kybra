@@ -1,4 +1,4 @@
-from kybra import blob, Func, ic, nat, nat16, opt, Query, query, Record, StableBTreeMap, update, Variant
+from kybra import alias, blob, Func, ic, nat, nat16, opt, Query, query, Record, StableBTreeMap, update, Variant
 from typing import TypeAlias
 
 
@@ -24,7 +24,7 @@ class StreamingStrategy(Variant, total=False):
     Callback: CallbackStrategy
 
 
-HeaderField: TypeAlias = tuple[str, str]
+HeaderField = alias[tuple[str, str]]
 
 
 class HttpResponse(Record):
@@ -169,15 +169,14 @@ def http_streaming(token: Token) -> StreamingCallbackHttpResponse:
             'body': ' is '.encode('utf-8'),
             'token': {'arbitrary_data': 'next'}
         }
-    elif token['arbitrary_data'] == 'next':
+    if token['arbitrary_data'] == 'next':
         return {
             'body': f"{stable_storage.get('counter')}".encode('utf-8'),
             'token': {'arbitrary_data': 'last'}
         }
-    elif token['arbitrary_data'] == 'last':
+    if token['arbitrary_data'] == 'last':
         return {
             'body': ' streaming\n'.encode('utf-8'),
             'token': None
         }
-    else:
-        ic.trap('unreachable')
+    ic.trap('unreachable')
