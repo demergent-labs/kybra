@@ -1,4 +1,4 @@
-use cdk_framework::{act::node::data_type::TypeAlias, ToDataType};
+use cdk_framework::act::node::data_type::TypeAlias;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{py_ast::PyAst, source_map::SourceMapped};

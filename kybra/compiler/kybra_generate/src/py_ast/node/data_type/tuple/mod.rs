@@ -1,9 +1,6 @@
 pub mod errors;
 
-use cdk_framework::{
-    act::node::data_type::{tuple::Member, Tuple},
-    ToDataType,
-};
+use cdk_framework::act::node::data_type::{tuple::Member, Tuple};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::Message, py_ast::PyAst, source_map::SourceMapped};

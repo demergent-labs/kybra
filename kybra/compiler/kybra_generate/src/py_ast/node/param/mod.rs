@@ -1,4 +1,4 @@
-use cdk_framework::{act::node::param::Param, ToDataType};
+use cdk_framework::act::node::param::Param;
 use rustpython_parser::ast::{ArgData, Arguments, Located};
 
 use crate::source_map::SourceMapped;

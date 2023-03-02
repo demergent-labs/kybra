@@ -1,7 +1,4 @@
-use cdk_framework::{
-    act::node::{ExternalCanister, ExternalCanisterMethod},
-    ToDataType,
-};
+use cdk_framework::act::node::{ExternalCanister, ExternalCanisterMethod};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{

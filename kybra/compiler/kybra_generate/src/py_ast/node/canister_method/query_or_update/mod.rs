@@ -1,10 +1,7 @@
-use cdk_framework::{
-    act::node::{
-        canister_method::{CanisterMethodType, QueryOrUpdateDefinition},
-        data_type::Primitive,
-        DataType,
-    },
-    ToDataType,
+use cdk_framework::act::node::{
+    canister_method::{CanisterMethodType, QueryOrUpdateDefinition},
+    data_type::Primitive,
+    DataType,
 };
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
@@ -54,7 +51,7 @@ impl SourceMapped<&Located<StmtKind>> {
             Some(return_type) => {
                 SourceMapped::new(return_type.as_ref(), self.source_map.clone()).to_data_type()
             }
-            None => Primitive::Void.to_data_type(),
+            None => DataType::Primitive(Primitive::Void),
         }
     }
 

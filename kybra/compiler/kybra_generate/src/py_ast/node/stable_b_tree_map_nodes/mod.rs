@@ -1,7 +1,7 @@
 mod errors;
 
 use crate::{py_ast::PyAst, source_map::SourceMapped};
-use cdk_framework::{act::node::DataType, ToDataType};
+use cdk_framework::act::node::DataType;
 use num_bigint::{BigInt, Sign};
 use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
 

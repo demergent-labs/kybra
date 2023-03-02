@@ -1,4 +1,4 @@
-use cdk_framework::{act::node::data_type::Array, ToDataType};
+use cdk_framework::act::node::data_type::Array;
 use rustpython_parser::ast::{ExprKind, Located};
 
 use crate::{

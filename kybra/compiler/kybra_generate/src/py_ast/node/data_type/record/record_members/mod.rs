@@ -1,7 +1,7 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::source_map::SourceMapped;
-use cdk_framework::{act::node::data_type::record::Member, ToDataType};
+use cdk_framework::act::node::data_type::record::Member;
 
 mod errors;
 mod warnings;

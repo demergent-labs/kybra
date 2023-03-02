@@ -1,9 +1,6 @@
-use cdk_framework::{
-    act::node::{
-        data_type::{func::Mode, Func, Primitive},
-        DataType,
-    },
-    ToDataType,
+use cdk_framework::act::node::{
+    data_type::{func::Mode, Func, Primitive},
+    DataType,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
@@ -106,7 +103,7 @@ impl SourceMapped<&Located<ExprKind>> {
     fn get_func_return_type(&self, mode: Mode) -> Result<DataType, Message> {
         match &self.node {
             ExprKind::Call { args, .. } => match mode {
-                Mode::Oneway => Ok(Primitive::Void.to_data_type()),
+                Mode::Oneway => Ok(DataType::Primitive(Primitive::Void)),
                 _ => match &args[0].node {
                     ExprKind::Subscript { slice, .. } => match &slice.node {
                         ExprKind::Tuple { elts, .. } => {
