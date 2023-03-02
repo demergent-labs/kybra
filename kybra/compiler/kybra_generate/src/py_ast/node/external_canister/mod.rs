@@ -37,7 +37,7 @@ impl SourceMapped<&Located<StmtKind>> {
                                 let params = SourceMapped {
                                     node: args.as_ref(),
                                     source_map: self.source_map.clone()
-                                }.to_act_fn_params()
+                                }.to_param_list()
                                  .unwrap_or_else(|e| panic!("{}.{} violates Kybra requirements: {}", canister_name, name, e) );
 
                                 let expr_kind = returns.as_ref().expect(&format!("{}.{} is missing a return type", canister_name, &name));

@@ -8,7 +8,6 @@ mod query_or_update;
 
 use cdk_framework::act::node::canister_method::CanisterMethodType;
 use cdk_framework::act::node::param::Param;
-use cdk_framework::ToDataType;
 use proc_macro2::TokenStream;
 use rustpython_parser::ast::ExprKind;
 use rustpython_parser::ast::Located;
@@ -89,17 +88,12 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::FunctionDef { args, .. } => args
                 .args
                 .iter()
-                .map(|arg| match &arg.node.annotation {
-                    Some(annotation) => {
-                        let name = arg.node.arg.clone();
-                        let type_ = SourceMapped {
-                            node: annotation.as_ref(),
-                            source_map: self.source_map.clone(),
-                        }
-                        .to_data_type();
-                        Param { name, type_ }
+                .map(|arg| {
+                    SourceMapped {
+                        node: arg,
+                        source_map: self.source_map.clone(),
                     }
-                    None => panic!("{}", self.missing_type_annotation_error()),
+                    .to_param()
                 })
                 .collect(),
             _ => panic!("{}", self.not_a_function_def_error()),

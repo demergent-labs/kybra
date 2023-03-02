@@ -1,10 +1,10 @@
 use cdk_framework::{act::node::param::Param, ToDataType};
-use rustpython_parser::ast::Arguments;
+use rustpython_parser::ast::{ArgData, Arguments, Located};
 
 use crate::source_map::SourceMapped;
 
 impl SourceMapped<&Arguments> {
-    pub fn to_act_fn_params(&self) -> Result<Vec<Param>, String> {
+    pub fn to_param_list(&self) -> Result<Vec<Param>, String> {
         if self.node.kwarg.is_some() {
             return Err("the dictionary unpacking operator (**) is not supported".to_string());
         }
@@ -25,27 +25,36 @@ impl SourceMapped<&Arguments> {
         }
 
         // Ignore the first param, which is always "self"
-        self.node.args[1..]
+        Ok(self.node.args[1..]
             .iter()
             .map(|arg| {
-                let name = &arg.node.arg;
-
-                match &arg.node.annotation {
-                    Some(annotation) => {
-                        let data_type = SourceMapped {
-                            node: annotation.as_ref(),
-                            source_map: self.source_map.clone(),
-                        }
-                        .to_data_type();
-
-                        Ok(Param {
-                            name: name.to_string(),
-                            type_: data_type,
-                        })
-                    }
-                    None => Err(format!("parameter \"{}\" is missing a type annotation. All method parameters must specify their type.", &name)),
+                SourceMapped {
+                    node: arg,
+                    source_map: self.source_map.clone(),
                 }
+                .to_param()
             })
-            .collect()
+            .collect())
+    }
+}
+
+impl SourceMapped<&Located<ArgData>> {
+    pub fn to_param(&self) -> Param {
+        let param_name = self.node.node.arg.clone();
+        match &self.node.node.annotation {
+            Some(annotation) => {
+                let data_type = SourceMapped {
+                    node: annotation.as_ref(),
+                    source_map: self.source_map.clone(),
+                }
+                .to_data_type();
+
+                Param {
+                    name: param_name,
+                    type_: data_type,
+                }
+            }
+            None => todo!("{}", format!("parameter \"{}\" is missing a type annotation. All method parameters must specify their type.", param_name)),
+        }
     }
 }
