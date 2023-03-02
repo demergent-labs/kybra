@@ -1,17 +1,28 @@
-pub mod errors;
 mod record_members;
 
 use cdk_framework::act::node::data_type::{record::Member, Record};
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
-use crate::{errors::Message, py_ast::PyAst, source_map::SourceMapped};
+use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
 impl PyAst {
-    pub fn build_records(&self) -> Vec<Record> {
+    pub fn build_records(&self) -> KybraResult<Vec<Record>> {
+        let mut records = vec![];
+        let mut error_messages = vec![];
+
         self.get_stmt_kinds()
             .iter()
-            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_record())
-            .collect()
+            .for_each(|stmt_kind| match stmt_kind.as_record() {
+                Ok(Some(record)) => records.push(record),
+                Ok(None) => (),
+                Err(errors) => error_messages.extend(errors),
+            });
+
+        if error_messages.is_empty() {
+            Ok(records)
+        } else {
+            Err(error_messages)
+        }
     }
 }
 
@@ -29,16 +40,9 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn to_record(&self) -> Result<Record, Message> {
-        match self.as_record() {
-            Some(record) => Ok(record),
-            None => Err(self.not_a_record_error()),
-        }
-    }
-
-    pub fn as_record(&self) -> Option<Record> {
+    pub fn as_record(&self) -> KybraResult<Option<Record>> {
         if !self.is_record() {
-            return None;
+            return Ok(None);
         }
         match &self.node {
             StmtKind::ClassDef { name, body, .. } => {
@@ -57,12 +61,12 @@ impl SourceMapped<&Located<StmtKind>> {
                     })
                     .map(|stmt| SourceMapped::new(stmt, self.source_map.clone()).as_record_member())
                     .collect();
-                Some(Record {
+                Ok(Some(Record {
                     name: Some(name.clone()),
                     members,
-                })
+                }))
             }
-            _ => None,
+            _ => Ok(None),
         }
     }
 }

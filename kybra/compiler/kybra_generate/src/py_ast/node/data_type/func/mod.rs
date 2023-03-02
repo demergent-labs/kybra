@@ -4,16 +4,28 @@ use cdk_framework::act::node::{
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::Message, generators::func, py_ast::PyAst, source_map::SourceMapped};
+use crate::{errors::KybraResult, generators::func, py_ast::PyAst, source_map::SourceMapped};
 
 mod errors;
 
 impl PyAst {
-    pub fn build_funcs(&self) -> Vec<Func> {
+    pub fn build_funcs(&self) -> KybraResult<Vec<Func>> {
+        let mut funcs = vec![];
+        let mut error_messages = vec![];
+
         self.get_stmt_kinds()
             .iter()
-            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_func())
-            .collect()
+            .for_each(|stmt_kind| match stmt_kind.as_func() {
+                Ok(Some(func)) => funcs.push(func),
+                Ok(None) => (),
+                Err(errors) => error_messages.extend(errors),
+            });
+
+        if error_messages.is_empty() {
+            Ok(funcs)
+        } else {
+            Err(error_messages)
+        }
     }
 }
 
@@ -28,7 +40,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn to_func(&self, func_name: Option<String>) -> Result<Func, Message> {
+    pub fn to_func(&self, func_name: Option<String>) -> KybraResult<Func> {
         match &self.node {
             ExprKind::Call { args, .. } => {
                 if args.len() != 1 {
@@ -56,7 +68,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn get_func_mode(&self) -> Result<Mode, Message> {
+    fn get_func_mode(&self) -> KybraResult<Mode> {
         match &self.node {
             ExprKind::Call { args, .. } => match &args[0].node {
                 ExprKind::Subscript { value, .. } => match &value.node {
@@ -74,7 +86,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn get_func_params(&self) -> Result<Vec<DataType>, Message> {
+    fn get_func_params(&self) -> KybraResult<Vec<DataType>> {
         match &self.node {
             ExprKind::Call { args, .. } => match &args[0].node {
                 ExprKind::Subscript { slice, .. } => match &slice.node {
@@ -100,7 +112,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn get_func_return_type(&self, mode: Mode) -> Result<DataType, Message> {
+    fn get_func_return_type(&self, mode: Mode) -> KybraResult<DataType> {
         match &self.node {
             ExprKind::Call { args, .. } => match mode {
                 Mode::Oneway => Ok(DataType::Primitive(Primitive::Void)),
@@ -123,9 +135,9 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn to_func(&self) -> Result<Func, Message> {
+    pub fn as_func(&self) -> KybraResult<Option<Func>> {
         if !self.is_func() {
-            return Err(self.todo_func_error());
+            return Ok(None);
         }
         match &self.node {
             StmtKind::AnnAssign { target, value, .. } => match &value {
@@ -134,16 +146,14 @@ impl SourceMapped<&Located<StmtKind>> {
                         ExprKind::Name { id, .. } => Some(id.clone()),
                         _ => None,
                     };
-                    Ok(SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?)
+                    Ok(Some(
+                        SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
+                    ))
                 }
                 None => return Err(self.todo_func_error()),
             },
             _ => return Err(self.todo_func_error()),
         }
-    }
-
-    pub fn as_func(&self) -> Option<Func> {
-        self.to_func().ok()
     }
 
     pub fn is_func(&self) -> bool {

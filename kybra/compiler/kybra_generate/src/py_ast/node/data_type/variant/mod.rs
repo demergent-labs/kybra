@@ -1,24 +1,36 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{py_ast::PyAst, source_map::SourceMapped};
+use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 use cdk_framework::act::node::data_type::variant::{Member, Variant};
 
 mod errors;
 mod variants_members;
 
 impl PyAst {
-    pub fn build_variants(&self) -> Vec<Variant> {
+    pub fn build_variants(&self) -> KybraResult<Vec<Variant>> {
+        let mut variants = vec![];
+        let mut error_messages = vec![];
+
         self.get_stmt_kinds()
             .iter()
-            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_variant())
-            .collect()
+            .for_each(|stmt_kind| match stmt_kind.as_variant() {
+                Ok(Some(variant)) => variants.push(variant),
+                Ok(None) => (),
+                Err(errors) => error_messages.extend(errors),
+            });
+
+        if error_messages.is_empty() {
+            Ok(variants)
+        } else {
+            Err(error_messages)
+        }
     }
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_variant(&self) -> Option<Variant> {
+    pub fn as_variant(&self) -> KybraResult<Option<Variant>> {
         if !self.is_variant() {
-            return None;
+            return Ok(None);
         }
         match &self.node {
             StmtKind::ClassDef { name, body, .. } => {
@@ -28,12 +40,12 @@ impl SourceMapped<&Located<StmtKind>> {
                         SourceMapped::new(stmt, self.source_map.clone()).as_variant_member()
                     })
                     .collect();
-                Some(Variant {
+                Ok(Some(Variant {
                     name: Some(name.clone()),
                     members,
-                })
+                }))
             }
-            _ => panic!("{}", self.not_a_variant_error()),
+            _ => Err(self.not_a_variant_error()),
         }
     }
 

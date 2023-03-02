@@ -6,7 +6,7 @@ use crate::{
 };
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub(super) fn not_a_record_error(&self) -> Message {
-        self.create_error_message("Not a record", "", None)
+    pub fn must_be_subscript_error(&self) -> Vec<Message> {
+        vec![self.create_error_message("", "", None)]
     }
 }

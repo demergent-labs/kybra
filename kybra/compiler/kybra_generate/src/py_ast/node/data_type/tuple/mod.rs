@@ -3,14 +3,26 @@ pub mod errors;
 use cdk_framework::act::node::data_type::{tuple::Member, Tuple};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::Message, py_ast::PyAst, source_map::SourceMapped};
+use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
 impl PyAst {
-    pub fn build_tuples(&self) -> Vec<Tuple> {
+    pub fn build_tuples(&self) -> KybraResult<Vec<Tuple>> {
+        let mut tuples = vec![];
+        let mut error_messages = vec![];
+
         self.get_stmt_kinds()
             .iter()
-            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_tuple())
-            .collect()
+            .for_each(|stmt_kind| match stmt_kind.as_tuple() {
+                Ok(Some(tuple)) => tuples.push(tuple),
+                Ok(None) => (),
+                Err(errors) => error_messages.extend(errors),
+            });
+
+        if error_messages.is_empty() {
+            Ok(tuples)
+        } else {
+            Err(error_messages)
+        }
     }
 }
 
@@ -25,7 +37,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub(super) fn to_tuple(&self, tuple_name: Option<String>) -> Result<Tuple, Message> {
+    pub fn to_tuple(&self, tuple_name: Option<String>) -> KybraResult<Tuple> {
         match &self.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
@@ -71,13 +83,9 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn as_tuple(&self) -> Option<Tuple> {
-        self.to_tuple().ok()
-    }
-
-    pub fn to_tuple(&self) -> Result<Tuple, Message> {
+    pub fn as_tuple(&self) -> KybraResult<Option<Tuple>> {
         if !self.is_tuple() {
-            return Err(self.not_a_tuple_error());
+            return Ok(None);
         }
         match &self.node {
             StmtKind::Assign { targets, value, .. } => {
@@ -88,10 +96,12 @@ impl SourceMapped<&Located<StmtKind>> {
                     ExprKind::Name { id, .. } => id,
                     _ => return Err(self.invalid_target_error()),
                 };
-                SourceMapped::new(value.as_ref(), self.source_map.clone())
-                    .to_tuple(Some(tuple_name.clone()))
+                Ok(Some(
+                    SourceMapped::new(value.as_ref(), self.source_map.clone())
+                        .to_tuple(Some(tuple_name.clone()))?,
+                ))
             }
-            _ => panic!("{}", self.not_a_tuple_error()),
+            _ => Ok(None),
         }
     }
 }

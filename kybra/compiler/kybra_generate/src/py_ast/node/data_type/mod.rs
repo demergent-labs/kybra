@@ -67,7 +67,7 @@ impl SourceMapped<&Located<ExprKind>> {
         if self.is_tuple() {
             return match self.to_tuple(None) {
                 Ok(tuple) => DataType::Tuple(tuple),
-                Err(error) => panic!("{}", error),
+                Err(error) => panic!("{:?}", error),
             };
         }
         if self.is_type_ref() {

@@ -42,11 +42,11 @@ impl PyAst {
         };
 
         let data_types = DataTypes {
-            funcs: self.build_funcs(),
-            records: self.build_records(),
-            tuples: self.build_tuples(),
-            type_aliases: self.build_type_aliases(),
-            variants: self.build_variants(),
+            funcs: self.build_funcs()?,
+            records: self.build_records()?,
+            tuples: self.build_tuples()?,
+            type_aliases: self.build_type_aliases()?,
+            variants: self.build_variants()?,
         };
 
         Ok(AbstractCanisterTree {
