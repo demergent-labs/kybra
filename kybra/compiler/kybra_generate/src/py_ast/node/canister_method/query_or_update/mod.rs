@@ -1,12 +1,14 @@
 use cdk_framework::act::node::{
     canister_method::{CanisterMethodType, QueryOrUpdateDefinition},
-    data_type::Primitive,
     DataType,
 };
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
-use crate::{generators::canister_methods::query_and_update, source_map::SourceMapped};
+use crate::{
+    errors::KybraResult, generators::canister_methods::query_and_update, source_map::SourceMapped,
+};
 
+pub mod errors;
 pub mod query_method;
 pub mod update_method;
 
@@ -41,7 +43,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn build_return_type(&self) -> DataType {
+    pub fn build_return_type(&self) -> KybraResult<DataType> {
         let returns = match &self.node {
             StmtKind::FunctionDef { returns, .. } => returns,
             _ => panic!("Unreachable"),
@@ -49,9 +51,9 @@ impl SourceMapped<&Located<StmtKind>> {
 
         match returns {
             Some(return_type) => {
-                SourceMapped::new(return_type.as_ref(), self.source_map.clone()).to_data_type()
+                Ok(SourceMapped::new(return_type.as_ref(), self.source_map.clone()).to_data_type())
             }
-            None => DataType::Primitive(Primitive::Void),
+            None => Err(self.return_type_annotation_required_error()),
         }
     }
 
@@ -108,24 +110,24 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_query_or_update_definition(&self) -> Option<QueryOrUpdateDefinition> {
+    pub fn as_query_or_update_definition(&self) -> KybraResult<QueryOrUpdateDefinition> {
         if !self.is_canister_method_type(CanisterMethodType::Query)
             && !self.is_canister_method_type(CanisterMethodType::Update)
         {
-            return None;
+            panic!("Unreachable");
         }
-        match &self.node {
-            StmtKind::FunctionDef { name, .. } => Some(QueryOrUpdateDefinition {
-                body: query_and_update::generate_body(self),
+        Ok(match &self.node {
+            StmtKind::FunctionDef { name, .. } => QueryOrUpdateDefinition {
+                body: query_and_update::generate_body(self)?,
                 params: self.build_params(),
                 is_manual: self.is_manual(),
                 name: name.clone(),
-                return_type: self.build_return_type(),
+                return_type: self.build_return_type()?,
                 is_async: self.is_async(),
                 cdk_name: "kybra".to_string(),
                 guard_function_name: self.get_guard_function_name(),
-            }),
-            _ => None,
-        }
+            },
+            _ => panic!("Unreachable"),
+        })
     }
 }

@@ -3,9 +3,11 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{generators::tuple, source_map::SourceMapped};
+use crate::{errors::KybraResult, generators::tuple, source_map::SourceMapped};
 
-pub fn generate_body(kybra_statement: &SourceMapped<&Located<StmtKind>>) -> TokenStream {
+pub fn generate_body(
+    kybra_statement: &SourceMapped<&Located<StmtKind>>,
+) -> KybraResult<TokenStream> {
     let act_params = kybra_statement.build_params();
 
     let name = match kybra_statement.get_name() {
@@ -25,9 +27,9 @@ pub fn generate_body(kybra_statement: &SourceMapped<&Located<StmtKind>>) -> Toke
 
     let params = tuple::generate_tuple(&param_conversions);
 
-    let return_expression = generate_return_expression(kybra_statement);
+    let return_expression = generate_return_expression(kybra_statement)?;
 
-    quote! {
+    Ok(quote! {
         unsafe {
             let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
             let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
@@ -51,26 +53,28 @@ pub fn generate_body(kybra_statement: &SourceMapped<&Located<StmtKind>>) -> Toke
                 }
             }
         }
-    }
+    })
 }
 
-fn generate_return_expression(kybra_statement: &SourceMapped<&Located<StmtKind>>) -> TokenStream {
+fn generate_return_expression(
+    kybra_statement: &SourceMapped<&Located<StmtKind>>,
+) -> KybraResult<TokenStream> {
     if kybra_statement.is_manual() {
-        return quote! {
+        return Ok(quote! {
             ic_cdk::api::call::ManualReply::empty()
-        };
+        });
     }
 
     let return_type = kybra_statement.build_return_type();
-    if type_is_null_or_void(return_type) {
-        return quote! {
+    if type_is_null_or_void(return_type?) {
+        return Ok(quote! {
             return;
-        };
+        });
     }
 
-    quote! {
+    Ok(quote! {
         _kybra_final_return_value.try_from_vm_value(vm).unwrap()
-    }
+    })
 }
 
 fn type_is_null_or_void(act_type: DataType) -> bool {

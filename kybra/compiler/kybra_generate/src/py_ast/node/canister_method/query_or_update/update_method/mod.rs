@@ -1,35 +1,36 @@
 use cdk_framework::act::node::canister_method::{CanisterMethodType, UpdateMethod};
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{
-    errors::{CreateMessage, Message},
-    py_ast::PyAst,
-    source_map::SourceMapped,
-};
+use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
 impl PyAst {
-    pub fn build_update_methods(&self) -> Vec<UpdateMethod> {
+    pub fn build_update_methods(&self) -> KybraResult<Vec<UpdateMethod>> {
+        let mut update_methods = vec![];
+        let mut error_messages = vec![];
+
         self.get_stmt_kinds()
             .iter()
-            .filter_map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_update_method())
-            .collect()
+            .for_each(|stmt_kind| match stmt_kind.as_update_method() {
+                Ok(Some(query_method)) => update_methods.push(query_method),
+                Ok(None) => (),
+                Err(errors) => error_messages.extend(errors),
+            });
+
+        if error_messages.is_empty() {
+            Ok(update_methods)
+        } else {
+            Err(error_messages)
+        }
     }
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_update_method(&self) -> Option<UpdateMethod> {
+    pub fn as_update_method(&self) -> KybraResult<Option<UpdateMethod>> {
         if !self.is_canister_method_type(CanisterMethodType::Update) {
-            return None;
+            return Ok(None);
         }
-        Some(UpdateMethod {
+        Ok(Some(UpdateMethod {
             definition: self.as_query_or_update_definition()?,
-        })
-    }
-
-    pub fn to_update_method(&self) -> Result<UpdateMethod, Message> {
-        match self.as_update_method() {
-            Some(update_method) => Ok(update_method),
-            None => Err(self.create_error_message("title", "", None)),
-        }
+        }))
     }
 }

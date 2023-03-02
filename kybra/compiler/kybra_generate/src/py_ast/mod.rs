@@ -37,8 +37,8 @@ impl PyAst {
             inspect_message_method: self.build_inspect_method()?,
             post_upgrade_method: self.build_post_upgrade_method()?,
             pre_upgrade_method: self.build_pre_upgrade_method()?,
-            query_methods: self.build_query_methods(),
-            update_methods: self.build_update_methods(),
+            query_methods: self.build_query_methods()?,
+            update_methods: self.build_update_methods()?,
         };
 
         let data_types = DataTypes {
