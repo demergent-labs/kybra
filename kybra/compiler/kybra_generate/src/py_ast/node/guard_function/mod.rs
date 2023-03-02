@@ -1,12 +1,11 @@
 use std::collections::HashSet;
 
 use cdk_framework::act::node::GuardFunction;
-use proc_macro2::TokenStream;
-use quote::quote;
 use rustpython_parser::ast::{Located, Mod, StmtKind};
 
 use crate::{
     errors::{CreateMessage, Message},
+    generators::guard_function,
     py_ast::PyAst,
     source_map::SourceMapped,
 };
@@ -31,7 +30,6 @@ impl SourceMapped<&Located<StmtKind>> {
         }
         match &self.node.node {
             StmtKind::FunctionDef { name, .. } => {
-                let body = self.generate_guard_function_body(name);
                 if self.has_params() {
                     return Err(self.create_error_message(
                         "Guards functions can't have parameters",
@@ -41,7 +39,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 }
 
                 Ok(GuardFunction {
-                    body,
+                    body: guard_function::generate(name),
                     name: name.clone(),
                 })
             }
@@ -53,27 +51,6 @@ impl SourceMapped<&Located<StmtKind>> {
         match &self.node.node {
             StmtKind::FunctionDef { args, .. } => args.args.len() > 0,
             _ => panic!("Unreachable"),
-        }
-    }
-
-    fn generate_guard_function_body(&self, function_name: &String) -> TokenStream {
-        quote! {
-            unsafe{
-                let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-                let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
-                _kybra_interpreter.enter(|vm| {
-                    let method_py_object_ref =
-                        _kybra_unwrap_rust_python_result(_kybra_scope.globals.get_item(#function_name, vm), vm);
-                    let result_py_object_ref = vm.invoke(&method_py_object_ref, ());
-                    match result_py_object_ref {
-                        Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap(),
-                        Err(err) => {
-                            let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-                            panic!("{}", err_string);
-                        }
-                    }
-                })
-            }
         }
     }
 }

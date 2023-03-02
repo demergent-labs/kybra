@@ -2,6 +2,7 @@ pub mod async_result_handler;
 pub mod body;
 pub mod canister_methods;
 pub mod func;
+pub mod guard_function;
 pub mod header;
 pub mod ic_object;
 pub mod rng_seed;
