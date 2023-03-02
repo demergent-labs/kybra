@@ -14,7 +14,7 @@ impl PyAst {
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_type_alias(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { value, .. } => match &value.node {
                 ExprKind::Name { id, .. } => match &id[..] {
                     "alias" => true,
@@ -32,9 +32,9 @@ impl SourceMapped<&Located<StmtKind>> {
         if self.is_func() {
             return false;
         }
-        match &self.node.node {
+        match &self.node {
             StmtKind::Assign { value, .. } => SourceMapped {
-                node: value.as_ref(),
+                inner: value.as_ref(),
                 source_map: self.source_map.clone(),
             }
             .is_type_alias(),
@@ -46,7 +46,7 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_type_alias() {
             return None;
         }
-        let (alias_name, value) = match &self.node.node {
+        let (alias_name, value) = match &self.node {
             StmtKind::Assign { targets, value, .. } => {
                 if targets.len() > 1 {
                     panic!("{}", self.multiple_targets_error())
@@ -64,7 +64,7 @@ impl SourceMapped<&Located<StmtKind>> {
             _ => panic!("This is not a type alias"),
         };
         let enclosed_type = SourceMapped {
-            node: value.as_ref(),
+            inner: value.as_ref(),
             source_map: self.source_map.clone(),
         }
         .to_data_type();

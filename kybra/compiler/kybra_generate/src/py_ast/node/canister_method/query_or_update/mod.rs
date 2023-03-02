@@ -15,10 +15,10 @@ pub mod update_method;
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_manual(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             StmtKind::FunctionDef { returns, .. } => match returns {
                 Some(returns) => SourceMapped {
-                    node: returns.as_ref(),
+                    inner: returns.as_ref(),
                     source_map: self.source_map.clone(),
                 }
                 .is_manual(),
@@ -29,7 +29,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn is_async(&self) -> bool {
-        let returns = match &self.node.node {
+        let returns = match &self.node {
             StmtKind::FunctionDef { returns, .. } => returns,
             _ => return false,
         };
@@ -47,14 +47,14 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn build_return_type(&self) -> DataType {
-        let returns = match &self.node.node {
+        let returns = match &self.node {
             StmtKind::FunctionDef { returns, .. } => returns,
             _ => panic!("Unreachable"),
         };
 
         match returns {
             Some(return_type) => SourceMapped {
-                node: &**return_type,
+                inner: return_type.as_ref(),
                 source_map: self.source_map.clone(),
             }
             .to_data_type(),
@@ -63,7 +63,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn get_guard_function_name(&self) -> Option<String> {
-        match &self.node.node {
+        match &self.node {
             StmtKind::FunctionDef { decorator_list, .. } => {
                 decorator_list
                     .iter()
@@ -97,14 +97,14 @@ impl SourceMapped<&Located<StmtKind>> {
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_manual(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { value, slice, .. } => match &value.node {
                 ExprKind::Name { id, .. } => {
                     if id == "manual" {
                         return true;
                     } else {
                         return SourceMapped {
-                            node: slice.as_ref(),
+                            inner: slice.as_ref(),
                             source_map: self.source_map.clone(),
                         }
                         .is_manual();
@@ -124,7 +124,7 @@ impl SourceMapped<&Located<StmtKind>> {
         {
             return None;
         }
-        match &self.node.node {
+        match &self.node {
             StmtKind::FunctionDef { name, .. } => Some(QueryOrUpdateDefinition {
                 body: query_and_update::generate_body(self),
                 params: self.build_params(),

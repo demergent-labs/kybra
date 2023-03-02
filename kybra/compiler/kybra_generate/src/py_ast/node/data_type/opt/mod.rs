@@ -8,7 +8,7 @@ use crate::{
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_opt(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { value, .. } => match &value.node {
                 ExprKind::Name { id, .. } => id == "opt",
                 _ => false,
@@ -21,7 +21,7 @@ impl SourceMapped<&Located<ExprKind>> {
         if !self.is_opt() {
             return Err(self.not_opt_error());
         }
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
                     ExprKind::Name { id, .. } => {
@@ -32,7 +32,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     _ => panic!("{}", self.not_opt_error()),
                 }
                 let kybra_expr = SourceMapped {
-                    node: slice.as_ref(),
+                    inner: slice.as_ref(),
                     source_map: self.source_map.clone(),
                 };
                 Ok(Opt {

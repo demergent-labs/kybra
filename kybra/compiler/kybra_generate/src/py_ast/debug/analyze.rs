@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use rustpython_parser::ast::{
     AliasData, ArgData, Arguments, Boolop, Cmpop, Comprehension, Constant, ExcepthandlerKind,
     ExprContext, ExprKind, KeywordData, Located, MatchCase, Mod, Operator, PatternKind, StmtKind,
@@ -32,11 +34,8 @@ impl Analyze for SourceMapped<Mod> {
             == self.source_map.file_name
             || false
         {
-            eprintln!(
-                "{} is the length of this program",
-                self.node.get_token_length()
-            );
-            match &self.node {
+            eprintln!("{} is the length of this program", self.get_token_length());
+            match &self.deref() {
                 rustpython_parser::ast::Mod::Module { body, type_ignores } => {
                     give_analysis("Module", 2);
                     give_analysis("body", 3);

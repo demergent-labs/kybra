@@ -6,6 +6,8 @@ pub mod post_upgrade_method;
 pub mod pre_upgrade_method;
 mod query_or_update;
 
+use std::ops::Deref;
+
 use cdk_framework::act::node::canister_method::CanisterMethodType;
 use cdk_framework::act::node::param::Param;
 use proc_macro2::TokenStream;
@@ -29,24 +31,23 @@ impl PyAst {
         self.source_mapped_mods
             .iter()
             .fold(vec![], |mut acc, program| {
-                let thing = match &program.node {
+                acc.extend(match &program.deref() {
                     Mod::Module { body, .. } => body
                         .iter()
                         .filter(|stmt_kind| {
                             SourceMapped {
-                                node: *stmt_kind,
+                                inner: *stmt_kind,
                                 source_map: program.source_map.clone(),
                             }
                             .is_canister_method_type(method_type.clone())
                         })
                         .map(|stmt_kind| SourceMapped {
-                            node: stmt_kind,
+                            inner: stmt_kind,
                             source_map: program.source_map.clone(),
                         })
                         .collect(),
                     _ => vec![],
-                };
-                acc.extend(thing);
+                });
                 acc
             })
     }
@@ -66,7 +67,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     fn is_decorator_same_as(&self, decorator_name: &str) -> bool {
-        match &self.node.node {
+        match &self.node {
             StmtKind::FunctionDef { decorator_list, .. } => {
                 decorator_list
                     .iter()
@@ -84,13 +85,13 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn build_params(&self) -> Vec<Param> {
-        match &self.node.node {
+        match &self.node {
             StmtKind::FunctionDef { args, .. } => args
                 .args
                 .iter()
                 .map(|arg| {
                     SourceMapped {
-                        node: arg,
+                        inner: arg,
                         source_map: self.source_map.clone(),
                     }
                     .to_param()
@@ -101,7 +102,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn get_function_name(&self) -> String {
-        match &self.node.node {
+        match &self.node {
             StmtKind::FunctionDef { name, .. } => name.clone(),
             _ => panic!("{}", self.not_a_function_def_error()),
         }

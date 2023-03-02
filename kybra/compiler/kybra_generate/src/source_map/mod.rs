@@ -1,5 +1,7 @@
 pub mod token_length;
 
+use std::ops::Deref;
+
 use regex::Regex;
 use rustpython_parser::ast::{Located, Location};
 
@@ -17,8 +19,16 @@ pub struct SourceMap {
 
 #[derive(Clone)]
 pub struct SourceMapped<T> {
-    pub node: T,
+    pub inner: T,
     pub source_map: SourceMap,
+}
+
+impl<T> Deref for SourceMapped<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
 }
 
 #[derive(Clone)]
@@ -41,34 +51,34 @@ where
 {
     fn get_text(&self) -> String {
         self.source_map
-            .get_text(self.source_map.generate_span(self.node))
+            .get_text(self.source_map.generate_span(self.inner))
     }
 
     fn get_range(&self) -> (usize, usize) {
         self.source_map.get_range(
-            self.source_map.generate_span(self.node),
-            self.node.get_location(),
+            self.source_map.generate_span(self.inner),
+            self.get_location(),
         )
     }
 
     fn get_source(&self) -> String {
         self.source_map.get_source(
-            self.source_map.generate_span(self.node),
-            self.node.get_location(),
+            self.source_map.generate_span(self.inner),
+            self.get_location(),
         )
     }
 
     fn generate_modified_source(&self, replacement: &String) -> String {
         self.source_map.generate_modified_source(
-            &self.source_map.generate_span(self.node),
-            self.node.get_location(),
+            &self.source_map.generate_span(self.inner),
+            self.get_location(),
             replacement,
         )
     }
 
     fn generate_modified_range(&self, replacement: &String) -> (usize, usize) {
         self.source_map
-            .generate_modified_range(self.source_map.generate_span(self.node), replacement)
+            .generate_modified_range(self.source_map.generate_span(self.inner), replacement)
     }
 
     fn get_origin(&self) -> String {
@@ -76,7 +86,7 @@ where
     }
 
     fn get_line_number(&self) -> usize {
-        self.source_map.get_line_number(self.node.get_location())
+        self.source_map.get_line_number(self.get_location())
     }
 }
 

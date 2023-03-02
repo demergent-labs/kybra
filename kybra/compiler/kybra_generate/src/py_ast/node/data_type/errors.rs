@@ -18,7 +18,7 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     pub fn unsupported_type_error(&self) -> Message {
-        let expression_name = match &self.node.node {
+        let expression_name = match &self.node {
             ExprKind::BoolOp { .. } => "boolean operator",
             ExprKind::NamedExpr { .. } => "named expression",
             ExprKind::BinOp { .. } => "binary operator",
@@ -71,7 +71,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn unsupported_type_error(&self) -> Message {
-        let stmt_kind_name = match &self.node.node {
+        let stmt_kind_name = match &self.node {
             StmtKind::FunctionDef { .. } => "Function Def",
             StmtKind::AsyncFunctionDef { .. } => "Async Function Def",
             StmtKind::Return { .. } => "Return",

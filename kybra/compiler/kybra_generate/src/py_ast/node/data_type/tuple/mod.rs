@@ -19,7 +19,7 @@ impl PyAst {
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_tuple(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { value, .. } => match &value.node {
                 ExprKind::Name { id, .. } => id == "tuple",
                 _ => false,
@@ -29,7 +29,7 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     pub(super) fn to_tuple(&self, tuple_name: Option<String>) -> Result<Tuple, Message> {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
                     ExprKind::Name { id, .. } => {
@@ -43,13 +43,13 @@ impl SourceMapped<&Located<ExprKind>> {
                     ExprKind::Tuple { elts, .. } => elts
                         .iter()
                         .map(|elt| SourceMapped {
-                            node: elt,
+                            inner: elt,
                             source_map: self.source_map.clone(),
                         })
                         .collect(),
                     _ => {
                         vec![SourceMapped {
-                            node: slice.as_ref(),
+                            inner: slice.as_ref(),
                             source_map: self.source_map.clone(),
                         }]
                     }
@@ -72,9 +72,9 @@ impl SourceMapped<&Located<ExprKind>> {
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_tuple(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             StmtKind::Assign { value, .. } => SourceMapped {
-                node: value.as_ref(),
+                inner: value.as_ref(),
                 source_map: self.source_map.clone(),
             }
             .is_tuple(),
@@ -90,7 +90,7 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_tuple() {
             return Err(self.not_a_tuple_error());
         }
-        match &self.node.node {
+        match &self.node {
             StmtKind::Assign { targets, value, .. } => {
                 if targets.len() > 1 {
                     return Err(self.multiple_targets_error());
@@ -100,7 +100,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     _ => return Err(self.invalid_target_error()),
                 };
                 SourceMapped {
-                    node: value.as_ref(),
+                    inner: value.as_ref(),
                     source_map: self.source_map.clone(),
                 }
                 .to_tuple(Some(tuple_name.clone()))

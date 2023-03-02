@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use rustpython_parser::ast::{
     ArgData, Arguments, Boolop, Cmpop, Comprehension, Constant, ExprContext, ExprKind, KeywordData,
     Located, Operator, Unaryop,
@@ -12,10 +14,10 @@ pub trait ToHashString {
 impl ToHashString for SourceMapped<Located<ExprKind>> {
     fn to_hashable_string(&self) -> String {
         format!(
-            "Kybra Expression: {} from {}",
-            self.node.to_hashable_string(),
-            "main.py"
-        ) // TODO Add the source file for an even better hash
+            "SourceMapped: {} from {}",
+            self.deref().to_hashable_string(),
+            self.source_map.file_name
+        )
     }
 }
 

@@ -20,13 +20,13 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_variant() {
             return None;
         }
-        match &self.node.node {
+        match &self.node {
             StmtKind::ClassDef { name, body, .. } => {
                 let members: Vec<Member> = body
                     .iter()
                     .map(|stmt| {
                         SourceMapped {
-                            node: stmt,
+                            inner: stmt,
                             source_map: self.source_map.clone(),
                         }
                         .as_variant_member()
@@ -42,7 +42,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn is_variant(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {
                 let is_variant = match &base.node {
                     ExprKind::Name { id, .. } => id == "Variant",

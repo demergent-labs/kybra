@@ -8,7 +8,7 @@ use crate::{
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_type_ref(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Name { .. } => true,
             ExprKind::Constant { value, .. } => match value {
                 Constant::Str(_) => true,
@@ -22,7 +22,7 @@ impl SourceMapped<&Located<ExprKind>> {
         if !self.is_type_ref() {
             return Err(self.not_type_ref_error());
         }
-        match &self.node.node {
+        match &self.node {
             ExprKind::Name { id, .. } => Ok(TypeRef {
                 name: id.to_string(),
             }),

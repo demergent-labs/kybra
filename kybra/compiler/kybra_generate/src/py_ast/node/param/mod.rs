@@ -5,31 +5,31 @@ use crate::source_map::SourceMapped;
 
 impl SourceMapped<&Arguments> {
     pub fn to_param_list(&self) -> Result<Vec<Param>, String> {
-        if self.node.kwarg.is_some() {
+        if self.kwarg.is_some() {
             return Err("the dictionary unpacking operator (**) is not supported".to_string());
         }
 
-        if self.node.vararg.is_some() {
+        if self.vararg.is_some() {
             return Err("the iterator unpacking operator (*) is not supported".to_string());
         }
 
-        if self.node.args.len() == 0 {
+        if self.args.len() == 0 {
             return Err(
                 "method must be an instance method. Add \"self\" as the first parameter"
                     .to_string(),
             );
         }
 
-        if self.node.args[0].node.arg != "self".to_string() {
+        if self.args[0].node.arg != "self".to_string() {
             return Err("first parameter must be \"self\"".to_string());
         }
 
         // Ignore the first param, which is always "self"
-        Ok(self.node.args[1..]
+        Ok(self.args[1..]
             .iter()
             .map(|arg| {
                 SourceMapped {
-                    node: arg,
+                    inner: arg,
                     source_map: self.source_map.clone(),
                 }
                 .to_param()
@@ -40,11 +40,11 @@ impl SourceMapped<&Arguments> {
 
 impl SourceMapped<&Located<ArgData>> {
     pub fn to_param(&self) -> Param {
-        let param_name = self.node.node.arg.clone();
-        match &self.node.node.annotation {
+        let param_name = self.node.arg.clone();
+        match &self.node.annotation {
             Some(annotation) => {
                 let data_type = SourceMapped {
-                    node: annotation.as_ref(),
+                    inner: annotation.as_ref(),
                     source_map: self.source_map.clone(),
                 }
                 .to_data_type();

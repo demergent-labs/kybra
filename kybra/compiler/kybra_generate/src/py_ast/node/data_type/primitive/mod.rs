@@ -7,7 +7,7 @@ use crate::{errors::Message, source_map::SourceMapped};
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_primitive(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Name { id, .. } => match &id[..] {
                 "blob" => true,
                 "empty" => true,
@@ -41,7 +41,7 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     pub fn to_primitive(&self) -> Result<Primitive, Message> {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Name { id, .. } => match &id[..] {
                 "blob" => Ok(Primitive::Blob),
                 "empty" => Ok(Primitive::Empty),

@@ -24,7 +24,7 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_external_canister() {
             return Err(self.create_error_message("Not a external canister", "", None));
         }
-        match &self.node.node {
+        match &self.node {
             StmtKind::ClassDef { name, body, .. } => {
                 let canister_name = name.clone();
                 let methods: Vec<ExternalCanisterMethod> = body
@@ -35,7 +35,7 @@ impl SourceMapped<&Located<StmtKind>> {
                                 ensure_decorated_as_method_or_panic(decorator_list, &canister_name, name);
 
                                 let params = SourceMapped {
-                                    node: args.as_ref(),
+                                    inner: args.as_ref(),
                                     source_map: self.source_map.clone()
                                 }.to_param_list()
                                  .unwrap_or_else(|e| panic!("{}.{} violates Kybra requirements: {}", canister_name, name, e) );
@@ -43,7 +43,7 @@ impl SourceMapped<&Located<StmtKind>> {
                                 let expr_kind = returns.as_ref().expect(&format!("{}.{} is missing a return type", canister_name, &name));
 
                                 let return_type = SourceMapped {
-                                    node: expr_kind.as_ref(),
+                                    inner: expr_kind.as_ref(),
                                     source_map: self.source_map.clone(),
                                 }.to_data_type();
 
@@ -73,7 +73,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn is_external_canister(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {
                 let is_external_canister = match &base.node {
                     ExprKind::Name { id, .. } => id == "Canister",

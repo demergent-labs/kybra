@@ -28,16 +28,16 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     fn is_subscript_slice_data_type(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { value, slice, .. } => match &value.node {
                 ExprKind::Name { id, .. } => match &id[..] {
                     "Async" => SourceMapped {
-                        node: slice.as_ref(),
+                        inner: slice.as_ref(),
                         source_map: self.source_map.clone(),
                     }
                     .is_data_type(),
                     "manual" => SourceMapped {
-                        node: slice.as_ref(),
+                        inner: slice.as_ref(),
                         source_map: self.source_map.clone(),
                     }
                     .is_data_type(),
@@ -79,16 +79,16 @@ impl ToDataType for SourceMapped<&Located<ExprKind>> {
                 Err(error) => panic!("{}", error),
             }
         } else {
-            match &self.node.node {
+            match &self.node {
                 ExprKind::Subscript { value, slice, .. } => match &value.node {
                     ExprKind::Name { id, .. } => match &id[..] {
                         "Async" => SourceMapped {
-                            node: slice.as_ref(),
+                            inner: slice.as_ref(),
                             source_map: self.source_map.clone(),
                         }
                         .to_data_type(),
                         "manual" => SourceMapped {
-                            node: slice.as_ref(),
+                            inner: slice.as_ref(),
                             source_map: self.source_map.clone(),
                         }
                         .to_data_type(),

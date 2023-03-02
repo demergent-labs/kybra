@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use cdk_framework::{
     act::{CanisterMethods, DataTypes},
     AbstractCanisterTree,
@@ -85,7 +87,7 @@ impl PyAst {
 
                     SourceMapped {
                         source_map: SourceMap::new(source.clone(), py_file_names[index]),
-                        node: my_mod,
+                        inner: my_mod,
                     }
                 })
                 .collect(),
@@ -97,11 +99,11 @@ impl PyAst {
         self.source_mapped_mods
             .iter()
             .fold(vec![], |acc, source_mapped_mod| {
-                let source_mapped_stmt_kinds = match &source_mapped_mod.node {
+                let source_mapped_stmt_kinds = match &source_mapped_mod.deref() {
                     Mod::Module { body, .. } => body
                         .iter()
                         .map(|stmt_kind| SourceMapped {
-                            node: stmt_kind,
+                            inner: stmt_kind,
                             source_map: source_mapped_mod.source_map.clone(),
                         })
                         .collect(),

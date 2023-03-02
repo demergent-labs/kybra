@@ -22,7 +22,7 @@ impl PyAst {
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_func(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Call { func, .. } => match &func.node {
                 ExprKind::Name { id, .. } => id == "Func",
                 _ => false,
@@ -32,7 +32,7 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     pub fn to_func(&self, func_name: Option<String>) -> Result<Func, Message> {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Call { args, .. } => {
                 if args.len() != 1 {
                     return Err(self.todo_func_error());
@@ -60,7 +60,7 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     fn get_func_mode(&self) -> Result<Mode, Message> {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Call { args, .. } => match &args[0].node {
                 ExprKind::Subscript { value, .. } => match &value.node {
                     ExprKind::Name { id, .. } => Ok(match id.as_str() {
@@ -78,7 +78,7 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     fn get_func_params(&self) -> Result<Vec<DataType>, Message> {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Call { args, .. } => match &args[0].node {
                 ExprKind::Subscript { slice, .. } => match &slice.node {
                     ExprKind::Tuple { elts, .. } => {
@@ -90,7 +90,7 @@ impl SourceMapped<&Located<ExprKind>> {
                                 .iter()
                                 .map(|elt| {
                                     SourceMapped {
-                                        node: elt,
+                                        inner: elt,
                                         source_map: self.source_map.clone(),
                                     }
                                     .to_data_type()
@@ -108,7 +108,7 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     fn get_func_return_type(&self, mode: Mode) -> Result<DataType, Message> {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Call { args, .. } => match mode {
                 Mode::Oneway => Ok(Primitive::Void.to_data_type()),
                 _ => match &args[0].node {
@@ -118,7 +118,7 @@ impl SourceMapped<&Located<ExprKind>> {
                                 return Err(self.todo_func_error());
                             }
                             Ok(SourceMapped {
-                                node: &elts[1],
+                                inner: &elts[1],
                                 source_map: self.source_map.clone(),
                             }
                             .to_data_type())
@@ -138,7 +138,7 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_func() {
             return Err(self.todo_func_error());
         }
-        match &self.node.node {
+        match &self.node {
             StmtKind::AnnAssign { target, value, .. } => match &value {
                 Some(value) => {
                     let name = match &target.node {
@@ -146,7 +146,7 @@ impl SourceMapped<&Located<StmtKind>> {
                         _ => None,
                     };
                     Ok(SourceMapped {
-                        node: value.as_ref(),
+                        inner: value.as_ref(),
                         source_map: self.source_map.clone(),
                     }
                     .to_func(name)?)
@@ -162,7 +162,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn is_func(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             StmtKind::AnnAssign {
                 annotation, value, ..
             } => {
@@ -172,7 +172,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 };
                 let is_func = match &value {
                     Some(value) => SourceMapped {
-                        node: value.as_ref(),
+                        inner: value.as_ref(),
                         source_map: self.source_map.clone(),
                     }
                     .is_func(),
@@ -190,7 +190,7 @@ impl SourceMapped<&Located<StmtKind>> {
             return None;
         }
 
-        match &self.node.node {
+        match &self.node {
             StmtKind::AnnAssign { value, .. } => match &value {
                 Some(value) => match &value.node {
                     ExprKind::Call { args, .. } => Some(args),

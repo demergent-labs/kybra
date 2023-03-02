@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, ops::Deref};
 
 use cdk_framework::act::node::GuardFunction;
 use rustpython_parser::ast::{Located, Mod, StmtKind};
@@ -12,7 +12,7 @@ use crate::{
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_guard_function(&self, guard_function_names: &Vec<String>) -> bool {
-        match &self.node.node {
+        match &self.node {
             StmtKind::FunctionDef { name, .. } => guard_function_names.contains(name),
             _ => false,
         }
@@ -28,7 +28,7 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_guard_function(guard_function_names) {
             return Err(self.create_error_message("Not a guard function", "", None));
         }
-        match &self.node.node {
+        match &self.node {
             StmtKind::FunctionDef { name, .. } => {
                 if self.has_params() {
                     return Err(self.create_error_message(
@@ -48,7 +48,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     fn has_params(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             StmtKind::FunctionDef { args, .. } => args.args.len() > 0,
             _ => panic!("Unreachable"),
         }
@@ -57,12 +57,12 @@ impl SourceMapped<&Located<StmtKind>> {
 
 impl SourceMapped<Mod> {
     fn get_guard_function_names(&self) -> Vec<String> {
-        let guard_function_names: HashSet<_> = match &self.node {
+        let guard_function_names: HashSet<_> = match &self.deref() {
             Mod::Module { body, .. } => body
                 .iter()
                 .filter_map(|stmt_kind| {
                     SourceMapped {
-                        node: stmt_kind,
+                        inner: stmt_kind,
                         source_map: self.source_map.clone(),
                     }
                     .get_guard_function_name()

@@ -8,7 +8,7 @@ mod warnings;
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn as_variant_member(&self) -> Member {
-        match &self.node.node {
+        match &self.node {
             StmtKind::AnnAssign {
                 target,
                 annotation,
@@ -24,7 +24,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     _ => panic!("{}", self.variant_target_must_be_a_name_error()),
                 };
                 let type_ = SourceMapped {
-                    node: annotation.as_ref(),
+                    inner: annotation.as_ref(),
                     source_map: self.source_map.clone(),
                 }
                 .to_data_type();

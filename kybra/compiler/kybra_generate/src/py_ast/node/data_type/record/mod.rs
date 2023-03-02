@@ -17,7 +17,7 @@ impl PyAst {
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_record(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {
                 let is_record = match &base.node {
                     ExprKind::Name { id, .. } => id == "Record",
@@ -40,7 +40,7 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_record() {
             return None;
         }
-        match &self.node.node {
+        match &self.node {
             StmtKind::ClassDef { name, body, .. } => {
                 let members: Vec<Member> = body
                     .iter()
@@ -57,7 +57,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     })
                     .map(|stmt| {
                         SourceMapped {
-                            node: stmt,
+                            inner: stmt,
                             source_map: self.source_map.clone(),
                         }
                         .as_record_member()

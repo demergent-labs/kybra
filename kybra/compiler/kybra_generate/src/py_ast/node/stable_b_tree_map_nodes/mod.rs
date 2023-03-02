@@ -25,7 +25,7 @@ impl PyAst {
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_stable_b_tree_map_node(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Call { func, .. } => match &func.node {
                 ExprKind::Subscript { value, .. } => match &value.node {
                     ExprKind::Name { id, .. } => id == "StableBTreeMap",
@@ -38,10 +38,10 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     pub fn get_value_type(&self) -> SourceMapped<&Located<ExprKind>> {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { slice, .. } => match &slice.node {
                 ExprKind::Tuple { elts, .. } => SourceMapped {
-                    node: &elts[1],
+                    inner: &elts[1],
                     source_map: self.source_map.clone(),
                 },
                 _ => todo!(),
@@ -51,10 +51,10 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     pub fn get_key_type(&self) -> SourceMapped<&Located<ExprKind>> {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { slice, .. } => match &slice.node {
                 ExprKind::Tuple { elts, .. } => SourceMapped {
-                    node: &elts[0],
+                    inner: &elts[0],
                     source_map: self.source_map.clone(),
                 },
                 _ => todo!(),
@@ -66,9 +66,9 @@ impl SourceMapped<&Located<ExprKind>> {
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_stable_b_tree_map_node(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             StmtKind::Assign { value, .. } => SourceMapped {
-                node: value.as_ref(),
+                inner: value.as_ref(),
                 source_map: self.source_map.clone(),
             }
             .is_stable_b_tree_map_node(),
@@ -95,7 +95,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     fn get_memory_id(&self) -> u8 {
-        match &self.node.node {
+        match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { args, keywords, .. } => {
                     if args.len() >= 1 {
@@ -119,10 +119,10 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     fn get_key_type(&self) -> DataType {
-        match &self.node.node {
+        match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => SourceMapped {
-                    node: func.as_ref(),
+                    inner: func.as_ref(),
                     source_map: self.source_map.clone(),
                 }
                 .get_key_type()
@@ -134,10 +134,10 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     fn get_value_type(&self) -> DataType {
-        match &self.node.node {
+        match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => SourceMapped {
-                    node: func.as_ref(),
+                    inner: func.as_ref(),
                     source_map: self.source_map.clone(),
                 }
                 .get_value_type()
@@ -149,7 +149,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     fn get_max_key_size(&self) -> u32 {
-        match &self.node.node {
+        match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { args, keywords, .. } => {
                     if args.len() >= 2 {
@@ -167,7 +167,7 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     fn get_max_value_size(&self) -> u32 {
-        match &self.node.node {
+        match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { args, keywords, .. } => {
                     if args.len() >= 3 {

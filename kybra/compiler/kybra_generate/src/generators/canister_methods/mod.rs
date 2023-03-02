@@ -12,7 +12,7 @@ pub mod pre_upgrade;
 pub mod query_and_update;
 
 pub fn generate_call_to_py_function(statement: &SourceMapped<&Located<StmtKind>>) -> TokenStream {
-    match statement.node.node {
+    match statement.node {
         rustpython_parser::ast::StmtKind::FunctionDef { .. } => {
             let function_name = statement.get_function_name();
             let act_params = statement.build_params();

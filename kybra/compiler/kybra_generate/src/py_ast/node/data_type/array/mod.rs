@@ -8,7 +8,7 @@ use crate::{
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_array(&self) -> bool {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { value, .. } => match &value.node {
                 ExprKind::Name { id, .. } => id == "list",
                 _ => false,
@@ -25,7 +25,7 @@ impl SourceMapped<&Located<ExprKind>> {
         if !self.is_array() {
             return Err(self.not_array_error());
         }
-        match &self.node.node {
+        match &self.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
                     ExprKind::Name { id, .. } => {
@@ -36,7 +36,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     _ => return Err(self.not_array_error()),
                 }
                 let kybra_expr = SourceMapped {
-                    node: slice.as_ref(),
+                    inner: slice.as_ref(),
                     source_map: self.source_map.clone(),
                 };
                 Ok(Array {

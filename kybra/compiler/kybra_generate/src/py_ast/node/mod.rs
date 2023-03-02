@@ -13,7 +13,7 @@ pub use stable_b_tree_map_nodes::StableBTreeMapNode;
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn get_name(&self) -> Option<String> {
-        match &self.node.node {
+        match &self.node {
             StmtKind::FunctionDef { name, .. } => Some(name.clone()),
             StmtKind::AsyncFunctionDef { name, .. } => Some(name.clone()),
             StmtKind::ClassDef { name, .. } => Some(name.clone()),
@@ -22,7 +22,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     None
                 } else {
                     SourceMapped {
-                        node: &targets[0],
+                        inner: &targets[0],
                         source_map: self.source_map.clone(),
                     }
                     .get_name()
@@ -30,7 +30,7 @@ impl SourceMapped<&Located<StmtKind>> {
             }
             StmtKind::AugAssign { .. } => todo!(),
             StmtKind::AnnAssign { target, .. } => SourceMapped {
-                node: &**target,
+                inner: target.as_ref(),
                 source_map: self.source_map.clone(),
             }
             .get_name(),
@@ -41,7 +41,7 @@ impl SourceMapped<&Located<StmtKind>> {
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn get_name(&self) -> Option<String> {
-        match &self.node.node {
+        match &self.node {
             ExprKind::Name { id, .. } => Some(id.clone()),
             _ => None,
         }
