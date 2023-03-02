@@ -25,11 +25,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 let members: Vec<Member> = body
                     .iter()
                     .map(|stmt| {
-                        SourceMapped {
-                            inner: stmt,
-                            source_map: self.source_map.clone(),
-                        }
-                        .as_variant_member()
+                        SourceMapped::new(stmt, self.source_map.clone()).as_variant_member()
                     })
                     .collect();
                 Some(Variant {

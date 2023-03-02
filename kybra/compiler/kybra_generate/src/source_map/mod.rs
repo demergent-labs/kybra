@@ -19,8 +19,14 @@ pub struct SourceMap {
 
 #[derive(Clone)]
 pub struct SourceMapped<T> {
-    pub inner: T,
+    inner: T,
     pub source_map: SourceMap,
+}
+
+impl<T> SourceMapped<T> {
+    pub fn new(inner: T, source_map: SourceMap) -> SourceMapped<T> {
+        SourceMapped { inner, source_map }
+    }
 }
 
 impl<T> Deref for SourceMapped<T> {

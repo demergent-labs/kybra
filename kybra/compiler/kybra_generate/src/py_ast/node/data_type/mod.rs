@@ -29,22 +29,18 @@ impl SourceMapped<&Located<ExprKind>> {
 
     fn is_subscript_slice_data_type(&self) -> bool {
         match &self.node {
-            ExprKind::Subscript { value, slice, .. } => match &value.node {
-                ExprKind::Name { id, .. } => match &id[..] {
-                    "Async" => SourceMapped {
-                        inner: slice.as_ref(),
-                        source_map: self.source_map.clone(),
-                    }
-                    .is_data_type(),
-                    "manual" => SourceMapped {
-                        inner: slice.as_ref(),
-                        source_map: self.source_map.clone(),
-                    }
-                    .is_data_type(),
+            ExprKind::Subscript { value, slice, .. } => {
+                match &value.node {
+                    ExprKind::Name { id, .. } => match &id[..] {
+                        "Async" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
+                            .is_data_type(),
+                        "manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
+                            .is_data_type(),
+                        _ => false,
+                    },
                     _ => false,
-                },
-                _ => false,
-            },
+                }
+            }
             _ => false,
         }
     }
@@ -82,16 +78,10 @@ impl ToDataType for SourceMapped<&Located<ExprKind>> {
             match &self.node {
                 ExprKind::Subscript { value, slice, .. } => match &value.node {
                     ExprKind::Name { id, .. } => match &id[..] {
-                        "Async" => SourceMapped {
-                            inner: slice.as_ref(),
-                            source_map: self.source_map.clone(),
-                        }
-                        .to_data_type(),
-                        "manual" => SourceMapped {
-                            inner: slice.as_ref(),
-                            source_map: self.source_map.clone(),
-                        }
-                        .to_data_type(),
+                        "Async" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
+                            .to_data_type(),
+                        "manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
+                            .to_data_type(),
                         _ => panic!("{}", self.invalid_subscript_value_error()),
                     },
                     _ => panic!("{}", self.invalid_subscript_value_error()),

@@ -42,16 +42,10 @@ impl SourceMapped<&Located<ExprKind>> {
                 let kybra_elem_exprs = match &slice.node {
                     ExprKind::Tuple { elts, .. } => elts
                         .iter()
-                        .map(|elt| SourceMapped {
-                            inner: elt,
-                            source_map: self.source_map.clone(),
-                        })
+                        .map(|elt| SourceMapped::new(elt, self.source_map.clone()))
                         .collect(),
                     _ => {
-                        vec![SourceMapped {
-                            inner: slice.as_ref(),
-                            source_map: self.source_map.clone(),
-                        }]
+                        vec![SourceMapped::new(slice.as_ref(), self.source_map.clone())]
                     }
                 };
                 let act_elems = kybra_elem_exprs
@@ -73,11 +67,9 @@ impl SourceMapped<&Located<ExprKind>> {
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_tuple(&self) -> bool {
         match &self.node {
-            StmtKind::Assign { value, .. } => SourceMapped {
-                inner: value.as_ref(),
-                source_map: self.source_map.clone(),
+            StmtKind::Assign { value, .. } => {
+                SourceMapped::new(value.as_ref(), self.source_map.clone()).is_tuple()
             }
-            .is_tuple(),
             _ => false,
         }
     }
@@ -99,11 +91,8 @@ impl SourceMapped<&Located<StmtKind>> {
                     ExprKind::Name { id, .. } => id,
                     _ => return Err(self.invalid_target_error()),
                 };
-                SourceMapped {
-                    inner: value.as_ref(),
-                    source_map: self.source_map.clone(),
-                }
-                .to_tuple(Some(tuple_name.clone()))
+                SourceMapped::new(value.as_ref(), self.source_map.clone())
+                    .to_tuple(Some(tuple_name.clone()))
             }
             _ => panic!("{}", self.not_a_tuple_error()),
         }

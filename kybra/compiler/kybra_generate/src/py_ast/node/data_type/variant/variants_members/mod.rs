@@ -23,11 +23,8 @@ impl SourceMapped<&Located<StmtKind>> {
                     ExprKind::Name { id, .. } => id.clone(),
                     _ => panic!("{}", self.variant_target_must_be_a_name_error()),
                 };
-                let type_ = SourceMapped {
-                    inner: annotation.as_ref(),
-                    source_map: self.source_map.clone(),
-                }
-                .to_data_type();
+                let type_ =
+                    SourceMapped::new(annotation.as_ref(), self.source_map.clone()).to_data_type();
                 Member { name, type_ }
             }
             _ => panic!("{}", self.invalid_variant_member_error()),

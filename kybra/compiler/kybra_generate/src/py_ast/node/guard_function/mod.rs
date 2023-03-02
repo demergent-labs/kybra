@@ -61,11 +61,7 @@ impl SourceMapped<Mod> {
             Mod::Module { body, .. } => body
                 .iter()
                 .filter_map(|stmt_kind| {
-                    SourceMapped {
-                        inner: stmt_kind,
-                        source_map: self.source_map.clone(),
-                    }
-                    .get_guard_function_name()
+                    SourceMapped::new(stmt_kind, self.source_map.clone()).get_guard_function_name()
                 })
                 .collect(),
             _ => HashSet::new(),

@@ -85,10 +85,7 @@ impl PyAst {
                 .map(|(index, my_mod)| {
                     let source = std::fs::read_to_string(py_file_names[index]).unwrap();
 
-                    SourceMapped {
-                        source_map: SourceMap::new(source.clone(), py_file_names[index]),
-                        inner: my_mod,
-                    }
+                    SourceMapped::new(my_mod, SourceMap::new(source.clone(), py_file_names[index]))
                 })
                 .collect(),
             entry_module_name: entry_module_name.to_string(),
@@ -102,9 +99,8 @@ impl PyAst {
                 let source_mapped_stmt_kinds = match &source_mapped_mod.deref() {
                     Mod::Module { body, .. } => body
                         .iter()
-                        .map(|stmt_kind| SourceMapped {
-                            inner: stmt_kind,
-                            source_map: source_mapped_mod.source_map.clone(),
+                        .map(|stmt_kind| {
+                            SourceMapped::new(stmt_kind, source_mapped_mod.source_map.clone())
                         })
                         .collect(),
                     _ => vec![],

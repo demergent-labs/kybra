@@ -27,13 +27,7 @@ impl SourceMapped<&Arguments> {
         // Ignore the first param, which is always "self"
         Ok(self.args[1..]
             .iter()
-            .map(|arg| {
-                SourceMapped {
-                    inner: arg,
-                    source_map: self.source_map.clone(),
-                }
-                .to_param()
-            })
+            .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
             .collect())
     }
 }
@@ -43,10 +37,10 @@ impl SourceMapped<&Located<ArgData>> {
         let param_name = self.node.arg.clone();
         match &self.node.annotation {
             Some(annotation) => {
-                let data_type = SourceMapped {
-                    inner: annotation.as_ref(),
-                    source_map: self.source_map.clone(),
-                }
+                let data_type = SourceMapped::new(
+                    annotation.as_ref(),
+                    self.source_map.clone(),
+                )
                 .to_data_type();
 
                 Param {

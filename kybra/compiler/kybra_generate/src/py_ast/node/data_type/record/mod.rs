@@ -55,13 +55,7 @@ impl SourceMapped<&Located<StmtKind>> {
                         },
                         _ => true,
                     })
-                    .map(|stmt| {
-                        SourceMapped {
-                            inner: stmt,
-                            source_map: self.source_map.clone(),
-                        }
-                        .as_record_member()
-                    })
+                    .map(|stmt| SourceMapped::new(stmt, self.source_map.clone()).as_record_member())
                     .collect();
                 Some(Record {
                     name: Some(name.clone()),

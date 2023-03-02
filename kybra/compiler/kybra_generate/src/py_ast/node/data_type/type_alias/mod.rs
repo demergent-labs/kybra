@@ -33,11 +33,9 @@ impl SourceMapped<&Located<StmtKind>> {
             return false;
         }
         match &self.node {
-            StmtKind::Assign { value, .. } => SourceMapped {
-                inner: value.as_ref(),
-                source_map: self.source_map.clone(),
+            StmtKind::Assign { value, .. } => {
+                SourceMapped::new(value.as_ref(), self.source_map.clone()).is_type_alias()
             }
-            .is_type_alias(),
             _ => false,
         }
     }
@@ -63,11 +61,8 @@ impl SourceMapped<&Located<StmtKind>> {
             }
             _ => panic!("This is not a type alias"),
         };
-        let enclosed_type = SourceMapped {
-            inner: value.as_ref(),
-            source_map: self.source_map.clone(),
-        }
-        .to_data_type();
+        let enclosed_type =
+            SourceMapped::new(value.as_ref(), self.source_map.clone()).to_data_type();
         Some(TypeAlias {
             name: alias_name,
             aliased_type: Box::new(enclosed_type),

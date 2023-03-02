@@ -40,10 +40,9 @@ impl SourceMapped<&Located<ExprKind>> {
     pub fn get_value_type(&self) -> SourceMapped<&Located<ExprKind>> {
         match &self.node {
             ExprKind::Subscript { slice, .. } => match &slice.node {
-                ExprKind::Tuple { elts, .. } => SourceMapped {
-                    inner: &elts[1],
-                    source_map: self.source_map.clone(),
-                },
+                ExprKind::Tuple { elts, .. } => {
+                    SourceMapped::new(&elts[1], self.source_map.clone())
+                }
                 _ => todo!(),
             },
             _ => todo!(),
@@ -53,10 +52,9 @@ impl SourceMapped<&Located<ExprKind>> {
     pub fn get_key_type(&self) -> SourceMapped<&Located<ExprKind>> {
         match &self.node {
             ExprKind::Subscript { slice, .. } => match &slice.node {
-                ExprKind::Tuple { elts, .. } => SourceMapped {
-                    inner: &elts[0],
-                    source_map: self.source_map.clone(),
-                },
+                ExprKind::Tuple { elts, .. } => {
+                    SourceMapped::new(&elts[0], self.source_map.clone())
+                }
                 _ => todo!(),
             },
             _ => todo!(),
@@ -67,11 +65,10 @@ impl SourceMapped<&Located<ExprKind>> {
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_stable_b_tree_map_node(&self) -> bool {
         match &self.node {
-            StmtKind::Assign { value, .. } => SourceMapped {
-                inner: value.as_ref(),
-                source_map: self.source_map.clone(),
+            StmtKind::Assign { value, .. } => {
+                SourceMapped::new(value.as_ref(), self.source_map.clone())
+                    .is_stable_b_tree_map_node()
             }
-            .is_stable_b_tree_map_node(),
             _ => false,
         }
     }
@@ -121,12 +118,11 @@ impl SourceMapped<&Located<StmtKind>> {
     fn get_key_type(&self) -> DataType {
         match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
-                ExprKind::Call { func, .. } => SourceMapped {
-                    inner: func.as_ref(),
-                    source_map: self.source_map.clone(),
+                ExprKind::Call { func, .. } => {
+                    SourceMapped::new(func.as_ref(), self.source_map.clone())
+                        .get_key_type()
+                        .to_data_type()
                 }
-                .get_key_type()
-                .to_data_type(),
                 _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
             },
             _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
@@ -136,12 +132,11 @@ impl SourceMapped<&Located<StmtKind>> {
     fn get_value_type(&self) -> DataType {
         match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
-                ExprKind::Call { func, .. } => SourceMapped {
-                    inner: func.as_ref(),
-                    source_map: self.source_map.clone(),
+                ExprKind::Call { func, .. } => {
+                    SourceMapped::new(func.as_ref(), self.source_map.clone())
+                        .get_value_type()
+                        .to_data_type()
                 }
-                .get_value_type()
-                .to_data_type(),
                 _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
             },
             _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),

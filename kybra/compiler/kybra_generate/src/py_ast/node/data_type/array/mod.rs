@@ -35,10 +35,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     }
                     _ => return Err(self.not_array_error()),
                 }
-                let kybra_expr = SourceMapped {
-                    inner: slice.as_ref(),
-                    source_map: self.source_map.clone(),
-                };
+                let kybra_expr = SourceMapped::new(slice.as_ref(), self.source_map.clone());
                 Ok(Array {
                     enclosed_type: Box::from(kybra_expr.to_data_type()),
                 })

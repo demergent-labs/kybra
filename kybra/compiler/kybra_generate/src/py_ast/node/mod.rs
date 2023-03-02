@@ -21,19 +21,13 @@ impl SourceMapped<&Located<StmtKind>> {
                 if targets.len() != 1 {
                     None
                 } else {
-                    SourceMapped {
-                        inner: &targets[0],
-                        source_map: self.source_map.clone(),
-                    }
-                    .get_name()
+                    SourceMapped::new(&targets[0], self.source_map.clone()).get_name()
                 }
             }
             StmtKind::AugAssign { .. } => todo!(),
-            StmtKind::AnnAssign { target, .. } => SourceMapped {
-                inner: target.as_ref(),
-                source_map: self.source_map.clone(),
+            StmtKind::AnnAssign { target, .. } => {
+                SourceMapped::new(target.as_ref(), self.source_map.clone()).get_name()
             }
-            .get_name(),
             _ => None,
         }
     }

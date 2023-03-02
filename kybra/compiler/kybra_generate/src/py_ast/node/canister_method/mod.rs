@@ -35,16 +35,10 @@ impl PyAst {
                     Mod::Module { body, .. } => body
                         .iter()
                         .filter(|stmt_kind| {
-                            SourceMapped {
-                                inner: *stmt_kind,
-                                source_map: program.source_map.clone(),
-                            }
-                            .is_canister_method_type(method_type.clone())
+                            SourceMapped::new(*stmt_kind, program.source_map.clone())
+                                .is_canister_method_type(method_type.clone())
                         })
-                        .map(|stmt_kind| SourceMapped {
-                            inner: stmt_kind,
-                            source_map: program.source_map.clone(),
-                        })
+                        .map(|stmt_kind| SourceMapped::new(stmt_kind, program.source_map.clone()))
                         .collect(),
                     _ => vec![],
                 });
@@ -89,13 +83,7 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::FunctionDef { args, .. } => args
                 .args
                 .iter()
-                .map(|arg| {
-                    SourceMapped {
-                        inner: arg,
-                        source_map: self.source_map.clone(),
-                    }
-                    .to_param()
-                })
+                .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
                 .collect(),
             _ => panic!("{}", self.not_a_function_def_error()),
         }

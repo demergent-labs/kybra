@@ -31,10 +31,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     }
                     _ => panic!("{}", self.not_opt_error()),
                 }
-                let kybra_expr = SourceMapped {
-                    inner: slice.as_ref(),
-                    source_map: self.source_map.clone(),
-                };
+                let kybra_expr = SourceMapped::new(slice.as_ref(), self.source_map.clone());
                 Ok(Opt {
                     enclosed_type: Box::from(kybra_expr.to_data_type()),
                 })

@@ -89,11 +89,7 @@ impl SourceMapped<&Located<ExprKind>> {
                             ExprKind::List { elts, .. } => Ok(elts
                                 .iter()
                                 .map(|elt| {
-                                    SourceMapped {
-                                        inner: elt,
-                                        source_map: self.source_map.clone(),
-                                    }
-                                    .to_data_type()
+                                    SourceMapped::new(elt, self.source_map.clone()).to_data_type()
                                 })
                                 .collect()),
                             _ => Err(self.todo_func_error()),
@@ -117,11 +113,7 @@ impl SourceMapped<&Located<ExprKind>> {
                             if elts.len() != 2 {
                                 return Err(self.todo_func_error());
                             }
-                            Ok(SourceMapped {
-                                inner: &elts[1],
-                                source_map: self.source_map.clone(),
-                            }
-                            .to_data_type())
+                            Ok(SourceMapped::new(&elts[1], self.source_map.clone()).to_data_type())
                         }
                         _ => return Err(self.todo_func_error()),
                     },
@@ -145,11 +137,7 @@ impl SourceMapped<&Located<StmtKind>> {
                         ExprKind::Name { id, .. } => Some(id.clone()),
                         _ => None,
                     };
-                    Ok(SourceMapped {
-                        inner: value.as_ref(),
-                        source_map: self.source_map.clone(),
-                    }
-                    .to_func(name)?)
+                    Ok(SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?)
                 }
                 None => return Err(self.todo_func_error()),
             },
@@ -171,11 +159,9 @@ impl SourceMapped<&Located<StmtKind>> {
                     _ => false,
                 };
                 let is_func = match &value {
-                    Some(value) => SourceMapped {
-                        inner: value.as_ref(),
-                        source_map: self.source_map.clone(),
+                    Some(value) => {
+                        SourceMapped::new(value.as_ref(), self.source_map.clone()).is_func()
                     }
-                    .is_func(),
                     None => false,
                 };
                 is_type_alias && is_func

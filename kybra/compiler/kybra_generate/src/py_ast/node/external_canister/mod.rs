@@ -34,18 +34,15 @@ impl SourceMapped<&Located<StmtKind>> {
                             StmtKind::FunctionDef { name, args, body: _, decorator_list, returns, type_comment: _ } => {
                                 ensure_decorated_as_method_or_panic(decorator_list, &canister_name, name);
 
-                                let params = SourceMapped {
-                                    inner: args.as_ref(),
-                                    source_map: self.source_map.clone()
-                                }.to_param_list()
+                                let params = SourceMapped::new(
+                                    args.as_ref(),
+                                    self.source_map.clone()
+                                ).to_param_list()
                                  .unwrap_or_else(|e| panic!("{}.{} violates Kybra requirements: {}", canister_name, name, e) );
 
                                 let expr_kind = returns.as_ref().expect(&format!("{}.{} is missing a return type", canister_name, &name));
 
-                                let return_type = SourceMapped {
-                                    inner: expr_kind.as_ref(),
-                                    source_map: self.source_map.clone(),
-                                }.to_data_type();
+                                let return_type = SourceMapped::new(expr_kind.as_ref(), self.source_map.clone()).to_data_type();
 
                                 ExternalCanisterMethod {
                                     name: name.clone(),

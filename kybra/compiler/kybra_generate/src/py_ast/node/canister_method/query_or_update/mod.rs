@@ -17,11 +17,9 @@ impl SourceMapped<&Located<StmtKind>> {
     pub fn is_manual(&self) -> bool {
         match &self.node {
             StmtKind::FunctionDef { returns, .. } => match returns {
-                Some(returns) => SourceMapped {
-                    inner: returns.as_ref(),
-                    source_map: self.source_map.clone(),
+                Some(returns) => {
+                    SourceMapped::new(returns.as_ref(), self.source_map.clone()).is_manual()
                 }
-                .is_manual(),
                 None => false,
             },
             _ => false,
@@ -53,11 +51,9 @@ impl SourceMapped<&Located<StmtKind>> {
         };
 
         match returns {
-            Some(return_type) => SourceMapped {
-                inner: return_type.as_ref(),
-                source_map: self.source_map.clone(),
+            Some(return_type) => {
+                SourceMapped::new(return_type.as_ref(), self.source_map.clone()).to_data_type()
             }
-            .to_data_type(),
             None => Primitive::Void.to_data_type(),
         }
     }
@@ -103,11 +99,8 @@ impl SourceMapped<&Located<ExprKind>> {
                     if id == "manual" {
                         return true;
                     } else {
-                        return SourceMapped {
-                            inner: slice.as_ref(),
-                            source_map: self.source_map.clone(),
-                        }
-                        .is_manual();
+                        return SourceMapped::new(slice.as_ref(), self.source_map.clone())
+                            .is_manual();
                     }
                 }
                 _ => false,
