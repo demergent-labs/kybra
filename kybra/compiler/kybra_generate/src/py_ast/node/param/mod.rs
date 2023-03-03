@@ -45,32 +45,36 @@ impl SourceMapped<&Arguments> {
             );
         }
 
-        if self.args.len() == 0 {
-            todo!(
-                "{}",
-                "method must be an instance method. Add \"self\" as the first parameter"
-                    .to_string(),
-            );
-        }
-
-        match internal_or_external {
+        let param_results = match internal_or_external {
             InternalOrExternal::Internal => {
                 if self.args[0].node.arg == "self".to_string() {
                     todo!("{}", "first parameter must not be \"self\"".to_string());
                 }
+                self.args
+                    .iter()
+                    .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
+                    .collect()
             }
             InternalOrExternal::External => {
+                if self.args.len() == 0 {
+                    todo!(
+                        "{}",
+                        "method must be an instance method. Add \"self\" as the first parameter"
+                            .to_string(),
+                    );
+                }
+
                 if self.args[0].node.arg != "self".to_string() {
                     todo!("{}", "first parameter must be \"self\"".to_string());
                 }
+                self.args[1..]
+                    .iter()
+                    .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
+                    .collect()
             }
-        }
+        };
 
         // Ignore the first param, which is always "self"
-        let param_results = self.args[1..]
-            .iter()
-            .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
-            .collect();
         Ok(crate::errors::collect_kybra_results(param_results)?)
     }
 }
