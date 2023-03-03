@@ -2,7 +2,11 @@ pub mod errors;
 
 use cdk_framework::act::node::canister_method::{CanisterMethodType, InitMethod};
 
-use crate::{errors::KybraResult, generators::canister_methods::init, py_ast::PyAst};
+use crate::{
+    errors::KybraResult,
+    generators::canister_methods::init,
+    py_ast::{node::param::InternalOrExternal, PyAst},
+};
 
 impl PyAst {
     pub fn build_init_method(&self) -> KybraResult<InitMethod> {
@@ -18,7 +22,9 @@ impl PyAst {
         let init_function_def_option = init_function_defs.get(0);
 
         let params = match init_function_def_option {
-            Some(init_function_def) => init_function_def.build_params()?,
+            Some(init_function_def) => {
+                init_function_def.build_params(InternalOrExternal::Internal)?
+            }
             None => vec![],
         };
 

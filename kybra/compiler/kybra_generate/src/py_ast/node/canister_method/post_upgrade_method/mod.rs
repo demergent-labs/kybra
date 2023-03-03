@@ -2,7 +2,11 @@ pub mod errors;
 
 use cdk_framework::act::node::canister_method::{CanisterMethodType, PostUpgradeMethod};
 
-use crate::{errors::KybraResult, generators::canister_methods::post_upgrade, py_ast::PyAst};
+use crate::{
+    errors::KybraResult,
+    generators::canister_methods::post_upgrade,
+    py_ast::{node::param::InternalOrExternal, PyAst},
+};
 
 impl PyAst {
     pub fn build_post_upgrade_method(&self) -> KybraResult<PostUpgradeMethod> {
@@ -21,7 +25,9 @@ impl PyAst {
         let post_upgrade_function_def_option = post_upgrade_function_defs.get(0);
 
         let params = match &post_upgrade_function_def_option {
-            Some(post_upgrade_function_def) => post_upgrade_function_def.build_params()?,
+            Some(post_upgrade_function_def) => {
+                post_upgrade_function_def.build_params(InternalOrExternal::Internal)?
+            }
             None => vec![],
         };
 

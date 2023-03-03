@@ -5,6 +5,8 @@ use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
+use super::param::InternalOrExternal;
+
 impl PyAst {
     pub fn build_external_canisters(&self) -> KybraResult<Vec<ExternalCanister>> {
         Ok(crate::errors::collect_kybra_results(
@@ -34,7 +36,7 @@ impl SourceMapped<&Located<StmtKind>> {
 
                 Ok(ExternalCanisterMethod {
                     name: name.clone(),
-                    params: self.build_params()?,
+                    params: self.build_params(InternalOrExternal::External)?,
                     return_type: self.build_return_type()?,
                 })
             }

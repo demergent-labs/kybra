@@ -3,12 +3,15 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{errors::KybraResult, generators::tuple, source_map::SourceMapped};
+use crate::{
+    errors::KybraResult, generators::tuple, py_ast::node::param::InternalOrExternal,
+    source_map::SourceMapped,
+};
 
 pub fn generate_body(
     kybra_statement: &SourceMapped<&Located<StmtKind>>,
 ) -> KybraResult<TokenStream> {
-    let params = kybra_statement.build_params()?;
+    let params = kybra_statement.build_params(InternalOrExternal::Internal)?;
 
     let name = match kybra_statement.get_name() {
         Some(name) => name,

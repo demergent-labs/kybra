@@ -6,11 +6,20 @@ use rustpython_parser::ast::{ArgData, Arguments, Located, StmtKind};
 
 use crate::{errors::KybraResult, source_map::SourceMapped};
 
+pub enum InternalOrExternal {
+    Internal,
+    External,
+}
+
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn build_params(&self) -> KybraResult<Vec<Param>> {
+    pub fn build_params(
+        &self,
+        internal_or_external: InternalOrExternal,
+    ) -> KybraResult<Vec<Param>> {
         match &self.node {
             StmtKind::FunctionDef { args, .. } => {
-                SourceMapped::new(args.as_ref(), self.source_map.clone()).to_param_list()
+                SourceMapped::new(args.as_ref(), self.source_map.clone())
+                    .to_param_list(internal_or_external)
             }
             _ => panic!("Unreachable"),
         }
@@ -18,7 +27,10 @@ impl SourceMapped<&Located<StmtKind>> {
 }
 
 impl SourceMapped<&Arguments> {
-    pub fn to_param_list(&self) -> KybraResult<Vec<Param>> {
+    pub fn to_param_list(
+        &self,
+        internal_or_external: InternalOrExternal,
+    ) -> KybraResult<Vec<Param>> {
         if self.kwarg.is_some() {
             todo!(
                 "{}",
@@ -41,8 +53,17 @@ impl SourceMapped<&Arguments> {
             );
         }
 
-        if self.args[0].node.arg != "self".to_string() {
-            todo!("{}", "first parameter must be \"self\"".to_string());
+        match internal_or_external {
+            InternalOrExternal::Internal => {
+                if self.args[0].node.arg == "self".to_string() {
+                    todo!("{}", "first parameter must not be \"self\"".to_string());
+                }
+            }
+            InternalOrExternal::External => {
+                if self.args[0].node.arg != "self".to_string() {
+                    todo!("{}", "first parameter must be \"self\"".to_string());
+                }
+            }
         }
 
         // Ignore the first param, which is always "self"

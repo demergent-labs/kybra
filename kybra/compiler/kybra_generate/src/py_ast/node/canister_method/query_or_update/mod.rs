@@ -2,7 +2,8 @@ use cdk_framework::act::node::canister_method::{CanisterMethodType, QueryOrUpdat
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::KybraResult, generators::canister_methods::query_and_update, source_map::SourceMapped,
+    errors::KybraResult, generators::canister_methods::query_and_update,
+    py_ast::node::param::InternalOrExternal, source_map::SourceMapped,
 };
 
 pub mod query_method;
@@ -101,7 +102,7 @@ impl SourceMapped<&Located<StmtKind>> {
         Ok(match &self.node {
             StmtKind::FunctionDef { name, .. } => QueryOrUpdateDefinition {
                 body: query_and_update::generate_body(self)?,
-                params: self.build_params()?,
+                params: self.build_params(InternalOrExternal::Internal)?,
                 is_manual: self.is_manual(),
                 name: name.clone(),
                 return_type: match self.build_return_type() {

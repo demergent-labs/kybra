@@ -2,7 +2,10 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{errors::KybraResult, generators::tuple, source_map::SourceMapped};
+use crate::{
+    errors::KybraResult, generators::tuple, py_ast::node::param::InternalOrExternal,
+    source_map::SourceMapped,
+};
 
 pub mod heartbeat;
 pub mod init;
@@ -17,7 +20,7 @@ pub fn generate_call_to_py_function(
     match statement.node {
         StmtKind::FunctionDef { .. } => {
             let function_name = statement.get_function_name()?;
-            let params = statement.build_params()?;
+            let params = statement.build_params(InternalOrExternal::Internal)?;
 
             let param_conversions = params
                 .iter()
