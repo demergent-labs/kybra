@@ -21,12 +21,12 @@ impl PyAst {
         let post_upgrade_function_def_option = post_upgrade_function_defs.get(0);
 
         let params = match &post_upgrade_function_def_option {
-            Some(post_upgrade_function_def) => post_upgrade_function_def.build_params(),
+            Some(post_upgrade_function_def) => post_upgrade_function_def.build_params()?,
             None => vec![],
         };
 
         let body =
-            post_upgrade::generate(post_upgrade_function_def_option, &self.entry_module_name);
+            post_upgrade::generate(post_upgrade_function_def_option, &self.entry_module_name)?;
 
         Ok(PostUpgradeMethod { params, body })
     }

@@ -1,7 +1,7 @@
 use cdk_framework::act::node::DataType;
 use rustpython_parser::ast::{Constant, ExprKind, Located};
 
-use crate::source_map::SourceMapped;
+use crate::{errors::KybraResult, source_map::SourceMapped};
 
 pub mod array;
 pub mod errors;
@@ -44,37 +44,22 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn to_data_type(&self) -> DataType {
+    pub fn to_data_type(&self) -> KybraResult<DataType> {
         // TODO make these ifs that return instead of else if
         if self.is_primitive() {
-            return match self.to_primitive() {
-                Ok(primitive) => DataType::Primitive(primitive),
-                Err(error) => panic!("{}", error),
-            };
+            return Ok(DataType::Primitive(self.to_primitive()?));
         }
         if self.is_array() {
-            return match self.to_array() {
-                Ok(array) => DataType::Array(array),
-                Err(error) => panic!("{}", error),
-            };
+            return Ok(DataType::Array(self.to_array()?));
         }
         if self.is_opt() {
-            return match self.to_opt() {
-                Ok(opt) => DataType::Opt(opt),
-                Err(error) => panic!("{}", error),
-            };
+            return Ok(DataType::Opt(self.to_opt()?));
         }
         if self.is_tuple() {
-            return match self.to_tuple(None) {
-                Ok(tuple) => DataType::Tuple(tuple),
-                Err(error) => panic!("{:?}", error),
-            };
+            return Ok(DataType::Tuple(self.to_tuple(None)?));
         }
         if self.is_type_ref() {
-            return match self.to_type_ref() {
-                Ok(type_ref) => DataType::TypeRef(type_ref),
-                Err(error) => panic!("{}", error),
-            };
+            return Ok(DataType::TypeRef(self.to_type_ref()?));
         }
         match &self.node {
             ExprKind::Subscript { value, slice, .. } => {

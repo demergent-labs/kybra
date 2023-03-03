@@ -28,8 +28,8 @@ pub struct PyAst {
 
 impl PyAst {
     pub fn to_act(&self) -> KybraResult<AbstractCanisterTree> {
-        let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes();
-        let external_canisters = self.build_external_canisters();
+        let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes()?;
+        let external_canisters = self.build_external_canisters()?;
 
         let canister_methods = CanisterMethods {
             heartbeat_method: self.build_heartbeat_method()?,

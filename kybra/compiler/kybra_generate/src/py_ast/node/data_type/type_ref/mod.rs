@@ -1,10 +1,9 @@
+pub mod errors;
+
 use cdk_framework::act::node::data_type::TypeRef;
 use rustpython_parser::ast::{Constant, ExprKind, Located};
 
-use crate::{
-    errors::{CreateMessage, Message},
-    source_map::SourceMapped,
-};
+use crate::{errors::KybraResult, source_map::SourceMapped};
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_type_ref(&self) -> bool {
@@ -18,7 +17,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn to_type_ref(&self) -> Result<TypeRef, Message> {
+    pub fn to_type_ref(&self) -> KybraResult<TypeRef> {
         if !self.is_type_ref() {
             return Err(self.not_type_ref_error());
         }
@@ -30,13 +29,9 @@ impl SourceMapped<&Located<ExprKind>> {
                 Constant::Str(string) => Ok(TypeRef {
                     name: string.clone(),
                 }),
-                _ => Err(self.not_type_ref_error()),
+                _ => panic!("Unreachable"),
             },
-            _ => Err(self.not_type_ref_error()),
+            _ => panic!("Unreachable"),
         }
-    }
-
-    pub fn not_type_ref_error(&self) -> Message {
-        self.create_error_message("This is is not a type ref", "", None)
     }
 }

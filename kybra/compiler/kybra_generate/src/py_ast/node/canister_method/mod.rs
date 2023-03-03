@@ -16,6 +16,7 @@ use rustpython_parser::ast::Located;
 use rustpython_parser::ast::Mod;
 use rustpython_parser::ast::StmtKind;
 
+use crate::errors::KybraResult;
 use crate::generators::canister_methods;
 use crate::py_ast::PyAst;
 use crate::source_map::SourceMapped;
@@ -78,15 +79,15 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn build_params(&self) -> Vec<Param> {
-        match &self.node {
+    pub fn build_params(&self) -> KybraResult<Vec<Param>> {
+        crate::errors::collect_kybra_results(match &self.node {
             StmtKind::FunctionDef { args, .. } => args
                 .args
                 .iter()
                 .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
                 .collect(),
             _ => panic!("{}", self.not_a_function_def_error()),
-        }
+        })
     }
 
     pub fn get_function_name(&self) -> String {
@@ -96,7 +97,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn generate_call_to_py_function(&self) -> TokenStream {
+    pub fn generate_call_to_py_function(&self) -> KybraResult<TokenStream> {
         canister_methods::generate_call_to_py_function(self)
     }
 }

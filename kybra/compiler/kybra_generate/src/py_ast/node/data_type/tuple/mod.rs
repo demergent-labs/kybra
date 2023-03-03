@@ -1,6 +1,7 @@
 pub mod errors;
+pub mod tuple_members;
 
-use cdk_framework::act::node::data_type::{tuple::Member, Tuple};
+use cdk_framework::act::node::data_type::Tuple;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
@@ -48,7 +49,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     }
                     _ => return Err(self.not_tuple_error()),
                 }
-                let kybra_elem_exprs = match &slice.node {
+                let tuple_members_exprs = match &slice.node {
                     ExprKind::Tuple { elts, .. } => elts
                         .iter()
                         .map(|elt| SourceMapped::new(elt, self.source_map.clone()))
@@ -57,15 +58,15 @@ impl SourceMapped<&Located<ExprKind>> {
                         vec![SourceMapped::new(slice.as_ref(), self.source_map.clone())]
                     }
                 };
-                let act_elems = kybra_elem_exprs
-                    .iter()
-                    .map(|kybra_elem| Member {
-                        type_: kybra_elem.to_data_type(),
-                    })
-                    .collect();
+                let members: Vec<_> = crate::errors::collect_kybra_results(
+                    tuple_members_exprs
+                        .iter()
+                        .map(|kybra_elem| kybra_elem.as_tuple_member())
+                        .collect(),
+                )?;
                 Ok(Tuple {
                     name: tuple_name,
-                    members: act_elems,
+                    members,
                 })
             }
             _ => Err(self.not_tuple_error()),

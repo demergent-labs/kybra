@@ -50,9 +50,11 @@ impl SourceMapped<&Located<StmtKind>> {
         };
 
         match returns {
-            Some(return_type) => {
-                Ok(SourceMapped::new(return_type.as_ref(), self.source_map.clone()).to_data_type())
-            }
+            Some(return_type) => Ok(SourceMapped::new(
+                return_type.as_ref(),
+                self.source_map.clone(),
+            )
+            .to_data_type()?),
             None => Err(self.return_type_annotation_required_error()),
         }
     }
@@ -119,10 +121,13 @@ impl SourceMapped<&Located<StmtKind>> {
         Ok(match &self.node {
             StmtKind::FunctionDef { name, .. } => QueryOrUpdateDefinition {
                 body: query_and_update::generate_body(self)?,
-                params: self.build_params(),
+                params: self.build_params()?,
                 is_manual: self.is_manual(),
                 name: name.clone(),
-                return_type: self.build_return_type()?,
+                return_type: match self.build_return_type() {
+                    Ok(return_type) => return_type,
+                    Err(error) => return Err(error),
+                },
                 is_async: self.is_async(),
                 cdk_name: "kybra".to_string(),
                 guard_function_name: self.get_guard_function_name(),

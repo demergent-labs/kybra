@@ -1,10 +1,9 @@
+pub mod errors;
+
 use cdk_framework::act::node::data_type::Opt;
 use rustpython_parser::ast::{ExprKind, Located};
 
-use crate::{
-    errors::{CreateMessage, Message},
-    source_map::SourceMapped,
-};
+use crate::{errors::KybraResult, source_map::SourceMapped};
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_opt(&self) -> bool {
@@ -17,7 +16,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub(super) fn to_opt(&self) -> Result<Opt, Message> {
+    pub(super) fn to_opt(&self) -> KybraResult<Opt> {
         if !self.is_opt() {
             return Err(self.not_opt_error());
         }
@@ -26,21 +25,17 @@ impl SourceMapped<&Located<ExprKind>> {
                 match &value.node {
                     ExprKind::Name { id, .. } => {
                         if id != "opt" {
-                            panic!("{}", self.not_opt_error())
+                            panic!("Unreachable");
                         }
                     }
-                    _ => panic!("{}", self.not_opt_error()),
+                    _ => panic!("Unreachable"),
                 }
                 let kybra_expr = SourceMapped::new(slice.as_ref(), self.source_map.clone());
                 Ok(Opt {
-                    enclosed_type: Box::from(kybra_expr.to_data_type()),
+                    enclosed_type: Box::from(kybra_expr.to_data_type()?),
                 })
             }
-            _ => Err(self.not_opt_error()),
+            _ => panic!("Unreachable"),
         }
-    }
-
-    pub fn not_opt_error(&self) -> Message {
-        self.create_error_message("This is is not an opt", "", None)
     }
 }

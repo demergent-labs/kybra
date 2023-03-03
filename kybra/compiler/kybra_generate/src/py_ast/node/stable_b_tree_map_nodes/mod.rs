@@ -1,6 +1,6 @@
 mod errors;
 
-use crate::{py_ast::PyAst, source_map::SourceMapped};
+use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 use cdk_framework::act::node::DataType;
 use num_bigint::{BigInt, Sign};
 use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
@@ -15,11 +15,25 @@ pub struct StableBTreeMapNode {
     pub max_value_size: u32,
 }
 impl PyAst {
-    pub fn build_stable_b_tree_map_nodes(&self) -> Vec<StableBTreeMapNode> {
-        self.get_stmt_kinds()
-            .iter()
-            .filter_map(|stmt| stmt.as_stable_b_tree_map_node())
-            .collect()
+    pub fn build_stable_b_tree_map_nodes(&self) -> KybraResult<Vec<StableBTreeMapNode>> {
+        let mut stable_b_tree_map_nodes = vec![];
+        let mut error_messages = vec![];
+
+        self.get_stmt_kinds().iter().for_each(|stmt_kind| {
+            match stmt_kind.as_stable_b_tree_map_node() {
+                Ok(Some(stable_b_tree_map_node)) => {
+                    stable_b_tree_map_nodes.push(stable_b_tree_map_node)
+                }
+                Ok(None) => (),
+                Err(errors) => error_messages.extend(errors),
+            }
+        });
+
+        if error_messages.is_empty() {
+            Ok(stable_b_tree_map_nodes)
+        } else {
+            Err(error_messages)
+        }
     }
 }
 
@@ -73,22 +87,22 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn as_stable_b_tree_map_node(&self) -> Option<StableBTreeMapNode> {
+    pub fn as_stable_b_tree_map_node(&self) -> KybraResult<Option<StableBTreeMapNode>> {
         if !self.is_stable_b_tree_map_node() {
-            return None;
+            return Ok(None);
         }
         let memory_id = self.get_memory_id();
-        let key_type = self.get_key_type();
-        let value_type = self.get_value_type();
+        let key_type = self.get_key_type()?;
+        let value_type = self.get_value_type()?;
         let max_key_size = self.get_max_key_size();
         let max_value_size = self.get_max_value_size();
-        Some(StableBTreeMapNode {
+        Ok(Some(StableBTreeMapNode {
             memory_id,
             key_type,
             value_type,
             max_key_size,
             max_value_size,
-        })
+        }))
     }
 
     fn get_memory_id(&self) -> u8 {
@@ -115,7 +129,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    fn get_key_type(&self) -> DataType {
+    fn get_key_type(&self) -> KybraResult<DataType> {
         match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => {
@@ -129,7 +143,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    fn get_value_type(&self) -> DataType {
+    fn get_value_type(&self) -> KybraResult<DataType> {
         match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => {

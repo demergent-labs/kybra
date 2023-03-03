@@ -1,39 +1,50 @@
 use cdk_framework::act::node::param::Param;
 use rustpython_parser::ast::{ArgData, Arguments, Located};
 
-use crate::source_map::SourceMapped;
+use crate::{
+    errors::{self, KybraResult},
+    source_map::SourceMapped,
+};
 
 impl SourceMapped<&Arguments> {
-    pub fn to_param_list(&self) -> Result<Vec<Param>, String> {
+    pub fn to_param_list(&self) -> KybraResult<Vec<Param>> {
         if self.kwarg.is_some() {
-            return Err("the dictionary unpacking operator (**) is not supported".to_string());
+            todo!(
+                "{}",
+                "the dictionary unpacking operator (**) is not supported".to_string()
+            );
         }
 
         if self.vararg.is_some() {
-            return Err("the iterator unpacking operator (*) is not supported".to_string());
+            todo!(
+                "{}",
+                "the iterator unpacking operator (*) is not supported".to_string()
+            );
         }
 
         if self.args.len() == 0 {
-            return Err(
+            todo!(
+                "{}",
                 "method must be an instance method. Add \"self\" as the first parameter"
                     .to_string(),
             );
         }
 
         if self.args[0].node.arg != "self".to_string() {
-            return Err("first parameter must be \"self\"".to_string());
+            todo!("{}", "first parameter must be \"self\"".to_string());
         }
 
         // Ignore the first param, which is always "self"
-        Ok(self.args[1..]
+        let param_results = self.args[1..]
             .iter()
             .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
-            .collect())
+            .collect();
+        Ok(errors::collect_kybra_results(param_results)?)
     }
 }
 
 impl SourceMapped<&Located<ArgData>> {
-    pub fn to_param(&self) -> Param {
+    pub fn to_param(&self) -> KybraResult<Param> {
         let param_name = self.node.arg.clone();
         match &self.node.annotation {
             Some(annotation) => {
@@ -41,12 +52,12 @@ impl SourceMapped<&Located<ArgData>> {
                     annotation.as_ref(),
                     self.source_map.clone(),
                 )
-                .to_data_type();
+                .to_data_type()?;
 
-                Param {
+                Ok(Param {
                     name: param_name,
                     type_: data_type,
-                }
+                })
             }
             None => todo!("{}", format!("parameter \"{}\" is missing a type annotation. All method parameters must specify their type.", param_name)),
         }

@@ -22,8 +22,9 @@ impl PyAst {
 
         Ok(
             if let Some(inspect_method_function_def) = inspect_message_function_def_option {
-                let body = inspect_message::generate(inspect_method_function_def);
-                Some(InspectMessageMethod { body })
+                Some(InspectMessageMethod {
+                    body: inspect_message::generate(inspect_method_function_def)?,
+                })
             } else {
                 None
             },

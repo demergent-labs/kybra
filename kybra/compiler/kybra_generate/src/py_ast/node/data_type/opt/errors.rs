@@ -6,7 +6,7 @@ use crate::{
 };
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn not_a_primitive_error(&self) -> Vec<Message> {
-        vec![self.create_error_message("Not a primitive", "TODO", None)]
+    pub fn not_opt_error(&self) -> Vec<Message> {
+        vec![self.create_error_message("This is is not an opt", "", None)]
     }
 }

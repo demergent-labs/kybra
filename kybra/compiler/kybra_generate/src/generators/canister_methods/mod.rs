@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{generators::tuple, source_map::SourceMapped};
+use crate::{errors::KybraResult, generators::tuple, source_map::SourceMapped};
 
 pub mod heartbeat;
 pub mod init;
@@ -11,13 +11,15 @@ pub mod post_upgrade;
 pub mod pre_upgrade;
 pub mod query_and_update;
 
-pub fn generate_call_to_py_function(statement: &SourceMapped<&Located<StmtKind>>) -> TokenStream {
+pub fn generate_call_to_py_function(
+    statement: &SourceMapped<&Located<StmtKind>>,
+) -> KybraResult<TokenStream> {
     match statement.node {
         rustpython_parser::ast::StmtKind::FunctionDef { .. } => {
             let function_name = statement.get_function_name();
-            let act_params = statement.build_params();
+            let params = statement.build_params()?;
 
-            let param_conversions = act_params
+            let param_conversions = params
                 .iter()
                 .map(|act_fn_param| {
                     let name = format_ident!("{}", act_fn_param.prefixed_name());
@@ -28,7 +30,7 @@ pub fn generate_call_to_py_function(statement: &SourceMapped<&Located<StmtKind>>
                 .collect();
             let params = tuple::generate_tuple(&param_conversions);
 
-            quote! {
+            Ok(quote! {
                 let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
                 let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
 
@@ -46,7 +48,7 @@ pub fn generate_call_to_py_function(statement: &SourceMapped<&Located<StmtKind>>
                         }
                     }
                 });
-            }
+            })
         }
         _ => panic!("{}", statement.not_a_function_def_error()),
     }

@@ -48,7 +48,10 @@ impl SourceMapped<&Located<ExprKind>> {
                 }
                 let mode = self.get_func_mode()?;
                 let params = self.get_func_params()?;
-                let return_type = Box::from(self.get_func_return_type(mode.clone())?);
+                let return_type = Box::from(match self.get_func_return_type(mode.clone()) {
+                    Ok(return_type) => return_type,
+                    Err(err) => return Err(err),
+                });
                 let name = match func_name.clone() {
                     Some(name) => name,
                     None => return Err(self.inline_func_not_supported()),
@@ -95,12 +98,14 @@ impl SourceMapped<&Located<ExprKind>> {
                             return Err(self.todo_func_error());
                         }
                         match &elts[0].node {
-                            ExprKind::List { elts, .. } => Ok(elts
-                                .iter()
-                                .map(|elt| {
-                                    SourceMapped::new(elt, self.source_map.clone()).to_data_type()
-                                })
-                                .collect()),
+                            ExprKind::List { elts, .. } => crate::errors::collect_kybra_results(
+                                elts.iter()
+                                    .map(|elt| {
+                                        SourceMapped::new(elt, self.source_map.clone())
+                                            .to_data_type()
+                                    })
+                                    .collect(),
+                            ),
                             _ => Err(self.todo_func_error()),
                         }
                     }
@@ -120,16 +125,17 @@ impl SourceMapped<&Located<ExprKind>> {
                     ExprKind::Subscript { slice, .. } => match &slice.node {
                         ExprKind::Tuple { elts, .. } => {
                             if elts.len() != 2 {
-                                return Err(self.todo_func_error());
+                                return Err(self.todo_func_small_error());
                             }
-                            Ok(SourceMapped::new(&elts[1], self.source_map.clone()).to_data_type())
+                            Ok(SourceMapped::new(&elts[1], self.source_map.clone())
+                                .to_data_type()?)
                         }
-                        _ => return Err(self.todo_func_error()),
+                        _ => return Err(self.todo_func_small_error()),
                     },
-                    _ => return Err(self.todo_func_error()),
+                    _ => return Err(self.todo_func_small_error()),
                 },
             },
-            _ => Err(self.not_a_func_error()),
+            _ => panic!("Unreachable"),
         }
     }
 }

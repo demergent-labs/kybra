@@ -18,11 +18,11 @@ impl PyAst {
         let init_function_def_option = init_function_defs.get(0);
 
         let params = match init_function_def_option {
-            Some(init_function_def) => init_function_def.build_params(),
+            Some(init_function_def) => init_function_def.build_params()?,
             None => vec![],
         };
 
-        let body = init::generate(init_function_def_option, &self.entry_module_name);
+        let body = init::generate(init_function_def_option, &self.entry_module_name)?;
 
         Ok(InitMethod { params, body })
     }

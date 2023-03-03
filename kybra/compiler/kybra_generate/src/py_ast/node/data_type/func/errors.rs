@@ -16,6 +16,10 @@ impl SourceMapped<&Located<ExprKind>> {
         vec![self.create_error_message("Not a func", "", None)]
     }
 
+    pub fn todo_func_small_error(&self) -> Vec<Message> {
+        vec![self.create_error_message("Not a func", "", None)]
+    }
+
     pub fn not_a_func_error(&self) -> Vec<Message> {
         vec![self.create_error_message("Not a func", "", None)]
     }

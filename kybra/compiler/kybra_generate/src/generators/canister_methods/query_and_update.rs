@@ -8,14 +8,14 @@ use crate::{errors::KybraResult, generators::tuple, source_map::SourceMapped};
 pub fn generate_body(
     kybra_statement: &SourceMapped<&Located<StmtKind>>,
 ) -> KybraResult<TokenStream> {
-    let act_params = kybra_statement.build_params();
+    let params = kybra_statement.build_params()?;
 
     let name = match kybra_statement.get_name() {
         Some(name) => name,
         None => todo!(),
     };
 
-    let param_conversions = act_params
+    let param_conversions = params
         .iter()
         .map(|param| {
             let name = format_ident!("{}", param.prefixed_name());

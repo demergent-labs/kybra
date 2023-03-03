@@ -1,65 +1,83 @@
+pub mod errors;
+
 use cdk_framework::act::node::{ExternalCanister, ExternalCanisterMethod};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{
-    errors::{CreateMessage, Message},
-    py_ast::PyAst,
-    source_map::SourceMapped,
-};
+use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
 impl PyAst {
-    pub fn build_external_canisters(&self) -> Vec<ExternalCanister> {
+    pub fn build_external_canisters(&self) -> KybraResult<Vec<ExternalCanister>> {
+        let mut external_canisters = vec![];
+        let mut error_messages = vec![];
+
         self.get_stmt_kinds()
             .iter()
-            .filter_map(|stmt| stmt.to_act_external_canister().ok())
-            .collect()
+            .for_each(|stmt_kind| match stmt_kind.as_external_canister() {
+                Ok(Some(record)) => external_canisters.push(record),
+                Ok(None) => (),
+                Err(errors) => error_messages.extend(errors),
+            });
+
+        if error_messages.is_empty() {
+            Ok(external_canisters)
+        } else {
+            Err(error_messages)
+        }
     }
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn to_act_external_canister(&self) -> Result<ExternalCanister, Message> {
+    pub fn to_external_canister_method(
+        &self,
+        canister_name: &String,
+    ) -> KybraResult<ExternalCanisterMethod> {
+        match &self.node {
+            StmtKind::FunctionDef { name, args, body: _, decorator_list, returns, type_comment: _ } => {
+                ensure_decorated_as_method_or_panic(decorator_list, &canister_name, name);
+
+                let params = SourceMapped::new(
+                    args.as_ref(),
+                    self.source_map.clone()
+                ).to_param_list()
+                    .unwrap_or_else(|e| panic!("{}.{} violates Kybra requirements: {:?}", canister_name, name, e) );
+
+                let expr_kind = returns.as_ref().expect(&format!("{}.{} is missing a return type", canister_name, &name));
+
+                let return_type = SourceMapped::new(expr_kind.as_ref(), self.source_map.clone()).to_data_type()?;
+
+                Ok(ExternalCanisterMethod {
+                    name: name.clone(),
+                    params,
+                    return_type,
+                })
+            },
+            _ => panic!("class \"{}\" should only contain function definitions. Please remove everything else.", canister_name)
+        }
+    }
+}
+
+impl SourceMapped<&Located<StmtKind>> {
+    pub fn as_external_canister(&self) -> KybraResult<Option<ExternalCanister>> {
         if !self.is_external_canister() {
-            return Err(self.create_error_message("Not a external canister", "", None));
+            return Ok(None);
         }
         match &self.node {
             StmtKind::ClassDef { name, body, .. } => {
-                let canister_name = name.clone();
-                let methods: Vec<ExternalCanisterMethod> = body
+                let method_results: Vec<_> = body
                     .iter()
-                    .map(|located_statement| -> ExternalCanisterMethod {
-                        match &located_statement.node {
-                            StmtKind::FunctionDef { name, args, body: _, decorator_list, returns, type_comment: _ } => {
-                                ensure_decorated_as_method_or_panic(decorator_list, &canister_name, name);
-
-                                let params = SourceMapped::new(
-                                    args.as_ref(),
-                                    self.source_map.clone()
-                                ).to_param_list()
-                                 .unwrap_or_else(|e| panic!("{}.{} violates Kybra requirements: {}", canister_name, name, e) );
-
-                                let expr_kind = returns.as_ref().expect(&format!("{}.{} is missing a return type", canister_name, &name));
-
-                                let return_type = SourceMapped::new(expr_kind.as_ref(), self.source_map.clone()).to_data_type();
-
-                                ExternalCanisterMethod {
-                                    name: name.clone(),
-                                    params,
-                                    return_type,
-                                }
-                            },
-                            _ => panic!("class \"{}\" should only contain function definitions. Please remove everything else.", name)
-                        }
-                    })
+                    .map(|located_statement| SourceMapped::new(located_statement, self.source_map.clone()).to_external_canister_method(&name) )
                     .collect();
+
+                let methods = crate::errors::collect_kybra_results(method_results)?;
 
                 if methods.len() == 0 {
                     panic!("class \"{}\" doesn't have any methods. External canisters are required to expose at least one method.", name)
                 }
 
-                Ok(ExternalCanister {
-                    name: canister_name,
+                Ok(Some(ExternalCanister {
+                    name: name.clone(),
                     methods,
-                })
+                }))
             }
             // We filter out any non classDefs in KybraProgram.get_external_canister_declarations
             _ => panic!("Oops! Looks like we introduced a bug while refactoring. Please open a ticket at https://github.com/demergent-labs/kybra/issues/new"),

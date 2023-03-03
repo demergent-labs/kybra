@@ -76,7 +76,10 @@ impl SourceMapped<&Located<StmtKind>> {
             _ => return Ok(None),
         };
         let enclosed_type =
-            SourceMapped::new(value.as_ref(), self.source_map.clone()).to_data_type();
+            match SourceMapped::new(value.as_ref(), self.source_map.clone()).to_data_type() {
+                Ok(enclosed_type) => enclosed_type,
+                Err(err) => return Err(err),
+            };
         Ok(Some(TypeAlias {
             name: alias_name,
             aliased_type: Box::new(enclosed_type),

@@ -3,7 +3,7 @@ pub mod errors;
 use cdk_framework::act::node::data_type::Primitive;
 use rustpython_parser::ast::{ExprKind, Located};
 
-use crate::{errors::Message, source_map::SourceMapped};
+use crate::{errors::KybraResult, source_map::SourceMapped};
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_primitive(&self) -> bool {
@@ -36,11 +36,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn as_primitive(&self) -> Option<Primitive> {
-        self.to_primitive().ok()
-    }
-
-    pub fn to_primitive(&self) -> Result<Primitive, Message> {
+    pub fn to_primitive(&self) -> KybraResult<Primitive> {
         match &self.node {
             ExprKind::Name { id, .. } => match &id[..] {
                 "blob" => Ok(Primitive::Blob),

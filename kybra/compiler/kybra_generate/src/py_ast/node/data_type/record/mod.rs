@@ -1,6 +1,6 @@
 mod record_members;
 
-use cdk_framework::act::node::data_type::{record::Member, Record};
+use cdk_framework::act::node::data_type::Record;
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
@@ -46,21 +46,24 @@ impl SourceMapped<&Located<StmtKind>> {
         }
         match &self.node {
             StmtKind::ClassDef { name, body, .. } => {
-                let members: Vec<Member> = body
-                    .iter()
-                    .filter(|stmt| match &stmt.node {
-                        StmtKind::Expr { value } => match &value.node {
-                            ExprKind::Constant { value, .. } => match value {
-                                // Remove ellipses since they are parsed as nothing.
-                                Constant::Ellipsis => false,
+                let members: Vec<_> = crate::errors::collect_kybra_results(
+                    body.iter()
+                        .filter(|stmt| match &stmt.node {
+                            StmtKind::Expr { value } => match &value.node {
+                                ExprKind::Constant { value, .. } => match value {
+                                    // Remove ellipses since they are parsed as nothing.
+                                    Constant::Ellipsis => false,
+                                    _ => true,
+                                },
                                 _ => true,
                             },
                             _ => true,
-                        },
-                        _ => true,
-                    })
-                    .map(|stmt| SourceMapped::new(stmt, self.source_map.clone()).as_record_member())
-                    .collect();
+                        })
+                        .map(|stmt| {
+                            SourceMapped::new(stmt, self.source_map.clone()).as_record_member()
+                        })
+                        .collect(),
+                )?;
                 Ok(Some(Record {
                     name: Some(name.clone()),
                     members,

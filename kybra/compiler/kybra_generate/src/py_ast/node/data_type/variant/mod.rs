@@ -1,7 +1,7 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
-use cdk_framework::act::node::data_type::variant::{Member, Variant};
+use cdk_framework::act::node::data_type::variant::Variant;
 
 mod errors;
 mod variants_members;
@@ -34,7 +34,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
         match &self.node {
             StmtKind::ClassDef { name, body, .. } => {
-                let members: Vec<Member> = body
+                let member_results: Vec<_> = body
                     .iter()
                     .map(|stmt| {
                         SourceMapped::new(stmt, self.source_map.clone()).as_variant_member()
@@ -42,7 +42,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     .collect();
                 Ok(Some(Variant {
                     name: Some(name.clone()),
-                    members,
+                    members: crate::errors::collect_kybra_results(member_results)?,
                 }))
             }
             _ => Err(self.not_a_variant_error()),

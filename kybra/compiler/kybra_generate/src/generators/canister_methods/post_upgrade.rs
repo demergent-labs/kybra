@@ -2,18 +2,20 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::source_map::SourceMapped;
+use crate::{errors::KybraResult, source_map::SourceMapped};
 
 pub fn generate(
     post_upgrade_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
     entry_module_name: &String,
-) -> TokenStream {
+) -> KybraResult<TokenStream> {
     let call_to_post_upgrade_py_function = match &post_upgrade_function_def_option {
-        Some(post_upgrade_function_def) => post_upgrade_function_def.generate_call_to_py_function(),
+        Some(post_upgrade_function_def) => {
+            post_upgrade_function_def.generate_call_to_py_function()?
+        }
         None => quote!(),
     };
 
-    quote! {
+    Ok(quote! {
         unsafe {
             let _kybra_interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
                 // TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
@@ -47,5 +49,5 @@ pub fn generate(
 
             ic_cdk::timer::set_timer(core::time::Duration::new(0, 0), _azle_rng_seed);
         }
-    }
+    })
 }
