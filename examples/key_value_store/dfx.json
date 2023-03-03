@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".kybra/key_value_store/key_value_store.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/key_value_store"
+                "output": "test/dfx_generated/key_value_store",
+                "node_compatibility": true
             }
         }
     }
