@@ -37,7 +37,7 @@ impl SourceMapped<&Located<ExprKind>> {
         match &self.node {
             ExprKind::Call { args, .. } => {
                 if args.len() != 1 {
-                    return Err(self.only_one_func_per_func_decl_error());
+                    return Err(self.func_formatting_error());
                 }
                 let mode = self.get_func_mode()?;
                 let params = self.get_func_params()?;
@@ -60,7 +60,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     mode,
                 })
             }
-            _ => return Err(self.not_a_func_error()),
+            _ => return Err(crate::errors::unreachable()),
         }
     }
 
@@ -88,7 +88,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 ExprKind::Subscript { slice, .. } => match &slice.node {
                     ExprKind::Tuple { elts, .. } => {
                         if elts.len() != 2 {
-                            return Err(self.todo_func_error());
+                            return Err(self.func_formatting_error());
                         }
                         match &elts[0].node {
                             ExprKind::List { elts, .. } => crate::errors::collect_kybra_results(
@@ -99,12 +99,12 @@ impl SourceMapped<&Located<ExprKind>> {
                                     })
                                     .collect(),
                             ),
-                            _ => Err(self.todo_func_error()),
+                            _ => Err(self.func_formatting_error()),
                         }
                     }
-                    _ => Err(self.todo_func_error()),
+                    _ => Err(self.func_formatting_error()),
                 },
-                _ => Err(self.todo_func_error()),
+                _ => Err(self.func_formatting_error()),
             },
             _ => Err(crate::errors::unreachable()),
         }
@@ -118,14 +118,14 @@ impl SourceMapped<&Located<ExprKind>> {
                     ExprKind::Subscript { slice, .. } => match &slice.node {
                         ExprKind::Tuple { elts, .. } => {
                             if elts.len() != 2 {
-                                return Err(self.todo_func_small_error());
+                                return Err(self.func_formatting_error());
                             }
                             Ok(SourceMapped::new(&elts[1], self.source_map.clone())
                                 .to_data_type()?)
                         }
-                        _ => return Err(self.todo_func_small_error()),
+                        _ => return Err(self.func_formatting_error()),
                     },
-                    _ => return Err(self.todo_func_small_error()),
+                    _ => return Err(self.func_formatting_error()),
                 },
             },
             _ => Err(crate::errors::unreachable()),
@@ -149,9 +149,9 @@ impl SourceMapped<&Located<StmtKind>> {
                         SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
                     ))
                 }
-                None => return Err(self.todo_func_error()),
+                None => return Err(crate::errors::unreachable()),
             },
-            _ => return Err(self.todo_func_error()),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
