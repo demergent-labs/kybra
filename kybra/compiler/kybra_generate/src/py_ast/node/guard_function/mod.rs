@@ -1,13 +1,12 @@
+pub mod errors;
+
 use std::{collections::HashSet, ops::Deref};
 
 use cdk_framework::act::node::GuardFunction;
 use rustpython_parser::ast::{Located, Mod, StmtKind};
 
 use crate::{
-    errors::{CreateMessage, Message},
-    generators::guard_function,
-    py_ast::PyAst,
-    source_map::SourceMapped,
+    errors::KybraResult, generators::guard_function, py_ast::PyAst, source_map::SourceMapped,
 };
 
 impl SourceMapped<&Located<StmtKind>> {
@@ -17,33 +16,26 @@ impl SourceMapped<&Located<StmtKind>> {
             _ => false,
         }
     }
-    pub fn as_guard_function(&self, guard_function_names: &Vec<String>) -> Option<GuardFunction> {
-        self.to_guard_function(guard_function_names).ok()
-    }
 
-    pub fn to_guard_function(
+    pub fn as_guard_function(
         &self,
         guard_function_names: &Vec<String>,
-    ) -> Result<GuardFunction, Message> {
+    ) -> KybraResult<Option<GuardFunction>> {
         if !self.is_guard_function(guard_function_names) {
-            return Err(self.create_error_message("Not a guard function", "", None));
+            return Ok(None);
         }
         match &self.node {
             StmtKind::FunctionDef { name, .. } => {
                 if self.has_params() {
-                    return Err(self.create_error_message(
-                        "Guards functions can't have parameters",
-                        "",
-                        None,
-                    ));
+                    return Err(self.guard_functions_param_error());
                 }
 
-                Ok(GuardFunction {
+                Ok(Some(GuardFunction {
                     body: guard_function::generate(name),
                     name: name.clone(),
-                })
+                }))
             }
-            _ => return Err(self.create_error_message("Not a guard function", "", None)),
+            _ => return Err(crate::errors::unreachable()),
         }
     }
 
@@ -71,14 +63,19 @@ impl SourceMapped<Mod> {
 }
 
 impl PyAst {
-    pub fn build_guard_functions(&self) -> Vec<GuardFunction> {
+    pub fn build_guard_functions(&self) -> KybraResult<Vec<GuardFunction>> {
         let guard_function_names = self.get_guard_function_names();
-        self.get_stmt_kinds()
-            .iter()
-            .filter_map(|source_mapped_stmt_kind| {
-                source_mapped_stmt_kind.as_guard_function(&guard_function_names)
-            })
-            .collect()
+        Ok(crate::errors::collect_kybra_results(
+            self.get_stmt_kinds()
+                .iter()
+                .map(|source_mapped_stmt_kind| {
+                    source_mapped_stmt_kind.as_guard_function(&guard_function_names)
+                })
+                .collect(),
+        )?
+        .drain(..)
+        .filter_map(|x| x)
+        .collect())
     }
 
     pub fn get_guard_function_names(&self) -> Vec<String> {

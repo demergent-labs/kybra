@@ -61,7 +61,7 @@ impl PyAst {
             data_types,
             canister_methods,
             external_canisters,
-            guard_functions: self.build_guard_functions(),
+            guard_functions: self.build_guard_functions()?,
             try_from_vm_value_impls: try_into_vm_value_impls::generate(),
             try_into_vm_value_impls: try_from_vm_value_impls::generate(),
             keywords: crate::get_python_keywords(),
