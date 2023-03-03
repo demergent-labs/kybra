@@ -82,11 +82,11 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_stable_b_tree_map_node() {
             return Ok(None);
         }
-        let memory_id = self.get_memory_id();
+        let memory_id = self.get_memory_id()?;
         let key_type = self.get_key_type()?;
         let value_type = self.get_value_type()?;
-        let max_key_size = self.get_max_key_size();
-        let max_value_size = self.get_max_value_size();
+        let max_key_size = self.get_max_key_size()?;
+        let max_value_size = self.get_max_value_size()?;
         Ok(Some(StableBTreeMapNode {
             memory_id,
             key_type,
@@ -96,7 +96,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }))
     }
 
-    fn get_memory_id(&self) -> u8 {
+    fn get_memory_id(&self) -> KybraResult<u8> {
         match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { args, keywords, .. } => {
@@ -104,19 +104,19 @@ impl SourceMapped<&Located<StmtKind>> {
                         return match &args[0].node {
                             ExprKind::Constant { value, .. } => match value {
                                 Constant::Int(integer) => self.big_int_to_memory_id(integer),
-                                _ => panic!("{}", self.memory_id_must_be_an_integer_error()),
+                                _ => Err(self.memory_id_must_be_an_integer_error()),
                             },
-                            _ => panic!("{}", self.invalid_memory_id_error()),
+                            _ => Err(self.invalid_memory_id_error()),
                         };
                     }
                     if let Some(memory_id) = self.get_memory_from_keywords(keywords) {
                         return memory_id;
                     }
-                    panic!("{}", self.missing_memory_id_error())
+                    Err(self.missing_memory_id_error())
                 }
-                _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
+                _ => Err(self.not_a_stable_b_tree_map_node_error()),
             },
-            _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
+            _ => Err(self.not_a_stable_b_tree_map_node_error()),
         }
     }
 
@@ -128,9 +128,9 @@ impl SourceMapped<&Located<StmtKind>> {
                         .get_key_type()
                         .to_data_type()
                 }
-                _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
+                _ => Err(self.not_a_stable_b_tree_map_node_error()),
             },
-            _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
+            _ => Err(self.not_a_stable_b_tree_map_node_error()),
         }
     }
 
@@ -142,13 +142,13 @@ impl SourceMapped<&Located<StmtKind>> {
                         .get_value_type()
                         .to_data_type()
                 }
-                _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
+                _ => Err(self.not_a_stable_b_tree_map_node_error()),
             },
-            _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
+            _ => Err(self.not_a_stable_b_tree_map_node_error()),
         }
     }
 
-    fn get_max_key_size(&self) -> u32 {
+    fn get_max_key_size(&self) -> KybraResult<u32> {
         match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { args, keywords, .. } => {
@@ -158,15 +158,15 @@ impl SourceMapped<&Located<StmtKind>> {
                     if let Some(max_key_size) = self.get_max_size_from_keywords("key", keywords) {
                         return max_key_size;
                     }
-                    panic!("{}", self.max_key_size_missing_error())
+                    Err(self.max_key_size_missing_error())
                 }
-                _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
+                _ => Err(self.not_a_stable_b_tree_map_node_error()),
             },
-            _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
+            _ => Err(self.not_a_stable_b_tree_map_node_error()),
         }
     }
 
-    fn get_max_value_size(&self) -> u32 {
+    fn get_max_value_size(&self) -> KybraResult<u32> {
         match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { args, keywords, .. } => {
@@ -176,11 +176,11 @@ impl SourceMapped<&Located<StmtKind>> {
                     if let Some(max_key_size) = self.get_max_size_from_keywords("value", keywords) {
                         return max_key_size;
                     }
-                    panic!("{}", self.max_value_size_missing_error())
+                    Err(self.max_value_size_missing_error())
                 }
-                _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
+                _ => Err(self.not_a_stable_b_tree_map_node_error()),
             },
-            _ => panic!("{}", self.not_a_stable_b_tree_map_node_error()),
+            _ => Err(self.not_a_stable_b_tree_map_node_error()),
         }
     }
 
@@ -189,17 +189,17 @@ impl SourceMapped<&Located<StmtKind>> {
         &self,
         name: &str,
         keywords: &Vec<Located<KeywordData>>,
-    ) -> Option<u32> {
+    ) -> Option<KybraResult<u32>> {
         keywords.iter().fold(None, |act_key_type, keyword| {
             if let Some(arg_name) = &keyword.node.arg {
                 if arg_name == format!("max_{}_size", name).as_str() {
-                    match &keyword.node.value.node {
+                    Some(match &keyword.node.value.node {
                         ExprKind::Constant { value, .. } => match value {
-                            Constant::Int(int) => Some(self.big_int_to_max_size(int)),
-                            _ => todo!(),
+                            Constant::Int(int) => self.big_int_to_max_size(int),
+                            _ => Err(self.max_size_must_be_integer_constant()),
                         },
-                        _ => todo!(),
-                    }
+                        _ => Err(self.max_size_must_be_integer_constant()),
+                    })
                 } else {
                     if let Some(_) = act_key_type {
                         act_key_type
@@ -217,7 +217,11 @@ impl SourceMapped<&Located<StmtKind>> {
         })
     }
 
-    fn get_max_size_from_args(&self, name: usize, keywords: &Vec<Located<ExprKind>>) -> u32 {
+    fn get_max_size_from_args(
+        &self,
+        name: usize,
+        keywords: &Vec<Located<ExprKind>>,
+    ) -> KybraResult<u32> {
         match &keywords[name].node {
             ExprKind::Constant { value, .. } => match value {
                 Constant::Int(integer) => self.big_int_to_max_size(integer),
@@ -228,17 +232,20 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     // Helper method for get_memory_id
-    fn get_memory_from_keywords(&self, keywords: &Vec<Located<KeywordData>>) -> Option<u8> {
+    fn get_memory_from_keywords(
+        &self,
+        keywords: &Vec<Located<KeywordData>>,
+    ) -> Option<KybraResult<u8>> {
         keywords.iter().fold(None, |act_key_type, keyword| {
             let result = if let Some(arg_name) = &keyword.node.arg {
                 if arg_name == "memory_id" {
-                    match &keyword.node.value.node {
+                    Some(match &keyword.node.value.node {
                         ExprKind::Constant { value, .. } => match value {
-                            Constant::Int(int) => Some(self.big_int_to_memory_id(int)),
-                            _ => todo!(),
+                            Constant::Int(int) => self.big_int_to_memory_id(int),
+                            _ => Err(self.memory_id_error_must_by_integer_constant()),
                         },
-                        _ => todo!(),
-                    }
+                        _ => Err(self.memory_id_error_must_by_integer_constant()),
+                    })
                 } else {
                     None
                 }
@@ -253,32 +260,32 @@ impl SourceMapped<&Located<StmtKind>> {
         })
     }
 
-    fn big_int_to_max_size(&self, num: &BigInt) -> u32 {
+    fn big_int_to_max_size(&self, num: &BigInt) -> KybraResult<u32> {
         let digits = num.to_u32_digits();
         if digits.0 == Sign::Minus {
-            panic!("{}", self.max_size_must_be_non_negative())
+            return Err(self.max_size_must_be_non_negative());
         }
         if digits.1.len() > 1 {
-            panic!("{}", self.max_size_too_big_error())
+            return Err(self.max_size_too_big_error());
         }
-        digits.1[0]
+        Ok(digits.1[0])
     }
 
-    fn big_int_to_memory_id(&self, num: &BigInt) -> u8 {
+    fn big_int_to_memory_id(&self, num: &BigInt) -> KybraResult<u8> {
         let digits = num.to_u32_digits();
         if digits.0 == Sign::Minus {
-            panic!("{}", self.memory_id_must_be_non_negative())
+            return Err(self.memory_id_must_be_non_negative());
         }
         if digits.1.len() > 1 {
-            panic!("{}", self.memory_id_too_big_error())
+            return Err(self.memory_id_too_big_error());
         }
         if digits.1.len() == 0 {
-            return 0;
+            return Ok(0);
         }
         let value = digits.1[0];
         if value > u8::MAX as u32 {
-            panic!("{}", self.memory_id_too_big_error())
+            return Err(self.memory_id_too_big_error());
         }
-        value as u8
+        Ok(value as u8)
     }
 }

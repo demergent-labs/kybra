@@ -128,7 +128,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     _ => return Err(self.todo_func_small_error()),
                 },
             },
-            _ => panic!("Unreachable"),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 }

@@ -29,9 +29,9 @@ impl SourceMapped<&Located<ExprKind>> {
                 Constant::Str(string) => Ok(TypeRef {
                     name: string.clone(),
                 }),
-                _ => panic!("Unreachable"),
+                _ => Err(crate::errors::unreachable()),
             },
-            _ => panic!("Unreachable"),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 }

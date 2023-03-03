@@ -25,26 +25,20 @@ impl SourceMapped<&Located<StmtKind>> {
         canister_name: &String,
     ) -> KybraResult<ExternalCanisterMethod> {
         match &self.node {
-            StmtKind::FunctionDef { name, args, body: _, decorator_list, returns, type_comment: _ } => {
-                ensure_decorated_as_method_or_panic(decorator_list, &canister_name, name);
-
-                let params = SourceMapped::new(
-                    args.as_ref(),
-                    self.source_map.clone()
-                ).to_param_list()
-                    .unwrap_or_else(|e| panic!("{}.{} violates Kybra requirements: {:?}", canister_name, name, e) );
-
-                let expr_kind = returns.as_ref().expect(&format!("{}.{} is missing a return type", canister_name, &name));
-
-                let return_type = SourceMapped::new(expr_kind.as_ref(), self.source_map.clone()).to_data_type()?;
+            StmtKind::FunctionDef {
+                name,
+                decorator_list,
+                ..
+            } => {
+                ensure_decorated_as_method_or_err(self, decorator_list, &canister_name, name)?;
 
                 Ok(ExternalCanisterMethod {
                     name: name.clone(),
-                    params,
-                    return_type,
+                    params: self.build_params()?,
+                    return_type: self.build_return_type()?,
                 })
-            },
-            _ => panic!("class \"{}\" should only contain function definitions. Please remove everything else.", canister_name)
+            }
+            _ => Err(self.class_with_not_function_defs_error(canister_name)),
         }
     }
 }
@@ -58,13 +52,16 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::ClassDef { name, body, .. } => {
                 let method_results: Vec<_> = body
                     .iter()
-                    .map(|located_statement| SourceMapped::new(located_statement, self.source_map.clone()).to_external_canister_method(&name) )
+                    .map(|located_statement| {
+                        SourceMapped::new(located_statement, self.source_map.clone())
+                            .to_external_canister_method(&name)
+                    })
                     .collect();
 
                 let methods = crate::errors::collect_kybra_results(method_results)?;
 
                 if methods.len() == 0 {
-                    panic!("class \"{}\" doesn't have any methods. External canisters are required to expose at least one method.", name)
+                    return Err(self.class_must_have_methods_error(name));
                 }
 
                 Ok(Some(ExternalCanister {
@@ -73,7 +70,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 }))
             }
             // We filter out any non classDefs in KybraProgram.get_external_canister_declarations
-            _ => panic!("Oops! Looks like we introduced a bug while refactoring. Please open a ticket at https://github.com/demergent-labs/kybra/issues/new"),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
@@ -91,39 +88,49 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 }
 
-fn ensure_decorated_as_method_or_panic(
+fn ensure_decorated_as_method_or_err(
+    method_stmt: &SourceMapped<&Located<StmtKind>>,
     decorator_list: &Vec<Located<ExprKind>>,
     canister_name: &String,
     method_name: &String,
-) {
-    let decorator_name = "@method";
+) -> KybraResult<()> {
+    let decorator_name = "@method".to_string();
 
     if decorator_list.len() == 0 {
-        panic!(
-            "{}.{} is missing a \"{}\" decorator. Please add it above the method",
-            canister_name, method_name, decorator_name
-        );
+        return Err(method_stmt.missing_decorator_error(
+            canister_name,
+            method_name,
+            &decorator_name,
+        ));
     }
 
     if decorator_list.len() > 1 {
-        panic!(
-            "{}.{} has too many decorators. Please remove all but \"{}\"",
-            canister_name, method_name, decorator_name
-        )
+        return Err(method_stmt.too_many_decorators_error(
+            canister_name,
+            method_name,
+            &decorator_name,
+        ));
     }
 
     match &decorator_list[0].node {
         ExprKind::Name { id, ctx: _ } => {
             if id != "method" {
-                panic!(
-                    "{}.{} has the wrong decorator: expected \"{}\", got \"@{}\"",
-                    canister_name, method_name, decorator_name, id
-                )
+                return Err(method_stmt.wrong_decorator_error(
+                    canister_name,
+                    method_name,
+                    &decorator_name,
+                    &id.to_string(),
+                ));
             }
         }
-        _ => panic!(
-            "{}.{} has an invalid decorator. Change it to \"{}\"",
-            canister_name, method_name, decorator_name
-        ),
+        _ => {
+            return Err(method_stmt.invalid_decorator_error(
+                canister_name,
+                method_name,
+                &decorator_name,
+            ));
+        }
     }
+
+    Ok(())
 }

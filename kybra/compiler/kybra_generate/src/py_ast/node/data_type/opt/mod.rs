@@ -25,17 +25,17 @@ impl SourceMapped<&Located<ExprKind>> {
                 match &value.node {
                     ExprKind::Name { id, .. } => {
                         if id != "opt" {
-                            panic!("Unreachable");
+                            return Err(crate::errors::unreachable());
                         }
                     }
-                    _ => panic!("Unreachable"),
+                    _ => return Err(crate::errors::unreachable()),
                 }
                 let kybra_expr = SourceMapped::new(slice.as_ref(), self.source_map.clone());
                 Ok(Opt {
                     enclosed_type: Box::from(kybra_expr.to_data_type()?),
                 })
             }
-            _ => panic!("Unreachable"),
+            _ => return Err(crate::errors::unreachable()),
         }
     }
 }

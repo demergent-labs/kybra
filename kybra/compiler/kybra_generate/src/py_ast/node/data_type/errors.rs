@@ -6,18 +6,18 @@ use crate::{
 };
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn invalid_subscript_value_error(&self) -> Message {
+    pub fn invalid_subscript_value_error(&self) -> Vec<Message> {
         let title =
             "Only Async, list, manual, opt, or tuple are allowed subscripts for candid values";
         let annotation = "Invalid subscript here";
-        self.create_error_message(title, annotation, None)
+        vec![self.create_error_message(title, annotation, None)]
     }
 
-    pub fn none_cant_be_a_type_error(&self) -> Message {
-        self.create_error_message("None must not be used as a type, but only as a value. Please specify either kybra.null or kybra.void.", "Ambiguous None here", None)
+    pub fn none_cant_be_a_type_error(&self) -> Vec<Message> {
+        vec![self.create_error_message("None must not be used as a type, but only as a value. Please specify either kybra.null or kybra.void.", "Ambiguous None here", None)]
     }
 
-    pub fn unsupported_type_error(&self) -> Message {
+    pub fn unsupported_type_error(&self) -> Vec<Message> {
         let expression_name = match &self.node {
             ExprKind::BoolOp { .. } => "boolean operator",
             ExprKind::NamedExpr { .. } => "named expression",
@@ -47,7 +47,7 @@ impl SourceMapped<&Located<ExprKind>> {
         };
         let title = format!("{} is not allowed here.", expression_name);
         let annotation = "Illegal expression used here";
-        self.create_error_message(&title, annotation, None)
+        vec![self.create_error_message(&title, annotation, None)]
     }
 }
 
@@ -70,7 +70,7 @@ impl SourceMapped<&Located<StmtKind>> {
         self.create_error_message(title, annotation, None)
     }
 
-    pub fn unsupported_type_error(&self) -> Message {
+    pub fn unsupported_type_error(&self) -> Vec<Message> {
         let stmt_kind_name = match &self.node {
             StmtKind::FunctionDef { .. } => "Function Def",
             StmtKind::AsyncFunctionDef { .. } => "Async Function Def",
@@ -95,15 +95,13 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::Pass => "Pass",
             StmtKind::Break => "Break",
             StmtKind::Continue => "Continue",
-            _ => {
-                panic!("Unreachable: This type should be supported. I don't know how we got here.")
-            }
+            _ => return crate::errors::unreachable(),
         };
         let title = format!(
             "{} are not allowed here. They cannot be represented as a candid type.",
             stmt_kind_name
         );
         let annotation = "Illegal expression used here";
-        self.create_error_message(&title, annotation, None)
+        vec![self.create_error_message(&title, annotation, None)]
     }
 }

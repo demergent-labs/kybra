@@ -1,12 +1,15 @@
 use proc_macro2::TokenStream;
+use quote::quote;
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::source_map::SourceMapped;
+use crate::{errors::KybraResult, source_map::SourceMapped};
 
-pub fn generate(heartbeat_function_def: &SourceMapped<&Located<StmtKind>>) -> TokenStream {
-    let function_name = heartbeat_function_def.get_function_name();
+pub fn generate(
+    heartbeat_function_def: &SourceMapped<&Located<StmtKind>>,
+) -> KybraResult<TokenStream> {
+    let function_name = heartbeat_function_def.get_function_name()?;
 
-    quote::quote! {
+    Ok(quote! {
         unsafe {
             ic_cdk::spawn(async {
                 let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
@@ -28,5 +31,5 @@ pub fn generate(heartbeat_function_def: &SourceMapped<&Located<StmtKind>>) -> To
                 };
             });
         }
-    }
+    })
 }

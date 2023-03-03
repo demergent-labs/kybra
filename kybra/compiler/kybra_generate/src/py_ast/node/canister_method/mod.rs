@@ -9,7 +9,6 @@ mod query_or_update;
 use std::ops::Deref;
 
 use cdk_framework::act::node::canister_method::CanisterMethodType;
-use cdk_framework::act::node::param::Param;
 use proc_macro2::TokenStream;
 use rustpython_parser::ast::ExprKind;
 use rustpython_parser::ast::Located;
@@ -79,21 +78,10 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn build_params(&self) -> KybraResult<Vec<Param>> {
-        crate::errors::collect_kybra_results(match &self.node {
-            StmtKind::FunctionDef { args, .. } => args
-                .args
-                .iter()
-                .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
-                .collect(),
-            _ => panic!("{}", self.not_a_function_def_error()),
-        })
-    }
-
-    pub fn get_function_name(&self) -> String {
+    pub fn get_function_name(&self) -> KybraResult<String> {
         match &self.node {
-            StmtKind::FunctionDef { name, .. } => name.clone(),
-            _ => panic!("{}", self.not_a_function_def_error()),
+            StmtKind::FunctionDef { name, .. } => Ok(name.clone()),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 

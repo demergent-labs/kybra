@@ -15,8 +15,8 @@ pub fn generate_call_to_py_function(
     statement: &SourceMapped<&Located<StmtKind>>,
 ) -> KybraResult<TokenStream> {
     match statement.node {
-        rustpython_parser::ast::StmtKind::FunctionDef { .. } => {
-            let function_name = statement.get_function_name();
+        StmtKind::FunctionDef { .. } => {
+            let function_name = statement.get_function_name()?;
             let params = statement.build_params()?;
 
             let param_conversions = params
@@ -50,6 +50,6 @@ pub fn generate_call_to_py_function(
                 });
             })
         }
-        _ => panic!("{}", statement.not_a_function_def_error()),
+        _ => Err(statement.not_a_function_def_error()),
     }
 }

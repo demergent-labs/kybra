@@ -1,10 +1,21 @@
-use cdk_framework::act::node::param::Param;
-use rustpython_parser::ast::{ArgData, Arguments, Located};
+pub mod errors;
+pub mod returns;
 
-use crate::{
-    errors::{self, KybraResult},
-    source_map::SourceMapped,
-};
+use cdk_framework::act::node::param::Param;
+use rustpython_parser::ast::{ArgData, Arguments, Located, StmtKind};
+
+use crate::{errors::KybraResult, source_map::SourceMapped};
+
+impl SourceMapped<&Located<StmtKind>> {
+    pub fn build_params(&self) -> KybraResult<Vec<Param>> {
+        match &self.node {
+            StmtKind::FunctionDef { args, .. } => {
+                SourceMapped::new(args.as_ref(), self.source_map.clone()).to_param_list()
+            }
+            _ => panic!("Unreachable"),
+        }
+    }
+}
 
 impl SourceMapped<&Arguments> {
     pub fn to_param_list(&self) -> KybraResult<Vec<Param>> {
@@ -39,7 +50,7 @@ impl SourceMapped<&Arguments> {
             .iter()
             .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
             .collect();
-        Ok(errors::collect_kybra_results(param_results)?)
+        Ok(crate::errors::collect_kybra_results(param_results)?)
     }
 }
 

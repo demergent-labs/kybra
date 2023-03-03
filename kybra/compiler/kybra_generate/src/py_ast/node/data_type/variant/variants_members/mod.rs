@@ -21,13 +21,13 @@ impl SourceMapped<&Located<StmtKind>> {
                 }
                 let name = match &target.node {
                     ExprKind::Name { id, .. } => id.clone(),
-                    _ => panic!("{}", self.variant_target_must_be_a_name_error()),
+                    _ => return Err(self.variant_target_must_be_a_name_error()),
                 };
                 let type_ = SourceMapped::new(annotation.as_ref(), self.source_map.clone())
                     .to_data_type()?;
                 Ok(Member { name, type_ })
             }
-            _ => panic!("{}", self.invalid_variant_member_error()),
+            _ => Err(self.invalid_variant_member_error()),
         }
     }
 }

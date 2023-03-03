@@ -21,7 +21,7 @@ impl PyAst {
 
         Ok(
             if let Some(heartbeat_function_def) = heartbeat_function_def_option {
-                let body = heartbeat::generate(heartbeat_function_def);
+                let body = heartbeat::generate(heartbeat_function_def)?;
                 Some(HeartbeatMethod { body })
             } else {
                 None

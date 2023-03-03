@@ -50,7 +50,7 @@ impl SourceMapped<&Located<StmtKind>> {
     fn has_params(&self) -> bool {
         match &self.node {
             StmtKind::FunctionDef { args, .. } => args.args.len() > 0,
-            _ => panic!("Unreachable"),
+            _ => false,
         }
     }
 }

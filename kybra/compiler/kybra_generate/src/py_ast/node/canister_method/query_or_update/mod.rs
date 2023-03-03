@@ -1,14 +1,10 @@
-use cdk_framework::act::node::{
-    canister_method::{CanisterMethodType, QueryOrUpdateDefinition},
-    DataType,
-};
+use cdk_framework::act::node::canister_method::{CanisterMethodType, QueryOrUpdateDefinition};
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use crate::{
     errors::KybraResult, generators::canister_methods::query_and_update, source_map::SourceMapped,
 };
 
-pub mod errors;
 pub mod query_method;
 pub mod update_method;
 
@@ -40,22 +36,6 @@ impl SourceMapped<&Located<StmtKind>> {
                 _ => false,
             },
             None => false,
-        }
-    }
-
-    pub fn build_return_type(&self) -> KybraResult<DataType> {
-        let returns = match &self.node {
-            StmtKind::FunctionDef { returns, .. } => returns,
-            _ => panic!("Unreachable"),
-        };
-
-        match returns {
-            Some(return_type) => Ok(SourceMapped::new(
-                return_type.as_ref(),
-                self.source_map.clone(),
-            )
-            .to_data_type()?),
-            None => Err(self.return_type_annotation_required_error()),
         }
     }
 

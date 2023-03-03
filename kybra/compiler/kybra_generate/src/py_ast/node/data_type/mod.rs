@@ -45,7 +45,6 @@ impl SourceMapped<&Located<ExprKind>> {
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn to_data_type(&self) -> KybraResult<DataType> {
-        // TODO make these ifs that return instead of else if
         if self.is_primitive() {
             return Ok(DataType::Primitive(self.to_primitive()?));
         }
@@ -69,22 +68,16 @@ impl SourceMapped<&Located<ExprKind>> {
                             .to_data_type(),
                         "manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
                             .to_data_type(),
-                        _ => panic!("{}", self.invalid_subscript_value_error()),
+                        _ => Err(self.invalid_subscript_value_error()),
                     },
-                    _ => panic!("{}", self.invalid_subscript_value_error()),
+                    _ => Err(self.invalid_subscript_value_error()),
                 }
             }
             ExprKind::Constant { value, .. } => match value {
-                Constant::None => {
-                    panic!("{}", self.none_cant_be_a_type_error());
-                }
-                _ => {
-                    todo!("{}", self.unsupported_type_error())
-                }
+                Constant::None => Err(self.none_cant_be_a_type_error()),
+                _ => Err(self.unsupported_type_error()),
             },
-            _ => {
-                panic!("{}", self.unsupported_type_error());
-            }
+            _ => Err(self.unsupported_type_error()),
         }
     }
 }

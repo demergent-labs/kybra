@@ -6,7 +6,8 @@ use std::fmt;
 
 use crate::source_map::GetSourceInfo;
 
-pub type KybraResult<T> = Result<T, Vec<Message>>;
+pub type KybraError = Vec<Message>;
+pub type KybraResult<T> = Result<T, KybraError>;
 
 pub fn collect_kybra_results<T>(results: Vec<KybraResult<T>>) -> KybraResult<Vec<T>>
 where
@@ -25,6 +26,10 @@ where
     } else {
         Err(error_messages)
     }
+}
+
+pub fn unreachable() -> KybraError {
+    panic!("Oops! Looks like we introduced a bug while refactoring. Please open a ticket at https://github.com/demergent-labs/kybra/issues/new");
 }
 
 #[derive(Clone, Debug)]
