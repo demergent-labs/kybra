@@ -28,7 +28,7 @@ impl SourceMapped<&Located<StmtKind>> {
 
                 let param_results = match internal_or_external {
                     InternalOrExternal::Internal => {
-                        if args.args[0].node.arg == "self".to_string() {
+                        if args.args.len() > 0 && args.args[0].node.arg == "self".to_string() {
                             return Err(self.first_parameter_must_not_be_self_error());
                         }
                         args.args
