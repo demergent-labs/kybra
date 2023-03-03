@@ -1,9 +1,19 @@
-use rustpython_parser::ast::{Located, StmtKind};
+use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
     errors::{CreateMessage, Message},
     source_map::SourceMapped,
 };
+
+impl SourceMapped<&Located<ExprKind>> {
+    pub fn stable_b_tree_map_node_format_error(&self) -> Vec<Message> {
+        vec![self.create_error_message(
+            "This is not how a stable b tree map node ought to be formatted",
+            "",
+            None,
+        )]
+    }
+}
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn invalid_memory_id_error(&self) -> Vec<Message> {

@@ -42,27 +42,27 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn get_value_type(&self) -> SourceMapped<&Located<ExprKind>> {
+    pub fn get_value_type(&self) -> KybraResult<SourceMapped<&Located<ExprKind>>> {
         match &self.node {
             ExprKind::Subscript { slice, .. } => match &slice.node {
                 ExprKind::Tuple { elts, .. } => {
-                    SourceMapped::new(&elts[1], self.source_map.clone())
+                    Ok(SourceMapped::new(&elts[1], self.source_map.clone()))
                 }
-                _ => todo!(),
+                _ => Err(self.stable_b_tree_map_node_format_error()),
             },
-            _ => todo!(),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
-    pub fn get_key_type(&self) -> SourceMapped<&Located<ExprKind>> {
+    pub fn get_key_type(&self) -> KybraResult<SourceMapped<&Located<ExprKind>>> {
         match &self.node {
             ExprKind::Subscript { slice, .. } => match &slice.node {
                 ExprKind::Tuple { elts, .. } => {
-                    SourceMapped::new(&elts[0], self.source_map.clone())
+                    Ok(SourceMapped::new(&elts[0], self.source_map.clone()))
                 }
-                _ => todo!(),
+                _ => Err(self.stable_b_tree_map_node_format_error()),
             },
-            _ => todo!(),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 }
@@ -125,7 +125,7 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => {
                     SourceMapped::new(func.as_ref(), self.source_map.clone())
-                        .get_key_type()
+                        .get_key_type()?
                         .to_data_type()
                 }
                 _ => Err(self.not_a_stable_b_tree_map_node_error()),
@@ -139,7 +139,7 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => {
                     SourceMapped::new(func.as_ref(), self.source_map.clone())
-                        .get_value_type()
+                        .get_value_type()?
                         .to_data_type()
                 }
                 _ => Err(self.not_a_stable_b_tree_map_node_error()),
@@ -225,9 +225,9 @@ impl SourceMapped<&Located<StmtKind>> {
         match &keywords[name].node {
             ExprKind::Constant { value, .. } => match value {
                 Constant::Int(integer) => self.big_int_to_max_size(integer),
-                _ => todo!(),
+                _ => Err(self.max_size_must_be_integer_constant_error()),
             },
-            _ => todo!(),
+            _ => Err(self.max_size_must_be_integer_constant_error()),
         }
     }
 
