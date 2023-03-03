@@ -1,7 +1,7 @@
 mod record_members;
 
 use cdk_framework::act::node::data_type::Record;
-use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
+use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
@@ -41,19 +41,12 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::ClassDef { name, body, .. } => {
                 let members: Vec<_> = crate::errors::collect_kybra_results(
                     body.iter()
-                        .filter(|stmt| match &stmt.node {
-                            StmtKind::Expr { value } => match &value.node {
-                                ExprKind::Constant { value, .. } => match value {
-                                    // Remove ellipses since they are parsed as nothing.
-                                    Constant::Ellipsis => false,
-                                    _ => true,
-                                },
-                                _ => true,
-                            },
-                            _ => true,
+                        .filter(|stmt| {
+                            SourceMapped::new(stmt.clone(), self.source_map.clone())
+                                .is_record_member()
                         })
                         .map(|stmt| {
-                            SourceMapped::new(stmt, self.source_map.clone()).as_record_member()
+                            SourceMapped::new(stmt, self.source_map.clone()).to_record_member()
                         })
                         .collect(),
                 )?;

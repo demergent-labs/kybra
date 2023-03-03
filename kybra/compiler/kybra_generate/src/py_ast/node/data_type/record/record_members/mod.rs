@@ -1,4 +1,4 @@
-use rustpython_parser::ast::{ExprKind, Located, StmtKind};
+use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, source_map::SourceMapped};
 use cdk_framework::act::node::data_type::record::Member;
@@ -7,7 +7,21 @@ mod errors;
 mod warnings;
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_record_member(&self) -> KybraResult<Member> {
+    pub fn is_record_member(&self) -> bool {
+        // Ellipses can show up in records but are not record members.
+        match &self.node {
+            StmtKind::Expr { value } => match &value.node {
+                ExprKind::Constant { value, .. } => match value {
+                    Constant::Ellipsis => false,
+                    _ => true,
+                },
+                _ => true,
+            },
+            _ => true,
+        }
+    }
+
+    pub fn to_record_member(&self) -> KybraResult<Member> {
         match &self.node {
             StmtKind::AnnAssign {
                 target,

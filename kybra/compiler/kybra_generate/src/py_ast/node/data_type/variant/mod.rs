@@ -21,27 +21,6 @@ impl PyAst {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_variant(&self) -> KybraResult<Option<Variant>> {
-        if !self.is_variant() {
-            return Ok(None);
-        }
-        match &self.node {
-            StmtKind::ClassDef { name, body, .. } => {
-                let member_results: Vec<_> = body
-                    .iter()
-                    .map(|stmt| {
-                        SourceMapped::new(stmt, self.source_map.clone()).as_variant_member()
-                    })
-                    .collect();
-                Ok(Some(Variant {
-                    name: Some(name.clone()),
-                    members: crate::errors::collect_kybra_results(member_results)?,
-                }))
-            }
-            _ => Err(self.not_a_variant_error()),
-        }
-    }
-
     pub fn is_variant(&self) -> bool {
         match &self.node {
             StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {
@@ -52,6 +31,28 @@ impl SourceMapped<&Located<StmtKind>> {
                 acc || is_variant
             }),
             _ => false,
+        }
+    }
+
+    pub fn as_variant(&self) -> KybraResult<Option<Variant>> {
+        if !self.is_variant() {
+            return Ok(None);
+        }
+        match &self.node {
+            StmtKind::ClassDef { name, body, .. } => {
+                let members: Vec<_> = crate::errors::collect_kybra_results(
+                    body.iter()
+                        .map(|stmt| {
+                            SourceMapped::new(stmt, self.source_map.clone()).as_variant_member()
+                        })
+                        .collect(),
+                )?;
+                Ok(Some(Variant {
+                    name: Some(name.clone()),
+                    members,
+                }))
+            }
+            _ => Err(self.not_a_variant_error()),
         }
     }
 }
