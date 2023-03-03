@@ -10,22 +10,15 @@ mod errors;
 
 impl PyAst {
     pub fn build_funcs(&self) -> KybraResult<Vec<Func>> {
-        let mut funcs = vec![];
-        let mut error_messages = vec![];
-
-        self.get_stmt_kinds()
-            .iter()
-            .for_each(|stmt_kind| match stmt_kind.as_func() {
-                Ok(Some(func)) => funcs.push(func),
-                Ok(None) => (),
-                Err(errors) => error_messages.extend(errors),
-            });
-
-        if error_messages.is_empty() {
-            Ok(funcs)
-        } else {
-            Err(error_messages)
-        }
+        Ok(crate::errors::collect_kybra_results(
+            self.get_stmt_kinds()
+                .iter()
+                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_func())
+                .collect(),
+        )?
+        .drain(..)
+        .filter_map(|x| x)
+        .collect())
     }
 }
 

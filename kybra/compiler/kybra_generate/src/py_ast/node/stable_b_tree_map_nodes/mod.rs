@@ -16,24 +16,15 @@ pub struct StableBTreeMapNode {
 }
 impl PyAst {
     pub fn build_stable_b_tree_map_nodes(&self) -> KybraResult<Vec<StableBTreeMapNode>> {
-        let mut stable_b_tree_map_nodes = vec![];
-        let mut error_messages = vec![];
-
-        self.get_stmt_kinds().iter().for_each(|stmt_kind| {
-            match stmt_kind.as_stable_b_tree_map_node() {
-                Ok(Some(stable_b_tree_map_node)) => {
-                    stable_b_tree_map_nodes.push(stable_b_tree_map_node)
-                }
-                Ok(None) => (),
-                Err(errors) => error_messages.extend(errors),
-            }
-        });
-
-        if error_messages.is_empty() {
-            Ok(stable_b_tree_map_nodes)
-        } else {
-            Err(error_messages)
-        }
+        Ok(crate::errors::collect_kybra_results(
+            self.get_stmt_kinds()
+                .iter()
+                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_stable_b_tree_map_node())
+                .collect(),
+        )?
+        .drain(..)
+        .filter_map(|x| x)
+        .collect())
     }
 }
 

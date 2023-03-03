@@ -8,22 +8,15 @@ mod variants_members;
 
 impl PyAst {
     pub fn build_variants(&self) -> KybraResult<Vec<Variant>> {
-        let mut variants = vec![];
-        let mut error_messages = vec![];
-
-        self.get_stmt_kinds()
-            .iter()
-            .for_each(|stmt_kind| match stmt_kind.as_variant() {
-                Ok(Some(variant)) => variants.push(variant),
-                Ok(None) => (),
-                Err(errors) => error_messages.extend(errors),
-            });
-
-        if error_messages.is_empty() {
-            Ok(variants)
-        } else {
-            Err(error_messages)
-        }
+        Ok(crate::errors::collect_kybra_results(
+            self.get_stmt_kinds()
+                .iter()
+                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_variant())
+                .collect(),
+        )?
+        .drain(..)
+        .filter_map(|x| x)
+        .collect())
     }
 }
 

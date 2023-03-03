@@ -8,22 +8,15 @@ use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
 impl PyAst {
     pub fn build_tuples(&self) -> KybraResult<Vec<Tuple>> {
-        let mut tuples = vec![];
-        let mut error_messages = vec![];
-
-        self.get_stmt_kinds()
-            .iter()
-            .for_each(|stmt_kind| match stmt_kind.as_tuple() {
-                Ok(Some(tuple)) => tuples.push(tuple),
-                Ok(None) => (),
-                Err(errors) => error_messages.extend(errors),
-            });
-
-        if error_messages.is_empty() {
-            Ok(tuples)
-        } else {
-            Err(error_messages)
-        }
+        Ok(crate::errors::collect_kybra_results(
+            self.get_stmt_kinds()
+                .iter()
+                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_tuple())
+                .collect(),
+        )?
+        .drain(..)
+        .filter_map(|x| x)
+        .collect())
     }
 }
 

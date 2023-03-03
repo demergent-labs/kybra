@@ -4,26 +4,15 @@ use rustpython_parser::ast::{Located, StmtKind};
 
 impl PyAst {
     pub fn build_query_methods(&self) -> KybraResult<Vec<QueryMethod>> {
-        let (query_methods, error_messages): (Vec<_>, Vec<_>) = self.get_stmt_kinds().iter().fold(
-            (vec![], vec![]),
-            |(mut query_methods, mut error_messages), stmt_kind| match stmt_kind.as_query_method() {
-                Ok(Some(query_method)) => {
-                    query_methods.push(query_method);
-                    (query_methods, error_messages)
-                }
-                Ok(None) => (query_methods, error_messages),
-                Err(messages) => {
-                    error_messages.extend(messages);
-                    (query_methods, error_messages)
-                }
-            },
-        );
-
-        if error_messages.is_empty() {
-            Ok(query_methods)
-        } else {
-            Err(error_messages)
-        }
+        Ok(crate::errors::collect_kybra_results(
+            self.get_stmt_kinds()
+                .iter()
+                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_query_method())
+                .collect(),
+        )?
+        .drain(..)
+        .filter_map(|x| x)
+        .collect())
     }
 }
 

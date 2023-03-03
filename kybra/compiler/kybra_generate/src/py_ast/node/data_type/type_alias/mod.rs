@@ -7,22 +7,15 @@ use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
 impl PyAst {
     pub fn build_type_aliases(&self) -> KybraResult<Vec<TypeAlias>> {
-        let mut type_aliases = vec![];
-        let mut error_messages = vec![];
-
-        self.get_stmt_kinds()
-            .iter()
-            .for_each(|stmt_kind| match stmt_kind.as_type_alias() {
-                Ok(Some(type_alias)) => type_aliases.push(type_alias),
-                Ok(None) => (),
-                Err(errors) => error_messages.extend(errors),
-            });
-
-        if error_messages.is_empty() {
-            Ok(type_aliases)
-        } else {
-            Err(error_messages)
-        }
+        Ok(crate::errors::collect_kybra_results(
+            self.get_stmt_kinds()
+                .iter()
+                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_type_alias())
+                .collect(),
+        )?
+        .drain(..)
+        .filter_map(|x| x)
+        .collect())
     }
 }
 

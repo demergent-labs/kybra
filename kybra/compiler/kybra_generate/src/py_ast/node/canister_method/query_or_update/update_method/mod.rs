@@ -5,22 +5,15 @@ use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
 impl PyAst {
     pub fn build_update_methods(&self) -> KybraResult<Vec<UpdateMethod>> {
-        let mut update_methods = vec![];
-        let mut error_messages = vec![];
-
-        self.get_stmt_kinds()
-            .iter()
-            .for_each(|stmt_kind| match stmt_kind.as_update_method() {
-                Ok(Some(query_method)) => update_methods.push(query_method),
-                Ok(None) => (),
-                Err(errors) => error_messages.extend(errors),
-            });
-
-        if error_messages.is_empty() {
-            Ok(update_methods)
-        } else {
-            Err(error_messages)
-        }
+        Ok(crate::errors::collect_kybra_results(
+            self.get_stmt_kinds()
+                .iter()
+                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_update_method())
+                .collect(),
+        )?
+        .drain(..)
+        .filter_map(|x| x)
+        .collect())
     }
 }
 

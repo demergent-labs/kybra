@@ -7,22 +7,15 @@ use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
 impl PyAst {
     pub fn build_external_canisters(&self) -> KybraResult<Vec<ExternalCanister>> {
-        let mut external_canisters = vec![];
-        let mut error_messages = vec![];
-
-        self.get_stmt_kinds()
-            .iter()
-            .for_each(|stmt_kind| match stmt_kind.as_external_canister() {
-                Ok(Some(record)) => external_canisters.push(record),
-                Ok(None) => (),
-                Err(errors) => error_messages.extend(errors),
-            });
-
-        if error_messages.is_empty() {
-            Ok(external_canisters)
-        } else {
-            Err(error_messages)
-        }
+        Ok(crate::errors::collect_kybra_results(
+            self.get_stmt_kinds()
+                .iter()
+                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_external_canister())
+                .collect(),
+        )?
+        .drain(..)
+        .filter_map(|x| x)
+        .collect())
     }
 }
 
