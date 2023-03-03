@@ -52,7 +52,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     members,
                 }))
             }
-            _ => Err(self.not_a_variant_error()),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 }

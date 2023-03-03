@@ -50,6 +50,6 @@ pub fn generate_call_to_py_function(
                 });
             })
         }
-        _ => Err(statement.not_a_function_def_error()),
+        _ => Err(crate::errors::unreachable()),
     }
 }

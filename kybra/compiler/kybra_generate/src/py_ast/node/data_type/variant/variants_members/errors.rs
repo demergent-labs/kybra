@@ -1,13 +1,16 @@
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{errors::Message, source_map::SourceMapped};
+use crate::{
+    errors::{CreateMessage, Message},
+    source_map::SourceMapped,
+};
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub(super) fn variant_target_must_be_a_name_error(&self) -> Vec<Message> {
-        todo!()
+    pub fn variant_target_must_be_a_name_error(&self) -> Vec<Message> {
+        vec![self.create_error_message("variant target must be a name", "", None)]
     }
 
-    pub(super) fn invalid_variant_member_error(&self) -> Vec<Message> {
-        todo!()
+    pub fn invalid_variant_member_error(&self) -> Vec<Message> {
+        vec![self.create_error_message("invalid variant member", "", None)]
     }
 }

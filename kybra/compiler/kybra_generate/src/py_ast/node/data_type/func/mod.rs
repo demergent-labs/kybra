@@ -37,7 +37,7 @@ impl SourceMapped<&Located<ExprKind>> {
         match &self.node {
             ExprKind::Call { args, .. } => {
                 if args.len() != 1 {
-                    return Err(self.todo_func_error());
+                    return Err(self.only_one_func_per_func_decl_error());
                 }
                 let mode = self.get_func_mode()?;
                 let params = self.get_func_params()?;
@@ -72,13 +72,13 @@ impl SourceMapped<&Located<ExprKind>> {
                         "Oneway" => Mode::Oneway,
                         "Update" => Mode::Update,
                         "Query" => Mode::Query,
-                        _ => return Err(self.todo_func_error()),
+                        _ => return Err(self.return_type_mode_error()),
                     }),
-                    _ => Err(self.todo_func_error()),
+                    _ => Err(self.return_type_mode_error()),
                 },
-                _ => Err(self.todo_func_error()),
+                _ => Err(self.return_type_mode_error()),
             },
-            _ => Err(self.not_a_func_error()),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
@@ -106,7 +106,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 },
                 _ => Err(self.todo_func_error()),
             },
-            _ => Err(self.not_a_func_error()),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 

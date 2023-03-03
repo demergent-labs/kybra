@@ -24,7 +24,6 @@ impl SourceMapped<&Located<StmtKind>> {
                     SourceMapped::new(&targets[0], self.source_map.clone()).get_name()
                 }
             }
-            StmtKind::AugAssign { .. } => todo!(),
             StmtKind::AnnAssign { target, .. } => {
                 SourceMapped::new(target.as_ref(), self.source_map.clone()).get_name()
             }

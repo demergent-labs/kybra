@@ -196,9 +196,9 @@ impl SourceMapped<&Located<StmtKind>> {
                     Some(match &keyword.node.value.node {
                         ExprKind::Constant { value, .. } => match value {
                             Constant::Int(int) => self.big_int_to_max_size(int),
-                            _ => Err(self.max_size_must_be_integer_constant()),
+                            _ => Err(self.max_size_must_be_integer_constant_error()),
                         },
-                        _ => Err(self.max_size_must_be_integer_constant()),
+                        _ => Err(self.max_size_must_be_integer_constant_error()),
                     })
                 } else {
                     if let Some(_) = act_key_type {
@@ -242,9 +242,9 @@ impl SourceMapped<&Located<StmtKind>> {
                     Some(match &keyword.node.value.node {
                         ExprKind::Constant { value, .. } => match value {
                             Constant::Int(int) => self.big_int_to_memory_id(int),
-                            _ => Err(self.memory_id_error_must_by_integer_constant()),
+                            _ => Err(self.memory_id_must_by_integer_constant_error()),
                         },
-                        _ => Err(self.memory_id_error_must_by_integer_constant()),
+                        _ => Err(self.memory_id_must_by_integer_constant_error()),
                     })
                 } else {
                     None
