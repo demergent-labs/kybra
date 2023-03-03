@@ -1,4 +1,4 @@
-pub mod error;
+pub mod errors;
 
 use cdk_framework::act::node::data_type::Array;
 use rustpython_parser::ast::{ExprKind, Located};
