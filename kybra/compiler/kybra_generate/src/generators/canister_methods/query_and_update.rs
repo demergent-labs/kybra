@@ -15,7 +15,7 @@ pub fn generate_body(
 
     let name = match kybra_statement.get_name() {
         Some(name) => name,
-        None => todo!(),
+        None => return Err(crate::errors::unreachable()),
     };
 
     let param_conversions = params
