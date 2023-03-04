@@ -97,10 +97,10 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_canister_method_type(CanisterMethodType::Query)
             && !self.is_canister_method_type(CanisterMethodType::Update)
         {
-            panic!("Unreachable");
+            return Err(crate::errors::unreachable());
         }
-        Ok(match &self.node {
-            StmtKind::FunctionDef { name, .. } => QueryOrUpdateDefinition {
+        match &self.node {
+            StmtKind::FunctionDef { name, .. } => Ok(QueryOrUpdateDefinition {
                 body: query_and_update::generate_body(self)?,
                 params: self.build_params(InternalOrExternal::Internal)?,
                 is_manual: self.is_manual(),
@@ -112,8 +112,8 @@ impl SourceMapped<&Located<StmtKind>> {
                 is_async: self.is_async(),
                 cdk_name: "kybra".to_string(),
                 guard_function_name: self.get_guard_function_name(),
-            },
-            _ => panic!("Unreachable"),
-        })
+            }),
+            _ => Err(crate::errors::unreachable()),
+        }
     }
 }

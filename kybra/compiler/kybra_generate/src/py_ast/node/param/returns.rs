@@ -7,7 +7,7 @@ impl SourceMapped<&Located<StmtKind>> {
     pub fn build_return_type(&self) -> KybraResult<DataType> {
         let returns = match &self.node {
             StmtKind::FunctionDef { returns, .. } => returns,
-            _ => panic!("Unreachable"),
+            _ => return Err(crate::errors::unreachable()),
         };
 
         match returns {
