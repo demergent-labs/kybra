@@ -1,0 +1,34 @@
+{
+    "canisters": {
+        "works": {
+            "type": "custom",
+            "build": "python -m kybra --verbose works src/works/works.py src/works/works.did",
+            "candid": "src/works/works.did",
+            "wasm": ".kybra/works/works.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/works",
+                "node_compatibility": true
+            }
+        },
+        "wip": {
+            "type": "custom",
+            "build": "python -m kybra --verbose wip src/wip/wip.py src/wip/wip.did",
+            "candid": "src/wip/wip.did",
+            "wasm": ".kybra/wip/wip.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/wip",
+                "node_compatibility": true
+            }
+        },
+        "breaks": {
+            "type": "custom",
+            "build": "python -m kybra --verbose breaks src/breaks/breaks.py src/breaks/breaks.did",
+            "candid": "src/breaks/breaks.did",
+            "wasm": ".kybra/breaks/breaks.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/breaks",
+                "node_compatibility": true
+            }
+        }
+    }
+}
