@@ -2,12 +2,13 @@ use cdk_framework::act::node::{
     canister_method::{QueryMethod, UpdateMethod},
     traits::HasReturnValue,
 };
+use proc_macro2::TokenStream;
 use quote::quote;
 
 pub fn generate(
     canister_methods: &Vec<UpdateMethod>,
     query_methods: &Vec<QueryMethod>,
-) -> proc_macro2::TokenStream {
+) -> TokenStream {
     let match_arms = generate_match_arms(canister_methods, query_methods);
     quote! {
         #[pymethod]
@@ -25,12 +26,12 @@ pub fn generate(
 fn generate_match_arms(
     update_methods: &Vec<UpdateMethod>,
     query_methods: &Vec<QueryMethod>,
-) -> Vec<proc_macro2::TokenStream> {
+) -> Vec<TokenStream> {
     vec![
         update_methods
             .iter()
             .filter(|canister_method| canister_method.is_manual)
-            .map(|canister_method| generate_update_match_arm(canister_method))
+            .map(|update_method| generate_update_match_arm(update_method))
             .collect::<Vec<_>>(),
         query_methods
             .iter()
@@ -41,7 +42,7 @@ fn generate_match_arms(
     .concat()
 }
 
-fn generate_update_match_arm(update_method: &UpdateMethod) -> proc_macro2::TokenStream {
+fn generate_update_match_arm(update_method: &UpdateMethod) -> TokenStream {
     let name = &update_method.name;
     let return_type = update_method
         .create_return_type_annotation(&crate::get_python_keywords(), &update_method.name);
@@ -53,7 +54,7 @@ fn generate_update_match_arm(update_method: &UpdateMethod) -> proc_macro2::Token
     )
 }
 
-fn generate_query_match_arm(query_method: &QueryMethod) -> proc_macro2::TokenStream {
+fn generate_query_match_arm(query_method: &QueryMethod) -> TokenStream {
     let name = &query_method.name;
     let return_type = query_method
         .create_return_type_annotation(&crate::get_python_keywords(), &query_method.name);
