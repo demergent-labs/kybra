@@ -42,7 +42,7 @@ pub fn generate(external_canisters: &Vec<ExternalCanister>) -> Vec<TokenStream> 
 fn generate_param_variables(method: &ExternalCanisterMethod) -> Vec<TokenStream> {
     method.params.iter().enumerate().map(|(index, act_fn_param)| {
         let variable_name = format_ident!("{}", act_fn_param.prefixed_name());
-        let variable_type = method.create_param_type_annotation(index, &crate::get_python_keywords(), &method.name);
+        let variable_type = method.create_param_type_annotation(index, &crate::get_python_keywords());
         let actual_index = index + 2;
 
         quote! {

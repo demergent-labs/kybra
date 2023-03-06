@@ -38,6 +38,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     name: name.clone(),
                     params: self.build_params(InternalOrExternal::External)?,
                     return_type: self.build_return_type()?,
+                    canister_name: canister_name.clone(),
                 })
             }
             _ => Err(self.class_with_not_function_defs_error(canister_name)),

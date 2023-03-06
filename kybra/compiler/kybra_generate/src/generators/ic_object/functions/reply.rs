@@ -44,8 +44,7 @@ fn generate_match_arms(
 
 fn generate_update_match_arm(update_method: &UpdateMethod) -> TokenStream {
     let name = &update_method.name;
-    let return_type = update_method
-        .create_return_type_annotation(&crate::get_python_keywords(), &update_method.name);
+    let return_type = update_method.create_return_type_annotation(&crate::get_python_keywords());
     quote!(
         #name => {
             let reply_value: #return_type = reply_value_py_object_ref.try_from_vm_value(vm).unwrap();
@@ -56,8 +55,7 @@ fn generate_update_match_arm(update_method: &UpdateMethod) -> TokenStream {
 
 fn generate_query_match_arm(query_method: &QueryMethod) -> TokenStream {
     let name = &query_method.name;
-    let return_type = query_method
-        .create_return_type_annotation(&crate::get_python_keywords(), &query_method.name);
+    let return_type = query_method.create_return_type_annotation(&crate::get_python_keywords());
     quote!(
         #name => {
             let reply_value: #return_type = reply_value_py_object_ref.try_from_vm_value(vm).unwrap();
