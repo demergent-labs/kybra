@@ -106,70 +106,41 @@ def set(key: str, value: str) -> void:
 
 @update
 def set_many(entries: list[Entry]) -> void:
-    ...
+    for entry in entries:
+        result = db.insert(entry['key'], entry['value'])
+
+        if result.err is not None:
+            ic.trap(str(result.err))
 ```
 
-```typescript
-import { ic, ok, Opt, $query, Record, StableBTreeMap, $update } from 'azle';
-
-type Entry = Record<{
-    key: string;
-    value: string;
-}>;
-
-let db = new StableBTreeMap<string, string>(0, 10, 10);
-
-$query;
-export function get(key: string): Opt<string> {
-    return db.get(key);
-}
-
-$update;
-export function set(key: string, value: string): void {
-    db.insert(key, value);
-}
-
-$update;
-export function set_many(entries: Entry[]): void {
-    entries.forEach((entry) => {
-        const result = db.insert(entry.key, entry.value);
-
-        if (!ok(result)) {
-            ic.trap(JSON.stringify(result.err));
-        }
-    });
-}
-```
-
-In addition to `ic.trap`, an explicit JavaScript `throw` or any unhandled exception will also trap.
+In addition to `ic.trap`, an explicit Python `raise` or any unhandled exception will also trap.
 
 There is a limit to how much computation can be done in a single call to an update method. The current update call limit is [20 billion Wasm instructions](https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits). If we modify our database example, we can introduce an update method that runs the risk reaching the limit:
 
-```typescript
-import { ic, nat64, ok, Opt, $query, StableBTreeMap, $update } from 'azle';
+```python
+from kybra import ic, nat64, opt, query, Record, StableBTreeMap, update, void
 
-let db = new StableBTreeMap<string, string>(0, 1_000, 1_000);
+class Entry(Record):
+    key: str
+    value: str
 
-$query;
-export function get(key: string): Opt<string> {
-    return db.get(key);
-}
+db = StableBTreeMap[str, str](memory_id=0, max_key_size=1_000, max_value_size=1_000)
 
-$update;
-export function set(key: string, value: string): void {
-    db.insert(key, value);
-}
+@query
+def get(key: str) -> opt[str]:
+    return db.get(key)
 
-$update;
-export function set_many(num_entries: nat64): void {
-    for (let i = 0; i < num_entries; i++) {
-        const result = db.insert(i.toString(), i.toString());
+@update
+def set(key: str, value: str) -> void:
+    db.insert(key, value)
 
-        if (!ok(result)) {
-            ic.trap(JSON.stringify(result.err));
-        }
-    }
-}
+@update
+def set_many(num_entries: nat64) -> void:
+    for i in range(num_entries):
+        result = db.insert(str(i), str(i))
+
+        if result.err is not None:
+            ic.trap(str(result.err))
 ```
 
 From the `dfx command line` you can call `set_many` like this:
