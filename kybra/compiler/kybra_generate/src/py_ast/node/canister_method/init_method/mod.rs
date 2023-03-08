@@ -9,7 +9,7 @@ use crate::{
 };
 
 impl PyAst {
-    pub fn build_init_method(&self) -> KybraResult<InitMethod> {
+    pub fn build_init_method(&self) -> KybraResult<Option<InitMethod>> {
         let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
 
         if init_function_defs.len() > 1 {
@@ -30,6 +30,6 @@ impl PyAst {
 
         let body = init::generate(init_function_def_option, &self.entry_module_name)?;
 
-        Ok(InitMethod { params, body })
+        Ok(Some(InitMethod { params, body }))
     }
 }

@@ -65,12 +65,12 @@ impl SourceMapped<&Located<ArgData>> {
         let param_name = self.node.arg.clone();
         match &self.node.annotation {
             Some(annotation) => {
-                let data_type = SourceMapped::new(annotation.as_ref(), self.source_map.clone())
+                let candid_type = SourceMapped::new(annotation.as_ref(), self.source_map.clone())
                     .to_data_type()?;
 
                 Ok(Param {
                     name: param_name,
-                    type_: data_type,
+                    candid_type,
                 })
             }
             None => Err(self.param_type_annotation_required_error()),

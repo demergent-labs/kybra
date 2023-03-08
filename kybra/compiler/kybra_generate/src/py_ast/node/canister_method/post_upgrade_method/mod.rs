@@ -9,7 +9,7 @@ use crate::{
 };
 
 impl PyAst {
-    pub fn build_post_upgrade_method(&self) -> KybraResult<PostUpgradeMethod> {
+    pub fn build_post_upgrade_method(&self) -> KybraResult<Option<PostUpgradeMethod>> {
         let post_upgrade_function_defs =
             self.get_canister_stmt_of_type(CanisterMethodType::PostUpgrade);
 
@@ -34,6 +34,6 @@ impl PyAst {
         let body =
             post_upgrade::generate(post_upgrade_function_def_option, &self.entry_module_name)?;
 
-        Ok(PostUpgradeMethod { params, body })
+        Ok(Some(PostUpgradeMethod { params, body }))
     }
 }

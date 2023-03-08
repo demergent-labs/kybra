@@ -1,6 +1,6 @@
 pub mod errors;
 
-use cdk_framework::act::node::data_type::Array;
+use cdk_framework::act::node::candid::Array;
 use rustpython_parser::ast::{ExprKind, Located};
 
 use crate::{errors::KybraResult, source_map::SourceMapped};

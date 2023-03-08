@@ -1,7 +1,7 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
-use cdk_framework::act::node::data_type::variant::Variant;
+use cdk_framework::act::node::candid::variant::Variant;
 
 mod errors;
 mod variants_members;

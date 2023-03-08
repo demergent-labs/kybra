@@ -1,6 +1,6 @@
 use cdk_framework::act::node::{
-    data_type::{func::Mode, Func, Primitive},
-    DataType,
+    candid::{func::Mode, Func, Primitive},
+    CandidType,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
@@ -33,7 +33,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn to_func(&self, func_name: Option<String>) -> KybraResult<Func> {
+    pub fn to_func(&self, name: Option<String>) -> KybraResult<Func> {
         match &self.node {
             ExprKind::Call { args, .. } => {
                 if args.len() != 1 {
@@ -45,16 +45,14 @@ impl SourceMapped<&Located<ExprKind>> {
                     Ok(return_type) => return_type,
                     Err(err) => return Err(err),
                 });
-                let name = match func_name.clone() {
-                    Some(name) => name,
-                    None => return Err(self.inline_func_not_supported()),
-                };
                 Ok(Func {
-                    to_vm_value: func::generate_func_to_vm_value(&name),
-                    list_to_vm_value: func::generate_func_list_to_vm_value(&name),
-                    from_vm_value: func::generate_func_from_vm_value(&name),
-                    list_from_vm_value: func::generate_func_list_from_vm_value(&name),
-                    name: func_name,
+                    to_vm_value: |name: String| func::generate_func_to_vm_value(&name),
+                    list_to_vm_value: |name: String| func::generate_func_list_to_vm_value(&name),
+                    from_vm_value: |name: String| func::generate_func_from_vm_value(&name),
+                    list_from_vm_value: |name: String| {
+                        func::generate_func_list_from_vm_value(&name)
+                    },
+                    name,
                     params,
                     return_type,
                     mode,
@@ -82,7 +80,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn get_func_params(&self) -> KybraResult<Vec<DataType>> {
+    fn get_func_params(&self) -> KybraResult<Vec<CandidType>> {
         match &self.node {
             ExprKind::Call { args, .. } => match &args[0].node {
                 ExprKind::Subscript { slice, .. } => match &slice.node {
@@ -110,10 +108,10 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn get_func_return_type(&self, mode: Mode) -> KybraResult<DataType> {
+    fn get_func_return_type(&self, mode: Mode) -> KybraResult<CandidType> {
         match &self.node {
             ExprKind::Call { args, .. } => match mode {
-                Mode::Oneway => Ok(DataType::Primitive(Primitive::Void)),
+                Mode::Oneway => Ok(CandidType::Primitive(Primitive::Void)),
                 _ => match &args[0].node {
                     ExprKind::Subscript { slice, .. } => match &slice.node {
                         ExprKind::Tuple { elts, .. } => {

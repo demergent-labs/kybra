@@ -1,5 +1,5 @@
-use cdk_framework::act::node::{
-    canister_method::{QueryMethod, UpdateMethod},
+use cdk_framework::{
+    act::node::canister_method::{QueryMethod, UpdateMethod},
     traits::HasReturnValue,
 };
 use proc_macro2::TokenStream;

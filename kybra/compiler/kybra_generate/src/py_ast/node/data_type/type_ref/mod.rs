@@ -1,6 +1,6 @@
 pub mod errors;
 
-use cdk_framework::act::node::data_type::TypeRef;
+use cdk_framework::act::node::candid::TypeRef;
 use rustpython_parser::ast::{Constant, ExprKind, Located};
 
 use crate::{errors::KybraResult, source_map::SourceMapped};

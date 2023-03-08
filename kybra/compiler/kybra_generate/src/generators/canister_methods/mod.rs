@@ -24,8 +24,8 @@ pub fn generate_call_to_py_function(
 
             let param_conversions = params
                 .iter()
-                .map(|act_fn_param| {
-                    let name = format_ident!("{}", act_fn_param.prefixed_name());
+                .map(|param| {
+                    let name = format_ident!("{}", param.get_prefixed_name());
                     quote! {
                         #name.try_into_vm_value(vm).unwrap()
                     }

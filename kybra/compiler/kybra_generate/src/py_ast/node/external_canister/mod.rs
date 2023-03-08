@@ -1,6 +1,6 @@
 pub mod errors;
 
-use cdk_framework::act::node::{ExternalCanister, ExternalCanisterMethod};
+use cdk_framework::act::node::{ExternalCanister, Method};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
@@ -22,10 +22,7 @@ impl PyAst {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn to_external_canister_method(
-        &self,
-        canister_name: &String,
-    ) -> KybraResult<ExternalCanisterMethod> {
+    pub fn to_external_canister_method(&self, canister_name: &String) -> KybraResult<Method> {
         match &self.node {
             StmtKind::FunctionDef {
                 name,
@@ -34,7 +31,7 @@ impl SourceMapped<&Located<StmtKind>> {
             } => {
                 ensure_decorated_as_method_or_err(self, decorator_list, &canister_name, name)?;
 
-                Ok(ExternalCanisterMethod {
+                Ok(Method {
                     name: name.clone(),
                     params: self.build_params(InternalOrExternal::External)?,
                     return_type: self.build_return_type()?,

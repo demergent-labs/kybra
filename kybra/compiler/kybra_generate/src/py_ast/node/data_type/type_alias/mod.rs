@@ -1,6 +1,6 @@
 pub mod errors;
 
-use cdk_framework::act::node::data_type::TypeAlias;
+use cdk_framework::act::node::candid::TypeAlias;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};

@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use cdk_framework::{
-    act::{CanisterMethods, DataTypes},
+    act::{CandidTypes, CanisterMethods, VmValueConversion},
     AbstractCanisterTree,
 };
 use rustpython_parser::{
@@ -41,12 +41,17 @@ impl PyAst {
             update_methods: self.build_update_methods()?,
         };
 
-        let data_types = DataTypes {
+        let candid_types = CandidTypes {
             funcs: self.build_funcs()?,
             records: self.build_records()?,
             tuples: self.build_tuples()?,
             type_aliases: self.build_type_aliases()?,
             variants: self.build_variants()?,
+        };
+
+        let vm_value_conversion = VmValueConversion {
+            try_from_vm_value_impls: try_into_vm_value_impls::generate(),
+            try_into_vm_value_impls: try_from_vm_value_impls::generate(),
         };
 
         Ok(AbstractCanisterTree {
@@ -58,12 +63,11 @@ impl PyAst {
                 &external_canisters,
                 &stable_b_tree_map_nodes,
             ),
-            data_types,
+            candid_types,
             canister_methods,
             external_canisters,
             guard_functions: self.build_guard_functions()?,
-            try_from_vm_value_impls: try_into_vm_value_impls::generate(),
-            try_into_vm_value_impls: try_from_vm_value_impls::generate(),
+            vm_value_conversion,
             keywords: crate::get_python_keywords(),
         })
     }

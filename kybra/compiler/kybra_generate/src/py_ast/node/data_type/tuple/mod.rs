@@ -1,7 +1,7 @@
 pub mod errors;
 pub mod tuple_members;
 
-use cdk_framework::act::node::data_type::Tuple;
+use cdk_framework::act::node::candid::Tuple;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};

@@ -1,6 +1,6 @@
 mod record_members;
 
-use cdk_framework::act::node::data_type::Record;
+use cdk_framework::act::node::candid::Record;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};

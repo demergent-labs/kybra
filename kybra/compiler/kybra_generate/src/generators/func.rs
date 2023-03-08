@@ -4,7 +4,7 @@ use quote::{quote, ToTokens};
 use cdk_framework::traits::ToIdent;
 
 pub fn generate_func_to_vm_value(name: &String) -> TokenStream {
-    let type_alias_name = name.to_identifier().to_token_stream();
+    let type_alias_name = name.to_ident().to_token_stream();
     quote! {
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for #type_alias_name {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
@@ -15,7 +15,7 @@ pub fn generate_func_to_vm_value(name: &String) -> TokenStream {
 }
 
 pub fn generate_func_list_to_vm_value(name: &String) -> TokenStream {
-    let type_alias_name = name.to_identifier().to_token_stream();
+    let type_alias_name = name.to_ident().to_token_stream();
     quote! {
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for Vec<#type_alias_name> {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
@@ -26,7 +26,7 @@ pub fn generate_func_list_to_vm_value(name: &String) -> TokenStream {
 }
 
 pub fn generate_func_from_vm_value(name: &String) -> TokenStream {
-    let type_alias_name = name.to_identifier().to_token_stream();
+    let type_alias_name = name.to_ident().to_token_stream();
     quote! {
         impl CdkActTryFromVmValue<#type_alias_name, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<#type_alias_name, CdkActTryFromVmValueError> {
@@ -38,7 +38,7 @@ pub fn generate_func_from_vm_value(name: &String) -> TokenStream {
 }
 
 pub fn generate_func_list_from_vm_value(name: &String) -> TokenStream {
-    let type_alias_name = name.to_identifier().to_token_stream();
+    let type_alias_name = name.to_ident().to_token_stream();
     quote! {
         impl CdkActTryFromVmValue<Vec<#type_alias_name>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<#type_alias_name>, CdkActTryFromVmValueError> {

@@ -1,4 +1,7 @@
-use cdk_framework::act::node::{traits::HasParams, ExternalCanister, ExternalCanisterMethod};
+use cdk_framework::{
+    act::node::{ExternalCanister, Method},
+    traits::HasParams,
+};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
@@ -12,7 +15,7 @@ pub fn generate(external_canisters: &Vec<ExternalCanister>) -> Vec<TokenStream> 
             let wrapper_fn_name = format_ident!("{}_wrapper", function_name_string);
             let param_variable_definitions = generate_param_variables(method);
             let param_names = method.params.iter().map(|param| {
-                let name = format_ident!("{}", param.prefixed_name());
+                let name = format_ident!("{}", param.get_prefixed_name());
                 quote!{#name}
             }).collect();
             let params = tuple::generate_tuple(&param_names);
@@ -36,9 +39,9 @@ pub fn generate(external_canisters: &Vec<ExternalCanister>) -> Vec<TokenStream> 
     }).collect::<Vec<Vec<TokenStream>>>().concat()
 }
 
-fn generate_param_variables(method: &ExternalCanisterMethod) -> Vec<TokenStream> {
-    method.params.iter().enumerate().map(|(index, act_fn_param)| {
-        let variable_name = format_ident!("{}", act_fn_param.prefixed_name());
+fn generate_param_variables(method: &Method) -> Vec<TokenStream> {
+    method.params.iter().enumerate().map(|(index, param)| {
+        let variable_name = format_ident!("{}", param.get_prefixed_name());
         let variable_type = method.create_param_type_annotation(index, &crate::get_python_keywords());
         let actual_index = index + 2;
 

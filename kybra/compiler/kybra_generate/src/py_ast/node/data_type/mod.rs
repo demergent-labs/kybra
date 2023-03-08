@@ -1,4 +1,4 @@
-use cdk_framework::act::node::DataType;
+use cdk_framework::act::node::CandidType;
 use rustpython_parser::ast::{Constant, ExprKind, Located};
 
 use crate::{errors::KybraResult, source_map::SourceMapped};
@@ -44,21 +44,21 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn to_data_type(&self) -> KybraResult<DataType> {
+    pub fn to_data_type(&self) -> KybraResult<CandidType> {
         if self.is_primitive() {
-            return Ok(DataType::Primitive(self.to_primitive()?));
+            return Ok(CandidType::Primitive(self.to_primitive()?));
         }
         if self.is_array() {
-            return Ok(DataType::Array(self.to_array()?));
+            return Ok(CandidType::Array(self.to_array()?));
         }
         if self.is_opt() {
-            return Ok(DataType::Opt(self.to_opt()?));
+            return Ok(CandidType::Opt(self.to_opt()?));
         }
         if self.is_tuple() {
-            return Ok(DataType::Tuple(self.to_tuple(None)?));
+            return Ok(CandidType::Tuple(self.to_tuple(None)?));
         }
         if self.is_type_ref() {
-            return Ok(DataType::TypeRef(self.to_type_ref()?));
+            return Ok(CandidType::TypeRef(self.to_type_ref()?));
         }
         match &self.node {
             ExprKind::Subscript { value, slice, .. } => {

@@ -1,4 +1,4 @@
-use cdk_framework::act::node::{data_type::Primitive, DataType};
+use cdk_framework::act::node::{candid::Primitive, CandidType};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
@@ -21,7 +21,7 @@ pub fn generate_body(
     let param_conversions = params
         .iter()
         .map(|param| {
-            let name = format_ident!("{}", param.prefixed_name());
+            let name = format_ident!("{}", param.get_prefixed_name());
             quote! {
                 #name.try_into_vm_value(vm).unwrap()
             }
@@ -80,9 +80,9 @@ fn generate_return_expression(
     })
 }
 
-fn type_is_null_or_void(act_type: DataType) -> bool {
-    match act_type {
-        DataType::Primitive(primitive) => match primitive {
+fn type_is_null_or_void(candid_type: CandidType) -> bool {
+    match candid_type {
+        CandidType::Primitive(primitive) => match primitive {
             Primitive::Null => true,
             Primitive::Void => true,
             _ => false,

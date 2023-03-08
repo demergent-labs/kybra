@@ -1,10 +1,10 @@
-use cdk_framework::act::node::DataType;
+use cdk_framework::act::node::CandidType;
 use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::{errors::KybraResult, source_map::SourceMapped};
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn build_return_type(&self) -> KybraResult<DataType> {
+    pub fn build_return_type(&self) -> KybraResult<CandidType> {
         let returns = match &self.node {
             StmtKind::FunctionDef { returns, .. } => returns,
             _ => return Err(crate::errors::unreachable()),

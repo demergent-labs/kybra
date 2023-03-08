@@ -1,7 +1,7 @@
 mod errors;
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
-use cdk_framework::act::node::DataType;
+use cdk_framework::act::node::CandidType;
 use num_bigint::{BigInt, Sign};
 use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
 
@@ -9,8 +9,8 @@ use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind}
 #[derive(Clone)]
 pub struct StableBTreeMapNode {
     pub memory_id: u8,
-    pub key_type: DataType,
-    pub value_type: DataType,
+    pub key_type: CandidType,
+    pub value_type: CandidType,
     pub max_key_size: u32,
     pub max_value_size: u32,
 }
@@ -120,7 +120,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    fn get_key_type(&self) -> KybraResult<DataType> {
+    fn get_key_type(&self) -> KybraResult<CandidType> {
         match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => {
@@ -134,7 +134,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    fn get_value_type(&self) -> KybraResult<DataType> {
+    fn get_value_type(&self) -> KybraResult<CandidType> {
         match &self.node {
             StmtKind::Assign { value, .. } => match &value.node {
                 ExprKind::Call { func, .. } => {
