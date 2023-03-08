@@ -7,7 +7,7 @@ pub fn generate() -> proc_macro2::TokenStream {
         use ic_cdk::api::call::CallResult;
         use serde::de::{DeserializeSeed, Visitor};
         use serde::ser::{Serialize, SerializeMap, SerializeSeq, SerializeTuple};
-        use slotmap::Key;
+        use slotmap::Key as KybraSlotMapKey; // Renamed to avoid clashes with user-defined types
         use rand::{Rng, SeedableRng, rngs::StdRng};
         use std::convert::TryInto;
     }

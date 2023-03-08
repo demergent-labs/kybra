@@ -142,6 +142,376 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="stable-structures"><a class="header" href="#stable-structures">Stable Structures</a></h1>
+<h2 id="tldr"><a class="header" href="#tldr">TLDR</a></h2>
+<ul>
+<li>48 GiB of stable memory</li>
+<li>Persistent across upgrades</li>
+<li>Familiar API</li>
+<li>Must specify memory id</li>
+<li>Must specify maximum key size</li>
+<li>Must specify maximum value size</li>
+<li>No migrations per memory id</li>
+</ul>
+<p>Stable structures are data structures with familiar APIs that allow access to stable memory. Stable memory is a separate memory location from the heap that currently allows up to 48 GiB of storage. Stable memory persists automatically across upgrades.</p>
+<p>Persistence on the Internet Computer (IC) is very important to understand. When a canister is upgraded (its code is changed after being initially deployed) its heap is wiped. This includes all global variables.</p>
+<p>On the other hand, anything stored in stable memory will be preserved. Writing and reading to and from stable memory can be done with a <a href="./reference/stable_memory/stable_memory.html">low-level API</a>, but it is generally easier and preferable to use stable structures.</p>
+<p>Kybra currently provides one stable structure called <code>StableBTreeMap</code>. It's similar to a Python dictionary or a map that you'd find in most languages, and has most of the common operations you'd expect such as reading, inserting, and removing values.</p>
+<p>Here's how to define a simple <code>StableBTreeMap</code>. Each <code>StableBTreeMap</code> must be defined in the global scope (not within any functions or objects etc):</p>
+<pre><code class="language-python">from kybra import nat8, StableBTreeMap
+
+map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_000)
+</code></pre>
+<p>This is a <code>StableBTreeMap</code> with a key of type <code>nat8</code> and a value of type <code>str</code>. Key and value types can be any <a href="./candid.html">Candid type</a>.</p>
+<p>This <code>StableBTreeMap</code> also has a <code>memory id</code> of <code>0</code>, a maximum key size of <code>100</code> bytes and a maximum value size of <code>1_000</code> bytes. You must statically specify the <code>memory id</code>, maximum key size, and maximum value sizes (they cannot be variables).</p>
+<p>Each <code>StableBTreeMap</code> instance must have a unique <code>memory id</code>. Once a <code>memory id</code> is allocated, it cannot be used with a different <code>StableBTreeMap</code>. This means you can't create another <code>StableBTreeMap</code> using the same <code>memory id</code>, and you can't change the key or value types of an existing <code>StableBTreeMap</code>. <a href="https://github.com/demergent-labs/kybra/issues/215">This problem will be addressed</a>.</p>
+<p>Here's an example showing all of the basic <code>StableBTreeMap</code> operations:</p>
+<pre><code class="language-python">from kybra import (
+    InsertError,
+    nat64,
+    nat8,
+    opt,
+    query,
+    StableBTreeMap,
+    update,
+    Variant
+)
+
+Key = nat8
+Value = str
+
+class InsertResult(Variant, total=False):
+    ok: opt[Value]
+    err: InsertError
+
+map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
+
+@query
+def contains_key(key: Key) -&gt; bool:
+    return map.contains_key(key)
+
+@query
+def get(key: Key) -&gt; opt[Value]:
+    return map.get(key)
+
+@update
+def insert(key: Key, value: Value) -&gt; InsertResult:
+    result = map.insert(key, value)
+
+    if result.err is not None:
+        return {
+            'err': result.err
+        }
+
+    return {
+        'ok': result.ok
+    }
+
+@query
+def is_empty() -&gt; bool:
+    return map.is_empty()
+
+@query
+def items() -&gt; list[tuple[Key, Value]]:
+    return map.items()
+
+@query
+def keys() -&gt; list[Key]:
+    return map.keys()
+
+@query
+def len() -&gt; nat64:
+    return map.len()
+
+@update
+def remove(key: Key) -&gt; opt[Value]:
+    return map.remove(key)
+
+@query
+def values() -&gt; list[Value]:
+    return map.values()
+</code></pre>
+<p>With these basic operations you can build more complex CRUD database applications:</p>
+<pre><code class="language-python">import math
+import _random
+
+from kybra import (
+    blob,
+    ic,
+    InsertError,
+    nat64,
+    opt,
+    Principal,
+    query,
+    Record,
+    StableBTreeMap,
+    update,
+    Variant,
+)
+
+
+class User(Record):
+    id: Principal
+    created_at: nat64
+    recording_ids: list[Principal]
+    username: str
+
+
+class Recording(Record):
+    id: Principal
+    audio: blob
+    created_at: nat64
+    name: str
+    user_id: Principal
+
+
+users = StableBTreeMap[Principal, User](
+    memory_id=0, max_key_size=38, max_value_size=100_000
+)
+recordings = StableBTreeMap[Principal, Recording](
+    memory_id=1, max_key_size=38, max_value_size=5_000_000
+)
+
+
+class CreateUserResult(Variant, total=False):
+    ok: User
+    err: InsertError
+
+
+@update
+def create_user(username: str) -&gt; CreateUserResult:
+    id = generate_id()
+    user: User = {
+        &quot;id&quot;: id,
+        &quot;created_at&quot;: ic.time(),
+        &quot;recording_ids&quot;: [],
+        &quot;username&quot;: username,
+    }
+
+    result = users.insert(user[&quot;id&quot;], user)
+
+    if result.err is not None:
+        return {&quot;err&quot;: result.err}
+
+    return {&quot;ok&quot;: user}
+
+
+@query
+def read_users() -&gt; list[User]:
+    return users.values()
+
+
+@query
+def read_user_by_id(id: Principal) -&gt; opt[User]:
+    return users.get(id)
+
+
+class DeleteUserResult(Variant, total=False):
+    ok: User
+    err: &quot;DeleteUserErr&quot;
+
+
+class DeleteUserErr(Variant, total=False):
+    UserDoesNotExist: Principal
+
+
+@update
+def delete_user(id: Principal) -&gt; DeleteUserResult:
+    user = users.get(id)
+
+    if user is None:
+        return {&quot;err&quot;: {&quot;UserDoesNotExist&quot;: id}}
+
+    for recording_id in user[&quot;recording_ids&quot;]:
+        recordings.remove(recording_id)
+
+    users.remove(user[&quot;id&quot;])
+
+    return {&quot;ok&quot;: user}
+
+
+class CreateRecordingResult(Variant, total=False):
+    ok: Recording
+    err: &quot;CreateRecordingErr&quot;
+
+
+class CreateRecordingErr(Variant, total=False):
+    InsertError: InsertError
+    UserDoesNotExist: Principal
+
+
+@update
+def create_recording(
+    audio: blob, name: str, user_id: Principal
+) -&gt; CreateRecordingResult:
+    user = users.get(user_id)
+
+    if user is None:
+        return {&quot;err&quot;: {&quot;UserDoesNotExist&quot;: user_id}}
+
+    id = generate_id()
+    recording: Recording = {
+        &quot;id&quot;: id,
+        &quot;audio&quot;: audio,
+        &quot;created_at&quot;: ic.time(),
+        &quot;name&quot;: name,
+        &quot;user_id&quot;: user_id,
+    }
+
+    create_recording_result = recordings.insert(recording[&quot;id&quot;], recording)
+
+    if create_recording_result.err is not None:
+        return {&quot;err&quot;: {&quot;InsertError&quot;: create_recording_result.err}}
+
+    updated_user: User = {
+        **user,
+        &quot;recording_ids&quot;: [*user[&quot;recording_ids&quot;], recording[&quot;id&quot;]],
+    }
+
+    update_user_result = users.insert(updated_user[&quot;id&quot;], updated_user)
+
+    if update_user_result.err is not None:
+        return {&quot;err&quot;: {&quot;InsertError&quot;: update_user_result.err}}
+
+    return {&quot;ok&quot;: recording}
+
+
+@query
+def read_recordings() -&gt; list[Recording]:
+    return recordings.values()
+
+
+@query
+def read_recording_by_id(id: Principal) -&gt; opt[Recording]:
+    return recordings.get(id)
+
+
+class DeleteRecordingResult(Variant, total=False):
+    ok: Recording
+    err: &quot;DeleteRecordingError&quot;
+
+
+class DeleteRecordingError(Variant, total=False):
+    InsertError: InsertError
+    RecordingDoesNotExist: Principal
+    UserDoesNotExist: Principal
+
+
+@update
+def delete_recording(id: Principal) -&gt; DeleteRecordingResult:
+    recording = recordings.get(id)
+
+    if recording is None:
+        return {&quot;err&quot;: {&quot;RecordingDoesNotExist&quot;: id}}
+
+    user = users.get(recording[&quot;user_id&quot;])
+
+    if user is None:
+        return {&quot;err&quot;: {&quot;UserDoesNotExist&quot;: recording[&quot;user_id&quot;]}}
+
+    updated_user: User = {
+        **user,
+        &quot;recording_ids&quot;: list(
+            filter(
+                lambda recording_id: recording_id.to_str() != recording[&quot;id&quot;].to_str(),
+                user[&quot;recording_ids&quot;],
+            )
+        ),
+    }
+
+    update_user_result = users.insert(updated_user[&quot;id&quot;], updated_user)
+
+    if update_user_result.err is not None:
+        return {&quot;err&quot;: {&quot;InsertError&quot;: update_user_result.err}}
+
+    recordings.remove(id)
+
+    return {&quot;ok&quot;: recording}
+
+
+def generate_id() -&gt; Principal:
+    random_bytes = bytes(
+        [math.floor(_random.Random().random() * 256) for _ in range(29)]
+    )
+
+    return Principal.from_hex(random_bytes.hex())
+</code></pre>
+<p>The example above shows a very basic audio recording backend application. There are two types of entities that need to be stored, <code>User</code> and <code>Recording</code>. These are represented as <code>Candid</code> records.</p>
+<p>Each entity gets its own <code>StableBTreeMap</code>:</p>
+<pre><code class="language-python">import math
+import _random
+
+from kybra import (
+    blob,
+    ic,
+    InsertError,
+    nat64,
+    opt,
+    Principal,
+    query,
+    Record,
+    StableBTreeMap,
+    update,
+    Variant,
+)
+
+
+class User(Record):
+    id: Principal
+    created_at: nat64
+    recording_ids: list[Principal]
+    username: str
+
+
+class Recording(Record):
+    id: Principal
+    audio: blob
+    created_at: nat64
+    name: str
+    user_id: Principal
+
+
+users = StableBTreeMap[Principal, User](
+    memory_id=0, max_key_size=38, max_value_size=100_000
+)
+recordings = StableBTreeMap[Principal, Recording](
+    memory_id=1, max_key_size=38, max_value_size=5_000_000
+)
+</code></pre>
+<p>Notice that each <code>StableBTreeMap</code> has a unique <code>memory id</code>. The maximum key and value sizes are also set according to the expected application usage.</p>
+<p>You can figure out the appropriate maximum key and value sizes by reasoning about your application and engaging in some trial and error using the <code>insert</code> method. Calling <code>insert</code> on a <code>StableBTreeMap</code> returns an <code>InsertResult</code> object that looks like this:</p>
+<pre><code class="language-python">K = TypeVar(&quot;K&quot;)
+V = TypeVar(&quot;V&quot;)
+
+
+class KeyTooLarge(Record):
+    given: nat32
+    max: nat32
+
+
+class ValueTooLarge(Record):
+    given: nat32
+    max: nat32
+
+
+class InsertError(Variant, total=False):
+    KeyTooLarge: KeyTooLarge
+    ValueTooLarge: ValueTooLarge
+
+
+class InsertResult(Generic[V]):
+    ok: V
+    err: Optional[InsertError]
+
+    def __init__(self, ok: V, err: InsertError):
+        self.ok = ok
+        self.err = err
+</code></pre>
+<p>The <code>InsertError</code> variant will in some cases have the information that you need to determine the maximum key or value size. If you attempt to insert a key or value that is too large, the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> records will show you the size of the value that you attempted to insert. You can increase the maximum key or value size based on the information you receive from the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> records and try inserting again.</p>
+<p>Thus through some trial and error you can whittle your way to a correct solution. In some cases all of your values will have an obvious static maximum size. In the audio recording example, trial and error revealed that <code>Principal</code> is most likely always 38 bytes, thus the maximum key size is set to 38.</p>
+<p>Maximum value sizes can be more tricky to figure out, especially if the values are records or variants with dynamic fields such as arrays. <code>User</code> has one such dynamic field, <code>recording_ids</code>. Since each recording id is a Principal, we know that each will take up 38 bytes. The other fields on <code>User</code> shouldn't take up too many bytes so we'll ignore them for our analysis.</p>
+<p>We've set the maximum value size of <code>User</code> to be 100_000 bytes. If we divide 100_00 by 38, we get ~2_631. This will result in each user being able to store around that many recordings. That's acceptable for our example, and so we'll go with it.</p>
+<p>As for <code>Recording</code>, the largest dynamic field is <code>audio</code>, which will be the actual bytes of the audio recording. We've set the maximum value size here to 5_000_000, which should allow for recordings of ~5 MB in size. That seems reasonable for our example, and so we'll go with it.</p>
+<p>As you can see, finding the correct maximum key and value sizes is a bit of an art right now. Combining some trial and error with reasoning about your specific application should get you a working solution in most cases. It's our hope that the need to specify maximum key and value sizes will be removed in the future.</p>
 
                     </main>
 

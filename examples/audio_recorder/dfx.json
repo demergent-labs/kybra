@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "audio_recorder": {
+            "type": "custom",
+            "build": "python -m kybra audio_recorder src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".kybra/audio_recorder/audio_recorder.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/audio_recorder",
+                "node_compatibility": true
+            }
+        }
+    }
+}
