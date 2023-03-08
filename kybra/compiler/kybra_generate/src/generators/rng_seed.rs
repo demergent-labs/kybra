@@ -1,6 +1,7 @@
+use proc_macro2::TokenStream;
 use quote::quote;
 
-pub fn generate() -> proc_macro2::TokenStream {
+pub fn generate() -> TokenStream {
     quote! {
         fn _azle_rng_seed() {
             ic_cdk::spawn(async move {
