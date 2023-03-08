@@ -143,8 +143,6 @@
                     <main>
                         <h1 id="canister-lifecycle"><a class="header" href="#canister-lifecycle">Canister Lifecycle</a></h1>
 <p>This chapter is a work in progress.</p>
-<p>TODO check that the underscores are necessary</p>
-<p>TODO check on explicit void</p>
 <pre><code class="language-python">from kybra import init, post_upgrade, pre_upgrade
 
 @init
@@ -155,7 +153,7 @@ def init_():
 def pre_upgrade_():
     print('runs before canister upgrade')
 
-@post_upgrade_
+@post_upgrade
 def post_upgrade_():
     print('runs after canister upgrade')
 </code></pre>
