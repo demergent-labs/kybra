@@ -51,7 +51,7 @@ impl SourceMapped<&Located<ExprKind>> {
                         vec![SourceMapped::new(slice.as_ref(), self.source_map.clone())]
                     }
                 };
-                let members: Vec<_> = crate::errors::collect_kybra_results(
+                let elems: Vec<_> = crate::errors::collect_kybra_results(
                     tuple_members_exprs
                         .iter()
                         .map(|kybra_elem| kybra_elem.as_tuple_member())
@@ -59,7 +59,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 )?;
                 Ok(Tuple {
                     name: tuple_name,
-                    members,
+                    elems,
                 })
             }
             _ => Err(self.not_tuple_error()),

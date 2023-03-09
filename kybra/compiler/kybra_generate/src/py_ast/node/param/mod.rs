@@ -1,7 +1,7 @@
 pub mod errors;
 pub mod returns;
 
-use cdk_framework::act::node::param::Param;
+use cdk_framework::act::node::Param;
 use rustpython_parser::ast::{ArgData, Located, StmtKind};
 
 use crate::{errors::KybraResult, source_map::SourceMapped};

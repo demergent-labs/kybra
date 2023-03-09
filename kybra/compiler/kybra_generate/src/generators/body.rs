@@ -4,9 +4,7 @@ use cdk_framework::act::node::{
 };
 
 use crate::{
-    generators::{
-        async_result_handler, ic_object, rng_seed, stable_b_tree_map, unwrap_rust_python_result,
-    },
+    generators::{async_result_handler, ic_object, stable_b_tree_map, unwrap_rust_python_result},
     py_ast::node::stable_b_tree_map_nodes::StableBTreeMapNode,
 };
 
@@ -25,13 +23,11 @@ pub fn generate(
     let unwrap_rust_python_result = unwrap_rust_python_result::generate();
     let async_result_handler = async_result_handler::generate(&external_canisters);
     let stable_b_tree_map = stable_b_tree_map::generate(stable_b_tree_map_nodes);
-    let rng_seed = rng_seed::generate();
 
     quote::quote! {
         #ic_object
         #unwrap_rust_python_result
         #async_result_handler
         #stable_b_tree_map
-        #rng_seed
     }
 }
