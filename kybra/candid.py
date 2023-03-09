@@ -283,8 +283,8 @@ def generate_candid_file(paths) -> str:
         ],
     )
 
-    candid_pointer = instance.exports(store)["get_candid_pointer"](store)
-    candid_length = instance.exports(store)["get_candid_length"](store)
+    candid_pointer = instance.exports(store)["_cdk_get_candid_pointer"](store)
+    candid_length = instance.exports(store)["_cdk_get_candid_length"](store)
 
     candid_bytes = bytes(
         instance.exports(store)["memory"].data_ptr(store)[
