@@ -1,296 +1,173 @@
 # type: ignore
 
-import wasmtime
+from wasmer import Store, Module, Instance, ImportObject, Function, FunctionType, Type
 
 
 def generate_candid_file(paths) -> str:
-
     file = open(paths["wasm"], "rb")
     wasm_buffer = file.read()
     file.close()
 
-    store = wasmtime.Store()
+    store = Store()
 
-    module = wasmtime.Module(store.engine, wasm_buffer)
+    module = Module(store, wasm_buffer)
 
-    msg_reply = wasmtime.Func(store, wasmtime.FuncType([], []), None)
-    stable_size = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i32()]), None
-    )
-    stable64_size = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i64()]), None
-    )
-    stable_write = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i32(), wasmtime.ValType.i32(), wasmtime.ValType.i32()], []
-        ),
-        None,
-    )
-    stable_read = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i32(), wasmtime.ValType.i32(), wasmtime.ValType.i32()], []
-        ),
-        None,
-    )
-    debug_print = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i32(), wasmtime.ValType.i32()], []),
-        None,
-    )
-    trap = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i32(), wasmtime.ValType.i32()], []),
-        None,
-    )
-    time = wasmtime.Func(store, wasmtime.FuncType([], [wasmtime.ValType.i64()]), None)
-    msg_caller_size = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i32()]), None
-    )
-    msg_caller_copy = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i32(), wasmtime.ValType.i32(), wasmtime.ValType.i32()], []
-        ),
-        None,
-    )
-    canister_self_size = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i32()]), None
-    )
-    canister_self_copy = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i32(), wasmtime.ValType.i32(), wasmtime.ValType.i32()], []
-        ),
-        None,
-    )
-    canister_cycle_balance = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i64()]), None
-    )
-    canister_cycle_balance128 = wasmtime.Func(
-        store, wasmtime.FuncType([wasmtime.ValType.i32()], []), None
-    )
-    certified_data_set = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i32(), wasmtime.ValType.i32()], []),
-        None,
-    )
-    data_certificate_present = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i32()]), None
-    )
-    data_certificate_size = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i32()]), None
-    )
-    data_certificate_copy = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i32(), wasmtime.ValType.i32(), wasmtime.ValType.i32()], []
-        ),
-        None,
-    )
-    msg_reply_data_append = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i32(), wasmtime.ValType.i32()], []),
-        None,
-    )
-    call_cycles_add128 = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i64(), wasmtime.ValType.i64()], []),
-        None,
-    )
-    call_new = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [
-                wasmtime.ValType.i32(),
-                wasmtime.ValType.i32(),
-                wasmtime.ValType.i32(),
-                wasmtime.ValType.i32(),
-                wasmtime.ValType.i32(),
-                wasmtime.ValType.i32(),
-                wasmtime.ValType.i32(),
-                wasmtime.ValType.i32(),
-            ],
-            [],
-        ),
-        None,
-    )
-    call_data_append = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i32(), wasmtime.ValType.i32()], []),
-        None,
-    )
-    call_perform = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i32()]), None
-    )
-    call_cycles_add = wasmtime.Func(
-        store, wasmtime.FuncType([wasmtime.ValType.i64()], []), None
-    )
-    call_on_cleanup = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i32(), wasmtime.ValType.i32()], []),
-        None,
-    )
-    msg_reject_code = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i32()]), None
-    )
-    msg_reject_msg_size = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i32()]), None
-    )
-    msg_reject_msg_copy = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i32(), wasmtime.ValType.i32(), wasmtime.ValType.i32()], []
-        ),
-        None,
-    )
-    msg_reject = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i32(), wasmtime.ValType.i32()], []),
-        None,
-    )
-    msg_cycles_available = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i64()]), None
-    )
-    msg_cycles_available128 = wasmtime.Func(
-        store, wasmtime.FuncType([wasmtime.ValType.i32()], []), None
-    )
-    msg_cycles_refunded = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i64()]), None
-    )
-    msg_cycles_refunded128 = wasmtime.Func(
-        store, wasmtime.FuncType([wasmtime.ValType.i32()], []), None
-    )
-    msg_cycles_accept = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i64()], [wasmtime.ValType.i64()]),
-        None,
-    )
-    msg_cycles_accept128 = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i64(), wasmtime.ValType.i64(), wasmtime.ValType.i32()], []
-        ),
-        None,
-    )
-    msg_arg_data_size = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i32()]), None
-    )
-    msg_arg_data_copy = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i32(), wasmtime.ValType.i32(), wasmtime.ValType.i32()], []
-        ),
-        None,
-    )
-    accept_message = wasmtime.Func(store, wasmtime.FuncType([], []), None)
-    msg_method_name_size = wasmtime.Func(
-        store, wasmtime.FuncType([], [wasmtime.ValType.i32()]), None
-    )
-    msg_method_name_copy = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i32(), wasmtime.ValType.i32(), wasmtime.ValType.i32()], []
-        ),
-        None,
-    )
-    performance_counter = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i32()], [wasmtime.ValType.i64()]),
-        None,
-    )
-    stable_grow = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i32()], [wasmtime.ValType.i32()]),
-        None,
-    )
-    stable64_grow = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i64()], [wasmtime.ValType.i64()]),
-        None,
-    )
-    stable64_write = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i64(), wasmtime.ValType.i64(), wasmtime.ValType.i64()], []
-        ),
-        None,
-    )
-    stable64_read = wasmtime.Func(
-        store,
-        wasmtime.FuncType(
-            [wasmtime.ValType.i64(), wasmtime.ValType.i64(), wasmtime.ValType.i64()], []
-        ),
-        None,
-    )
-    global_timer_set = wasmtime.Func(
-        store,
-        wasmtime.FuncType([wasmtime.ValType.i64()], [wasmtime.ValType.i64()]),
-        None,
+    import_object = ImportObject()
+
+    import_object.register(
+        "ic0",
+        {
+            "msg_reply": Function(store, lambda _: _, FunctionType([], [])),
+            "stable_size": Function(store, lambda _: _, FunctionType([], [Type.I32])),
+            "stable64_size": Function(store, lambda _: _, FunctionType([], [Type.I64])),
+            "stable_write": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32, Type.I32], [])
+            ),
+            "stable_read": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32, Type.I32], [])
+            ),
+            "debug_print": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32], [])
+            ),
+            "trap": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32], [])
+            ),
+            "time": Function(store, lambda _: _, FunctionType([], [Type.I64])),
+            "msg_caller_size": Function(
+                store, lambda _: _, FunctionType([], [Type.I32])
+            ),
+            "msg_caller_copy": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32, Type.I32], [])
+            ),
+            "canister_self_size": Function(
+                store, lambda _: _, FunctionType([], [Type.I32])
+            ),
+            "canister_self_copy": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32, Type.I32], [])
+            ),
+            "canister_cycle_balance": Function(
+                store, lambda _: _, FunctionType([], [Type.I64])
+            ),
+            "canister_cycle_balance128": Function(
+                store, lambda _: _, FunctionType([Type.I32], [])
+            ),
+            "certified_data_set": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32], [])
+            ),
+            "data_certificate_present": Function(
+                store, lambda _: _, FunctionType([], [Type.I32])
+            ),
+            "data_certificate_size": Function(
+                store, lambda _: _, FunctionType([], [Type.I32])
+            ),
+            "data_certificate_copy": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32, Type.I32], [])
+            ),
+            "msg_reply_data_append": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32], [])
+            ),
+            "call_cycles_add128": Function(
+                store, lambda _: _, FunctionType([Type.I64, Type.I64], [])
+            ),
+            "call_new": Function(
+                store,
+                lambda _: _,
+                FunctionType(
+                    [
+                        Type.I32,
+                        Type.I32,
+                        Type.I32,
+                        Type.I32,
+                        Type.I32,
+                        Type.I32,
+                        Type.I32,
+                        Type.I32,
+                    ],
+                    [],
+                ),
+            ),
+            "call_data_append": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32], [])
+            ),
+            "call_perform": Function(store, lambda _: _, FunctionType([], [Type.I32])),
+            "call_cycles_add": Function(
+                store, lambda _: _, FunctionType([Type.I64], [])
+            ),
+            "call_on_cleanup": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32], [])
+            ),
+            "msg_reject_code": Function(
+                store, lambda _: _, FunctionType([], [Type.I32])
+            ),
+            "msg_reject_msg_size": Function(
+                store, lambda _: _, FunctionType([], [Type.I32])
+            ),
+            "msg_reject_msg_copy": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32, Type.I32], [])
+            ),
+            "msg_reject": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32], [])
+            ),
+            "msg_cycles_available": Function(
+                store, lambda _: _, FunctionType([], [Type.I64])
+            ),
+            "msg_cycles_available128": Function(
+                store, lambda _: _, FunctionType([Type.I32], [])
+            ),
+            "msg_cycles_refunded": Function(
+                store, lambda _: _, FunctionType([], [Type.I64])
+            ),
+            "msg_cycles_refunded128": Function(
+                store, lambda _: _, FunctionType([Type.I32], [])
+            ),
+            "msg_cycles_accept": Function(
+                store, lambda _: _, FunctionType([Type.I64], [Type.I64])
+            ),
+            "msg_cycles_accept128": Function(
+                store, lambda _: _, FunctionType([Type.I64, Type.I64, Type.I32], [])
+            ),
+            "msg_arg_data_size": Function(
+                store, lambda _: _, FunctionType([], [Type.I32])
+            ),
+            "msg_arg_data_copy": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32, Type.I32], [])
+            ),
+            "accept_message": Function(store, lambda _: _, FunctionType([], [])),
+            "msg_method_name_size": Function(
+                store, lambda _: _, FunctionType([], [Type.I32])
+            ),
+            "msg_method_name_copy": Function(
+                store, lambda _: _, FunctionType([Type.I32, Type.I32, Type.I32], [])
+            ),
+            "performance_counter": Function(
+                store, lambda _: _, FunctionType([Type.I32], [Type.I64])
+            ),
+            "stable_grow": Function(
+                store, lambda _: _, FunctionType([Type.I32], [Type.I32])
+            ),
+            "stable64_grow": Function(
+                store, lambda _: _, FunctionType([Type.I64], [Type.I64])
+            ),
+            "stable64_write": Function(
+                store, lambda _: _, FunctionType([Type.I64, Type.I64, Type.I64], [])
+            ),
+            "stable64_read": Function(
+                store, lambda _: _, FunctionType([Type.I64, Type.I64, Type.I64], [])
+            ),
+            "global_timer_set": Function(
+                store, lambda _: _, FunctionType([Type.I64], [Type.I64])
+            ),
+        },
     )
 
-    instance = wasmtime.Instance(
-        store,
-        module,
-        [
-            msg_reply,
-            stable_size,
-            stable64_size,
-            stable_write,
-            stable_read,
-            debug_print,
-            trap,
-            time,
-            msg_caller_size,
-            msg_caller_copy,
-            canister_self_size,
-            canister_self_copy,
-            canister_cycle_balance,
-            canister_cycle_balance128,
-            certified_data_set,
-            data_certificate_present,
-            data_certificate_size,
-            data_certificate_copy,
-            msg_reply_data_append,
-            call_cycles_add128,
-            call_new,
-            call_data_append,
-            call_perform,
-            call_cycles_add,
-            call_on_cleanup,
-            msg_reject_code,
-            msg_reject_msg_size,
-            msg_reject_msg_copy,
-            msg_reject,
-            msg_cycles_available,
-            msg_cycles_available128,
-            msg_cycles_refunded,
-            msg_cycles_refunded128,
-            msg_cycles_accept,
-            msg_cycles_accept128,
-            msg_arg_data_size,
-            msg_arg_data_copy,
-            accept_message,
-            msg_method_name_size,
-            msg_method_name_copy,
-            performance_counter,
-            stable_grow,
-            stable64_grow,
-            stable64_write,
-            stable64_read,
-            global_timer_set,
-        ],
-    )
+    instance = Instance(module, import_object)
 
-    candid_pointer = instance.exports(store)["_cdk_get_candid_pointer"](store)
-    candid_length = instance.exports(store)["_cdk_get_candid_length"](store)
+    candid_pointer = instance.exports._cdk_get_candid_pointer()
+    candid_length = instance.exports._cdk_get_candid_length()
 
-    candid_bytes = bytes(
-        instance.exports(store)["memory"].data_ptr(store)[
-            candid_pointer : candid_pointer + candid_length
-        ]
-    )
+    candid_bytes = bytes(instance.exports.memory.buffer)[
+        candid_pointer : candid_pointer + candid_length
+    ]
 
     candid_string = candid_bytes.decode("utf-8")
 
