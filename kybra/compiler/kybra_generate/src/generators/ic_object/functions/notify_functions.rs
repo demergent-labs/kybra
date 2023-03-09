@@ -1,6 +1,6 @@
 use cdk_framework::{
-    act::node::{ExternalCanister, Method},
-    traits::HasParams,
+    act::node::{external_canister::Method, ExternalCanister},
+    traits::ToTypeAnnotation,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
@@ -13,7 +13,7 @@ pub fn generate(external_canisters: &Vec<ExternalCanister>) -> Vec<TokenStream> 
             let function_name_string = format!("_kybra_notify_{}_{}", canister.name, method.name);
             let real_function_name = format_ident!("{}", function_name_string);
             let wrapper_fn_name = format_ident!("{}_wrapper", function_name_string);
-            let param_variable_definitions = generate_param_variables(method);
+            let param_variable_definitions = generate_param_variables(method, &canister.name);
             let param_names = method.params.iter().map(|param| {
                 let name = format_ident!("{}", param.get_prefixed_name());
                 quote!{#name}
@@ -39,10 +39,10 @@ pub fn generate(external_canisters: &Vec<ExternalCanister>) -> Vec<TokenStream> 
     }).collect::<Vec<Vec<TokenStream>>>().concat()
 }
 
-fn generate_param_variables(method: &Method) -> Vec<TokenStream> {
+fn generate_param_variables(method: &Method, canister_name: &String) -> Vec<TokenStream> {
     method.params.iter().enumerate().map(|(index, param)| {
         let variable_name = format_ident!("{}", param.get_prefixed_name());
-        let variable_type = method.create_param_type_annotation(index, &crate::get_python_keywords());
+        let variable_type = param.to_type_annotation(&crate::get_python_keywords(), method.create_qualified_name(canister_name));
         let actual_index = index + 2;
 
         quote! {

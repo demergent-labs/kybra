@@ -5,7 +5,6 @@ pub mod func;
 pub mod guard_function;
 pub mod header;
 pub mod ic_object;
-pub mod rng_seed;
 pub mod stable_b_tree_map;
 pub mod tuple;
 pub mod unwrap_rust_python_result;

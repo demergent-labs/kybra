@@ -3,7 +3,7 @@ pub mod errors;
 use std::{collections::HashSet, ops::Deref};
 
 use cdk_framework::act::node::GuardFunction;
-use rustpython_parser::ast::{Located, Mod, StmtKind};
+use rustpython_parser::ast::{ExprKind, Located, Mod, StmtKind};
 
 use crate::{
     errors::KybraResult, generators::guard_function, py_ast::PyAst, source_map::SourceMapped,
@@ -29,6 +29,9 @@ impl SourceMapped<&Located<StmtKind>> {
                 if self.has_params() {
                     return Err(self.guard_functions_param_error());
                 }
+                if !self.returns_guard_result() {
+                    return Err(self.guard_function_return_error());
+                }
 
                 Ok(Some(GuardFunction {
                     body: guard_function::generate(name),
@@ -42,6 +45,22 @@ impl SourceMapped<&Located<StmtKind>> {
     fn has_params(&self) -> bool {
         match &self.node {
             StmtKind::FunctionDef { args, .. } => args.args.len() > 0,
+            _ => false,
+        }
+    }
+
+    fn returns_guard_result(&self) -> bool {
+        match &self.node {
+            StmtKind::FunctionDef { returns, .. } => {
+                if let Some(returns) = returns {
+                    match &returns.node {
+                        ExprKind::Name { id, .. } => id == "GuardResult",
+                        _ => false,
+                    }
+                } else {
+                    false
+                }
+            }
             _ => false,
         }
     }

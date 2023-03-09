@@ -1,6 +1,6 @@
 pub mod errors;
 
-use cdk_framework::act::node::{ExternalCanister, Method};
+use cdk_framework::act::node::{external_canister::Method, ExternalCanister};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
@@ -35,7 +35,6 @@ impl SourceMapped<&Located<StmtKind>> {
                     name: name.clone(),
                     params: self.build_params(InternalOrExternal::External)?,
                     return_type: self.build_return_type()?,
-                    canister_name: canister_name.clone(),
                 })
             }
             _ => Err(self.class_with_not_function_defs_error(canister_name)),
