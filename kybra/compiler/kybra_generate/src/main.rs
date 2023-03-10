@@ -28,9 +28,4 @@ fn main() {
     let mut f = File::create(output_file_path).expect("Unable to create file");
     f.write_all(lib_file.as_bytes())
         .expect("Unable to write data");
-
-    println!(
-        "Generated unformatted rust canister at {}",
-        output_file_path
-    );
 }

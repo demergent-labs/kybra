@@ -7,7 +7,7 @@ use super::PyAst;
 use crate::{
     body,
     errors::KybraResult,
-    header,
+    header, keywords,
     vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
 };
 
@@ -53,7 +53,7 @@ impl PyAst {
             external_canisters,
             guard_functions: self.build_guard_functions()?,
             vm_value_conversion,
-            keywords: crate::get_python_keywords(),
+            keywords: keywords::get_python_keywords(),
         })
     }
 }

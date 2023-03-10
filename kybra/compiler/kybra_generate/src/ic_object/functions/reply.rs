@@ -5,6 +5,8 @@ use cdk_framework::{
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use crate::keywords;
+
 pub fn generate(
     canister_methods: &Vec<UpdateMethod>,
     query_methods: &Vec<QueryMethod>,
@@ -46,7 +48,7 @@ fn generate_update_match_arm(update_method: &UpdateMethod) -> TokenStream {
     let name = &update_method.name;
     let return_type = update_method
         .return_type
-        .to_type_annotation(&crate::get_python_keywords(), update_method.name.clone());
+        .to_type_annotation(&keywords::get_python_keywords(), update_method.name.clone());
     quote!(
         #name => {
             let reply_value: #return_type = reply_value_py_object_ref.try_from_vm_value(vm).unwrap();
@@ -59,7 +61,7 @@ fn generate_query_match_arm(query_method: &QueryMethod) -> TokenStream {
     let name = &query_method.name;
     let return_type = query_method
         .return_type
-        .to_type_annotation(&crate::get_python_keywords(), query_method.name.clone());
+        .to_type_annotation(&keywords::get_python_keywords(), query_method.name.clone());
     quote!(
         #name => {
             let reply_value: #return_type = reply_value_py_object_ref.try_from_vm_value(vm).unwrap();

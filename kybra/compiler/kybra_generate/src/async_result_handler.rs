@@ -2,7 +2,7 @@ use cdk_framework::act::{node::external_canister::ExternalCanister, ToTypeAnnota
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
-use crate::tuple;
+use crate::{keywords, tuple};
 
 pub fn generate(external_canisters: &Vec<ExternalCanister>) -> TokenStream {
     let call_match_arms = generate_call_match_arms(external_canisters);
@@ -194,7 +194,7 @@ fn generate_call_match_arms(external_canisters: &Vec<ExternalCanister>) -> Vec<T
 
                 let param_variable_definitions: Vec<TokenStream> = method.params.iter().enumerate().map(|(index, param)| {
                     let variable_name = format_ident!("{}", param.get_prefixed_name());
-                    let variable_type = param.to_type_annotation(&crate::get_python_keywords(), method.create_qualified_name(&external_canister.name));
+                    let variable_type = param.to_type_annotation(&keywords::get_python_keywords(), method.create_qualified_name(&external_canister.name));
                     let actual_index = index + 2;
 
                     quote! {
@@ -248,7 +248,7 @@ fn generate_call_with_payment_match_arms(
 
                 let param_variable_definitions: Vec<TokenStream> = method.params.iter().enumerate().map(|(index, param)| {
                     let variable_name = format_ident!("{}", param.get_prefixed_name());
-                    let variable_type = param.to_type_annotation(&crate::get_python_keywords(), method.create_qualified_name(&external_canister.name));
+                    let variable_type = param.to_type_annotation(&keywords::get_python_keywords(), method.create_qualified_name(&external_canister.name));
                     let actual_index = index + 2;
 
                     quote! {
@@ -306,7 +306,7 @@ fn generate_call_with_payment128_match_arms(
 
                 let param_variable_definitions: Vec<TokenStream> = method.params.iter().enumerate().map(|(index, param)| {
                     let variable_name = format_ident!("{}", param.get_prefixed_name());
-                    let variable_type = param.to_type_annotation(&crate::get_python_keywords(), method.create_qualified_name(&external_canister.name));
+                    let variable_type = param.to_type_annotation(&keywords::get_python_keywords(), method.create_qualified_name(&external_canister.name));
                     let actual_index = index + 2;
 
                     quote! {

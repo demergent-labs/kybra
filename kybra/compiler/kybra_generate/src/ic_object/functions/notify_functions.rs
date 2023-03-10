@@ -5,7 +5,7 @@ use cdk_framework::{
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
-use crate::tuple;
+use crate::{keywords, tuple};
 
 pub fn generate(external_canisters: &Vec<ExternalCanister>) -> Vec<TokenStream> {
     external_canisters.iter().map(|canister| {
@@ -42,7 +42,7 @@ pub fn generate(external_canisters: &Vec<ExternalCanister>) -> Vec<TokenStream> 
 fn generate_param_variables(method: &Method, canister_name: &String) -> Vec<TokenStream> {
     method.params.iter().enumerate().map(|(index, param)| {
         let variable_name = format_ident!("{}", param.get_prefixed_name());
-        let variable_type = param.to_type_annotation(&crate::get_python_keywords(), method.create_qualified_name(canister_name));
+        let variable_type = param.to_type_annotation(&keywords::get_python_keywords(), method.create_qualified_name(canister_name));
         let actual_index = index + 2;
 
         quote! {
