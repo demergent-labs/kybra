@@ -1,4 +1,6 @@
-pub fn generate() -> proc_macro2::TokenStream {
+use proc_macro2::TokenStream;
+
+pub fn generate() -> TokenStream {
     quote::quote! {
         impl<T> CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for (T,)
         where

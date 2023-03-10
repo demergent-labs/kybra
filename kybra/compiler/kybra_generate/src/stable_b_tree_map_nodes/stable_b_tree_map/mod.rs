@@ -12,11 +12,11 @@ pub mod wrapper_type;
 pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStream {
     let stable_b_tree_maps_and_impls =
         generate_global_stable_b_tree_maps_and_impls(stable_b_tree_map_nodes);
-    let stable_b_tree_maps: Vec<proc_macro2::TokenStream> = stable_b_tree_maps_and_impls
+    let stable_b_tree_maps: Vec<TokenStream> = stable_b_tree_maps_and_impls
         .iter()
         .map(|stable_b_tree_map_and_impl| stable_b_tree_map_and_impl.0.clone())
         .collect();
-    let stable_b_tree_impls: Vec<proc_macro2::TokenStream> = stable_b_tree_maps_and_impls
+    let stable_b_tree_impls: Vec<TokenStream> = stable_b_tree_maps_and_impls
         .iter()
         .map(|stable_b_tree_map_and_impl| stable_b_tree_map_and_impl.1.clone())
         .collect();
@@ -46,7 +46,7 @@ pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStrea
 
 fn generate_global_stable_b_tree_maps_and_impls(
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
-) -> Vec<(proc_macro2::TokenStream, proc_macro2::TokenStream)> {
+) -> Vec<(TokenStream, TokenStream)> {
     stable_b_tree_map_nodes
         .iter()
         .map(|stable_b_tree_map_node| {

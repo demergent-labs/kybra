@@ -1,8 +1,9 @@
+use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::{stable_b_tree_map_nodes::stable_b_tree_map, StableBTreeMapNode};
 
-pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> proc_macro2::TokenStream {
+pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStream {
     let match_arms = generate_match_arms(stable_b_tree_map_nodes);
 
     quote! {
@@ -18,9 +19,7 @@ pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> proc_macro
     }
 }
 
-fn generate_match_arms(
-    stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
-) -> Vec<proc_macro2::TokenStream> {
+fn generate_match_arms(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> Vec<TokenStream> {
     stable_b_tree_map_nodes
         .iter()
         .map(|stable_b_tree_map_node| {

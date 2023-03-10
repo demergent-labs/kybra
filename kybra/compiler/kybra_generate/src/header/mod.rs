@@ -1,7 +1,9 @@
+use proc_macro2::TokenStream;
+
 mod ref_cells;
 mod use_statements;
 
-pub fn generate() -> proc_macro2::TokenStream {
+pub fn generate() -> TokenStream {
     let use_statements = use_statements::generate();
     let ref_cells = ref_cells::generate();
 

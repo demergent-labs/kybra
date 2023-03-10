@@ -1,4 +1,6 @@
-pub fn generate() -> proc_macro2::TokenStream {
+use proc_macro2::TokenStream;
+
+pub fn generate() -> TokenStream {
     quote::quote! {
         use rustpython_vm::{AsObject, builtins::{PyDict, PyBaseException, PyGenerator, PyListRef, PyTupleRef, PyIntRef, PyStr, PyList, PyTuple, PyBytes}, class::PyClassImpl, convert::ToPyObject, function::IntoFuncArgs, PyObjectRef, PyObject, PyRef, VirtualMachine, protocol::{PyIter, PyIterReturn}, py_serde::{deserialize, serialize}};
         use rustpython_derive::{pyclass, PyPayload};

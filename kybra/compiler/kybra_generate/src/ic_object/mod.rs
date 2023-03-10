@@ -2,6 +2,7 @@ use cdk_framework::act::node::{
     canister_method::{QueryMethod, UpdateMethod},
     ExternalCanister,
 };
+use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::{
@@ -25,7 +26,7 @@ pub fn generate(
     query_methods: &Vec<QueryMethod>,
     external_canisters: &Vec<ExternalCanister>,
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
-) -> proc_macro2::TokenStream {
+) -> TokenStream {
     let accept_message = accept_message::generate();
     let arg_data_raw = arg_data_raw::generate();
     let arg_data_raw_size = arg_data_raw_size::generate();

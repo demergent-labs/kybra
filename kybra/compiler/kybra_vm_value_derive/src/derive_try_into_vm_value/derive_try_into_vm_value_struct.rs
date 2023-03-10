@@ -1,12 +1,12 @@
 use cdk_framework::traits::ToIdent;
-use proc_macro2::Ident;
+use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use syn::{DataStruct, Fields, Index};
 
 pub fn derive_try_into_vm_value_struct(
     struct_name: &Ident,
     data_struct: &DataStruct,
-) -> proc_macro2::TokenStream {
+) -> TokenStream {
     let data_structure_definition = derive_data_structure_definition(data_struct);
     let variable_definitions = derive_struct_fields_variable_definitions(data_struct);
     let property_definitions = derive_struct_fields_property_definitions(data_struct);
@@ -32,11 +32,11 @@ pub fn derive_try_into_vm_value_struct(
     }
 }
 
-fn derive_data_structure_definition(data_struct: &DataStruct) -> proc_macro2::TokenStream {
+fn derive_data_structure_definition(data_struct: &DataStruct) -> TokenStream {
     match &data_struct.fields {
         Fields::Named(_) => quote!(let py_data_structure = vm.ctx.new_dict();),
         Fields::Unnamed(fields_unnamed) => {
-            let field_names: Vec<proc_macro2::TokenStream> = fields_unnamed
+            let field_names: Vec<TokenStream> = fields_unnamed
                 .unnamed
                 .iter()
                 .enumerate()
@@ -53,9 +53,7 @@ fn derive_data_structure_definition(data_struct: &DataStruct) -> proc_macro2::To
     }
 }
 
-fn derive_struct_fields_variable_definitions(
-    data_struct: &DataStruct,
-) -> Vec<proc_macro2::TokenStream> {
+fn derive_struct_fields_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStream> {
     match &data_struct.fields {
         Fields::Named(fields_named) => fields_named
             .named
@@ -85,9 +83,7 @@ fn derive_struct_fields_variable_definitions(
     }
 }
 
-fn derive_struct_fields_property_definitions(
-    data_struct: &DataStruct,
-) -> Vec<proc_macro2::TokenStream> {
+fn derive_struct_fields_property_definitions(data_struct: &DataStruct) -> Vec<TokenStream> {
     match &data_struct.fields {
         Fields::Named(fields_named) => fields_named
             .named

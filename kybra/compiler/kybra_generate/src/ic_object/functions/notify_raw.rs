@@ -1,6 +1,7 @@
+use proc_macro2::TokenStream;
 use quote::quote;
 
-pub fn generate() -> proc_macro2::TokenStream {
+pub fn generate() -> TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_notify_raw(&self, canister_id_py_object_ref: PyObjectRef, method_py_object_ref: PyObjectRef, args_raw_py_object_ref: PyObjectRef, payment_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {

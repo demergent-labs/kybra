@@ -1,12 +1,10 @@
 use cdk_framework::traits::ToIdent;
 use proc_macro2::Ident;
+use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{DataEnum, Fields};
 
-pub fn derive_try_from_vm_value_enum(
-    enum_name: &Ident,
-    data_enum: &DataEnum,
-) -> proc_macro2::TokenStream {
+pub fn derive_try_from_vm_value_enum(enum_name: &Ident, data_enum: &DataEnum) -> TokenStream {
     let item_initializers = derive_item_initializers(enum_name, data_enum);
 
     quote! {
@@ -26,10 +24,7 @@ pub fn derive_try_from_vm_value_enum(
     }
 }
 
-fn derive_item_initializers(
-    enum_name: &Ident,
-    data_enum: &DataEnum,
-) -> Vec<proc_macro2::TokenStream> {
+fn derive_item_initializers(enum_name: &Ident, data_enum: &DataEnum) -> Vec<TokenStream> {
     data_enum
         .variants
         .iter()
@@ -50,7 +45,7 @@ fn derive_item_initializers(
 fn derive_item_initializers_for_unnamed_fields(
     enum_name: &Ident,
     variant_name: &Ident,
-) -> proc_macro2::TokenStream {
+) -> TokenStream {
     let restored_variant_name = cdk_framework::keyword::restore_for_vm(
         &variant_name.to_string(),
         &crate::get_python_keywords(),
@@ -65,10 +60,7 @@ fn derive_item_initializers_for_unnamed_fields(
     }
 }
 
-fn derive_item_initializers_for_unit(
-    enum_name: &Ident,
-    variant_name: &Ident,
-) -> proc_macro2::TokenStream {
+fn derive_item_initializers_for_unit(enum_name: &Ident, variant_name: &Ident) -> TokenStream {
     let restored_variant_name = cdk_framework::keyword::restore_for_vm(
         &variant_name.to_string(),
         &crate::get_python_keywords(),

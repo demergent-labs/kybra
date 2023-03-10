@@ -2,6 +2,7 @@ use cdk_framework::act::node::{
     canister_method::{QueryMethod, UpdateMethod},
     ExternalCanister,
 };
+use proc_macro2::TokenStream;
 
 use crate::{
     async_result_handler, ic_object, stable_b_tree_map_nodes::stable_b_tree_map,
@@ -13,7 +14,7 @@ pub fn generate(
     query_methods: &Vec<QueryMethod>,
     external_canisters: &Vec<ExternalCanister>,
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
-) -> proc_macro2::TokenStream {
+) -> TokenStream {
     let ic_object = ic_object::generate(
         update_methods,
         query_methods,

@@ -1,6 +1,7 @@
+use proc_macro2::TokenStream;
 use quote::quote;
 
-pub fn generate() -> proc_macro2::TokenStream {
+pub fn generate() -> TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_accept_message(&self, vm: &VirtualMachine) -> PyObjectRef {

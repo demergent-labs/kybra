@@ -3,7 +3,9 @@ mod generic;
 mod numeric;
 mod vec;
 
-pub fn generate() -> proc_macro2::TokenStream {
+use proc_macro2::TokenStream;
+
+pub fn generate() -> TokenStream {
     let basic_impls = basic::generate();
     let generic_impls = generic::generate();
     let numeric_impls = numeric::generate();

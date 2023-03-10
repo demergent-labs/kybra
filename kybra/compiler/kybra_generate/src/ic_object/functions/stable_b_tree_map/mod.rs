@@ -1,3 +1,5 @@
+use proc_macro2::TokenStream;
+
 use crate::StableBTreeMapNode;
 
 pub mod contains_key;
@@ -10,7 +12,7 @@ pub mod len;
 pub mod remove;
 pub mod values;
 
-pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> proc_macro2::TokenStream {
+pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStream {
     let contains_key = contains_key::generate(stable_b_tree_map_nodes);
     let get = get::generate(stable_b_tree_map_nodes);
     let insert = insert::generate(stable_b_tree_map_nodes);

@@ -1,6 +1,7 @@
+use proc_macro2::TokenStream;
 use quote::quote;
 
-pub fn generate() -> proc_macro2::TokenStream {
+pub fn generate() -> TokenStream {
     quote! {
         #[pymethod]
         fn _kybra_stable64_write(&self, offset_py_object_ref: PyObjectRef, buf_vector_py_object_ref: PyObjectRef, vm: &VirtualMachine) {
