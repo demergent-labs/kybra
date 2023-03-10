@@ -12,7 +12,7 @@ rustpython-parser = { git = "https://github.com/demergent-labs/RustPython", bran
 annotate-snippets = "0.9.1"
 num-bigint = "0.4.3"
 # rustpython = { path = "../../../../RustPython", default-features = false, features = [] }
-cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "5ed4a1c44849baaf3b38380adf8aa7bc644fc125" }
+cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "08a74a4077d0981acde2b0fc714e877bba659b9e" }
 # cdk_framework = { path = "path/to/local/cdk_framework" }
 # For local rust-analyzer uncomment this line and comment out the line above.
 # Update path/to/local to be the path to your local cdk_framework repo
