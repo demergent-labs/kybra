@@ -1,4 +1,7 @@
-use cdk_framework::act::node::canister_method::{CanisterMethodType, QueryOrUpdateDefinition};
+use cdk_framework::act::node::{
+    canister_method::{CanisterMethodType, QueryOrUpdateDefinition},
+    ReturnType,
+};
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use crate::{
@@ -105,7 +108,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 params: self.build_params(InternalOrExternal::Internal)?,
                 is_manual: self.is_manual(),
                 name: name.clone(),
-                return_type: self.build_return_type()?,
+                return_type: ReturnType::new(self.build_return_type()?),
                 is_async: self.is_async(),
                 cdk_name: "kybra".to_string(),
                 guard_function_name: self.get_guard_function_name(),

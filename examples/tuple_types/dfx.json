@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".kybra/tuple_types/tuple_types.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/tuple_types"
+                "output": "test/dfx_generated/tuple_types",
+                "node_compatibility": true
             }
         }
     }

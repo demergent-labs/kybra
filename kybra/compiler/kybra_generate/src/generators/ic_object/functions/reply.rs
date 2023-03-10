@@ -1,8 +1,5 @@
 use cdk_framework::{
-    act::node::{
-        canister_method::{QueryMethod, UpdateMethod},
-        ReturnType,
-    },
+    act::node::canister_method::{QueryMethod, UpdateMethod},
     traits::ToTypeAnnotation,
 };
 use proc_macro2::TokenStream;
@@ -47,7 +44,8 @@ fn generate_match_arms(
 
 fn generate_update_match_arm(update_method: &UpdateMethod) -> TokenStream {
     let name = &update_method.name;
-    let return_type = ReturnType::new(update_method.return_type.clone())
+    let return_type = update_method
+        .return_type
         .to_type_annotation(&crate::get_python_keywords(), update_method.name.clone());
     quote!(
         #name => {
@@ -59,7 +57,8 @@ fn generate_update_match_arm(update_method: &UpdateMethod) -> TokenStream {
 
 fn generate_query_match_arm(query_method: &QueryMethod) -> TokenStream {
     let name = &query_method.name;
-    let return_type = ReturnType::new(query_method.return_type.clone())
+    let return_type = query_method
+        .return_type
         .to_type_annotation(&crate::get_python_keywords(), query_method.name.clone());
     quote!(
         #name => {
