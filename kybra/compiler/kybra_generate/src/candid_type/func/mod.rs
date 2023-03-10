@@ -41,9 +41,9 @@ impl SourceMapped<&Located<ExprKind>> {
                     return Err(self.func_formatting_error());
                 }
                 let mode = self.get_func_mode()?;
-                let params = self.get_func_params()?;
+                let params = self.build_func_params()?;
                 let return_type = Box::from(ReturnType::new(
-                    match self.get_func_return_type(mode.clone()) {
+                    match self.build_func_return_type(mode.clone()) {
                         Ok(return_type) => return_type,
                         Err(err) => return Err(err),
                     },
@@ -83,7 +83,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn get_func_params(&self) -> KybraResult<Vec<CandidType>> {
+    fn build_func_params(&self) -> KybraResult<Vec<CandidType>> {
         match &self.node {
             ExprKind::Call { args, .. } => match &args[0].node {
                 ExprKind::Subscript { slice, .. } => match &slice.node {
@@ -111,7 +111,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn get_func_return_type(&self, mode: Mode) -> KybraResult<CandidType> {
+    fn build_func_return_type(&self, mode: Mode) -> KybraResult<CandidType> {
         match &self.node {
             ExprKind::Call { args, .. } => match mode {
                 Mode::Oneway => Ok(CandidType::Primitive(Primitive::Void)),

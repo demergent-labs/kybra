@@ -1,11 +1,11 @@
 pub mod errors;
-mod generate;
 pub mod heartbeat_method;
 pub mod init_method;
 pub mod inspect_message_method;
 pub mod post_upgrade_method;
 pub mod pre_upgrade_method;
 mod query_or_update;
+mod rust;
 
 use std::ops::Deref;
 
@@ -48,7 +48,7 @@ impl PyAst {
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_canister_method_type(&self, canister_method_type: CanisterMethodType) -> bool {
-        self.is_decorator_same_as(match canister_method_type {
+        self.has_decorator(match canister_method_type {
             CanisterMethodType::Heartbeat => "heartbeat",
             CanisterMethodType::Init => "init",
             CanisterMethodType::InspectMessage => "inspect_message",
@@ -59,7 +59,7 @@ impl SourceMapped<&Located<StmtKind>> {
         })
     }
 
-    fn is_decorator_same_as(&self, decorator_name: &str) -> bool {
+    fn has_decorator(&self, decorator_name: &str) -> bool {
         match &self.node {
             StmtKind::FunctionDef { decorator_list, .. } => {
                 decorator_list
