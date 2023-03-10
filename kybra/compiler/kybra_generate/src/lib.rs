@@ -2,16 +2,27 @@ use errors::KybraResult;
 use proc_macro2::TokenStream;
 use py_ast::PyAst;
 
-pub mod act;
+pub mod async_result_handler;
+pub mod body;
+pub mod canister_method;
+pub mod data_type;
 pub mod debug;
 mod errors;
-mod generators;
+pub mod external_canister;
 pub mod get_name;
-pub mod plugins;
+pub mod guard_function;
+pub mod header;
+pub mod ic_object;
+pub mod keywords;
+pub mod param;
 pub mod py_ast;
 pub mod source_map;
+pub mod stable_b_tree_map_nodes;
+pub mod tuple;
+pub mod unwrap_rust_python_result;
+pub mod vm_value_conversion;
 
-pub use plugins::stable_b_tree_map_nodes::StableBTreeMapNode;
+pub use stable_b_tree_map_nodes::StableBTreeMapNode;
 
 const PYTHON_KEYWORDS: [&str; 35] = [
     "False", "None", "True", "and", "as", "assert", "async", "await", "break", "class", "continue",

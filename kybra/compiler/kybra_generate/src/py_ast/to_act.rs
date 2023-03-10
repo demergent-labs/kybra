@@ -5,11 +5,10 @@ use cdk_framework::{
 
 use super::PyAst;
 use crate::{
+    body,
     errors::KybraResult,
-    generators::{
-        body, header,
-        vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
-    },
+    header,
+    vm_value_conversion::{try_from_vm_value_impls, try_into_vm_value_impls},
 };
 
 impl PyAst {
