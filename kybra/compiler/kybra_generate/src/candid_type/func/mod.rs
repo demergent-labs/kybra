@@ -96,7 +96,7 @@ impl SourceMapped<&Located<ExprKind>> {
                                 elts.iter()
                                     .map(|elt| {
                                         SourceMapped::new(elt, self.source_map.clone())
-                                            .to_data_type()
+                                            .to_candid_type()
                                     })
                                     .collect(),
                             ),
@@ -122,7 +122,7 @@ impl SourceMapped<&Located<ExprKind>> {
                                 return Err(self.func_formatting_error());
                             }
                             Ok(SourceMapped::new(&elts[1], self.source_map.clone())
-                                .to_data_type()?)
+                                .to_candid_type()?)
                         }
                         _ => return Err(self.func_formatting_error()),
                     },

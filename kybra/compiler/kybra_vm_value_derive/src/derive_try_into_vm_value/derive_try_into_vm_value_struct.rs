@@ -1,4 +1,4 @@
-use cdk_framework::nodes::data_type_nodes::ToIdent;
+use cdk_framework::traits::ToIdent;
 use proc_macro2::Ident;
 use quote::{format_ident, quote};
 use syn::{DataStruct, Fields, Index};
@@ -101,7 +101,7 @@ fn derive_struct_fields_property_definitions(
                             &field_name.to_string(),
                             &crate::get_python_keywords(),
                         )
-                        .to_identifier(),
+                        .to_ident(),
                     ),
                     None => field_name.clone(),
                 };

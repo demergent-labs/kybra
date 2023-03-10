@@ -1,4 +1,4 @@
-use cdk_framework::nodes::data_type_nodes::ToIdent;
+use cdk_framework::traits::ToIdent;
 use proc_macro2::Ident;
 use quote::quote;
 use syn::{DataEnum, Field, Fields};
@@ -60,7 +60,7 @@ fn derive_variant_branches_unnamed_fields(
         &variant_name.to_string(),
         &crate::get_python_keywords(),
     )
-    .to_identifier();
+    .to_ident();
     if unnamed_fields.len() == 0 {
         quote! {
             #enum_name::#variant_name => {

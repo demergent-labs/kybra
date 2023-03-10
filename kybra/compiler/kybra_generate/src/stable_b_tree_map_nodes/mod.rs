@@ -127,7 +127,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 ExprKind::Call { func, .. } => {
                     SourceMapped::new(func.as_ref(), self.source_map.clone())
                         .get_key_type()?
-                        .to_data_type()
+                        .to_candid_type()
                 }
                 _ => Err(self.not_a_stable_b_tree_map_node_error()),
             },
@@ -141,7 +141,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 ExprKind::Call { func, .. } => {
                     SourceMapped::new(func.as_ref(), self.source_map.clone())
                         .get_value_type()?
-                        .to_data_type()
+                        .to_candid_type()
                 }
                 _ => Err(self.not_a_stable_b_tree_map_node_error()),
             },

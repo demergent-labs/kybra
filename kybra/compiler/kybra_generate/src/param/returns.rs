@@ -15,7 +15,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 return_type.as_ref(),
                 self.source_map.clone(),
             )
-            .to_data_type()?),
+            .to_candid_type()?),
             None => Err(self.return_type_annotation_required_error()),
         }
     }

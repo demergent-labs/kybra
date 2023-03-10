@@ -1,4 +1,4 @@
-use cdk_framework::nodes::data_type_nodes::ToIdent;
+use cdk_framework::traits::ToIdent;
 use proc_macro2::Ident;
 use quote::quote;
 use syn::{DataEnum, Fields};
@@ -55,7 +55,7 @@ fn derive_item_initializers_for_unnamed_fields(
         &variant_name.to_string(),
         &crate::get_python_keywords(),
     )
-    .to_identifier();
+    .to_ident();
     quote! {
         let get_item_result = self.get_item(stringify!(#restored_variant_name), vm);
 
@@ -73,7 +73,7 @@ fn derive_item_initializers_for_unit(
         &variant_name.to_string(),
         &crate::get_python_keywords(),
     )
-    .to_identifier();
+    .to_ident();
     quote! {
         let get_item_result = self.get_item(stringify!(#restored_variant_name), vm);
 

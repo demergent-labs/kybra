@@ -13,16 +13,16 @@ pub fn collect_kybra_results<T>(results: Vec<KybraResult<T>>) -> KybraResult<Vec
 where
     T: Clone,
 {
-    let mut data_types: Vec<T> = vec![];
+    let mut oks: Vec<T> = vec![];
     let mut error_messages = vec![];
 
     results.iter().for_each(|small_result| match small_result {
-        Ok(data_type) => data_types.push(data_type.clone()),
+        Ok(ok) => oks.push(ok.clone()),
         Err(error) => error_messages.extend(error.clone()),
     });
 
     if error_messages.is_empty() {
-        Ok(data_types)
+        Ok(oks)
     } else {
         Err(error_messages)
     }

@@ -69,7 +69,7 @@ impl SourceMapped<&Located<StmtKind>> {
             _ => return Ok(None),
         };
         let enclosed_type =
-            match SourceMapped::new(value.as_ref(), self.source_map.clone()).to_data_type() {
+            match SourceMapped::new(value.as_ref(), self.source_map.clone()).to_candid_type() {
                 Ok(enclosed_type) => enclosed_type,
                 Err(err) => return Err(err),
             };

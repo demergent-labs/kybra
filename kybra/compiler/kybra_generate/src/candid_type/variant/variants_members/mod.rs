@@ -24,7 +24,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     _ => return Err(self.variant_target_must_be_a_name_error()),
                 };
                 let candid_type = SourceMapped::new(annotation.as_ref(), self.source_map.clone())
-                    .to_data_type()?;
+                    .to_candid_type()?;
                 Ok(Member { name, candid_type })
             }
             _ => Err(self.invalid_variant_member_error()),

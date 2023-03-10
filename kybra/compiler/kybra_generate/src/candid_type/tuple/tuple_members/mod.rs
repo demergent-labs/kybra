@@ -6,7 +6,7 @@ use crate::{errors::KybraResult, source_map::SourceMapped};
 impl SourceMapped<&Located<ExprKind>> {
     pub fn as_tuple_member(&self) -> KybraResult<Elem> {
         Ok(Elem {
-            candid_type: self.to_data_type()?,
+            candid_type: self.to_candid_type()?,
         })
     }
 }

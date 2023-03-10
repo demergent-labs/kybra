@@ -80,16 +80,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cdk_framework"
-version = "0.0.0"
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=65fdb1d0f6cf86b180d2786bd57f6dc96cbe6e4f#65fdb1d0f6cf86b180d2786bd57f6dc96cbe6e4f"
-dependencies = [
- "proc-macro2",
- "quote",
- "regex",
-]
-
-[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -131,7 +121,7 @@ dependencies = [
 name = "kybra-vm-value-derive"
 version = "0.0.0"
 dependencies = [
- "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=65fdb1d0f6cf86b180d2786bd57f6dc96cbe6e4f)",
+ "cdk_framework",
  "proc-macro2",
  "quote",
  "syn",
@@ -142,7 +132,7 @@ name = "kybra_generate"
 version = "0.0.0"
 dependencies = [
  "annotate-snippets",
- "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=08a74a4077d0981acde2b0fc714e877bba659b9e)",
+ "cdk_framework",
  "num-bigint",
  "proc-macro2",
  "quote",

@@ -15,24 +15,24 @@ pub mod type_ref;
 pub mod variant;
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn is_data_type(&self) -> bool {
+    pub fn is_candid_type(&self) -> bool {
         self.is_primitive()
             || self.is_array()
             || self.is_opt()
             || self.is_tuple()
             || self.is_type_ref()
-            || self.is_subscript_slice_data_type()
+            || self.is_subscript_slice_a_candid_type()
     }
 
-    fn is_subscript_slice_data_type(&self) -> bool {
+    fn is_subscript_slice_a_candid_type(&self) -> bool {
         match &self.node {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
                     ExprKind::Name { id, .. } => match &id[..] {
                         "Async" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
-                            .is_data_type(),
+                            .is_candid_type(),
                         "manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
-                            .is_data_type(),
+                            .is_candid_type(),
                         _ => false,
                     },
                     _ => false,
@@ -44,7 +44,7 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn to_data_type(&self) -> KybraResult<CandidType> {
+    pub fn to_candid_type(&self) -> KybraResult<CandidType> {
         if self.is_primitive() {
             return Ok(CandidType::Primitive(self.to_primitive()?));
         }
@@ -65,9 +65,9 @@ impl SourceMapped<&Located<ExprKind>> {
                 match &value.node {
                     ExprKind::Name { id, .. } => match &id[..] {
                         "Async" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
-                            .to_data_type(),
+                            .to_candid_type(),
                         "manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
-                            .to_data_type(),
+                            .to_candid_type(),
                         _ => Err(self.invalid_subscript_value_error()),
                     },
                     _ => Err(self.invalid_subscript_value_error()),

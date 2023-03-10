@@ -32,7 +32,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 }
                 let kybra_expr = SourceMapped::new(slice.as_ref(), self.source_map.clone());
                 Ok(Array {
-                    enclosed_type: Box::from(kybra_expr.to_data_type()?),
+                    enclosed_type: Box::from(kybra_expr.to_candid_type()?),
                 })
             }
             _ => Err(crate::errors::unreachable()),
