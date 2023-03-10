@@ -163,12 +163,13 @@ def generate_candid_file(paths) -> str:
     instance = Instance(module, import_object)
 
     candid_pointer = instance.exports._cdk_get_candid_pointer()
-    candid_length = instance.exports._cdk_get_candid_length()
 
-    candid_bytes = bytes(instance.exports.memory.buffer)[
-        candid_pointer : candid_pointer + candid_length
-    ]
-
-    candid_string = candid_bytes.decode("utf-8")
+    memory = instance.exports.memory.uint8_view()
+    string_bytes = []
+    i = candid_pointer
+    while memory[i] != 0:
+        string_bytes.append(memory[i])
+        i += 1
+    candid_string = bytes(string_bytes).decode("utf-8")
 
     return candid_string
