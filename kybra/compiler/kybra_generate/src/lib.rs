@@ -4,8 +4,8 @@ use py_ast::PyAst;
 
 pub mod async_result_handler;
 pub mod body;
+pub mod candid_type;
 pub mod canister_method;
-pub mod data_type;
 pub mod debug;
 mod errors;
 pub mod external_canister;
