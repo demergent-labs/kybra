@@ -72,11 +72,7 @@ dependencies = [
 [[package]]
 name = "cdk_framework"
 version = "0.0.0"
-<<<<<<< HEAD
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=62e03c8f63d552f91baa0fa59a6c71af35772887#62e03c8f63d552f91baa0fa59a6c71af35772887"
-=======
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=5ed4a1c44849baaf3b38380adf8aa7bc644fc125#5ed4a1c44849baaf3b38380adf8aa7bc644fc125"
->>>>>>> 271-embrace-results
+source = "git+https://github.com/demergent-labs/cdk_framework?rev=08a74a4077d0981acde2b0fc714e877bba659b9e#08a74a4077d0981acde2b0fc714e877bba659b9e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -146,11 +142,7 @@ name = "kybra_generate"
 version = "0.0.0"
 dependencies = [
  "annotate-snippets",
-<<<<<<< HEAD
- "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=62e03c8f63d552f91baa0fa59a6c71af35772887)",
-=======
- "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=5ed4a1c44849baaf3b38380adf8aa7bc644fc125)",
->>>>>>> 271-embrace-results
+ "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=08a74a4077d0981acde2b0fc714e877bba659b9e)",
  "num-bigint",
  "proc-macro2",
  "quote",
