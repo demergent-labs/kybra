@@ -3,7 +3,9 @@ use quote::{format_ident, quote};
 use rustpython_parser::ast::Located;
 use rustpython_parser::ast::StmtKind;
 
-use crate::{errors::KybraResult, param::InternalOrExternal, source_map::SourceMapped, tuple};
+use crate::{
+    errors::KybraResult, method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple,
+};
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn generate_call_to_py_function(&self) -> KybraResult<TokenStream> {

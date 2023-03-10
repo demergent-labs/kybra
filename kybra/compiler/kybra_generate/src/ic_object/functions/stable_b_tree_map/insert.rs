@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::{stable_b_tree_map_nodes::stable_b_tree_map, StableBTreeMapNode};
+use crate::{stable_b_tree_map_nodes::rust, StableBTreeMapNode};
 
 pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStream {
     let match_arms = generate_match_arms(stable_b_tree_map_nodes);
@@ -24,10 +24,10 @@ fn generate_match_arms(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> Vec
         .iter()
         .map(|stable_b_tree_map_node| {
             let memory_id = stable_b_tree_map_node.memory_id;
-            let stable_b_tree_map_ref_cell = stable_b_tree_map::ref_cell_ident::generate(stable_b_tree_map_node.memory_id);
+            let stable_b_tree_map_ref_cell = rust::ref_cell_ident::generate(stable_b_tree_map_node.memory_id);
 
-            let (key_wrapper_type_name, _) = stable_b_tree_map::wrapper_type::generate(&stable_b_tree_map_node.key_type, memory_id, "Key");
-            let (value_wrapper_type_name, _) = stable_b_tree_map::wrapper_type::generate(&stable_b_tree_map_node.value_type, memory_id, "Value");
+            let (key_wrapper_type_name, _) = rust::wrapper_type::generate(&stable_b_tree_map_node.key_type, memory_id, "Key");
+            let (value_wrapper_type_name, _) = rust::wrapper_type::generate(&stable_b_tree_map_node.value_type, memory_id, "Value");
 
             // TODO the return value here might need a little work like in get
             quote! {

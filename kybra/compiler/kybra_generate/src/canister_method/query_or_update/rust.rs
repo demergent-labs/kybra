@@ -3,7 +3,9 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{errors::KybraResult, param::InternalOrExternal, source_map::SourceMapped, tuple};
+use crate::{
+    errors::KybraResult, method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple,
+};
 
 pub fn generate_body(
     source_mapped_located_stmtkind: &SourceMapped<&Located<StmtKind>>,

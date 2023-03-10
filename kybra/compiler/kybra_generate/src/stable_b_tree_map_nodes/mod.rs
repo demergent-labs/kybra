@@ -1,5 +1,5 @@
 mod errors;
-pub mod stable_b_tree_map;
+pub mod rust;
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 use cdk_framework::act::node::CandidType;

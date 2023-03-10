@@ -14,7 +14,7 @@ pub mod guard_function;
 pub mod header;
 pub mod ic_object;
 pub mod keywords;
-pub mod param;
+pub mod method_utils;
 pub mod py_ast;
 pub mod source_map;
 pub mod stable_b_tree_map_nodes;

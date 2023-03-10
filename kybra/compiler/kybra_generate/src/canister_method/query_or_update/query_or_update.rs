@@ -5,7 +5,9 @@ use cdk_framework::act::node::{
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use super::rust;
-use crate::{errors::KybraResult, param::InternalOrExternal, source_map::SourceMapped};
+use crate::{
+    errors::KybraResult, method_utils::params::InternalOrExternal, source_map::SourceMapped,
+};
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_manual(&self) -> bool {

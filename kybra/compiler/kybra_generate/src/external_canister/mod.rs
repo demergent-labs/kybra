@@ -5,7 +5,7 @@ use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
-use super::param::InternalOrExternal;
+use super::method_utils::params::InternalOrExternal;
 
 impl PyAst {
     pub fn build_external_canisters(&self) -> KybraResult<Vec<ExternalCanister>> {
