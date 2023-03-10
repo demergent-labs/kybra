@@ -3,7 +3,7 @@ use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::{
-    errors::KybraResult, generators::tuple, py_ast::node::param::InternalOrExternal,
+    act::param::InternalOrExternal, errors::KybraResult, generators::tuple,
     source_map::SourceMapped,
 };
 

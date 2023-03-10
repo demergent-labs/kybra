@@ -5,7 +5,7 @@ use rustpython_parser::ast::{
     TypeIgnore, Unaryop, Withitem,
 };
 
-use crate::py_ast::debug::WhatIsIt;
+use crate::debug::WhatIsIt;
 
 pub const SPECIAL_CHARACTERS: &str = r"[^A-Za-z0-9]";
 pub const REGULAR_CHARACTERS: &str = r"[A-Za-z0-9]";

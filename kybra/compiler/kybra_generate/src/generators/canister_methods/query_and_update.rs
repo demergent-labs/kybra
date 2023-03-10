@@ -4,16 +4,16 @@ use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::{
-    errors::KybraResult, generators::tuple, py_ast::node::param::InternalOrExternal,
+    act::param::InternalOrExternal, errors::KybraResult, generators::tuple,
     source_map::SourceMapped,
 };
 
 pub fn generate_body(
-    kybra_statement: &SourceMapped<&Located<StmtKind>>,
+    source_mapped_located_stmtkind: &SourceMapped<&Located<StmtKind>>,
 ) -> KybraResult<TokenStream> {
-    let params = kybra_statement.build_params(InternalOrExternal::Internal)?;
+    let params = source_mapped_located_stmtkind.build_params(InternalOrExternal::Internal)?;
 
-    let name = match kybra_statement.get_name() {
+    let name = match source_mapped_located_stmtkind.get_name() {
         Some(name) => name,
         None => return Err(crate::errors::unreachable()),
     };
@@ -30,7 +30,7 @@ pub fn generate_body(
 
     let params = tuple::generate_tuple(&param_conversions);
 
-    let return_expression = generate_return_expression(kybra_statement)?;
+    let return_expression = generate_return_expression(source_mapped_located_stmtkind)?;
 
     Ok(quote! {
         unsafe {

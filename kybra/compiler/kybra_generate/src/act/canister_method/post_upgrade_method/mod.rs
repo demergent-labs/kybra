@@ -3,9 +3,8 @@ pub mod errors;
 use cdk_framework::act::node::canister_method::{CanisterMethodType, PostUpgradeMethod};
 
 use crate::{
-    errors::KybraResult,
-    generators::canister_methods::post_upgrade,
-    py_ast::{node::param::InternalOrExternal, PyAst},
+    act::param::InternalOrExternal, errors::KybraResult,
+    generators::canister_methods::post_upgrade, py_ast::PyAst,
 };
 
 impl PyAst {

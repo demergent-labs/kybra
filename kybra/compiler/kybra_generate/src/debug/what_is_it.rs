@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use rustpython_parser::ast::{ArgData, ExprContext, ExprKind, Located, StmtKind};
 
-use crate::{py_ast::debug::ToDisplayString, source_map::SourceMapped};
+use crate::{debug::ToDisplayString, source_map::SourceMapped};
 
 pub trait WhatIsIt {
     fn what_is_it(&self) -> ();

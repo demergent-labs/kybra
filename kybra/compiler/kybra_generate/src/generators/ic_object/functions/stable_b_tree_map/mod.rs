@@ -1,4 +1,4 @@
-use crate::py_ast::node::stable_b_tree_map_nodes::StableBTreeMapNode;
+use crate::StableBTreeMapNode;
 
 pub mod contains_key;
 pub mod get;

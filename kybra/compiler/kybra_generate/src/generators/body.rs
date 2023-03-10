@@ -5,7 +5,7 @@ use cdk_framework::act::node::{
 
 use crate::{
     generators::{async_result_handler, ic_object, stable_b_tree_map, unwrap_rust_python_result},
-    py_ast::node::stable_b_tree_map_nodes::StableBTreeMapNode,
+    StableBTreeMapNode,
 };
 
 pub fn generate(

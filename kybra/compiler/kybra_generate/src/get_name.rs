@@ -1,15 +1,7 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::source_map::SourceMapped;
-
-pub mod canister_method;
-pub mod data_type;
-pub mod external_canister;
-pub mod guard_function;
-pub mod param;
-pub mod stable_b_tree_map_nodes;
-
-pub use stable_b_tree_map_nodes::StableBTreeMapNode;
+pub use crate::StableBTreeMapNode;
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn get_name(&self) -> Option<String> {

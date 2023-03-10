@@ -15,7 +15,7 @@ use crate::{
         stable64_grow, stable64_read, stable64_size, stable64_write, stable_b_tree_map,
         stable_bytes, stable_grow, stable_read, stable_size, stable_write, time, trap,
     },
-    py_ast::node::stable_b_tree_map_nodes::StableBTreeMapNode,
+    StableBTreeMapNode,
 };
 
 mod functions;

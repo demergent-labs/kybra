@@ -5,7 +5,7 @@ use std::ops::Deref;
 use regex::Regex;
 use rustpython_parser::ast::{Located, Location};
 
-use crate::py_ast::debug::WhatIsIt;
+use crate::debug::WhatIsIt;
 
 use self::token_length::{TokenLength, REGULAR_CHARACTERS, SPECIAL_CHARACTERS};
 

@@ -5,8 +5,8 @@ use cdk_framework::act::node::{
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::KybraResult, generators::canister_methods::query_and_update,
-    py_ast::node::param::InternalOrExternal, source_map::SourceMapped,
+    act::param::InternalOrExternal, errors::KybraResult,
+    generators::canister_methods::query_and_update, source_map::SourceMapped,
 };
 
 pub mod query_method;

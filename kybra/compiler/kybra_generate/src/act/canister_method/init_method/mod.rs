@@ -3,9 +3,8 @@ pub mod errors;
 use cdk_framework::act::node::canister_method::{CanisterMethodType, InitMethod};
 
 use crate::{
-    errors::KybraResult,
-    generators::canister_methods::init,
-    py_ast::{node::param::InternalOrExternal, PyAst},
+    act::param::InternalOrExternal, errors::KybraResult, generators::canister_methods::init,
+    py_ast::PyAst,
 };
 
 impl PyAst {
