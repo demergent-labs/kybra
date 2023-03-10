@@ -1,6 +1,6 @@
 use cdk_framework::act::node::{
     candid::{func::Mode, Func, Primitive},
-    CandidType,
+    CandidType, ReturnType,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
@@ -41,10 +41,12 @@ impl SourceMapped<&Located<ExprKind>> {
                 }
                 let mode = self.get_func_mode()?;
                 let params = self.get_func_params()?;
-                let return_type = Box::from(match self.get_func_return_type(mode.clone()) {
-                    Ok(return_type) => return_type,
-                    Err(err) => return Err(err),
-                });
+                let return_type = Box::from(ReturnType::new(
+                    match self.get_func_return_type(mode.clone()) {
+                        Ok(return_type) => return_type,
+                        Err(err) => return Err(err),
+                    },
+                ));
                 Ok(Func {
                     to_vm_value: |name: String| func::generate_func_to_vm_value(&name),
                     list_to_vm_value: |name: String| func::generate_func_list_to_vm_value(&name),
