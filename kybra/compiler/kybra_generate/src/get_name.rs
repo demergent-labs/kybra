@@ -1,7 +1,6 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::source_map::SourceMapped;
-pub use crate::StableBTreeMapNode;
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn get_name(&self) -> Option<String> {

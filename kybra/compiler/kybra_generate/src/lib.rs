@@ -7,11 +7,11 @@ pub mod debug;
 mod errors;
 mod generators;
 pub mod get_name;
+pub mod plugins;
 pub mod py_ast;
 pub mod source_map;
-pub mod stable_b_tree_map_nodes;
 
-pub use stable_b_tree_map_nodes::StableBTreeMapNode;
+pub use plugins::stable_b_tree_map_nodes::StableBTreeMapNode;
 
 const PYTHON_KEYWORDS: [&str; 35] = [
     "False", "None", "True", "and", "as", "assert", "async", "await", "break", "class", "continue",

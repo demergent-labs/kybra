@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::stable_b_tree_map_nodes::StableBTreeMapNode;
+use crate::StableBTreeMapNode;
 
 pub mod bounded_storable_impl;
 pub mod ref_cell_ident;
