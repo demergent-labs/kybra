@@ -6,6 +6,32 @@ use std::fmt;
 
 use crate::source_map::GetSourceInfo;
 
+pub type KybraError = Vec<Message>;
+pub type KybraResult<T> = Result<T, KybraError>;
+
+pub fn collect_kybra_results<T>(results: Vec<KybraResult<T>>) -> KybraResult<Vec<T>>
+where
+    T: Clone,
+{
+    let mut oks: Vec<T> = vec![];
+    let mut error_messages = vec![];
+
+    results.iter().for_each(|small_result| match small_result {
+        Ok(ok) => oks.push(ok.clone()),
+        Err(error) => error_messages.extend(error.clone()),
+    });
+
+    if error_messages.is_empty() {
+        Ok(oks)
+    } else {
+        Err(error_messages)
+    }
+}
+
+pub fn unreachable() -> KybraError {
+    panic!("Oops! Looks like we introduced a bug while refactoring. Please open a ticket at https://github.com/demergent-labs/kybra/issues/new");
+}
+
 #[derive(Clone, Debug)]
 pub struct Suggestion {
     pub title: String,

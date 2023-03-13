@@ -6,7 +6,8 @@
             "candid": "src/canister1/canister1.did",
             "wasm": ".kybra/canister1/canister1.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/canister1"
+                "output": "test/dfx_generated/canister1",
+                "node_compatibility": true
             }
         },
         "canister2": {
@@ -15,7 +16,8 @@
             "candid": "src/canister2/canister2.did",
             "wasm": ".kybra/canister2/canister2.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/canister2"
+                "output": "test/dfx_generated/canister2",
+                "node_compatibility": true
             }
         }
     }

@@ -1,4 +1,4 @@
-from kybra import nat, Record, query, update
+from kybra import nat, Record, query, update, void
 
 
 class ToDo(Record):
@@ -26,8 +26,8 @@ def add_todo(description: str) -> nat:
 
 
 @update
-def complete_todo(id: nat):
-    todo = todos[id]
+def complete_todo(id: nat) -> void:
+    todo = todos.get(id)
 
     if todo is not None:
         todos[id] = {'description': todo['description'], 'completed': True}
@@ -48,7 +48,7 @@ def incomplete(todo: ToDo) -> bool:
 
 
 @update
-def clear_completed():
+def clear_completed() -> void:
     global todos
     todos = {key: todo for key,
              todo in todos.items() if not todo['completed']}

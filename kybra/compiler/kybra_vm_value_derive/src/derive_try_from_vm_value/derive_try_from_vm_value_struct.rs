@@ -1,12 +1,13 @@
-use cdk_framework::nodes::data_type_nodes::ToIdent;
+use cdk_framework::traits::ToIdent;
 use proc_macro2::Ident;
+use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::{DataStruct, Fields, Index};
 
 pub fn derive_try_from_vm_value_struct(
     struct_name: &Ident,
     data_struct: &DataStruct,
-) -> proc_macro2::TokenStream {
+) -> TokenStream {
     let field_variable_definitions = generate_field_variable_definitions(data_struct);
     let field_variable_names = generate_field_initializers(data_struct);
 
@@ -29,7 +30,7 @@ pub fn derive_try_from_vm_value_struct(
     }
 }
 
-fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<proc_macro2::TokenStream> {
+fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStream> {
     match &data_struct.fields {
         Fields::Named(fields_named) => fields_named
             .named
@@ -38,7 +39,7 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<proc_mac
                 let field_name = &field.ident;
 
                 let restored_field_name = match field_name {
-                    Some(field_name) => Some(cdk_framework::keyword::restore_for_vm(&field_name.to_string(), &crate::get_python_keywords()).to_identifier()),
+                    Some(field_name) => Some(cdk_framework::keyword::restore_for_vm(&field_name.to_string(), &crate::get_python_keywords()).to_ident()),
                     None => field_name.clone(),
                 };
 
@@ -66,7 +67,7 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<proc_mac
     }
 }
 
-fn generate_field_initializers(data_struct: &DataStruct) -> Vec<proc_macro2::TokenStream> {
+fn generate_field_initializers(data_struct: &DataStruct) -> Vec<TokenStream> {
     match &data_struct.fields {
         Fields::Named(fields_named) => fields_named
             .named

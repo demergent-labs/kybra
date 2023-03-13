@@ -9,6 +9,7 @@ from kybra import (
     Record,
     TimerId,
     update,
+    void,
 )
 from kybra.canisters.management import management_canister
 
@@ -42,7 +43,7 @@ status: StatusReport = {
 
 
 @update
-def clear_timer(timer_id: TimerId):
+def clear_timer(timer_id: TimerId) -> void:
     ic.clear_timer(timer_id)
     ic.print(f"timer {timer_id} cancelled")
 
@@ -71,7 +72,8 @@ def set_timers(delay: Duration, interval: Duration) -> TimerIds:
 
     repeat_id = ic.set_timer_interval(interval, repeat_timer_callback)
 
-    single_cross_canister_id = ic.set_timer(delay, single_cross_canister_timer_callback)
+    single_cross_canister_id = ic.set_timer(
+        delay, single_cross_canister_timer_callback)
 
     repeat_cross_canister_id = ic.set_timer_interval(
         interval, repeat_cross_canister_timer_callback
