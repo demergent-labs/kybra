@@ -145,16 +145,16 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/call_raw">call_raw</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/candid_encoding">candid_encoding</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/call_raw">call_raw</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/candid_encoding">candid_encoding</a></li>
 </ul>
-<pre><code class="language-typescript">import { blob, ic, $query } from 'azle';
+<pre><code class="language-python">from kybra import blob, ic, query
 
-// decodes Candid bytes to a Candid string
-$query;
-export function candid_decode(candid_encoded: blob): string {
-    return ic.candid_decode(candid_encoded);
-}
+
+# decodes Candid bytes to a Candid string
+@query
+def candid_decode(candid_encoded: blob) -&gt; str:
+    return ic.candid_decode(candid_encoded)
 </code></pre>
 
                     </main>

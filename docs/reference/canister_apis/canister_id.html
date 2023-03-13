@@ -145,19 +145,19 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/ic_api">ic_api</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/motoko_examples/whoami">whoami</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ic_api">ic_api</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/whoami">whoami</a></li>
 </ul>
-<pre><code class="language-typescript">import { ic, Principal, $query } from 'azle';
+<pre><code class="language-python">from kybra import ic, Principal, query
 
-// returns this canister's id
-$query;
-export function id(): Principal {
-    return ic.id();
-}
+
+# returns this canister's id
+@query
+def id() -&gt; Principal:
+    return ic.id()
 </code></pre>
 
                     </main>

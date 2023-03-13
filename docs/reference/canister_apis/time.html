@@ -145,16 +145,16 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/audio_recorder">audio_recorder</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/ic_api">ic_api</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/audio_recorder">audio_recorder</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ic_api">ic_api</a></li>
 </ul>
-<pre><code class="language-typescript">import { ic, nat64, $query } from 'azle';
+<pre><code class="language-python">from kybra import ic, nat64, query
 
-// returns the current timestamp
-$query;
-export function time(): nat64 {
-    return ic.time();
-}
+
+# returns the current timestamp
+@query
+def time() -&gt; nat64:
+    return ic.time()
 </code></pre>
 
                     </main>

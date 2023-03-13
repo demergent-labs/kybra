@@ -145,22 +145,21 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/cross_canister_calls">cross_canister_calls</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/ic_api">ic_api</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/motoko_examples/threshold_ecdsa">threshold_ecdsa</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cross_canister_calls">cross_canister_calls</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ic_api">ic_api</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-typescript">import { ic, $query } from 'azle';
+<pre><code class="language-python">from kybra import ic, query
 
-// traps with a message, stopping execution and discarding all state within the call
-$query;
-export function trap(message: string): boolean {
-    ic.trap(message);
 
-    return true;
-}
+# traps with a message, stopping execution and discarding all state within the call
+@query
+def trap(message: str) -&gt; bool:
+    ic.trap(message)
+
+    return True
 </code></pre>
 
                     </main>

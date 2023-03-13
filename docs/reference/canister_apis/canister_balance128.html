@@ -145,16 +145,16 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/cycles">cycles</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/ic_api">ic_api</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ic_api">ic_api</a></li>
 </ul>
-<pre><code class="language-typescript">import { ic, nat, $query } from 'azle';
+<pre><code class="language-python">from kybra import ic, nat, query
 
-// returns the amount of cycles available in the canister
-$query;
-export function canister_balance128(): nat {
-    return ic.canister_balance128();
-}
+
+# returns the amount of cycles available in the canister
+@query
+def canister_balance128() -&gt; nat:
+    return ic.canister_balance128()
 </code></pre>
 
                     </main>
