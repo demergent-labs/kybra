@@ -142,6 +142,28 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="reject-code"><a class="header" href="#reject-code">reject code</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/rejections">rejections</a></li>
+</ul>
+<pre><code class="language-python">from kybra import Async, Canister, ic, method, Principal, RejectionCode, update, void
+
+
+class Nonexistent(Canister):
+    @method
+    def method(self) -&gt; void:
+        ...
+
+
+nonexistent_canister = Nonexistent(Principal.from_str(&quot;rkp4c-7iaaa-aaaaa-aaaca-cai&quot;))
+
+
+@update
+def get_rejection_code_destination_invalid() -&gt; Async[RejectionCode]:
+    yield nonexistent_canister.method()
+    return ic.reject_code()
+</code></pre>
 
                     </main>
 

@@ -142,6 +142,18 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="msg-cycles-available"><a class="header" href="#msg-cycles-available">msg cycles available</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
+</ul>
+<pre><code class="language-python">from kybra import ic, nat64, update
+
+
+@update
+def receive_cycles() -&gt; nat64:
+    return ic.msg_cycles_accept(ic.msg_cycles_available() // 2)
+</code></pre>
 
                     </main>
 

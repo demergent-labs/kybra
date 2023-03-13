@@ -142,6 +142,19 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="reply"><a class="header" href="#reply">reply</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/composite_queries">composite_queries</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/manual_reply">manual_reply</a></li>
+</ul>
+<pre><code class="language-python">from kybra import blob, ic, manual, update
+
+
+@update
+def update_blob() -&gt; manual[blob]:
+    ic.reply(bytes([83, 117, 114, 112, 114, 105, 115, 101, 33]))
+</code></pre>
 
                     </main>
 

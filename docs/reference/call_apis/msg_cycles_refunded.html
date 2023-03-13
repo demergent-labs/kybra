@@ -142,6 +142,37 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="msg-cycles-refunded"><a class="header" href="#msg-cycles-refunded">msg cycles refunded</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
+</ul>
+<pre><code class="language-python">from kybra import (
+    Async,
+    CanisterResult,
+    ic,
+    nat64,
+    update,
+    Variant,
+)
+from src.cycles.types import cycles
+
+
+class SendCyclesResult(Variant, total=False):
+    ok: nat64
+    err: str
+
+
+# Reports the number of cycles returned from the Cycles canister
+@update
+def send_cycles() -&gt; Async[SendCyclesResult]:
+    result: CanisterResult[nat64] = yield cycles.receive_cycles().with_cycles(1_000_000)
+
+    if result.err is not None:
+        return {&quot;err&quot;: result.err}
+
+    return {&quot;ok&quot;: ic.msg_cycles_refunded()}
+</code></pre>
 
                     </main>
 
