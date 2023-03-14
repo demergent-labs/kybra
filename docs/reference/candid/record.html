@@ -147,17 +147,20 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import Record
 
+
 class Post(Record):
     id: str
-    author: 'User'
+    author: &quot;User&quot;
     text: str
-    thread: 'Thread'
+    thread: &quot;Thread&quot;
+
 
 class Thread(Record):
     id: str
-    author: 'User'
+    author: &quot;User&quot;
     posts: list[Post]
     title: str
+
 
 class User(Record):
     id: str

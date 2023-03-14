@@ -1073,11 +1073,13 @@ def print_nat8(nat8: nat8) -&gt; nat8:
 <h4 id="int"><a class="header" href="#int">int</a></h4>
 <p>The Kybra type <code>int</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-int">Candid type int</a> and will become a <a href="https://docs.python.org/3/library/functions.html#int">Python int</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import ic, int, query
+<pre><code class="language-python">from kybra import ic, query
+
 
 @query
 def get_int() -&gt; int:
     return 170_141_183_460_469_231_731_687_303_715_884_105_727
+
 
 @query
 def print_int(int: int) -&gt; int:
@@ -1093,11 +1095,13 @@ def print_int(int: int) -&gt; int:
 <h4 id="int64"><a class="header" href="#int64">int64</a></h4>
 <p>The Kybra type <code>int64</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn">Candid type int64</a> and will become a <a href="https://docs.python.org/3/library/functions.html#int">Python int</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import ic, inat64, query
+<pre><code class="language-python">from kybra import ic, int64, query
+
 
 @query
 def get_int64() -&gt; int64:
     return 9_223_372_036_854_775_807
+
 
 @query
 def print_int64(int64: int64) -&gt; int64:
@@ -1173,9 +1177,10 @@ def print_int8(int8: int8) -&gt; int8:
 <h4 id="float64"><a class="header" href="#float64">float64</a></h4>
 <p>The Kybra type <code>float64</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-float32-and-float64">Candid type float64</a> and will become a <a href="https://docs.python.org/3/library/functions.html#float">Python float</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import float64, ic, query
+<pre><code class="language-python">import math
 
-import math
+from kybra import float64, ic, query
+
 
 @query
 def get_float64() -&gt; float64:
@@ -1195,11 +1200,17 @@ def print_float64(float64: float64) -&gt; float64:
 <h4 id="float32"><a class="header" href="#float32">float32</a></h4>
 <p>The Kybra type <code>float32</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-float32-and-float64">Candid type float32</a> and will become a <a href="https://docs.python.org/3/library/functions.html#float">Python float</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import float32, ic, query
+<pre><code class="language-python">import math
 
+from kybra import float32, ic, query
+
+
+@query
 def get_float32() -&gt; float32:
     return math.pi
 
+
+@query
 def print_float32(float32: float32) -&gt; float32:
     ic.print(type(float32))
     return float32
@@ -1288,17 +1299,20 @@ def get_opt_none() -&gt; opt[bool]:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import Record
 
+
 class Post(Record):
     id: str
-    author: 'User'
+    author: &quot;User&quot;
     text: str
-    thread: 'Thread'
+    thread: &quot;Thread&quot;
+
 
 class Thread(Record):
     id: str
-    author: 'User'
+    author: &quot;User&quot;
     posts: list[Post]
     title: str
+
 
 class User(Record):
     id: str
@@ -1333,16 +1347,19 @@ type User = record {
 <p>Python:</p>
 <pre><code class="language-python">from kybra import nat32, Variant
 
+
 class ReactionType(Variant, total=False):
     Fire: None
     ThumbsUp: None
     ThumbsDown: None
-    Emotion: 'Emotion'
-    Firework: 'Firework'
+    Emotion: &quot;Emotion&quot;
+    Firework: &quot;Firework&quot;
+
 
 class Emotion(Variant, total=False):
     Happy: None
     Sad: None
+
 
 class Firework(Variant, total=False):
     Color: str
@@ -1372,29 +1389,35 @@ type Firework = record {
 <p>The Kybra type <code>Func</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-func---">Candid type func</a> and at runtime will become a Python tuple with two elements, the first being an <a href="https://github.com/rocklabs-io/ic-py">ic-py Principal</a> and the second being a <a href="https://docs.python.org/3/library/stdtypes.html#textseq">Python str</a>. The <code>ic-py Principal</code> represents the <code>principal</code> of the canister/service where the function exists, and the <code>str</code> represents the function's name.</p>
 <p>Note that an explicit <code>TypeAlias</code> must be used when defining a <code>func</code>.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import Func, nat64, Principal, query, Query, Record, update, Update, Variant
+<pre><code class="language-python">from kybra import Func, nat64, null, Principal, query, Query, Record, Update, Variant
+from typing import TypeAlias
+
 
 class User(Record):
     id: str
-    basic_func: 'BasicFunc'
-    complex_func: 'ComplexFunc'
+    basic_func: &quot;BasicFunc&quot;
+    complex_func: &quot;ComplexFunc&quot;
+
 
 class Reaction(Variant, total=False):
-    Good: None
-    Bad: None
-    BasicFunc: 'BasicFunc'
-    ComplexFunc: 'ComplexFunc'
+    Good: null
+    Bad: null
+    BasicFunc: &quot;BasicFunc&quot;
+    ComplexFunc: &quot;ComplexFunc&quot;
 
-BasicFunc: TypeAlias = Func(Query[[str], str]) # type: ignore
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64]) # type: ignore
 
-@query
-def get_basic_func() -&gt; BasicFunc:
-    return (Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'), 'simple_function_name')
+BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
+ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+
 
 @query
-def get_complex_func() -&gt; ComplexFunc:
-    return (Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'), 'complex_function_name')
+def get_basic_func() -&gt; BasicFunc:  # type: ignore
+    return (Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;), &quot;simple_function_name&quot;)
+
+
+@query
+def get_complex_func() -&gt; ComplexFunc:  # type: ignore
+    return (Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;), &quot;complex_function_name&quot;)
 </code></pre>
 <p>Candid:</p>
 <pre><code class="language-python">type User = record {
@@ -3124,11 +3147,17 @@ def print_empty(empty: empty) -&gt; empty:
 <p>This section is a work in progress.</p>
 <p>The Kybra type <code>float32</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-float32-and-float64">Candid type float32</a> and will become a <a href="https://docs.python.org/3/library/functions.html#float">Python float</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import float32, ic, query
+<pre><code class="language-python">import math
 
+from kybra import float32, ic, query
+
+
+@query
 def get_float32() -&gt; float32:
     return math.pi
 
+
+@query
 def print_float32(float32: float32) -&gt; float32:
     ic.print(type(float32))
     return float32
@@ -3143,9 +3172,10 @@ def print_float32(float32: float32) -&gt; float32:
 <p>This section is a work in progress.</p>
 <p>The Kybra type <code>float64</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-float32-and-float64">Candid type float64</a> and will become a <a href="https://docs.python.org/3/library/functions.html#float">Python float</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import float64, ic, query
+<pre><code class="language-python">import math
 
-import math
+from kybra import float64, ic, query
+
 
 @query
 def get_float64() -&gt; float64:
@@ -3168,29 +3198,35 @@ def print_float64(float64: float64) -&gt; float64:
 <p>The Kybra type <code>Func</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-func---">Candid type func</a> and at runtime will become a Python tuple with two elements, the first being an <a href="https://github.com/rocklabs-io/ic-py">ic-py Principal</a> and the second being a <a href="https://docs.python.org/3/library/stdtypes.html#textseq">Python str</a>. The <code>ic-py Principal</code> represents the <code>principal</code> of the canister/service where the function exists, and the <code>str</code> represents the function's name.</p>
 <p>Note that an explicit <code>TypeAlias</code> must be used when defining a <code>func</code>.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import Func, nat64, Principal, query, Query, Record, update, Update, Variant
+<pre><code class="language-python">from kybra import Func, nat64, null, Principal, query, Query, Record, Update, Variant
+from typing import TypeAlias
+
 
 class User(Record):
     id: str
-    basic_func: 'BasicFunc'
-    complex_func: 'ComplexFunc'
+    basic_func: &quot;BasicFunc&quot;
+    complex_func: &quot;ComplexFunc&quot;
+
 
 class Reaction(Variant, total=False):
-    Good: None
-    Bad: None
-    BasicFunc: 'BasicFunc'
-    ComplexFunc: 'ComplexFunc'
+    Good: null
+    Bad: null
+    BasicFunc: &quot;BasicFunc&quot;
+    ComplexFunc: &quot;ComplexFunc&quot;
 
-BasicFunc: TypeAlias = Func(Query[[str], str]) # type: ignore
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64]) # type: ignore
 
-@query
-def get_basic_func() -&gt; BasicFunc:
-    return (Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'), 'simple_function_name')
+BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
+ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+
 
 @query
-def get_complex_func() -&gt; ComplexFunc:
-    return (Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'), 'complex_function_name')
+def get_basic_func() -&gt; BasicFunc:  # type: ignore
+    return (Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;), &quot;simple_function_name&quot;)
+
+
+@query
+def get_complex_func() -&gt; ComplexFunc:  # type: ignore
+    return (Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;), &quot;complex_function_name&quot;)
 </code></pre>
 <p>Candid:</p>
 <pre><code class="language-python">type User = record {
@@ -3213,11 +3249,13 @@ service: () -&gt; {
 <p>This section is a work in progress.</p>
 <p>The Kybra type <code>int</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-int">Candid type int</a> and will become a <a href="https://docs.python.org/3/library/functions.html#int">Python int</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import ic, int, query
+<pre><code class="language-python">from kybra import ic, query
+
 
 @query
 def get_int() -&gt; int:
     return 170_141_183_460_469_231_731_687_303_715_884_105_727
+
 
 @query
 def print_int(int: int) -&gt; int:
@@ -3297,11 +3335,13 @@ def print_int32(int32: int32) -&gt; int32:
 <p>This section is a work in progress.</p>
 <p>The Kybra type <code>int64</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn">Candid type int64</a> and will become a <a href="https://docs.python.org/3/library/functions.html#int">Python int</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import ic, inat64, query
+<pre><code class="language-python">from kybra import ic, int64, query
+
 
 @query
 def get_int64() -&gt; int64:
     return 9_223_372_036_854_775_807
+
 
 @query
 def print_int64(int64: int64) -&gt; int64:
@@ -3487,17 +3527,20 @@ def print_principal(principal: Principal) -&gt; Principal:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import Record
 
+
 class Post(Record):
     id: str
-    author: 'User'
+    author: &quot;User&quot;
     text: str
-    thread: 'Thread'
+    thread: &quot;Thread&quot;
+
 
 class Thread(Record):
     id: str
-    author: 'User'
+    author: &quot;User&quot;
     posts: list[Post]
     title: str
+
 
 class User(Record):
     id: str
@@ -3578,16 +3621,19 @@ def print_string(string: str) -&gt; str:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import nat32, Variant
 
+
 class ReactionType(Variant, total=False):
     Fire: None
     ThumbsUp: None
     ThumbsDown: None
-    Emotion: 'Emotion'
-    Firework: 'Firework'
+    Emotion: &quot;Emotion&quot;
+    Firework: &quot;Firework&quot;
+
 
 class Emotion(Variant, total=False):
     Happy: None
     Sad: None
+
 
 class Firework(Variant, total=False):
     Color: str

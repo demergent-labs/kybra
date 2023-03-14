@@ -7,11 +7,13 @@ The Kybra type `int` corresponds to the [Candid type int](https://internetcomput
 Python:
 
 ```python
-from kybra import ic, int, query
+from kybra import ic, query
+
 
 @query
 def get_int() -> int:
     return 170_141_183_460_469_231_731_687_303_715_884_105_727
+
 
 @query
 def print_int(int: int) -> int:

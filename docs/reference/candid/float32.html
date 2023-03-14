@@ -145,11 +145,17 @@
 <p>This section is a work in progress.</p>
 <p>The Kybra type <code>float32</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-float32-and-float64">Candid type float32</a> and will become a <a href="https://docs.python.org/3/library/functions.html#float">Python float</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import float32, ic, query
+<pre><code class="language-python">import math
 
+from kybra import float32, ic, query
+
+
+@query
 def get_float32() -&gt; float32:
     return math.pi
 
+
+@query
 def print_float32(float32: float32) -&gt; float32:
     ic.print(type(float32))
     return float32

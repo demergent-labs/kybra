@@ -7,11 +7,13 @@ The Kybra type `int64` corresponds to the [Candid type int64](https://internetco
 Python:
 
 ```python
-from kybra import ic, inat64, query
+from kybra import ic, int64, query
+
 
 @query
 def get_int64() -> int64:
     return 9_223_372_036_854_775_807
+
 
 @query
 def print_int64(int64: int64) -> int64:

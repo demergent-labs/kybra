@@ -11,29 +11,35 @@ Note that an explicit `TypeAlias` must be used when defining a `func`.
 Python:
 
 ```python
-from kybra import Func, nat64, Principal, query, Query, Record, update, Update, Variant
+from kybra import Func, nat64, null, Principal, query, Query, Record, Update, Variant
+from typing import TypeAlias
+
 
 class User(Record):
     id: str
-    basic_func: 'BasicFunc'
-    complex_func: 'ComplexFunc'
+    basic_func: "BasicFunc"
+    complex_func: "ComplexFunc"
+
 
 class Reaction(Variant, total=False):
-    Good: None
-    Bad: None
-    BasicFunc: 'BasicFunc'
-    ComplexFunc: 'ComplexFunc'
+    Good: null
+    Bad: null
+    BasicFunc: "BasicFunc"
+    ComplexFunc: "ComplexFunc"
 
-BasicFunc: TypeAlias = Func(Query[[str], str]) # type: ignore
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64]) # type: ignore
 
-@query
-def get_basic_func() -> BasicFunc:
-    return (Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'), 'simple_function_name')
+BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
+ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+
 
 @query
-def get_complex_func() -> ComplexFunc:
-    return (Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'), 'complex_function_name')
+def get_basic_func() -> BasicFunc:  # type: ignore
+    return (Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"), "simple_function_name")
+
+
+@query
+def get_complex_func() -> ComplexFunc:  # type: ignore
+    return (Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"), "complex_function_name")
 ```
 
 Candid:

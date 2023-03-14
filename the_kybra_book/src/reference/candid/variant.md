@@ -9,16 +9,19 @@ Python:
 ```python
 from kybra import nat32, Variant
 
+
 class ReactionType(Variant, total=False):
     Fire: None
     ThumbsUp: None
     ThumbsDown: None
-    Emotion: 'Emotion'
-    Firework: 'Firework'
+    Emotion: "Emotion"
+    Firework: "Firework"
+
 
 class Emotion(Variant, total=False):
     Happy: None
     Sad: None
+
 
 class Firework(Variant, total=False):
     Color: str

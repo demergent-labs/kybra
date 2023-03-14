@@ -9,17 +9,20 @@ Python:
 ```python
 from kybra import Record
 
+
 class Post(Record):
     id: str
-    author: 'User'
+    author: "User"
     text: str
-    thread: 'Thread'
+    thread: "Thread"
+
 
 class Thread(Record):
     id: str
-    author: 'User'
+    author: "User"
     posts: list[Post]
     title: str
+
 
 class User(Record):
     id: str

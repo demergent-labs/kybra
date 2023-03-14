@@ -368,11 +368,13 @@ The Kybra type `int` corresponds to the [Candid type int](https://internetcomput
 Python:
 
 ```python
-from kybra import ic, int, query
+from kybra import ic, query
+
 
 @query
 def get_int() -> int:
     return 170_141_183_460_469_231_731_687_303_715_884_105_727
+
 
 @query
 def print_int(int: int) -> int:
@@ -396,11 +398,13 @@ The Kybra type `int64` corresponds to the [Candid type int64](https://internetco
 Python:
 
 ```python
-from kybra import ic, inat64, query
+from kybra import ic, int64, query
+
 
 @query
 def get_int64() -> int64:
     return 9_223_372_036_854_775_807
+
 
 @query
 def print_int64(int64: int64) -> int64:
@@ -508,9 +512,10 @@ The Kybra type `float64` corresponds to the [Candid type float64](https://intern
 Python:
 
 ```python
+import math
+
 from kybra import float64, ic, query
 
-import math
 
 @query
 def get_float64() -> float64:
@@ -538,11 +543,17 @@ The Kybra type `float32` corresponds to the [Candid type float32](https://intern
 Python:
 
 ```python
+import math
+
 from kybra import float32, ic, query
 
+
+@query
 def get_float32() -> float32:
     return math.pi
 
+
+@query
 def print_float32(float32: float32) -> float32:
     ic.print(type(float32))
     return float32
@@ -671,17 +682,20 @@ Python:
 ```python
 from kybra import Record
 
+
 class Post(Record):
     id: str
-    author: 'User'
+    author: "User"
     text: str
-    thread: 'Thread'
+    thread: "Thread"
+
 
 class Thread(Record):
     id: str
-    author: 'User'
+    author: "User"
     posts: list[Post]
     title: str
+
 
 class User(Record):
     id: str
@@ -724,16 +738,19 @@ Python:
 ```python
 from kybra import nat32, Variant
 
+
 class ReactionType(Variant, total=False):
     Fire: None
     ThumbsUp: None
     ThumbsDown: None
-    Emotion: 'Emotion'
-    Firework: 'Firework'
+    Emotion: "Emotion"
+    Firework: "Firework"
+
 
 class Emotion(Variant, total=False):
     Happy: None
     Sad: None
+
 
 class Firework(Variant, total=False):
     Color: str
@@ -773,29 +790,35 @@ Note that an explicit `TypeAlias` must be used when defining a `func`.
 Python:
 
 ```python
-from kybra import Func, nat64, Principal, query, Query, Record, update, Update, Variant
+from kybra import Func, nat64, null, Principal, query, Query, Record, Update, Variant
+from typing import TypeAlias
+
 
 class User(Record):
     id: str
-    basic_func: 'BasicFunc'
-    complex_func: 'ComplexFunc'
+    basic_func: "BasicFunc"
+    complex_func: "ComplexFunc"
+
 
 class Reaction(Variant, total=False):
-    Good: None
-    Bad: None
-    BasicFunc: 'BasicFunc'
-    ComplexFunc: 'ComplexFunc'
+    Good: null
+    Bad: null
+    BasicFunc: "BasicFunc"
+    ComplexFunc: "ComplexFunc"
 
-BasicFunc: TypeAlias = Func(Query[[str], str]) # type: ignore
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64]) # type: ignore
 
-@query
-def get_basic_func() -> BasicFunc:
-    return (Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'), 'simple_function_name')
+BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
+ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+
 
 @query
-def get_complex_func() -> ComplexFunc:
-    return (Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'), 'complex_function_name')
+def get_basic_func() -> BasicFunc:  # type: ignore
+    return (Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"), "simple_function_name")
+
+
+@query
+def get_complex_func() -> ComplexFunc:  # type: ignore
+    return (Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"), "complex_function_name")
 ```
 
 Candid:

@@ -7,9 +7,10 @@ The Kybra type `float64` corresponds to the [Candid type float64](https://intern
 Python:
 
 ```python
+import math
+
 from kybra import float64, ic, query
 
-import math
 
 @query
 def get_float64() -> float64:

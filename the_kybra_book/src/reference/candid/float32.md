@@ -7,11 +7,17 @@ The Kybra type `float32` corresponds to the [Candid type float32](https://intern
 Python:
 
 ```python
+import math
+
 from kybra import float32, ic, query
 
+
+@query
 def get_float32() -> float32:
     return math.pi
 
+
+@query
 def print_float32(float32: float32) -> float32:
     ic.print(type(float32))
     return float32

@@ -145,9 +145,10 @@
 <p>This section is a work in progress.</p>
 <p>The Kybra type <code>float64</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-float32-and-float64">Candid type float64</a> and will become a <a href="https://docs.python.org/3/library/functions.html#float">Python float</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import float64, ic, query
+<pre><code class="language-python">import math
 
-import math
+from kybra import float64, ic, query
+
 
 @query
 def get_float64() -&gt; float64:

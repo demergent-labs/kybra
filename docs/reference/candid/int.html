@@ -145,11 +145,13 @@
 <p>This section is a work in progress.</p>
 <p>The Kybra type <code>int</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-int">Candid type int</a> and will become a <a href="https://docs.python.org/3/library/functions.html#int">Python int</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import ic, int, query
+<pre><code class="language-python">from kybra import ic, query
+
 
 @query
 def get_int() -&gt; int:
     return 170_141_183_460_469_231_731_687_303_715_884_105_727
+
 
 @query
 def print_int(int: int) -&gt; int:
