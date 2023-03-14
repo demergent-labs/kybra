@@ -140,38 +140,28 @@ impl SourceMapped<&Located<StmtKind>> {
             return Ok(None);
         }
         match &self.node {
-            StmtKind::AnnAssign { target, value, .. } => match &value {
-                Some(value) => {
-                    let name = match &target.node {
-                        ExprKind::Name { id, .. } => Some(id.clone()),
-                        _ => None,
-                    };
-                    Ok(Some(
-                        SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
-                    ))
+            StmtKind::Assign { targets, value, .. } => {
+                if targets.len() != 1 {
+                    return Err(self.multiple_func_targets_error());
                 }
-                None => return Err(crate::errors::unreachable()),
-            },
+
+                let name = match &targets[0].node {
+                    ExprKind::Name { id, .. } => Some(id.clone()),
+                    _ => None,
+                };
+
+                Ok(Some(
+                    SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
+                ))
+            }
             _ => Err(crate::errors::unreachable()),
         }
     }
 
     pub fn is_func(&self) -> bool {
         match &self.node {
-            StmtKind::AnnAssign {
-                annotation, value, ..
-            } => {
-                let is_type_alias = match &annotation.node {
-                    ExprKind::Name { id, .. } => id == "TypeAlias",
-                    _ => false,
-                };
-                let is_func = match &value {
-                    Some(value) => {
-                        SourceMapped::new(value.as_ref(), self.source_map.clone()).is_func()
-                    }
-                    None => false,
-                };
-                is_type_alias && is_func
+            StmtKind::Assign { value, .. } => {
+                SourceMapped::new(value.as_ref(), self.source_map.clone()).is_func()
             }
             _ => false,
         }

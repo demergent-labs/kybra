@@ -8,7 +8,6 @@ Examples:
 
 ```python
 from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
-from typing import TypeAlias
 
 
 class HttpRequest(Record):
@@ -38,7 +37,7 @@ class CallbackStrategy(Record):
     token: "Token"
 
 
-Callback: TypeAlias = Func(Query[["Token"], "StreamingCallbackHttpResponse"])  # type: ignore
+Callback = Func(Query[["Token"], "StreamingCallbackHttpResponse"])
 
 
 class StreamingCallbackHttpResponse(Record):

@@ -10,47 +10,55 @@ Examples:
 
 ```python
 from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
-from typing import TypeAlias
+
 
 class HttpRequest(Record):
     method: str
     url: str
-    headers: list['Header']
+    headers: list["Header"]
     body: blob
+
 
 class HttpResponse(Record):
     status_code: nat16
-    headers: list['Header']
+    headers: list["Header"]
     body: blob
-    streaming_strategy: opt['StreamingStrategy']
+    streaming_strategy: opt["StreamingStrategy"]
     upgrade: opt[bool]
+
 
 Header = tuple[str, str]
 
+
 class StreamingStrategy(Variant):
-    Callback: 'CallbackStrategy'
+    Callback: "CallbackStrategy"
+
 
 class CallbackStrategy(Record):
-    callback: 'Callback'
-    token: 'Token'
+    callback: "Callback"
+    token: "Token"
 
-Callback: TypeAlias = Func(Query[['Token'], 'StreamingCallbackHttpResponse']) # type: ignore
+
+Callback = Func(Query[["Token"], "StreamingCallbackHttpResponse"])
+
 
 class StreamingCallbackHttpResponse(Record):
     body: blob
-    token: opt['Token']
+    token: opt["Token"]
+
 
 class Token(Record):
     arbitrary_data: str
 
+
 @query
 def http_request(req: HttpRequest) -> HttpResponse:
     return {
-        'status_code': 200,
-        'headers': [],
-        'body': bytes(),
-        'streaming_strategy': None,
-        'upgrade': False
+        "status_code": 200,
+        "headers": [],
+        "body": bytes(),
+        "streaming_strategy": None,
+        "upgrade": False,
     }
 ```
 

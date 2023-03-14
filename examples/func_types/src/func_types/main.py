@@ -1,4 +1,3 @@
-from typing import TypeAlias
 from kybra import (
     Async,
     Func,
@@ -15,7 +14,7 @@ from kybra import (
     Update,
     update,
     Variant,
-    void
+    void,
 )
 
 from src.notifiers.types import Notifier, NotifierFunc
@@ -39,26 +38,29 @@ class GetNotifierFromNotifiersCanisterResult(Variant, total=False):
     err: str
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
-StableFunc: TypeAlias = Func(Query[[nat64, str], void])  # type: ignore
-NullFunc: TypeAlias = Func(
-    Query[[opt[null], list[null], null, list[list[null]], list[opt[null]]], null])  # type: ignore
+BasicFunc = Func(Query[[str], str])
+ComplexFunc = Func(Update[[User, Reaction], nat64])
+StableFunc = Func(Query[[nat64, str], void])
+NullFunc = Func(
+    Query[[opt[null], list[null], null, list[list[null]], list[opt[null]]], null]
+)
 
 
 stable_storage = StableBTreeMap[str, StableFunc](
-    memory_id=0, max_key_size=25, max_value_size=1_000)
+    memory_id=0, max_key_size=25, max_value_size=1_000
+)
 
 
 @init
 def init_():
     stable_storage.insert(
-        'stable_func', (Principal.from_str('aaaaa-aa'), 'start_canister'))
+        "stable_func", (Principal.from_str("aaaaa-aa"), "start_canister")
+    )
 
 
 @query
 def get_stable_func() -> StableFunc:
-    result = stable_storage.get('stable_func')
+    result = stable_storage.get("stable_func")
     if result:
         return result
     return (Principal.from_str("aaaaa-aa"), "raw_rand")
@@ -107,8 +109,7 @@ def complex_func_return_type() -> ComplexFunc:
 def get_notifier_from_notifiers_canister() -> Async[
     GetNotifierFromNotifiersCanisterResult
 ]:
-    notifiers_canister = Notifier(
-        Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
+    notifiers_canister = Notifier(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
 
     result: CanisterResult[NotifierFunc] = yield notifiers_canister.get_notifier()
 

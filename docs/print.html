@@ -837,7 +837,6 @@ def set_many(num_entries: nat64) -&gt; void:
     Query,
     Record
 )
-from typing import TypeAlias
 
 class Candid(Record):
     text: str
@@ -871,7 +870,7 @@ class CandidVariant(Variant, total=False):
     Tag2: null
     Tag3: int
 
-CandidFunc: TypeAlias = Func(Query[[], Candid]) # type: ignore
+CandidFunc = Func(Query[[], Candid])
 
 @query
 def candid_types() -&gt; Candid:
@@ -1392,12 +1391,9 @@ type Firework = record {
 };
 </code></pre>
 <h4 id="func"><a class="header" href="#func">func</a></h4>
-<p>WARNING: <code>Func</code> currently <a href="https://github.com/demergent-labs/kybra/issues/229">causes type errors in VS Code</a>. Get around this by ending your <code>Func</code> type declaration with the following comment: <code># type: ignore</code></p>
 <p>The Kybra type <code>Func</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-func---">Candid type func</a> and at runtime will become a Python tuple with two elements, the first being an <a href="https://github.com/rocklabs-io/ic-py">ic-py Principal</a> and the second being a <a href="https://docs.python.org/3/library/stdtypes.html#textseq">Python str</a>. The <code>ic-py Principal</code> represents the <code>principal</code> of the canister/service where the function exists, and the <code>str</code> represents the function's name.</p>
-<p>Note that an explicit <code>TypeAlias</code> must be used when defining a <code>func</code>.</p>
 <p>Python:</p>
 <pre><code class="language-python">from kybra import Func, nat64, null, Principal, query, Query, Record, Update, Variant
-from typing import TypeAlias
 
 
 class User(Record):
@@ -1413,17 +1409,17 @@ class Reaction(Variant, total=False):
     ComplexFunc: &quot;ComplexFunc&quot;
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+BasicFunc = Func(Query[[str], str])
+ComplexFunc = Func(Update[[User, Reaction], nat64])
 
 
 @query
-def get_basic_func() -&gt; BasicFunc:  # type: ignore
+def get_basic_func() -&gt; BasicFunc:
     return (Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;), &quot;simple_function_name&quot;)
 
 
 @query
-def get_complex_func() -&gt; ComplexFunc:  # type: ignore
+def get_complex_func() -&gt; ComplexFunc:
     return (Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;), &quot;complex_function_name&quot;)
 </code></pre>
 <p>Candid:</p>
@@ -2120,47 +2116,55 @@ def send_notification() -&gt; ReceiveNotificationResult:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
 <pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
-from typing import TypeAlias
+
 
 class HttpRequest(Record):
     method: str
     url: str
-    headers: list['Header']
+    headers: list[&quot;Header&quot;]
     body: blob
+
 
 class HttpResponse(Record):
     status_code: nat16
-    headers: list['Header']
+    headers: list[&quot;Header&quot;]
     body: blob
-    streaming_strategy: opt['StreamingStrategy']
+    streaming_strategy: opt[&quot;StreamingStrategy&quot;]
     upgrade: opt[bool]
+
 
 Header = tuple[str, str]
 
+
 class StreamingStrategy(Variant):
-    Callback: 'CallbackStrategy'
+    Callback: &quot;CallbackStrategy&quot;
+
 
 class CallbackStrategy(Record):
-    callback: 'Callback'
-    token: 'Token'
+    callback: &quot;Callback&quot;
+    token: &quot;Token&quot;
 
-Callback: TypeAlias = Func(Query[['Token'], 'StreamingCallbackHttpResponse']) # type: ignore
+
+Callback = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&quot;])
+
 
 class StreamingCallbackHttpResponse(Record):
     body: blob
-    token: opt['Token']
+    token: opt[&quot;Token&quot;]
+
 
 class Token(Record):
     arbitrary_data: str
 
+
 @query
 def http_request(req: HttpRequest) -&gt; HttpResponse:
     return {
-        'status_code': 200,
-        'headers': [],
-        'body': bytes(),
-        'streaming_strategy': None,
-        'upgrade': False
+        &quot;status_code&quot;: 200,
+        &quot;headers&quot;: [],
+        &quot;body&quot;: bytes(),
+        &quot;streaming_strategy&quot;: None,
+        &quot;upgrade&quot;: False,
     }
 </code></pre>
 <h2 id="outgoing-http-requests"><a class="header" href="#outgoing-http-requests">Outgoing HTTP requests</a></h2>
@@ -3237,7 +3241,6 @@ def print_float64(float64: float64) -&gt; float64:
 <p>Note that an explicit <code>TypeAlias</code> must be used when defining a <code>func</code>.</p>
 <p>Python:</p>
 <pre><code class="language-python">from kybra import Func, nat64, null, Principal, query, Query, Record, Update, Variant
-from typing import TypeAlias
 
 
 class User(Record):
@@ -3253,17 +3256,17 @@ class Reaction(Variant, total=False):
     ComplexFunc: &quot;ComplexFunc&quot;
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+BasicFunc = Func(Query[[str], str])
+ComplexFunc = Func(Update[[User, Reaction], nat64])
 
 
 @query
-def get_basic_func() -&gt; BasicFunc:  # type: ignore
+def get_basic_func() -&gt; BasicFunc:
     return (Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;), &quot;simple_function_name&quot;)
 
 
 @query
-def get_complex_func() -&gt; ComplexFunc:  # type: ignore
+def get_complex_func() -&gt; ComplexFunc:
     return (Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;), &quot;complex_function_name&quot;)
 </code></pre>
 <p>Candid:</p>
@@ -3281,7 +3284,6 @@ service: () -&gt; {
     &quot;get_basic_func&quot;: () -&gt; (BasicFunc) query;
     &quot;get_complex_func&quot;: () -&gt; (ComplexFunc) query;
 }
-
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="int-1"><a class="header" href="#int-1">int</a></h1>
 <p>This section is a work in progress.</p>
@@ -3917,7 +3919,6 @@ def heartbeat_() -&gt; void:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
 <pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
-from typing import TypeAlias
 
 
 class HttpRequest(Record):
@@ -3947,7 +3948,7 @@ class CallbackStrategy(Record):
     token: &quot;Token&quot;
 
 
-Callback: TypeAlias = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&quot;])  # type: ignore
+Callback = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&quot;])
 
 
 class StreamingCallbackHttpResponse(Record):
@@ -3976,7 +3977,6 @@ def http_request(req: HttpRequest) -&gt; HttpResponse:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
 <pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
-from typing import TypeAlias
 
 
 class HttpRequest(Record):
@@ -4006,7 +4006,7 @@ class CallbackStrategy(Record):
     token: &quot;Token&quot;
 
 
-Callback: TypeAlias = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&quot;])  # type: ignore
+Callback = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&quot;])
 
 
 class StreamingCallbackHttpResponse(Record):

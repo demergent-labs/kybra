@@ -10,7 +10,6 @@ from typing import (
     ParamSpec,
     TypedDict,
     TypeVar,
-    Type,
     TypeAlias,
 )
 
@@ -217,9 +216,11 @@ class Stable64GrowResult(Variant, total=False):
     err: StableMemoryError
 
 
-# TODO we might want to just make this a dict[int, str] to keep the derive simple, or maybe a class with a principal and method name field
-def Func(callable: Callable[..., Any]) -> Type[tuple[Principal, str]]:
-    return type((Principal.from_str("aaaaa-aa"), ""))
+FuncTuple = tuple[Principal, str]
+
+
+def Func(callable: Callable[..., Any]) -> type[FuncTuple]:
+    return FuncTuple
 
 
 def get_first_called_function_name() -> str:

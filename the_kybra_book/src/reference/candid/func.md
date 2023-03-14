@@ -12,7 +12,6 @@ Python:
 
 ```python
 from kybra import Func, nat64, null, Principal, query, Query, Record, Update, Variant
-from typing import TypeAlias
 
 
 class User(Record):
@@ -28,17 +27,17 @@ class Reaction(Variant, total=False):
     ComplexFunc: "ComplexFunc"
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+BasicFunc = Func(Query[[str], str])
+ComplexFunc = Func(Update[[User, Reaction], nat64])
 
 
 @query
-def get_basic_func() -> BasicFunc:  # type: ignore
+def get_basic_func() -> BasicFunc:
     return (Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"), "simple_function_name")
 
 
 @query
-def get_complex_func() -> ComplexFunc:  # type: ignore
+def get_complex_func() -> ComplexFunc:
     return (Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"), "complex_function_name")
 ```
 
@@ -59,5 +58,4 @@ service: () -> {
     "get_basic_func": () -> (BasicFunc) query;
     "get_complex_func": () -> (ComplexFunc) query;
 }
-
 ```

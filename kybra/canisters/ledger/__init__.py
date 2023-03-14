@@ -11,14 +11,15 @@ from kybra import (
     Principal,
     Query,
     Record,
-    Variant)
-from typing import TypeAlias
+    Variant,
+)
 
 # Amount of tokens, measured in 10^-8 of a token.
 
 
 class Tokens(Record):
     e8s: nat64
+
 
 # Number of nanoseconds from the UNIX epoch in UTC timezone.
 
@@ -105,6 +106,7 @@ class TransferResult(Variant, total=False):
     Ok: nat64
     Err: TransferError
 
+
 # Arguments for the `account_balance` call.
 
 
@@ -162,6 +164,7 @@ class Block(Record):
     transaction: Transaction
     timestamp: TimeStamp
 
+
 # A prefix of the block range specified in the [GetBlocksArgs] request.
 
 
@@ -191,6 +194,7 @@ class QueryArchiveError_Other(Record):
     error_code: nat64
     error_message: str
 
+
 # An error indicating that the arguments passed to [QueryArchiveFn] were invalid.
 
 
@@ -210,8 +214,7 @@ class QueryArchiveResult(Variant, total=False):
 
 
 # A function that is used for fetching archived ledger blocks.
-QueryArchiveFn: TypeAlias = Func(
-    Query[[GetBlocksArgs], QueryArchiveResult])  # type: ignore
+QueryArchiveFn = Func(Query[[GetBlocksArgs], QueryArchiveResult])
 
 
 class QueryBlocksResponse_archived_blocks(Record):
@@ -225,6 +228,7 @@ class QueryBlocksResponse_archived_blocks(Record):
     # The range of the blocks accessible using this function is given by [from]
     # and [len] fields above.
     callback: QueryArchiveFn
+
 
 # The result of a "query_blocks" call.
 #
@@ -294,35 +298,40 @@ class Ledger(Canister):
     # The source address is computed from the principal of the caller and the specified subaccount.
     # When successful, returns the index of the block containing the transaction.
     @method
-    def transfer(self, transfer_args: TransferArgs) -> TransferResult: ...
+    def transfer(self, transfer_args: TransferArgs) -> TransferResult:
+        ...
 
     # Returns the amount of Tokens on the specified account.
     @method
-    def account_balance(
-        self, account_balance_args: AccountBalanceArgs) -> Tokens: ...
+    def account_balance(self, account_balance_args: AccountBalanceArgs) -> Tokens:
+        ...
 
     # Returns the current transfer_fee.
     @method
-    def transfer_fee(
-        self, transfer_fee_arg: TransferFeeArg) -> TransferFee: ...
+    def transfer_fee(self, transfer_fee_arg: TransferFeeArg) -> TransferFee:
+        ...
 
     # Queries blocks in the specified range.
     @method
-    def query_blocks(
-        self, get_blocks_args: GetBlocksArgs) -> QueryBlocksResponse: ...
+    def query_blocks(self, get_blocks_args: GetBlocksArgs) -> QueryBlocksResponse:
+        ...
 
     # Returns token symbol.
     @method
-    def symbol(self) -> SymbolResult: ...
+    def symbol(self) -> SymbolResult:
+        ...
 
     # Returns token name.
     @method
-    def name(self) -> NameResult: ...
+    def name(self) -> NameResult:
+        ...
 
     # Returns token decimals.
     @method
-    def decimals(self) -> DecimalsResult: ...
+    def decimals(self) -> DecimalsResult:
+        ...
 
     # Returns the existing archive canisters information.
     @method
-    def archives(self) -> Archives: ...
+    def archives(self) -> Archives:
+        ...

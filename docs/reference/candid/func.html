@@ -148,7 +148,6 @@
 <p>Note that an explicit <code>TypeAlias</code> must be used when defining a <code>func</code>.</p>
 <p>Python:</p>
 <pre><code class="language-python">from kybra import Func, nat64, null, Principal, query, Query, Record, Update, Variant
-from typing import TypeAlias
 
 
 class User(Record):
@@ -164,17 +163,17 @@ class Reaction(Variant, total=False):
     ComplexFunc: &quot;ComplexFunc&quot;
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+BasicFunc = Func(Query[[str], str])
+ComplexFunc = Func(Update[[User, Reaction], nat64])
 
 
 @query
-def get_basic_func() -&gt; BasicFunc:  # type: ignore
+def get_basic_func() -&gt; BasicFunc:
     return (Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;), &quot;simple_function_name&quot;)
 
 
 @query
-def get_complex_func() -&gt; ComplexFunc:  # type: ignore
+def get_complex_func() -&gt; ComplexFunc:
     return (Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;), &quot;complex_function_name&quot;)
 </code></pre>
 <p>Candid:</p>
@@ -192,7 +191,6 @@ service: () -&gt; {
     &quot;get_basic_func&quot;: () -&gt; (BasicFunc) query;
     &quot;get_complex_func&quot;: () -&gt; (ComplexFunc) query;
 }
-
 </code></pre>
 
                     </main>

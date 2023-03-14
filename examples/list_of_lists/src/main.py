@@ -20,9 +20,8 @@ from kybra import (
     query,
     Record,
     reserved,
-    Variant
+    Variant,
 )
-from typing import TypeAlias
 
 
 class Person(Record):
@@ -36,7 +35,7 @@ class State(Variant, total=False):
     gas: null
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
+BasicFunc = Func(Query[[str], str])
 
 
 @query
@@ -50,7 +49,9 @@ def list_of_string_two(params: list[list[str]]) -> list[list[str]]:
 
 
 @query
-def list_of_string_four(params: list[list[list[list[str]]]]) -> list[list[list[list[str]]]]:
+def list_of_string_four(
+    params: list[list[list[list[str]]]],
+) -> list[list[list[list[str]]]]:
     return params
 
 
@@ -59,56 +60,21 @@ def list_of_list_of_int8() -> list[list[list[list[list[list[list[int8]]]]]]]:
     return [
         [
             [
-                [
-                    [
-                        [
-                            [1], [2]
-                        ],
-                        [
-                            [1, 2, 3],
-                            [4, 5, 6]
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        [
-                            [1]
-                        ]
-                    ],
-                    [
-                        [
-                            [2]
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        [
-                            [3]
-                        ]
-                    ]
-                ],
+                [[[[1], [2]], [[1, 2, 3], [4, 5, 6]]]],
+                [[[[1]]], [[[2]]]],
+                [[[[3]]]],
             ]
         ],
         [
             [
-                [
-                    [[[1]]]
-                ],
-                [
-                    [[[2]]]
-                ],
+                [[[[1]]]],
+                [[[[2]]]],
             ],
             [
-                [
-                    [[[3]]]
-                ],
-                [
-                    [[[4]]]
-                ],
-            ]
-        ]
+                [[[[3]]]],
+                [[[[4]]]],
+            ],
+        ],
     ]
 
 
@@ -128,18 +94,20 @@ def list_of_string(param: list[list[list[str]]]) -> list[list[list[str]]]:
 
 
 @query
-def list_of_option_string(param: list[list[list[opt[str]]]]) -> list[list[list[opt[str]]]]:
+def list_of_option_string(
+    param: list[list[list[opt[str]]]],
+) -> list[list[list[opt[str]]]]:
     return param
 
 
 @query
 def list_of_empty() -> list[list[list[empty]]]:
-    raise Exception('Anything you want')
+    raise Exception("Anything you want")
 
 
 @query
 def list_of_reserved() -> list[list[list[reserved]]]:
-    return [[['A'], ['n']], [['y', 't', 'h'], ['i', 'n', 'g']]]
+    return [[["A"], ["n"]], [["y", "t", "h"], ["i", "n", "g"]]]
 
 
 @query
@@ -148,8 +116,11 @@ def list_of_func(param: list[list[list[BasicFunc]]]) -> list[list[list[BasicFunc
 
 
 @query
-def list_of_principal(param: list[list[list[Principal]]]) -> list[list[list[Principal]]]:
+def list_of_principal(
+    param: list[list[list[Principal]]],
+) -> list[list[list[Principal]]]:
     return param
+
 
 # TODO do I need to test Rejection Code
 
@@ -214,21 +185,21 @@ def list_of_nat8(param: list[list[list[nat8]]]) -> list[list[list[nat8]]]:
     return param
 
 
-@ query
+@query
 def list_of_record(param: list[list[list[Person]]]) -> list[list[list[Person]]]:
     return param
 
 
-@ query
+@query
 def list_of_variant(param: list[list[list[State]]]) -> list[list[list[State]]]:
     return param
 
 
-@ query
+@query
 def list_of_blob(param: list[blob]) -> list[blob]:
     return param
 
 
-@ query
+@query
 def list_of_list_of_blob(param: list[list[blob]]) -> list[list[blob]]:
     return param
