@@ -145,57 +145,45 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-typescript">import { ic, ok, $query, $update } from 'azle';
-import {
-    HttpResponse,
-    HttpTransformArgs,
-    management_canister
-} from 'azle/canisters/management';
+<pre><code class="language-python">from kybra import Async, CanisterResult, ic, query, update
+from kybra.canisters.management import management_canister
+from kybra.canisters.management.http import HttpResponse, HttpTransformArgs
 
-$update;
-export async function xkcd(): Promise&lt;HttpResponse&gt; {
-    const max_response_bytes = 1_000n;
 
-    // TODO this is just a hueristic for cost, might change when the feature is officially released: https://forum.dfinity.org/t/enable-canisters-to-make-http-s-requests/9670/130
-    const cycle_cost_base = 400_000_000n;
-    const cycle_cost_per_byte = 300_000n; // TODO not sure on this exact cost
-    const cycle_cost_total =
-        cycle_cost_base + cycle_cost_per_byte * max_response_bytes;
+@update
+def xkcd() -&gt; Async[HttpResponse]:
+    max_response_bytes = 1_000
 
-    const http_result = await management_canister
-        .http_request({
-            url: `https://xkcd.com/642/info.0.json`,
-            max_response_bytes,
-            method: {
-                get: null
-            },
-            headers: [],
-            body: null,
-            transform: {
-                function: [ic.id(), 'xkcd_transform'],
-                context: Uint8Array.from([])
-            }
-        })
-        .cycles(cycle_cost_total)
-        .call();
+    # TODO this is just a heuristic for cost, might change when the feature is officially released: https://forum.dfinity.org/t/enable-canisters-to-make-http-s-requests/9670/130
+    cycle_cost_base = 400_000_000
+    cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
+    cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    if (!ok(http_result)) {
-        ic.trap(http_result.err ?? 'http_result had an error');
-    }
+    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request(
+        {
+            &quot;url&quot;: &quot;https://xkcd.com/642/info.0.json&quot;,
+            &quot;max_response_bytes&quot;: max_response_bytes,
+            &quot;method&quot;: {&quot;get&quot;: None},
+            &quot;headers&quot;: [],
+            &quot;body&quot;: None,
+            &quot;transform&quot;: {&quot;function&quot;: (ic.id(), &quot;xkcd_transform&quot;), &quot;context&quot;: bytes()},
+        }
+    ).with_cycles(cycle_cost_total)
 
-    return http_result.ok;
-}
+    if http_result.err is not None:
+        if http_result.err:
+            ic.trap(http_result.err)
+        ic.trap(&quot;http_result had an error&quot;)
 
-$query;
-export function xkcd_transform(args: HttpTransformArgs): HttpResponse {
-    return {
-        ...args.response,
-        headers: []
-    };
-}
+    return http_result.ok
+
+
+@query
+def xkcd_transform(args: HttpTransformArgs) -&gt; HttpResponse:
+    return {**args[&quot;response&quot;], &quot;headers&quot;: []}
 </code></pre>
 
                     </main>

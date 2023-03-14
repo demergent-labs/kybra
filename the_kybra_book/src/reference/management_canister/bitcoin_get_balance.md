@@ -4,34 +4,33 @@ This section is a work in progress.
 
 Examples:
 
--   [bitcoin](https://github.com/demergent-labs/azle/tree/main/examples/bitcoin)
+-   [bitcoin](https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin)
 
-```typescript
-import { $update, Variant } from 'azle';
-import {
-    BitcoinNetwork,
-    management_canister,
-    Satoshi
-} from 'azle/canisters/management';
+```python
+from kybra import Async, CanisterResult, update, Variant
+from kybra.canisters.management.bitcoin import Satoshi
+from kybra.canisters.management import management_canister
 
-const BITCOIN_API_CYCLE_COST = 100_000_000n;
+BITCOIN_API_CYCLE_COST = 100_000_000
 
-$update;
-export async function get_balance(address: string): Promise<
-    Variant<{
-        ok: Satoshi;
-        err: string;
-    }>
-> {
-    const canister_result = await management_canister
-        .bitcoin_get_balance({
-            address,
-            min_confirmations: null,
-            network: BitcoinNetwork.Regtest
-        })
-        .cycles(BITCOIN_API_CYCLE_COST)
-        .call();
 
-    return canister_result;
-}
+class ExecuteGetBalanceResult(Variant, total=False):
+    ok: Satoshi
+    err: str
+
+
+@update
+def get_balance(address: str) -> Async[ExecuteGetBalanceResult]:
+    canister_result: CanisterResult[
+        Satoshi
+    ] = yield management_canister.bitcoin_get_balance(
+        {"address": address, "min_confirmations": None, "network": {"Regtest": None}}
+    ).with_cycles(
+        BITCOIN_API_CYCLE_COST
+    )
+
+    if canister_result.err is not None:
+        return {"err": canister_result.err}
+
+    return {"ok": canister_result.ok}
 ```

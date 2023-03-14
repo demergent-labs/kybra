@@ -4,42 +4,41 @@ This section is a work in progress.
 
 Examples:
 
--   [management_canister](https://github.com/demergent-labs/azle/tree/main/examples/management_canister)
+-   [management_canister](https://github.com/demergent-labs/kybra/tree/main/examples/management_canister)
 
-```typescript
-import { blob, ok, Principal, $update } from 'azle';
-import { management_canister } from 'azle/canisters/management';
+```python
+from kybra import (
+    Async,
+    blob,
+    CanisterResult,
+    Principal,
+    update,
+    Variant,
+    void,
+)
+from kybra.canisters.management import management_canister
 
-$update;
-export async function execute_install_code(
-    canister_id: Principal,
-    wasm_module: blob
-): Promise<
-    Variant<{
-        ok: boolean;
-        err: string;
-    }>
-> {
-    const canister_result = await management_canister
-        .install_code({
-            mode: {
-                install: null
-            },
-            canister_id,
-            wasm_module,
-            arg: Uint8Array.from([])
-        })
-        .cycles(100_000_000_000n)
-        .call();
 
-    if (!ok(canister_result)) {
-        return {
-            err: canister_result.err
-        };
-    }
+class DefaultResult(Variant, total=False):
+    ok: bool
+    err: str
 
-    return {
-        ok: true
-    };
-}
+
+@update
+def execute_install_code(
+    canister_id: Principal, wasm_module: blob
+) -> Async[DefaultResult]:
+    canister_result: CanisterResult[void] = yield management_canister.install_code(
+        {
+            "mode": {"install": None},
+            "canister_id": canister_id,
+            "wasm_module": wasm_module,
+            "arg": bytes(),
+        }
+    ).with_cycles(100_000_000_000)
+
+    if canister_result.err is not None:
+        return {"err": canister_result.err}
+
+    return {"ok": True}
 ```

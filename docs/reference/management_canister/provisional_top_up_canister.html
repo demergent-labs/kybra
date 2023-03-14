@@ -145,30 +145,39 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/management_canister">management_canister</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-typescript">$update;
-export async function provisional_top_up_canister(
-    canister_id: Principal,
-    amount: nat
-): Promise&lt;DefaultResult&gt; {
-    const canister_result = await management_canister
-        .provisional_top_up_canister({
-            canister_id,
-            amount
-        })
-        .call();
+<pre><code class="language-python">from kybra import (
+    Async,
+    CanisterResult,
+    nat,
+    Principal,
+    update,
+    Variant,
+    void,
+)
+from kybra.canisters.management import management_canister
 
-    if (!ok(canister_result)) {
-        return {
-            err: canister_result.err
-        };
-    }
 
-    return {
-        ok: true
-    };
-}
+class DefaultResult(Variant, total=False):
+    ok: bool
+    err: str
+
+
+@update
+def provisional_top_up_canister(
+    canister_id: Principal, amount: nat
+) -&gt; Async[DefaultResult]:
+    canister_result: CanisterResult[
+        void
+    ] = yield management_canister.provisional_top_up_canister(
+        {&quot;canister_id&quot;: canister_id, &quot;amount&quot;: amount}
+    )
+
+    if canister_result.err is not None:
+        return {&quot;err&quot;: canister_result.err}
+
+    return {&quot;ok&quot;: True}
 </code></pre>
 
                     </main>

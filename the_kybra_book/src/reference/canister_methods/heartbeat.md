@@ -4,14 +4,13 @@ This section is a work in progress.
 
 Examples:
 
--   [heartbeat](https://github.com/demergent-labs/azle/tree/main/examples/heartbeat)
--   [run_time_errors](https://github.com/demergent-labs/azle/tree/main/examples/run_time_errors)
+-   [heartbeat](https://github.com/demergent-labs/kybra/tree/main/examples/heartbeat)
 
-```typescript
-import { $heartbeat } from 'azle';
+```python
+from kybra import heartbeat, ic, void
 
-$heartbeat;
-export function heartbeat() {
-    console.log('this runs ~1 time per second');
-}
+
+@heartbeat
+def heartbeat_() -> void:
+    ic.print("this runs ~1 time per second")
 ```

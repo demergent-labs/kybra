@@ -145,19 +145,19 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/func_types">func_types</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/init">init</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/motoko_examples/persistent-storage">persistent-storage</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/pre_and_post_upgrade">pre_and_post_upgrade</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/motoko_examples/whoami">whoami</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/func_types">func_types</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/init">init</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/persistent-storage">persistent-storage</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/pre_and_post_upgrade">pre_and_post_upgrade</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/whoami">whoami</a></li>
 </ul>
-<pre><code class="language-typescript">import { $init } from 'azle';
+<pre><code class="language-python">from kybra import ic, init, void
 
-$init;
-export function init() {
-    console.log('This runs once when the canister is first initialized');
-}
+
+@init
+def init_() -&gt; void:
+    ic.print(&quot;This runs once when the canister is first initialized&quot;)
 </code></pre>
 
                     </main>

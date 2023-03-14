@@ -145,35 +145,18 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/management_canister">management_canister</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-typescript">import { ok, Principal, $update, Variant } from 'azle';
-import { management_canister } from 'azle/canisters/management';
+<pre><code class="language-python">@update
+def execute_deposit_cycles(canister_id: Principal) -&gt; Async[DefaultResult]:
+    canister_result: CanisterResult[void] = yield management_canister.deposit_cycles(
+        {&quot;canister_id&quot;: canister_id}
+    ).with_cycles(1_000_000)
 
-$update;
-export async function execute_deposit_cycles(canister_id: Principal): Promise&lt;
-    Variant&lt;{
-        ok: boolean;
-        err: string;
-    }&gt;
-&gt; {
-    const canister_result = await management_canister
-        .deposit_cycles({
-            canister_id
-        })
-        .cycles(1_000_000n)
-        .call();
+    if canister_result.err is not None:
+        return {&quot;err&quot;: canister_result.err}
 
-    if (!ok(canister_result)) {
-        return {
-            err: canister_result.err
-        };
-    }
-
-    return {
-        ok: true
-    };
-}
+    return {&quot;ok&quot;: True}
 </code></pre>
 
                     </main>

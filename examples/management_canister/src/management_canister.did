@@ -27,6 +27,7 @@ type RawRandResult = variant { ok : vec nat8; err : text };
 service : () -> {
   execute_create_canister : () -> (ExecuteCreateCanisterResult);
   execute_delete_canister : (principal) -> (DefaultResult);
+  execute_deposit_cycles : (principal) -> (DefaultResult);
   execute_install_code : (principal, vec nat8) -> (DefaultResult);
   execute_start_canister : (principal) -> (DefaultResult);
   execute_stop_canister : (principal) -> (DefaultResult);

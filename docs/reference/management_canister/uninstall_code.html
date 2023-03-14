@@ -145,34 +145,27 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/management_canister">management_canister</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-typescript">import { ok, Principal, $update, Variant } from 'azle';
-import { management_canister } from 'azle/canisters/management';
+<pre><code class="language-python">from kybra import Async, CanisterResult, Principal, update, Variant, void
+from kybra.canisters.management import management_canister
 
-$update;
-export async function execute_uninstall_code(canister_id: Principal): Promise&lt;
-    Variant&lt;{
-        ok: boolean;
-        err: string;
-    }&gt;
-&gt; {
-    const canister_result = await management_canister
-        .uninstall_code({
-            canister_id
-        })
-        .call();
 
-    if (!ok(canister_result)) {
-        return {
-            err: canister_result.err
-        };
-    }
+class DefaultResult(Variant, total=False):
+    ok: bool
+    err: str
 
-    return {
-        ok: true
-    };
-}
+
+@update
+def execute_uninstall_code(canister_id: Principal) -&gt; Async[DefaultResult]:
+    canister_result: CanisterResult[void] = yield management_canister.uninstall_code(
+        {&quot;canister_id&quot;: canister_id}
+    )
+
+    if canister_result.err is not None:
+        return {&quot;err&quot;: canister_result.err}
+
+    return {&quot;ok&quot;: True}
 </code></pre>
 
                     </main>

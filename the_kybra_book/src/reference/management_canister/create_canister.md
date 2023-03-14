@@ -4,41 +4,30 @@ This section is a work in progress.
 
 Examples:
 
--   [management_canister](https://github.com/demergent-labs/azle/tree/main/examples/management_canister)
+-   [management_canister](https://github.com/demergent-labs/kybra/tree/main/examples/management_canister)
 
-```typescript
-import { ok, $update, Variant } from 'azle';
-import {
-    CreateCanisterResult,
-    management_canister
-} from 'azle/canisters/management';
+```python
+from kybra import Async, CanisterResult, update, Variant
+from kybra.canisters.management import CreateCanisterResult, management_canister
 
-$update;
-export async function execute_create_canister(): Promise<
-    Variant<{
-        ok: CreateCanisterResult;
-        err: string;
-    }>
-> {
-    const create_canister_result_canister_result = await management_canister
-        .create_canister({
-            settings: null
-        })
-        .cycles(50_000_000_000_000n)
-        .call();
 
-    if (!ok(create_canister_result_canister_result)) {
-        return {
-            err: create_canister_result_canister_result.err
-        };
-    }
+class ExecuteCreateCanisterResult(Variant, total=False):
+    ok: CreateCanisterResult
+    err: str
 
-    const create_canister_result = create_canister_result_canister_result.ok;
 
-    state.created_canister_id = create_canister_result.canister_id;
+@update
+def execute_create_canister() -> Async[ExecuteCreateCanisterResult]:
+    create_canister_result_canister_result: CanisterResult[
+        CreateCanisterResult
+    ] = yield management_canister.create_canister({"settings": None}).with_cycles(
+        50_000_000_000_000
+    )
 
-    return {
-        ok: create_canister_result
-    };
-}
+    if create_canister_result_canister_result.err is not None:
+        return {"err": create_canister_result_canister_result.err}
+
+    create_canister_result = create_canister_result_canister_result.ok
+
+    return {"ok": create_canister_result}
 ```

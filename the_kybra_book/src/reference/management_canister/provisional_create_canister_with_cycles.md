@@ -4,39 +4,36 @@ This section is a work in progress.
 
 Examples:
 
--   [management_canister](https://github.com/demergent-labs/azle/tree/main/examples/management_canister)
+-   [management_canister](https://github.com/demergent-labs/kybra/tree/main/examples/management_canister)
 
-```typescript
-import { ok, $update, Variant } from 'azle';
-import {
+```python
+from kybra import Async, CanisterResult, update, Variant
+from kybra.canisters.management import (
     CreateCanisterResult,
-    management_canister
-} from 'azle/canisters/management';
+    management_canister,
+    ProvisionalCreateCanisterWithCyclesResult,
+)
 
-$update;
-export async function provisional_create_canister_with_cycles(): Promise<
-    Variant<{
-        ok: CreateCanisterResult;
-        err: string;
-    }>
-> {
-    const canister_result = await management_canister
-        .provisional_create_canister_with_cycles({
-            amount: null,
-            settings: null
-        })
-        .call();
 
-    if (!ok(canister_result)) {
-        return {
-            err: canister_result.err
-        };
-    }
+class ExecuteProvisionalCreateCanisterWithCyclesResult(Variant, total=False):
+    ok: CreateCanisterResult
+    err: str
 
-    const provisional_create_canister_with_cycles_result = canister_result.ok;
 
-    return {
-        ok: provisional_create_canister_with_cycles_result
-    };
-}
+@update
+def provisional_create_canister_with_cycles() -> (
+    Async[ExecuteProvisionalCreateCanisterWithCyclesResult]
+):
+    canister_result: CanisterResult[
+        ProvisionalCreateCanisterWithCyclesResult
+    ] = yield management_canister.provisional_create_canister_with_cycles(
+        {"amount": None, "settings": None}
+    )
+
+    if canister_result.err is not None:
+        return {"err": canister_result.err}
+
+    provisional_create_canister_with_cycles_result = canister_result.ok
+
+    return {"ok": provisional_create_canister_with_cycles_result}
 ```

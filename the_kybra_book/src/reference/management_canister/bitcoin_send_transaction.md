@@ -4,32 +4,38 @@ This section is a work in progress.
 
 Examples:
 
-```typescript
-import { blob, $update, Variant } from 'azle';
-import { BitcoinNetwork, management_canister } from 'azle/canisters/management';
+-   [bitcoin](https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin)
 
-const BITCOIN_BASE_TRANSACTION_COST = 5_000_000_000n;
-const BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE = 20_000_000n;
+```python
+from kybra import Async, blob, CanisterResult, null, update, Variant, void
+from kybra.canisters.management import management_canister
 
-$update;
-export async function send_transaction(transaction: blob): Promise<
-    Variant<{
-        ok: null;
-        err: string;
-    }>
-> {
-    const transaction_fee =
-        BITCOIN_BASE_TRANSACTION_COST +
-        BigInt(transaction.length) * BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE;
+BITCOIN_BASE_TRANSACTION_COST = 5_000_000_000
+BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE = 20_000_000
 
-    const canister_result = await management_canister
-        .bitcoin_send_transaction({
-            transaction,
-            network: BitcoinNetwork.Regtest
-        })
-        .cycles(transaction_fee)
-        .call();
 
-    return canister_result;
-}
+class SendTransactionResult(Variant, total=False):
+    ok: null
+    err: str
+
+
+@update
+def send_transaction(transaction: blob) -> Async[SendTransactionResult]:
+    transaction_fee = (
+        BITCOIN_BASE_TRANSACTION_COST
+        + len(transaction) * BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE
+    )
+
+    canister_result: CanisterResult[
+        void
+    ] = yield management_canister.bitcoin_send_transaction(
+        {"transaction": transaction, "network": {"Regtest": None}}
+    ).with_cycles(
+        transaction_fee
+    )
+
+    if canister_result.err is not None:
+        return {"err": canister_result.err}
+
+    return {"ok": canister_result.ok}
 ```

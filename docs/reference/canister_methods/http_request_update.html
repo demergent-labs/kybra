@@ -145,57 +145,60 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
-<pre><code class="language-typescript">import { blob, Func, nat16, Opt, Query, Record, $update, Variant } from 'azle';
+<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
+from typing import TypeAlias
 
-type HttpRequest = Record&lt;{
-    method: string;
-    url: string;
-    headers: Header[];
-    body: blob;
-}&gt;;
 
-type HttpResponse = Record&lt;{
-    status_code: nat16;
-    headers: Header[];
-    body: blob;
-    streaming_strategy: Opt&lt;StreamingStrategy&gt;;
-    upgrade: Opt&lt;boolean&gt;;
-}&gt;;
+class HttpRequest(Record):
+    method: str
+    url: str
+    headers: list[&quot;Header&quot;]
+    body: blob
 
-type Header = [string, string];
 
-type StreamingStrategy = Variant&lt;{
-    Callback: CallbackStrategy;
-}&gt;;
+class HttpResponse(Record):
+    status_code: nat16
+    headers: list[&quot;Header&quot;]
+    body: blob
+    streaming_strategy: opt[&quot;StreamingStrategy&quot;]
+    upgrade: opt[bool]
 
-type CallbackStrategy = Record&lt;{
-    callback: Callback;
-    token: Token;
-}&gt;;
 
-type Callback = Func&lt;Query&lt;(t: Token) =&gt; StreamingCallbackHttpResponse&gt;&gt;;
+Header = tuple[str, str]
 
-type StreamingCallbackHttpResponse = Record&lt;{
-    body: blob;
-    token: Opt&lt;Token&gt;;
-}&gt;;
 
-type Token = Record&lt;{
-    arbitrary_data: string;
-}&gt;;
+class StreamingStrategy(Variant):
+    Callback: &quot;CallbackStrategy&quot;
 
-$update;
-export function http_request_update(req: HttpRequest): HttpResponse {
+
+class CallbackStrategy(Record):
+    callback: &quot;Callback&quot;
+    token: &quot;Token&quot;
+
+
+Callback: TypeAlias = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&quot;])  # type: ignore
+
+
+class StreamingCallbackHttpResponse(Record):
+    body: blob
+    token: opt[&quot;Token&quot;]
+
+
+class Token(Record):
+    arbitrary_data: str
+
+
+@query
+def http_request_update(req: HttpRequest) -&gt; HttpResponse:
     return {
-        status_code: 200,
-        headers: [],
-        body: Uint8Array.from([]),
-        streaming_strategy: null,
-        upgrade: false
-    };
-}
+        &quot;status_code&quot;: 200,
+        &quot;headers&quot;: [],
+        &quot;body&quot;: bytes(),
+        &quot;streaming_strategy&quot;: None,
+        &quot;upgrade&quot;: False,
+    }
 </code></pre>
 
                     </main>

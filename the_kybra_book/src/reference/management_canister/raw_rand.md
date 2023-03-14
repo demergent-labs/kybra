@@ -4,23 +4,22 @@ This section is a work in progress.
 
 Examples:
 
--   [async/await](https://github.com/demergent-labs/azle/tree/main/examples/async_await)
--   [heartbeat](https://github.com/demergent-labs/azle/tree/main/examples/heartbeat)
--   [management_canister](https://github.com/demergent-labs/azle/tree/main/examples/management_canister)
--   [timers](https://github.com/demergent-labs/azle/tree/main/examples/timers)
+-   [generators](https://github.com/demergent-labs/kybra/tree/main/examples/generators)
+-   [heartbeat](https://github.com/demergent-labs/kybra/tree/main/examples/heartbeat)
+-   [management_canister](https://github.com/demergent-labs/kybra/tree/main/examples/management_canister)
+-   [timers](https://github.com/demergent-labs/kybra/tree/main/examples/timers)
 
-```typescript
-import { blob, ok, $update } from 'azle';
-import { management_canister } from 'azle/canisters/management';
+```python
+from kybra import Async, blob, CanisterResult, update
+from kybra.canisters.management import management_canister
 
-$update;
-export async function get_randomness(): Promise<blob> {
-    const randomness_result = await management_canister.raw_rand().call();
 
-    if (!ok(randomness_result)) {
-        return Uint8Array.from([]);
-    }
+@update
+def get_randomness_directly() -> Async[blob]:
+    randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    return randomness_result.ok;
-}
+    if randomness_result.err is not None:
+        return bytes()
+
+    return randomness_result.ok
 ```

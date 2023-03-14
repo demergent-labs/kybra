@@ -145,43 +145,42 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/management_canister">management_canister</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-typescript">import { blob, ok, Principal, $update } from 'azle';
-import { management_canister } from 'azle/canisters/management';
+<pre><code class="language-python">from kybra import (
+    Async,
+    blob,
+    CanisterResult,
+    Principal,
+    update,
+    Variant,
+    void,
+)
+from kybra.canisters.management import management_canister
 
-$update;
-export async function execute_install_code(
-    canister_id: Principal,
-    wasm_module: blob
-): Promise&lt;
-    Variant&lt;{
-        ok: boolean;
-        err: string;
-    }&gt;
-&gt; {
-    const canister_result = await management_canister
-        .install_code({
-            mode: {
-                install: null
-            },
-            canister_id,
-            wasm_module,
-            arg: Uint8Array.from([])
-        })
-        .cycles(100_000_000_000n)
-        .call();
 
-    if (!ok(canister_result)) {
-        return {
-            err: canister_result.err
-        };
-    }
+class DefaultResult(Variant, total=False):
+    ok: bool
+    err: str
 
-    return {
-        ok: true
-    };
-}
+
+@update
+def execute_install_code(
+    canister_id: Principal, wasm_module: blob
+) -&gt; Async[DefaultResult]:
+    canister_result: CanisterResult[void] = yield management_canister.install_code(
+        {
+            &quot;mode&quot;: {&quot;install&quot;: None},
+            &quot;canister_id&quot;: canister_id,
+            &quot;wasm_module&quot;: wasm_module,
+            &quot;arg&quot;: bytes(),
+        }
+    ).with_cycles(100_000_000_000)
+
+    if canister_result.err is not None:
+        return {&quot;err&quot;: canister_result.err}
+
+    return {&quot;ok&quot;: True}
 </code></pre>
 
                     </main>

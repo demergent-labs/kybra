@@ -4,33 +4,33 @@ This section is a work in progress.
 
 Examples:
 
--   [management_canister](https://github.com/demergent-labs/azle/tree/main/examples/management_canister)
+-   [management_canister](https://github.com/demergent-labs/kybra/tree/main/examples/management_canister)
 
-```typescript
-import { ok, Principal, $update, Variant } from 'azle';
-import { management_canister } from 'azle/canisters/management';
+```python
+from kybra import (
+    Async,
+    CanisterResult,
+    Principal,
+    update,
+    Variant,
+    void,
+)
+from kybra.canisters.management import management_canister
 
-$update;
-export async function execute_start_canister(canister_id: Principal): Promise<
-    Variant<{
-        ok: boolean;
-        err: string;
-    }>
-> {
-    const canister_result = await management_canister
-        .start_canister({
-            canister_id
-        })
-        .call();
 
-    if (!ok(canister_result)) {
-        return {
-            err: canister_result.err
-        };
-    }
+class DefaultResult(Variant, total=False):
+    ok: bool
+    err: str
 
-    return {
-        ok: true
-    };
-}
+
+@update
+def execute_start_canister(canister_id: Principal) -> Async[DefaultResult]:
+    canister_result: CanisterResult[void] = yield management_canister.start_canister(
+        {"canister_id": canister_id}
+    )
+
+    if canister_result.err is not None:
+        return {"err": canister_result.err}
+
+    return {"ok": True}
 ```

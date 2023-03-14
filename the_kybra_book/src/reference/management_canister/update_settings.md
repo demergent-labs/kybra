@@ -4,39 +4,34 @@ This section is a work in progress.
 
 Examples:
 
--   [management_canister](https://github.com/demergent-labs/azle/tree/main/examples/management_canister)
+-   [management_canister](https://github.com/demergent-labs/kybra/tree/main/examples/management_canister)
 
-```typescript
-import { ok, Principal, $update, Variant } from 'azle';
-import { management_canister } from 'azle/canisters/management';
+```python
+from kybra import Async, CanisterResult, Principal, update, Variant, void
+from kybra.canisters.management import management_canister
 
-$update;
-export async function execute_update_settings(canister_id: Principal): Promise<
-    Variant<{
-        ok: boolean;
-        err: string;
-    }>
-> {
-    const canister_result = await management_canister
-        .update_settings({
-            canister_id,
-            settings: {
-                controllers: null,
-                compute_allocation: 1n,
-                memory_allocation: 3_000_000n,
-                freezing_threshold: 2_000_000n
-            }
-        })
-        .call();
 
-    if (!ok(canister_result)) {
-        return {
-            err: canister_result.err
-        };
-    }
+class DefaultResult(Variant, total=False):
+    ok: bool
+    err: str
 
-    return {
-        ok: true
-    };
-}
+
+@update
+def execute_update_settings(canister_id: Principal) -> Async[DefaultResult]:
+    canister_result: CanisterResult[void] = yield management_canister.update_settings(
+        {
+            "canister_id": canister_id,
+            "settings": {
+                "controllers": None,
+                "compute_allocation": 1,
+                "memory_allocation": 3_000_000,
+                "freezing_threshold": 2_000_000,
+            },
+        }
+    )
+
+    if canister_result.err is not None:
+        return {"err": canister_result.err}
+
+    return {"ok": True}
 ```

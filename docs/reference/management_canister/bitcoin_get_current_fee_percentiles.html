@@ -145,33 +145,34 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/bitcoin">bitcoin</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-typescript">import { $update, Variant } from 'azle';
-import {
-    BitcoinNetwork,
-    management_canister,
-    MillisatoshiPerByte
-} from 'azle/canisters/management';
+<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+from kybra.canisters.management.bitcoin import MillisatoshiPerByte
+from kybra.canisters.management import management_canister
 
-const BITCOIN_API_CYCLE_COST = 100_000_000n;
+BITCOIN_API_CYCLE_COST = 100_000_000
 
-$update;
-export async function get_current_fee_percentiles(): Promise&lt;
-    Variant&lt;{
-        ok: MillisatoshiPerByte[];
-        err: string;
-    }&gt;
-&gt; {
-    const canister_result = await management_canister
-        .bitcoin_get_current_fee_percentiles({
-            network: BitcoinNetwork.Regtest
-        })
-        .cycles(BITCOIN_API_CYCLE_COST)
-        .call();
 
-    return canister_result;
-}
+class GetCurrentFeePercentilesResult(Variant, total=False):
+    ok: list[MillisatoshiPerByte]
+    err: str
+
+
+@update
+def get_current_fee_percentiles() -&gt; Async[GetCurrentFeePercentilesResult]:
+    canister_result: CanisterResult[
+        list[MillisatoshiPerByte]
+    ] = yield management_canister.bitcoin_get_current_fee_percentiles(
+        {&quot;network&quot;: {&quot;Regtest&quot;: None}}
+    ).with_cycles(
+        BITCOIN_API_CYCLE_COST
+    )
+
+    if canister_result.err is not None:
+        return {&quot;err&quot;: canister_result.err}
+
+    return {&quot;ok&quot;: canister_result.ok}
 </code></pre>
 
                     </main>

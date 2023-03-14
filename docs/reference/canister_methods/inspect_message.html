@@ -145,41 +145,38 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/inspect_message">inspect_message</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/run_time_errors">run_time_errors</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/inspect_message">inspect_message</a></li>
 </ul>
-<pre><code class="language-typescript">import { ic, $inspect_message, $update } from 'azle';
+<pre><code class="language-python">from kybra import ic, inspect_message, update
 
-$inspect_message;
-export function inspect_message() {
-    console.log('inspect_message called');
 
-    if (ic.method_name() === 'accessible') {
-        ic.accept_message();
-        return;
-    }
+@inspect_message
+def inspect_message_():
+    ic.print(&quot;inspect_message called&quot;)
 
-    if (ic.method_name() === 'inaccessible') {
-        return;
-    }
+    if ic.method_name() == &quot;accessible&quot;:
+        ic.accept_message()
+        return
 
-    throw `Method &quot;${ic.method_name()}&quot; not allowed`;
-}
+    if ic.method_name() == &quot;inaccessible&quot;:
+        return
 
-$update;
-export function accessible(): boolean {
-    return true;
-}
+    raise Exception(&quot;Method &quot; + ic.method_name() + &quot; is not allowed&quot;)
 
-$update;
-export function inaccessible(): boolean {
-    return false;
-}
 
-$update;
-export function also_inaccessible(): boolean {
-    return false;
-}
+@update
+def accessible() -&gt; bool:
+    return True
+
+
+@update
+def inaccessible() -&gt; bool:
+    return False
+
+
+@update
+def also_inaccessible() -&gt; bool:
+    return False
 </code></pre>
 
                     </main>

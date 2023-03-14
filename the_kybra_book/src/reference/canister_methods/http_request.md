@@ -4,56 +4,59 @@ This section is a work in progress.
 
 Examples:
 
--   [http_counter](https://github.com/demergent-labs/azle/tree/main/examples/motoko_examples/http_counter)
+-   [http_counter](https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter)
 
-```typescript
-import { blob, Func, nat16, Opt, $query, Query, Record, Variant } from 'azle';
+```python
+from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
+from typing import TypeAlias
 
-type HttpRequest = Record<{
-    method: string;
-    url: string;
-    headers: Header[];
-    body: blob;
-}>;
 
-type HttpResponse = Record<{
-    status_code: nat16;
-    headers: Header[];
-    body: blob;
-    streaming_strategy: Opt<StreamingStrategy>;
-    upgrade: Opt<boolean>;
-}>;
+class HttpRequest(Record):
+    method: str
+    url: str
+    headers: list["Header"]
+    body: blob
 
-type Header = [string, string];
 
-type StreamingStrategy = Variant<{
-    Callback: CallbackStrategy;
-}>;
+class HttpResponse(Record):
+    status_code: nat16
+    headers: list["Header"]
+    body: blob
+    streaming_strategy: opt["StreamingStrategy"]
+    upgrade: opt[bool]
 
-type CallbackStrategy = Record<{
-    callback: Callback;
-    token: Token;
-}>;
 
-type Callback = Func<Query<(t: Token) => StreamingCallbackHttpResponse>>;
+Header = tuple[str, str]
 
-type StreamingCallbackHttpResponse = Record<{
-    body: blob;
-    token: Opt<Token>;
-}>;
 
-type Token = Record<{
-    arbitrary_data: string;
-}>;
+class StreamingStrategy(Variant):
+    Callback: "CallbackStrategy"
 
-$query;
-export function http_request(req: HttpRequest): HttpResponse {
+
+class CallbackStrategy(Record):
+    callback: "Callback"
+    token: "Token"
+
+
+Callback: TypeAlias = Func(Query[["Token"], "StreamingCallbackHttpResponse"])  # type: ignore
+
+
+class StreamingCallbackHttpResponse(Record):
+    body: blob
+    token: opt["Token"]
+
+
+class Token(Record):
+    arbitrary_data: str
+
+
+@query
+def http_request(req: HttpRequest) -> HttpResponse:
     return {
-        status_code: 200,
-        headers: [],
-        body: Uint8Array.from([]),
-        streaming_strategy: null,
-        upgrade: false
-    };
-}
+        "status_code": 200,
+        "headers": [],
+        "body": bytes(),
+        "streaming_strategy": None,
+        "upgrade": False,
+    }
 ```

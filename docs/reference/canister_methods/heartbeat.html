@@ -145,15 +145,14 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/heartbeat">heartbeat</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/run_time_errors">run_time_errors</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/heartbeat">heartbeat</a></li>
 </ul>
-<pre><code class="language-typescript">import { $heartbeat } from 'azle';
+<pre><code class="language-python">from kybra import heartbeat, ic, void
 
-$heartbeat;
-export function heartbeat() {
-    console.log('this runs ~1 time per second');
-}
+
+@heartbeat
+def heartbeat_() -&gt; void:
+    ic.print(&quot;this runs ~1 time per second&quot;)
 </code></pre>
 
                     </main>

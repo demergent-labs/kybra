@@ -2,18 +2,19 @@
 
 This section is a work in progress.
 
-```typescript
-import { $query, $update } from 'azle';
+```python
+from kybra import query, update, void
 
-let message = '';
+message = ""
 
-$query;
-export function get_message(): string {
-    return mesage;
-}
 
-$update;
-export function set_message(new_message): void {
-    message = new_message;
-}
+@query
+def get_message() -> str:
+    return message
+
+
+@update
+def set_message(new_message: str) -> void:
+    global message
+    message = new_message
 ```

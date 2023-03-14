@@ -145,15 +145,16 @@
 <p>This section is a work in progress.</p>
 <p>Examples:</p>
 <ul>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/pre_and_post_upgrade">pre_and_post_upgrade</a></li>
-<li><a href="https://github.com/demergent-labs/azle/tree/main/examples/motoko_examples/whoami">whoami</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/pre_and_post_upgrade">pre_and_post_upgrade</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/whoami">whoami</a></li>
 </ul>
-<pre><code class="language-typescript">import { $post_upgrade } from 'azle';
+<pre><code class="language-python">from kybra import ic, post_upgrade, void
 
-$post_upgrade;
-export function post_upgrade() {
-    console.log('This runs after every canister upgrade');
-}
+
+@post_upgrade
+def post_upgrade_() -&gt; void:
+    ic.print(&quot;This runs after every canister upgrade&quot;)
+
 </code></pre>
 
                     </main>

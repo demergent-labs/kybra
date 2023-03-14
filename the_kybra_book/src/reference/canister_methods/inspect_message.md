@@ -4,40 +4,37 @@ This section is a work in progress.
 
 Examples:
 
--   [inspect_message](https://github.com/demergent-labs/azle/tree/main/examples/inspect_message)
--   [run_time_errors](https://github.com/demergent-labs/azle/tree/main/examples/run_time_errors)
+-   [inspect_message](https://github.com/demergent-labs/kybra/tree/main/examples/inspect_message)
 
-```typescript
-import { ic, $inspect_message, $update } from 'azle';
+```python
+from kybra import ic, inspect_message, update
 
-$inspect_message;
-export function inspect_message() {
-    console.log('inspect_message called');
 
-    if (ic.method_name() === 'accessible') {
-        ic.accept_message();
-        return;
-    }
+@inspect_message
+def inspect_message_():
+    ic.print("inspect_message called")
 
-    if (ic.method_name() === 'inaccessible') {
-        return;
-    }
+    if ic.method_name() == "accessible":
+        ic.accept_message()
+        return
 
-    throw `Method "${ic.method_name()}" not allowed`;
-}
+    if ic.method_name() == "inaccessible":
+        return
 
-$update;
-export function accessible(): boolean {
-    return true;
-}
+    raise Exception("Method " + ic.method_name() + " is not allowed")
 
-$update;
-export function inaccessible(): boolean {
-    return false;
-}
 
-$update;
-export function also_inaccessible(): boolean {
-    return false;
-}
+@update
+def accessible() -> bool:
+    return True
+
+
+@update
+def inaccessible() -> bool:
+    return False
+
+
+@update
+def also_inaccessible() -> bool:
+    return False
 ```
