@@ -278,9 +278,9 @@ SOFTWARE.
 <h5 id="beta"><a class="header" href="#beta">Beta</a></h5>
 <p>Kybra reached beta in December of 2022. It's an immature project that may have unforeseen bugs and other issues. We're working constantly to improve it. We hope to get to a production-ready 1.0 in 2023. The following are the major blockers to 1.0:</p>
 <ul>
-<li>Majority <code>stdlib</code> support (~Q2/Q3 2023)</li>
-<li>Extensive automated property testing (~Q1 2023)</li>
-<li>Multiple independent security reviews/audits (~Q1/Q2 2023)</li>
+<li>Majority stdlib support (~Q2/Q3 2023)</li>
+<li>Extensive automated property testing (~Q1/Q2 2023)</li>
+<li>Multiple independent security reviews/audits (~Q3 2023)</li>
 <li>Performance improvements if necessary (~2023)</li>
 </ul>
 <h5 id="security-risks"><a class="header" href="#security-risks">Security risks</a></h5>
@@ -584,6 +584,13 @@ URLs:
 </code></pre>
 <p>Resolution:</p>
 <pre><code class="language-bash">sudo apt install cmake
+</code></pre>
+<p>Error:</p>
+<pre><code class="language-bash">ERROR: The Python ssl extension was not compiled. Missing the OpenSSL lib
+</code></pre>
+<p>Resolution:</p>
+<p>You may have the right version of open ssl but you might be missing libssl-dev</p>
+<pre><code class="language-bash">sudo apt-get install libssl-dev
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="internet-computer-overview"><a class="header" href="#internet-computer-overview">Internet Computer Overview</a></h1>
 <p>The <a href="https://internetcomputer.org/">Internet Computer</a> (IC) is a decentralized cloud platform. Actually, it is better thought of as a progressively decentralizing cloud platform. Its full vision is yet to be fulfilled.</p>
@@ -2437,7 +2444,38 @@ def repeat_cross_canister_timer_callback() -&gt; Async[blob]:
 <ul>
 <li>Most of the <code>stdlib</code> doesn't work yet</li>
 <li>Most PyPI packages will not work yet</li>
+<li>All Kybra canisters have a public metadata key-value pair named <code>cdk</code> which contains the version of Kybra the canister is using
+<ul>
+<li>Anyone can query this metadata which may be a security risk</li>
 </ul>
+</li>
+<li><a href="https://docs.python.org/3/library/datetime.html">The datetime stdlib</a> does not work yet, <a href="https://github.com/demergent-labs/kybra/blob/main/examples/date/src/main.py">see here for an alternative</a></li>
+</ul>
+<h2 id="python-stdlib"><a class="header" href="#python-stdlib">Python stdlib</a></h2>
+<p>There is limited support for the <code>stdlib</code>. The following modules may be supported as far as <a href="https://github.com/RustPython/RustPython">RustPython</a> or the IC support them:</p>
+<ul>
+<li>array</li>
+<li>binascii</li>
+<li>_bisect</li>
+<li>cmath</li>
+<li>_contextvars</li>
+<li>_csv</li>
+<li>_dis</li>
+<li>gc</li>
+<li>hashlib</li>
+<li>_json</li>
+<li>math</li>
+<li>pyexpat</li>
+<li>_struct</li>
+<li>_random</li>
+<li>_statistics</li>
+<li>unicodedata</li>
+<li>zlib</li>
+</ul>
+<h2 id="python-external-packages"><a class="header" href="#python-external-packages">Python External Packages</a></h2>
+<p>Installing external packages, such as from <a href="https://pypi.org/">PyPI</a>, will probably not work. The biggest problem you are most likely to run into is lack of support for most of the Python stdlib. Once the Wasm binary limit is increased on the IC, much more of the stdlib should be supported which should open up many external packages.</p>
+<p>Once the majority of the stdlib is supported, you are likely to run into issues with the environment that the Python code is running in. It is a Rust <code>wasm32-unknown-unknown</code> environment that has access to the IC APIs. Any external packages that can't compile or run in this environment with the supported APIs will not work.</p>
+<p>Much of the future work for enabling external packages will be forking and patching packages to support IC APIs.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="reference"><a class="header" href="#reference">Reference</a></h1>
 <ul>
 <li><a href="reference/./call_apis/call_apis.html">Call APIs</a></li>

@@ -166,3 +166,17 @@ Resolution:
 ```bash
 sudo apt install cmake
 ```
+
+Error:
+
+```bash
+ERROR: The Python ssl extension was not compiled. Missing the OpenSSL lib
+```
+
+Resolution:
+
+You may have the right version of open ssl but you might be missing libssl-dev
+
+```bash
+sudo apt-get install libssl-dev
+```
