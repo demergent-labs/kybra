@@ -23,6 +23,7 @@ impl PyAst {
             if let Some(inspect_method_function_def) = inspect_message_function_def_option {
                 Some(InspectMessageMethod {
                     body: rust::generate(inspect_method_function_def)?,
+                    guard_function_name: None,
                 })
             } else {
                 None
