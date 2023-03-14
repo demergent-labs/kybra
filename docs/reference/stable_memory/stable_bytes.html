@@ -142,6 +142,18 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="stable-bytes"><a class="header" href="#stable-bytes">stable bytes</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/stable_memory">stable_memory</a></li>
+</ul>
+<pre><code class="language-python">from kybra import blob, ic, query
+
+
+@query
+def stable_bytes() -&gt; blob:
+    return ic.stable_bytes()
+</code></pre>
 
                     </main>
 

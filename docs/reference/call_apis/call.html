@@ -142,6 +142,58 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="call"><a class="header" href="#call">call</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/composite_queries">composite_queries</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cross_canister_calls">cross_canister_calls</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/func_types">func_types</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/generators">generators</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ledger_canister">ledger_canister</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/rejections">rejections</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/timers">timers</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/whoami">whoami</a></li>
+</ul>
+<pre><code class="language-python">from kybra import (
+    Async,
+    Canister,
+    CanisterResult,
+    method,
+    nat64,
+    Principal,
+    update,
+    Variant,
+)
+
+
+class TokenCanister(Canister):
+    @method
+    def transfer(self, to: Principal, amount: nat64) -&gt; nat64:
+        ...
+
+
+token_canister = TokenCanister(Principal.from_str(&quot;r7inp-6aaaa-aaaaa-aaabq-cai&quot;))
+
+
+class PayoutResult(Variant, total=False):
+    ok: nat64
+    err: str
+
+
+@update
+def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
+    result: CanisterResult[nat64] = yield token_canister.transfer(to, amount)
+
+    if result.err is not None:
+        return {&quot;err&quot;: result.err}
+
+    return {&quot;ok&quot;: result.ok}
+</code></pre>
 
                     </main>
 

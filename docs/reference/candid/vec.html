@@ -142,6 +142,20 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="vec"><a class="header" href="#vec">vec</a></h1>
+<p>This section is a work in progress.</p>
+<p>The Python type <code>list</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t">Candid type vec</a> and will become an array of the specified type at runtime.</p>
+<p>Python:</p>
+<pre><code class="language-python">from kybra import int32, query
+
+@query
+def get_numbers() -&gt; list[int32]:
+    return [0, 1, 2, 3]
+</code></pre>
+<p>Candid:</p>
+<pre><code class="language-python">service: {
+    &quot;get_numbers&quot;: () -&gt; (vec int32) query;
+}
+</code></pre>
 
                     </main>
 

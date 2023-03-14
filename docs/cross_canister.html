@@ -142,6 +142,240 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="cross-canister"><a class="header" href="#cross-canister">Cross-canister</a></h1>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/composite_queries">composite_queries</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cross_canister_calls">cross_canister_calls</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/func_types">func_types</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/generators">generators</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ledger_canister">ledger_canister</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/rejections">rejections</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/timers">timers</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/whoami">whoami</a></li>
+</ul>
+<p>Canisters are generally able to call the query or update methods of other canisters in any subnet. We refer to these types of calls as cross-canister calls.</p>
+<p>A cross-canister call begins with a definition of the canister to be called, referred to as an external canister.</p>
+<p>Imagine a simple external canister called <code>token_canister</code>:</p>
+<pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update
+
+accounts = StableBTreeMap[Principal, nat64](memory_id=0, max_key_size=38, max_value_size=15)
+
+@update
+def transfer(to: Principal, amount: nat64) -&gt; nat64:
+    from_ = ic.caller()
+
+    from_balance = accounts.get(from_) or 0
+    to_balance = accounts.get(to) or 0
+
+    accounts.insert(from_, from_balance - amount)
+    accounts.insert(to, to_balance + amount)
+
+    return amount
+</code></pre>
+<p>Here's how you would create its external canister definition:</p>
+<pre><code class="language-python">from kybra import Canister, method, nat64, Principal
+
+class TokenCanister(Canister):
+    @method
+    def transfer(self, to: Principal, amount: nat64) -&gt; nat64: ...
+</code></pre>
+<p>Once you have a canister definition you can instantiate it with the canister's <code>Principal</code> and then invoke its methods.</p>
+<p>Here's how to instantiate <code>TokenCanister</code>:</p>
+<pre><code class="language-python">token_canister = TokenCanister(
+    Principal.from_str('r7inp-6aaaa-aaaaa-aaabq-cai')
+)
+</code></pre>
+<p>And here's a more complete example of a canister called <code>payout_canister</code> that performs a cross-canister call to <code>token_canister</code>:</p>
+<pre><code class="language-python">from kybra import Async, Canister, CanisterResult, method, nat64, Principal, update, Variant
+
+class TokenCanister(Canister):
+    @method
+    def transfer(self, to: Principal, amount: nat64) -&gt; nat64: ...
+
+token_canister = TokenCanister(
+    Principal.from_str('r7inp-6aaaa-aaaaa-aaabq-cai')
+)
+
+class PayoutResult(Variant, total=False):
+    ok: nat64
+    err: str
+
+@update
+def payout(
+    to: Principal,
+    amount: nat64
+) -&gt; Async[PayoutResult]:
+    result: CanisterResult[nat64] = yield token_canister.transfer(to, amount)
+
+    if result.err is not None:
+        return {
+            'err': result.err
+        }
+
+    return {
+        'ok': result.ok
+    }
+</code></pre>
+<p>Notice that the <code>token_canister.transfer</code> method, because it is a cross-canister method, returns a <code>CanisterResult</code>. All cross-canister calls return <code>CanisterResult</code>, which has an <code>ok</code> or <code>err</code> property depending on if the cross-canister call was successful or not.</p>
+<p>The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a <code>CanisterResult</code>. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a <code>try...except</code> most likely won't do anything useful.</p>
+<p>Let's add to our example code and explore adding some practical result-based error-handling to stop people from stealing tokens.</p>
+<p><code>token_canister</code>:</p>
+<pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update, Variant
+
+accounts = StableBTreeMap[Principal, nat64](memory_id=0, max_key_size=38, max_value_size=15)
+
+class TransferResult(Variant, total=False):
+    ok: nat64
+    err: 'TransferError'
+
+class TransferError(Variant, total=False):
+    InsufficientBalance: nat64
+
+@update
+def transfer(to: Principal, amount: nat64) -&gt; TransferResult:
+    from_ = ic.caller()
+
+    from_balance = accounts.get(from_) or 0
+
+    if from_balance &lt; amount:
+        return {
+            'err': {
+                'InsufficientBalance': from_balance
+            }
+        }
+
+    to_balance = accounts.get(to) or 0
+
+    accounts.insert(from_, from_balance - amount)
+    accounts.insert(to, to_balance + amount)
+
+    return {
+        'ok': amount
+    }
+</code></pre>
+<p><code>payout_canister</code>:</p>
+<pre><code class="language-python">from kybra import Async, Canister, CanisterResult, method, nat64, Principal, update, Variant
+
+class TokenCanister(Canister):
+    @method
+    def transfer(self, to: Principal, amount: nat64) -&gt; 'TransferResult': ...
+
+class TransferResult(Variant, total=False):
+    ok: nat64
+    err: 'TransferError'
+
+class TransferError(Variant, total=False):
+    InsufficientBalance: nat64
+
+token_canister = TokenCanister(
+    Principal.from_str('r7inp-6aaaa-aaaaa-aaabq-cai')
+)
+
+class PayoutResult(Variant, total=False):
+    ok: nat64
+    err: str
+
+@update
+def payout(
+    to: Principal,
+    amount: nat64
+) -&gt; Async[PayoutResult]:
+    canister_result: CanisterResult[TransferResult] = yield token_canister.transfer(to, amount)
+
+    if canister_result.err is not None:
+        return {
+            'err': canister_result.err
+        }
+
+    transfer_result = canister_result.ok
+
+    if 'err' in transfer_result:
+        return {
+            'err': str(transfer_result['err'])
+        }
+    elif 'ok' not in transfer_result:
+        return {
+            'err': f'ok and err both do not exist in {str(transfer_result)}'
+        }
+
+    return {
+        'ok': transfer_result['ok']
+    }
+</code></pre>
+<p>So far we have only shown a cross-canister call from an update method. Update methods can call other update methods or query methods (but not composite query methods as discussed below). If an update method calls a query method, that query method will be called in replicated mode. Replicated mode engages the consensus process, but for queries the state will still be discarded.</p>
+<p>Cross-canister calls can also be initiated from query methods (not yet live on IC mainnet but this works locally). These are known as composite queries, and in Kybra they are simply query methods that return a generator using the <code>Async</code> type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.</p>
+<p>Here's an example of a composite query method:</p>
+<pre><code class="language-python">from kybra import Async, Canister, CanisterResult, method, Principal, query, Variant
+
+class SomeCanister(Canister):
+    @method
+    def query_for_boolean(self) -&gt; bool: ...
+
+some_canister = SomeCanister(
+    Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai')
+)
+
+class QuerySomeCanisterResult(Variant, total=False):
+    ok: bool
+    err: str
+
+@query
+def query_some_canister() -&gt; Async[QuerySomeCanisterResult]:
+    canister_result: CanisterResult[bool] = yield some_canister.query_for_boolean()
+
+    if canister_result.err is not None:
+        return {
+            'err': canister_result.err
+        }
+
+    return {
+        'ok': canister_result.ok
+    }
+</code></pre>
+<p>You can expect cross-canister calls within the same subnet to take up to a few seconds to complete, and cross-canister calls across subnets <a href="https://forum.dfinity.org/t/can-i-run-multiple-inter-canister-update-calls-in-parallel/13115/6">take about double that time</a>.</p>
+<p>If you don't need to wait for your cross-canister call to return, you can use <code>notify</code>:</p>
+<pre><code class="language-python">from kybra import Canister, method, null, Principal, query, RejectionCode, Variant, void
+
+class SomeCanister(Canister):
+    @method
+    def receive_notification(self) -&gt; void: ...
+
+some_canister = SomeCanister(
+    Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai')
+)
+
+class ReceiveNotificationResult(Variant, total=False):
+    ok: null
+    err: RejectionCode
+
+@query
+def send_notification() -&gt; ReceiveNotificationResult:
+    return some_canister.receive_notification().notify()
+</code></pre>
+<p>If you need to send cycles with your cross-canister call, you can call <code>with_cycles</code> before calling <code>call</code> or <code>notify</code>:</p>
+<pre><code class="language-python">from kybra import Canister, method, null, Principal, query, RejectionCode, Variant, void
+
+class SomeCanister(Canister):
+    @method
+    def receive_notification(self) -&gt; void: ...
+
+some_canister = SomeCanister(
+    Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai')
+)
+
+class ReceiveNotificationResult(Variant, total=False):
+    ok: null
+    err: RejectionCode
+
+@query
+def send_notification() -&gt; ReceiveNotificationResult:
+    return some_canister.receive_notification().with_cycles(1_000_000).notify()
+</code></pre>
 
                     </main>
 

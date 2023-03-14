@@ -142,6 +142,38 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="delete_canister"><a class="header" href="#delete_canister">delete_canister</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
+</ul>
+<pre><code class="language-python">from kybra import (
+    Async,
+    CanisterResult,
+    Principal,
+    update,
+    Variant,
+    void,
+)
+from kybra.canisters.management import management_canister
+
+
+class DefaultResult(Variant, total=False):
+    ok: bool
+    err: str
+
+
+@update
+def execute_delete_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
+    canister_result: CanisterResult[void] = yield management_canister.delete_canister(
+        {&quot;canister_id&quot;: canister_id}
+    )
+
+    if canister_result.err is not None:
+        return {&quot;err&quot;: canister_result.err}
+
+    return {&quot;ok&quot;: True}
+</code></pre>
 
                     </main>
 

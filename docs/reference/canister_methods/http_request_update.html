@@ -142,6 +142,64 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="http_request_update"><a class="header" href="#http_request_update">http_request_update</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
+</ul>
+<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
+from typing import TypeAlias
+
+
+class HttpRequest(Record):
+    method: str
+    url: str
+    headers: list[&quot;Header&quot;]
+    body: blob
+
+
+class HttpResponse(Record):
+    status_code: nat16
+    headers: list[&quot;Header&quot;]
+    body: blob
+    streaming_strategy: opt[&quot;StreamingStrategy&quot;]
+    upgrade: opt[bool]
+
+
+Header = tuple[str, str]
+
+
+class StreamingStrategy(Variant):
+    Callback: &quot;CallbackStrategy&quot;
+
+
+class CallbackStrategy(Record):
+    callback: &quot;Callback&quot;
+    token: &quot;Token&quot;
+
+
+Callback: TypeAlias = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&quot;])  # type: ignore
+
+
+class StreamingCallbackHttpResponse(Record):
+    body: blob
+    token: opt[&quot;Token&quot;]
+
+
+class Token(Record):
+    arbitrary_data: str
+
+
+@query
+def http_request_update(req: HttpRequest) -&gt; HttpResponse:
+    return {
+        &quot;status_code&quot;: 200,
+        &quot;headers&quot;: [],
+        &quot;body&quot;: bytes(),
+        &quot;streaming_strategy&quot;: None,
+        &quot;upgrade&quot;: False,
+    }
+</code></pre>
 
                     </main>
 

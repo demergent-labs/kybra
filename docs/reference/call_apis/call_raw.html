@@ -142,6 +142,42 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="call-raw"><a class="header" href="#call-raw">call raw</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/call_raw">call_raw</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
+</ul>
+<pre><code class="language-python">from kybra import (
+    Async,
+    blob,
+    CanisterResult,
+    ic,
+    nat64,
+    Principal,
+    update,
+    Variant,
+)
+
+
+class ExecuteCallRawResult(Variant, total=False):
+    ok: str
+    err: str
+
+
+@update
+def execute_call_raw(
+    canister_id: Principal, method: str, candid_args: str, payment: nat64
+) -&gt; Async[ExecuteCallRawResult]:
+    canister_result: CanisterResult[blob] = yield ic.call_raw(
+        canister_id, method, ic.candid_encode(candid_args), payment
+    )
+
+    if canister_result.err is not None:
+        return {&quot;err&quot;: canister_result.err}
+
+    return {&quot;ok&quot;: ic.candid_decode(canister_result.ok)}
+</code></pre>
 
                     </main>
 

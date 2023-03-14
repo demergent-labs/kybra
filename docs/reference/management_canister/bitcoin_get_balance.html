@@ -142,6 +142,38 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="bitcoin_get_balance"><a class="header" href="#bitcoin_get_balance">bitcoin_get_balance</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
+</ul>
+<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+from kybra.canisters.management.bitcoin import Satoshi
+from kybra.canisters.management import management_canister
+
+BITCOIN_API_CYCLE_COST = 100_000_000
+
+
+class ExecuteGetBalanceResult(Variant, total=False):
+    ok: Satoshi
+    err: str
+
+
+@update
+def get_balance(address: str) -&gt; Async[ExecuteGetBalanceResult]:
+    canister_result: CanisterResult[
+        Satoshi
+    ] = yield management_canister.bitcoin_get_balance(
+        {&quot;address&quot;: address, &quot;min_confirmations&quot;: None, &quot;network&quot;: {&quot;Regtest&quot;: None}}
+    ).with_cycles(
+        BITCOIN_API_CYCLE_COST
+    )
+
+    if canister_result.err is not None:
+        return {&quot;err&quot;: canister_result.err}
+
+    return {&quot;ok&quot;: canister_result.ok}
+</code></pre>
 
                     </main>
 

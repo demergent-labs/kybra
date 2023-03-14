@@ -142,6 +142,26 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="null"><a class="header" href="#null">null</a></h1>
+<p>This section is a work in progress.</p>
+<p>The Python type <code>None</code> and the Kybra type <code>null</code> both correspond to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-null">Candid type null</a> and will become the <a href="https://docs.python.org/3/library/stdtypes.html#the-null-object">Python Null Object</a> at runtime.</p>
+<p>Python:</p>
+<pre><code class="language-python">from kybra import ic, query
+
+@query
+def get_null() -&gt; None:
+    return None
+
+@query
+def print_null(none: None) -&gt; None:
+    ic.print(type(none))
+    return none
+</code></pre>
+<p>Candid:</p>
+<pre><code class="language-python">service: {
+    &quot;get_null&quot;: () -&gt; (null) query;
+    &quot;print_null&quot;: (null) -&gt; (null) query;
+}
+</code></pre>
 
                     </main>
 

@@ -142,6 +142,58 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="func"><a class="header" href="#func">func</a></h1>
+<p>This section is a work in progress.</p>
+<p>WARNING: <code>Func</code> currently <a href="https://github.com/demergent-labs/kybra/issues/229">causes type errors in VS Code</a>. Get around this by ending your <code>Func</code> type declaration with the following comment: <code># type: ignore</code></p>
+<p>The Kybra type <code>Func</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-func---">Candid type func</a> and at runtime will become a Python tuple with two elements, the first being an <a href="https://github.com/rocklabs-io/ic-py">ic-py Principal</a> and the second being a <a href="https://docs.python.org/3/library/stdtypes.html#textseq">Python str</a>. The <code>ic-py Principal</code> represents the <code>principal</code> of the canister/service where the function exists, and the <code>str</code> represents the function's name.</p>
+<p>Note that an explicit <code>TypeAlias</code> must be used when defining a <code>func</code>.</p>
+<p>Python:</p>
+<pre><code class="language-python">from kybra import Func, nat64, null, Principal, query, Query, Record, Update, Variant
+from typing import TypeAlias
+
+
+class User(Record):
+    id: str
+    basic_func: &quot;BasicFunc&quot;
+    complex_func: &quot;ComplexFunc&quot;
+
+
+class Reaction(Variant, total=False):
+    Good: null
+    Bad: null
+    BasicFunc: &quot;BasicFunc&quot;
+    ComplexFunc: &quot;ComplexFunc&quot;
+
+
+BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
+ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+
+
+@query
+def get_basic_func() -&gt; BasicFunc:  # type: ignore
+    return (Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;), &quot;simple_function_name&quot;)
+
+
+@query
+def get_complex_func() -&gt; ComplexFunc:  # type: ignore
+    return (Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;), &quot;complex_function_name&quot;)
+</code></pre>
+<p>Candid:</p>
+<pre><code class="language-python">type User = record {
+    &quot;id&quot;: text;
+    &quot;basic_func&quot;: BasicFunc;
+    &quot;complex_func&quot;: ComplexFunc;
+};
+type Reaction = variant { &quot;Good&quot;: null; &quot;Bad&quot;: null; &quot;BasicFunc&quot;: BasicFunc; &quot;ComplexFunc&quot;: ComplexFunc };
+
+type BasicFunc = func (text) -&gt; (text) query;
+type ComplexFunc = func (User, Reaction) -&gt; (nat64);
+
+service: () -&gt; {
+    &quot;get_basic_func&quot;: () -&gt; (BasicFunc) query;
+    &quot;get_complex_func&quot;: () -&gt; (ComplexFunc) query;
+}
+
+</code></pre>
 
                     </main>
 

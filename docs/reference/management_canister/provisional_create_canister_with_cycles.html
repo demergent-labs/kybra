@@ -142,6 +142,41 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="provisional_create_canister_with_cycles"><a class="header" href="#provisional_create_canister_with_cycles">provisional_create_canister_with_cycles</a></h1>
+<p>This section is a work in progress.</p>
+<p>Examples:</p>
+<ul>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
+</ul>
+<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+from kybra.canisters.management import (
+    CreateCanisterResult,
+    management_canister,
+    ProvisionalCreateCanisterWithCyclesResult,
+)
+
+
+class ExecuteProvisionalCreateCanisterWithCyclesResult(Variant, total=False):
+    ok: CreateCanisterResult
+    err: str
+
+
+@update
+def provisional_create_canister_with_cycles() -&gt; (
+    Async[ExecuteProvisionalCreateCanisterWithCyclesResult]
+):
+    canister_result: CanisterResult[
+        ProvisionalCreateCanisterWithCyclesResult
+    ] = yield management_canister.provisional_create_canister_with_cycles(
+        {&quot;amount&quot;: None, &quot;settings&quot;: None}
+    )
+
+    if canister_result.err is not None:
+        return {&quot;err&quot;: canister_result.err}
+
+    provisional_create_canister_with_cycles_result = canister_result.ok
+
+    return {&quot;ok&quot;: provisional_create_canister_with_cycles_result}
+</code></pre>
 
                     </main>
 

@@ -146,7 +146,38 @@
 <ul>
 <li>Most of the <code>stdlib</code> doesn't work yet</li>
 <li>Most PyPI packages will not work yet</li>
+<li>All Kybra canisters have a public metadata key-value pair named <code>cdk</code> which contains the version of Kybra the canister is using
+<ul>
+<li>Anyone can query this metadata which may be a security risk</li>
 </ul>
+</li>
+<li><a href="https://docs.python.org/3/library/datetime.html">The datetime stdlib</a> does not work yet, <a href="https://github.com/demergent-labs/kybra/blob/main/examples/date/src/main.py">see here for an alternative</a></li>
+</ul>
+<h2 id="python-stdlib"><a class="header" href="#python-stdlib">Python stdlib</a></h2>
+<p>There is limited support for the <code>stdlib</code>. The following modules may be supported as far as <a href="https://github.com/RustPython/RustPython">RustPython</a> or the IC support them:</p>
+<ul>
+<li>array</li>
+<li>binascii</li>
+<li>_bisect</li>
+<li>cmath</li>
+<li>_contextvars</li>
+<li>_csv</li>
+<li>_dis</li>
+<li>gc</li>
+<li>hashlib</li>
+<li>_json</li>
+<li>math</li>
+<li>pyexpat</li>
+<li>_struct</li>
+<li>_random</li>
+<li>_statistics</li>
+<li>unicodedata</li>
+<li>zlib</li>
+</ul>
+<h2 id="python-external-packages"><a class="header" href="#python-external-packages">Python External Packages</a></h2>
+<p>Installing external packages, such as from <a href="https://pypi.org/">PyPI</a>, will probably not work. The biggest problem you are most likely to run into is lack of support for most of the Python stdlib. Once the Wasm binary limit is increased on the IC, much more of the stdlib should be supported which should open up many external packages.</p>
+<p>Once the majority of the stdlib is supported, you are likely to run into issues with the environment that the Python code is running in. It is a Rust <code>wasm32-unknown-unknown</code> environment that has access to the IC APIs. Any external packages that can't compile or run in this environment with the supported APIs will not work.</p>
+<p>Much of the future work for enabling external packages will be forking and patching packages to support IC APIs.</p>
 
                     </main>
 

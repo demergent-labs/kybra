@@ -142,6 +142,28 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="int64"><a class="header" href="#int64">int64</a></h1>
+<p>This section is a work in progress.</p>
+<p>The Kybra type <code>int64</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn">Candid type int64</a> and will become a <a href="https://docs.python.org/3/library/functions.html#int">Python int</a> at runtime.</p>
+<p>Python:</p>
+<pre><code class="language-python">from kybra import ic, int64, query
+
+
+@query
+def get_int64() -&gt; int64:
+    return 9_223_372_036_854_775_807
+
+
+@query
+def print_int64(int64: int64) -&gt; int64:
+    ic.print(type(int64))
+    return int64
+</code></pre>
+<p>Candid:</p>
+<pre><code class="language-python">service: {
+    &quot;get_int64&quot;: () -&gt; (int64) query;
+    &quot;print_int64&quot;: (int64) -&gt; (int64) query;
+}
+</code></pre>
 
                     </main>
 

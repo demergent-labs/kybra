@@ -17,69 +17,113 @@
 # Taken in part from: https://github.com/dfinity/interface-spec/blob/master/spec/ic.did
 
 from kybra import blob, Canister, method, Principal, void
-from kybra.canisters.management.basic import CanisterStatusResult, DepositCyclesArgs, DeleteCanisterArgs, CreateCanisterArgs, CreateCanisterResult, InstallCodeArgs, UninstallCodeArgs, UpdateSettingsArgs, StartCanisterArgs, StopCanisterArgs, CanisterStatusArgs, ProvisionalCreateCanisterWithCyclesArgs, ProvisionalCreateCanisterWithCyclesResult, ProvisionalTopUpCanisterArgs
-from kybra.canisters.management.http import HttpRequestArgs, HttpResponse
-from kybra.canisters.management.bitcoin import GetBalanceArgs, GetCurrentFeePercentilesArgs, GetUtxosArgs, GetUtxosResult, MillisatoshiPerByte, Satoshi, SendTransactionArgs
+
+# The as expressions are reexporting these variables
+from kybra.canisters.management.basic import (
+    CanisterStatusResult as CanisterStatusResult,
+    DepositCyclesArgs as DepositCyclesArgs,
+    DeleteCanisterArgs as DeleteCanisterArgs,
+    CreateCanisterArgs as CreateCanisterArgs,
+    CreateCanisterResult as CreateCanisterResult,
+    InstallCodeArgs as InstallCodeArgs,
+    UninstallCodeArgs as UninstallCodeArgs,
+    UpdateSettingsArgs as UpdateSettingsArgs,
+    StartCanisterArgs as StartCanisterArgs,
+    StopCanisterArgs as StopCanisterArgs,
+    CanisterStatusArgs as CanisterStatusArgs,
+    ProvisionalCreateCanisterWithCyclesArgs as ProvisionalCreateCanisterWithCyclesArgs,
+    ProvisionalCreateCanisterWithCyclesResult as ProvisionalCreateCanisterWithCyclesResult,
+    ProvisionalTopUpCanisterArgs as ProvisionalTopUpCanisterArgs,
+)
+from kybra.canisters.management.http import (
+    HttpRequestArgs as HttpRequestArgs,
+    HttpResponse as HttpResponse,
+)
+from kybra.canisters.management.bitcoin import (
+    GetBalanceArgs as GetBalanceArgs,
+    GetCurrentFeePercentilesArgs as GetCurrentFeePercentilesArgs,
+    GetUtxosArgs as GetUtxosArgs,
+    GetUtxosResult as GetUtxosResult,
+    MillisatoshiPerByte as MillisatoshiPerByte,
+    Satoshi as Satoshi,
+    SendTransactionArgs as SendTransactionArgs,
+)
 
 # TODO change the return types to void
 
 
 class ManagementCanister(Canister):
     @method
-    def bitcoin_get_balance(self, args: GetBalanceArgs) -> Satoshi: ...
+    def bitcoin_get_balance(self, args: GetBalanceArgs) -> Satoshi:
+        ...
 
     @method
     def bitcoin_get_current_fee_percentiles(
-        self, args: GetCurrentFeePercentilesArgs) -> list[MillisatoshiPerByte]: ...
+        self, args: GetCurrentFeePercentilesArgs
+    ) -> list[MillisatoshiPerByte]:
+        ...
 
     @method
-    def bitcoin_get_utxos(self, args: GetUtxosArgs) -> GetUtxosResult: ...
+    def bitcoin_get_utxos(self, args: GetUtxosArgs) -> GetUtxosResult:
+        ...
 
     @method
-    def bitcoin_send_transaction(self, args: SendTransactionArgs) -> void: ...
+    def bitcoin_send_transaction(self, args: SendTransactionArgs) -> void:
+        ...
 
     @method
-    def create_canister(
-        self, args: CreateCanisterArgs) -> CreateCanisterResult: ...
+    def create_canister(self, args: CreateCanisterArgs) -> CreateCanisterResult:
+        ...
 
     @method
-    def update_settings(self, args: UpdateSettingsArgs) -> void: ...
+    def update_settings(self, args: UpdateSettingsArgs) -> void:
+        ...
 
     @method
-    def install_code(self, args: InstallCodeArgs) -> void: ...
+    def install_code(self, args: InstallCodeArgs) -> void:
+        ...
 
     @method
-    def uninstall_code(self, args: UninstallCodeArgs) -> void: ...
+    def uninstall_code(self, args: UninstallCodeArgs) -> void:
+        ...
 
     @method
-    def start_canister(self, args: StartCanisterArgs) -> void: ...
+    def start_canister(self, args: StartCanisterArgs) -> void:
+        ...
 
     @method
-    def stop_canister(self, args: StopCanisterArgs) -> void: ...
+    def stop_canister(self, args: StopCanisterArgs) -> void:
+        ...
 
     @method
-    def canister_status(
-        self, args: CanisterStatusArgs) -> CanisterStatusResult: ...
+    def canister_status(self, args: CanisterStatusArgs) -> CanisterStatusResult:
+        ...
 
     @method
-    def delete_canister(self, args: DeleteCanisterArgs) -> void: ...
+    def delete_canister(self, args: DeleteCanisterArgs) -> void:
+        ...
 
     @method
-    def deposit_cycles(self, args: DepositCyclesArgs) -> void: ...
+    def deposit_cycles(self, args: DepositCyclesArgs) -> void:
+        ...
 
     @method
-    def raw_rand(self) -> blob: ...
+    def raw_rand(self) -> blob:
+        ...
 
     @method
     def provisional_create_canister_with_cycles(
-        self, args: ProvisionalCreateCanisterWithCyclesArgs) -> ProvisionalCreateCanisterWithCyclesResult: ...
+        self, args: ProvisionalCreateCanisterWithCyclesArgs
+    ) -> ProvisionalCreateCanisterWithCyclesResult:
+        ...
 
     @method
-    def provisional_top_up_canister(
-        self, args: ProvisionalTopUpCanisterArgs) -> void: ...
+    def provisional_top_up_canister(self, args: ProvisionalTopUpCanisterArgs) -> void:
+        ...
 
     @method
-    def http_request(self, args: HttpRequestArgs) -> HttpResponse: ...
+    def http_request(self, args: HttpRequestArgs) -> HttpResponse:
+        ...
 
 
-management_canister = ManagementCanister(Principal.from_str('aaaaa-aa'))
+management_canister = ManagementCanister(Principal.from_str("aaaaa-aa"))

@@ -144,16 +144,25 @@
                         <h1 id="management-canister"><a class="header" href="#management-canister">Management Canister</a></h1>
 <p>This chapter is a work in progress.</p>
 <p>You can access the management canister like this:</p>
-<pre><code class="language-python">from kybra import Async, blob, update, Variant
+<pre><code class="language-python">from kybra import Async, blob, CanisterResult, update, Variant
 from kybra.canisters.management import management_canister
 
-class RandomBytesResult(Variant):
+class RandomBytesResult(Variant, total=False):
     ok: blob
     err: str
 
 @update
 def random_bytes() -&gt; Async[RandomBytesResult]:
-    return yield management_canister.raw_rand()
+    canister_result: CanisterResult[blob] = yield management_canister.raw_rand()
+
+    if canister_result.err is not None:
+        return {
+            'err': canister_result.err
+        }
+
+    return {
+        'ok': canister_result.ok
+    }
 </code></pre>
 <p>See the <a href="https://github.com/demergent-labs/kybra/blob/main/kybra/canisters/management/__init__.py">management canister types</a> for all methods and their parameter and return types.</p>
 

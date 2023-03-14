@@ -142,6 +142,54 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="record"><a class="header" href="#record">record</a></h1>
+<p>This section is a work in progress.</p>
+<p>Python classes that inherit from the Kybra type <code>Record</code> correspond to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-record--n--t--">Candid record type</a> and will become <a href="https://docs.python.org/3/library/typing.html#typing.TypedDict">Python TypedDicts</a> at runtime.</p>
+<p>Python:</p>
+<pre><code class="language-python">from kybra import Record
+
+
+class Post(Record):
+    id: str
+    author: &quot;User&quot;
+    text: str
+    thread: &quot;Thread&quot;
+
+
+class Thread(Record):
+    id: str
+    author: &quot;User&quot;
+    posts: list[Post]
+    title: str
+
+
+class User(Record):
+    id: str
+    posts: list[Post]
+    thread: list[Thread]
+    username: str
+</code></pre>
+<p>Candid:</p>
+<pre><code class="language-python">type Post = record {
+    &quot;id&quot;: text;
+    &quot;author&quot;: User;
+    &quot;text&quot;: text;
+    &quot;thread&quot;: Thread;
+};
+
+type Thread = record {
+    &quot;id&quot;: text;
+    &quot;author&quot;: User;
+    &quot;posts&quot;: vec Post;
+    &quot;title&quot;: text;
+};
+
+type User = record {
+    &quot;id&quot;: text;
+    &quot;posts&quot;: vec Post;
+    &quot;threads&quot;: vec Thread;
+    &quot;username&quot;: text;
+};
+</code></pre>
 
                     </main>
 

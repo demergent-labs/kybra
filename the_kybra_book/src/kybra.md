@@ -155,9 +155,9 @@ Some of Kybra's main drawbacks can be summarized as follows:
 
 Kybra reached beta in December of 2022. It's an immature project that may have unforeseen bugs and other issues. We're working constantly to improve it. We hope to get to a production-ready 1.0 in 2023. The following are the major blockers to 1.0:
 
--   Majority `stdlib` support (~Q2/Q3 2023)
--   Extensive automated property testing (~Q1 2023)
--   Multiple independent security reviews/audits (~Q1/Q2 2023)
+-   Majority stdlib support (~Q2/Q3 2023)
+-   Extensive automated property testing (~Q1/Q2 2023)
+-   Multiple independent security reviews/audits (~Q3 2023)
 -   Performance improvements if necessary (~2023)
 
 ##### Security risks
