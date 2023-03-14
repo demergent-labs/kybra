@@ -1,4 +1,4 @@
-from kybra import nat, query, update
+from kybra import nat, query, update, void
 
 counter: nat = 0
 
@@ -9,14 +9,14 @@ def get() -> nat:
 
 
 @update
-def set(n: nat):
+def set(n: nat) -> void:
     global counter
 
     counter = n
 
 
 @update
-def inc():
+def inc() -> void:
     global counter
 
     counter += 1

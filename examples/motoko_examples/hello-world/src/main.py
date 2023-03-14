@@ -1,6 +1,6 @@
-from kybra import ic, query
+from kybra import ic, query, void
 
 
 @query
-def main():
+def main() -> void:
     ic.print("Hello World!")

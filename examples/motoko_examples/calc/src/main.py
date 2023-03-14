@@ -1,4 +1,4 @@
-from kybra import opt, update
+from kybra import opt, update, void
 
 cell: int = 0
 
@@ -44,7 +44,7 @@ def div(n: int) -> opt[int]:
 
 
 @update
-def clearall():
+def clearall() -> void:
     global cell
 
     cell = 0

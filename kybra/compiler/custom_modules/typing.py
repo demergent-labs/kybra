@@ -6,6 +6,10 @@
 
 import sys
 
+class Annotated():
+    def __class_getitem__(cls, x):
+        return cls
+
 class Optional():
     def __class_getitem__(cls, x):
         return cls

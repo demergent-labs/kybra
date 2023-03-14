@@ -7,10 +7,12 @@ edition = "2018"
 quote = "1.0.21"
 syn = "1.0.99"
 proc-macro2 = "1.0.43"
+regex = "1.7.0"
 rustpython-parser = { git = "https://github.com/demergent-labs/RustPython", branch = "kybra_initial", default-features = false, features = [] }
 annotate-snippets = "0.9.1"
 num-bigint = "0.4.3"
 # rustpython = { path = "../../../../RustPython", default-features = false, features = [] }
-cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "909f044f5a56266d69100bcff75f07cdb7fa9b9c" }
-# cdk_framework = { path = "../../../../cdk_framework" } # For local rust-analyzer
-# cdk_framework = { path = "../../../../../../../cdk_framework" } # For local deployment in kybra/examples
+cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "000026de9893422dc736b6a431495c6a204b8950" }
+# cdk_framework = { path = "path/to/local/cdk_framework" }
+# For local rust-analyzer uncomment this line and comment out the line above.
+# Update path/to/local to be the path to your local cdk_framework repo

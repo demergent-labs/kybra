@@ -1,4 +1,4 @@
-from kybra import ic, nat64, opt, query, update
+from kybra import ic, nat64, opt, query, update, void
 from src.canister2.types import Account, AccountArgs, State
 
 state: State = {
@@ -10,6 +10,7 @@ state: State = {
     },
     'notification': ''
 }
+
 
 @update
 def transfer(
@@ -32,7 +33,7 @@ def transfer(
 
     to_account = state['accounts'].get(to, None)
 
-    if  to_account is None:
+    if to_account is None:
         state['accounts'][to] = {
             'id': to,
             'balance': 0
@@ -43,26 +44,32 @@ def transfer(
 
     return amount
 
+
 @query
 def balance(id: str) -> nat64:
     return state['accounts'].get(id, {}).get('balance', 0)
+
 
 @query
 def account(account_args: AccountArgs) -> opt[Account]:
     return state['accounts'].get(account_args['id'], None)
 
+
 @query
 def accounts() -> list[Account]:
     return list(state['accounts'].values())
+
 
 @query
 def trap() -> str:
     ic.trap('hahahaha')
     return 'You will never get here'
 
+
 @update
-def receive_notification(message: str):
+def receive_notification(message: str) -> void:
     state['notification'] = message
+
 
 @query
 def get_notification() -> str:

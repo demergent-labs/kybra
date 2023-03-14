@@ -1,5 +1,6 @@
 import sys
 from typing import (
+    Annotated,
     Any,
     Callable,
     Generator,
@@ -40,6 +41,8 @@ text = str
 T = TypeVar("T")
 opt = Optional[T]
 manual = Optional[T]
+alias = Annotated[T, None]
+
 
 Record = TypedDict
 Variant = TypedDict
@@ -54,8 +57,8 @@ empty: TypeAlias = NoReturn  # TODO in Python 3.11 I believe there is a Never ty
 
 Async = Generator[Any, Any, T]
 
-TimerId = nat64
-Duration = nat64
+TimerId = alias[nat64]
+Duration = alias[nat64]
 
 
 def query(
