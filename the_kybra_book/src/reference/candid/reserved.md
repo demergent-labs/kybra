@@ -2,37 +2,28 @@
 
 This section is a work in progress.
 
-The Azle type `reserved` corresponds to the [Candid type reserved](https://internetcomputer.org/docs/current/references/candid-ref#type-reserved), is the TypeScript type `any`, and will become a [JavaScript null](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/null) at runtime.
+The Kybra type `reserved` corresponds to the [Candid type reserved](https://internetcomputer.org/docs/current/references/candid-ref#type-reserved) and will become the [Python Null Object](https://docs.python.org/3/library/stdtypes.html#the-null-object) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { $query, reserved } from 'azle';
+```python
+from kybra import ic, query, reserved
 
-$query;
-export function get_reserved(): reserved {
-    return 'anything';
-}
+@query
+def get_reserved() -> reserved:
+    return 'anything'
 
-$query;
-export function print_reserved(reserved: reserved): reserved {
-    console.log(typeof reserved);
-    return reserved;
-}
+@query
+def print_reserved(reserved: reserved) -> reserved:
+    ic.print(type(reserved))
+    return reserved
 ```
 
 Candid:
 
-```
-service : () -> {
-    get_reserved : () -> (reserved) query;
-    print_reserved : (reserved) -> (reserved) query;
+```python
+service: {
+    "get_reserved": () -> (reserved) query;
+    "print_reserved": (reserved) -> (reserved) query;
 }
-```
-
-dfx:
-
-```bash
-dfx canister call candid_canister print_reserved '(null)'
-(null : reserved)
 ```

@@ -2,37 +2,28 @@
 
 This section is a work in progress.
 
-The TypeScript type `null` corresponds to the [Candid type null](https://internetcomputer.org/docs/current/references/candid-ref#type-null) and will become a [JavaScript null](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/null) at runtime.
+The Python type `None` and the Kybra type `null` both correspond to the [Candid type null](https://internetcomputer.org/docs/current/references/candid-ref#type-null) and will become the [Python Null Object](https://docs.python.org/3/library/stdtypes.html#the-null-object) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { $query } from 'azle';
+```python
+from kybra import ic, query
 
-$query;
-export function get_null(): null {
-    return null;
-}
+@query
+def get_null() -> None:
+    return None
 
-$query;
-export function print_null(null_: null): null {
-    console.log(typeof null_);
-    return null_;
-}
+@query
+def print_null(none: None) -> None:
+    ic.print(type(none))
+    return none
 ```
 
 Candid:
 
-```
-service : () -> {
-    get_null : () -> (null) query;
-    print_null : (null) -> (null) query;
+```python
+service: {
+    "get_null": () -> (null) query;
+    "print_null": (null) -> (null) query;
 }
-```
-
-dfx:
-
-```bash
-dfx canister call candid_canister print_null '(null)'
-(null : null)
 ```

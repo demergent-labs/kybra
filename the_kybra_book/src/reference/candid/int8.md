@@ -2,37 +2,28 @@
 
 This section is a work in progress.
 
-The Azle type `int8` corresponds to the [Candid type int8](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [JavaScript Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) at runtime.
+The Kybra type `int8` corresponds to the [Candid type int8](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { int8, $query } from 'azle';
+```python
+from kybra import ic, int8, query
 
-$query;
-export function get_int8(): int8 {
-    return 127;
-}
+@query
+def get_int8() -> int8:
+    return 127
 
-$query;
-export function print_int8(int8: int8): int8 {
-    console.log(typeof int8);
-    return int8;
-}
+@query
+def print_int8(int8: int8) -> int8:
+    ic.print(type(int8))
+    return int8
 ```
 
 Candid:
 
-```
-service : () -> {
-    get_int8 : () -> (int8) query;
-    print_int8 : (int8) -> (int8) query;
+```python
+service: {
+    "get_int8": () -> (int8) query;
+    "print_int8": (int8) -> (int8) query;
 }
-```
-
-dfx:
-
-```bash
-dfx canister call candid_canister print_int8 '(127 : int8)'
-(127 : int8)
 ```

@@ -4,7 +4,7 @@ This section is a work in progress.
 
 Examples:
 
--   [ic_api](https://github.com/demergent-labs/azle/tree/main/examples/ic_api)
+-   [ic_api](https://github.com/demergent-labs/kybra/tree/main/examples/ic_api)
 
 ```python
 from kybra import blob, ic, update, void

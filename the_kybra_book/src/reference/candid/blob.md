@@ -2,40 +2,28 @@
 
 This section is a work in progress.
 
-The Azle type `blob` corresponds to the [Candid type blob](https://internetcomputer.org/docs/current/references/candid-ref#type-blob) and will become a [JavaScript Uint8Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array) at runtime.
+The Kybra type `blob` corresponds to the [Candid type blob](https://internetcomputer.org/docs/current/references/candid-ref#type-blob) and will become a [Python bytes](https://docs.python.org/3/library/stdtypes.html#bytes) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { blob, $query } from 'azle';
+```Python
+from kybra import blob, ic, query
 
-$query;
-export function get_blob(): blob {
-    return Uint8Array.from([68, 73, 68, 76, 0, 0]);
-}
+@query
+def get_blob() -> blob:
+    return bytes([68, 73, 68, 76, 0, 0])
 
-$query;
-export function print_blob(blob: blob): blob {
-    console.log(typeof blob);
-    return blob;
-}
+@query
+def print_blob(blob: blob) -> blob:
+    ic.print(type(blob))
+    return blob
 ```
 
 Candid:
 
-```
-service : () -> {
-    get_blob : () -> (vec nat8) query;
-    print_blob : (vec nat8) -> (vec nat8) query;
+```python
+service: {
+    "get_blob": () -> (blob) query;
+    "print_blob": (blob) -> (blob) query;
 }
-```
-
-dfx:
-
-```bash
-dfx canister call candid_canister print_blob '(vec { 68; 73; 68; 76; 0; 0; })'
-(blob "DIDL\00\00")
-
-dfx canister call candid_canister print_blob '(blob "DIDL\00\00")'
-(blob "DIDL\00\00")
 ```

@@ -2,37 +2,28 @@
 
 This section is a work in progress.
 
-The TypeScript type `boolean` corresponds to the [Candid type bool](https://internetcomputer.org/docs/current/references/candid-ref#type-bool) and will become a [JavaScript Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean) at runtime.
+The Python type `bool` corresponds to the [Candid type bool](https://internetcomputer.org/docs/current/references/candid-ref#type-bool) and will become a [Python Boolean Value](https://docs.python.org/3/library/stdtypes.html#boolean-values) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { $query } from 'azle';
+```Python
+from kybra import ic, query
 
-$query;
-export function get_bool(): boolean {
-    return true;
-}
+@query
+def get_bool() -> bool:
+    return True
 
-$query;
-export function print_bool(bool: boolean): boolean {
-    console.log(typeof bool);
-    return bool;
-}
+@query
+def print_bool(bool: bool) -> bool:
+    ic.print(type(bool))
+    return bool
 ```
 
 Candid:
 
-```
-service : () -> {
-    get_bool : () -> (bool) query;
-    print_bool : (bool) -> (bool) query;
+```python
+service: {
+    "get_bool": () -> (bool) query;
+    "print_bool": (bool) -> (bool) query;
 }
-```
-
-dfx:
-
-```bash
-dfx canister call candid_canister print_bool '(true)'
-(true)
 ```

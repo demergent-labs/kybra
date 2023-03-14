@@ -2,53 +2,47 @@
 
 This section is a work in progress.
 
-TypeScript type aliases referring to object literals wrapped in the `Variant` Azle type correspond to the [Candid variant type](https://internetcomputer.org/docs/current/references/candid-ref#type-variant--n--t--) and will become [JavaScript Objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) at runtime.
+Python classes that inherit from the Kybra type `Variant` correspond to the [Candid variant type](https://internetcomputer.org/docs/current/references/candid-ref#type-variant--n--t--) and will become [Python TypedDicts](https://docs.python.org/3/library/typing.html#typing.TypedDict) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { $query, Variant } from 'azle';
+```python
+from kybra import nat32, Variant
 
-type Reaction = Variant<{
-    Fire: null;
-    ThumbsUp: null;
-    Emotion: Emotion;
-}>;
+class ReactionType(Variant, total=False):
+    Fire: None
+    ThumbsUp: None
+    ThumbsDown: None
+    Emotion: 'Emotion'
+    Firework: 'Firework'
 
-type Emotion = Variant<{
-    Happy: null;
-    Indifferent: null;
-    Sad: null;
-}>;
+class Emotion(Variant, total=False):
+    Happy: None
+    Sad: None
 
-$query;
-export function get_reaction(): Reaction {
-    return {
-        Fire: null
-    };
-}
-
-$query;
-export function print_reaction(reaction: Reaction): Reaction {
-    console.log(typeof reaction);
-    return reaction;
-}
+class Firework(Variant, total=False):
+    Color: str
+    NumStreaks: nat32
 ```
 
 Candid:
 
-```
-type Emotion = variant { Sad; Indifferent; Happy };
-type Reaction = variant { Emotion : Emotion; Fire; ThumbsUp };
-service : () -> {
-    get_reaction : () -> (Reaction) query;
-    print_reaction : (Reaction) -> (Reaction) query;
-}
-```
+```python
+type ReactionType = variant {
+    "Fire": null;
+    "ThumbsUp": null;
+    "ThumbsDown": null;
+    "Emotion": Emotion;
+    "Firework": Firework
+};
 
-dfx:
+type Emotion = variant {
+    "Happy": null;
+    "Sad": null
+};
 
-```bash
-dfx canister call candid_canister print_reaction '(variant { Fire })'
-(variant { Fire })
+type Firework = record {
+    "Color": text;
+    "NumStreaks": nat32;
+};
 ```

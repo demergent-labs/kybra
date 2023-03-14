@@ -4,7 +4,7 @@ This section is a work in progress.
 
 Examples:
 
--   [timers](https://github.com/demergent-labs/azle/tree/main/examples/timers)
+-   [timers](https://github.com/demergent-labs/kybra/tree/main/examples/timers)
 
 ```python
 from kybra import (

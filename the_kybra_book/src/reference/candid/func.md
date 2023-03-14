@@ -2,48 +2,56 @@
 
 This section is a work in progress.
 
-The Azle type `func` corresponds to the [Candid type func](https://internetcomputer.org/docs/current/references/candid-ref#type-func---) and will become a [JavaScript array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) with two elements at runtime.
+WARNING: `Func` currently [causes type errors in VS Code](https://github.com/demergent-labs/kybra/issues/229). Get around this by ending your `Func` type declaration with the following comment: `# type: ignore`
 
-The first element is an [@dfinity/principal](https://www.npmjs.com/package/@dfinity/principal) and the second is a [JavaScript string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String). The `@dfinity/principal` represents the `principal` of the canister/service where the function exists, and the `string` represents the function's name.
+The Kybra type `Func` corresponds to the [Candid type func](https://internetcomputer.org/docs/current/references/candid-ref#type-func---) and at runtime will become a Python tuple with two elements, the first being an [ic-py Principal](https://github.com/rocklabs-io/ic-py) and the second being a [Python str](https://docs.python.org/3/library/stdtypes.html#textseq). The `ic-py Principal` represents the `principal` of the canister/service where the function exists, and the `str` represents the function's name.
 
-A `func` acts as a callback, allowing the `func` receiver to know which canister instance and method must be used to call back.
+Note that an explicit `TypeAlias` must be used when defining a `func`.
 
-TypeScript:
+Python:
 
-```typescript
-import { Func, Principal, $query, Query } from 'azle';
+```python
+from kybra import Func, nat64, Principal, query, Query, Record, update, Update, Variant
 
-type BasicFunc = Func<Query<(param1: string) => string>>;
+class User(Record):
+    id: str
+    basic_func: 'BasicFunc'
+    complex_func: 'ComplexFunc'
 
-$query;
-export function get_basic_func(): BasicFunc {
-    return [
-        Principal.fromText('rrkah-fqaaa-aaaaa-aaaaq-cai'),
-        'get_basic_func'
-    ];
-}
+class Reaction(Variant, total=False):
+    Good: None
+    Bad: None
+    BasicFunc: 'BasicFunc'
+    ComplexFunc: 'ComplexFunc'
 
-$query;
-export function print_basic_func(basic_func: BasicFunc): BasicFunc {
-    console.log(typeof basic_func);
-    return basic_func;
-}
+BasicFunc: TypeAlias = Func(Query[[str], str]) # type: ignore
+ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64]) # type: ignore
+
+@query
+def get_basic_func() -> BasicFunc:
+    return (Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'), 'simple_function_name')
+
+@query
+def get_complex_func() -> ComplexFunc:
+    return (Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'), 'complex_function_name')
 ```
 
 Candid:
 
-```
-service : () -> {
-    get_basic_func : () -> (func (text) -> (text) query) query;
-    print_basic_func : (func (text) -> (text) query) -> (
-        func (text) -> (text) query,
-      ) query;
+```python
+type User = record {
+    "id": text;
+    "basic_func": BasicFunc;
+    "complex_func": ComplexFunc;
+};
+type Reaction = variant { "Good": null; "Bad": null; "BasicFunc": BasicFunc; "ComplexFunc": ComplexFunc };
+
+type BasicFunc = func (text) -> (text) query;
+type ComplexFunc = func (User, Reaction) -> (nat64);
+
+service: () -> {
+    "get_basic_func": () -> (BasicFunc) query;
+    "get_complex_func": () -> (ComplexFunc) query;
 }
-```
 
-dfx:
-
-```bash
-dfx canister call candid_canister print_basic_func '(func "r7inp-6aaaa-aaaaa-aaabq-cai".get_basic_func)'
-(func "r7inp-6aaaa-aaaaa-aaabq-cai".get_basic_func)
 ```

@@ -2,37 +2,28 @@
 
 This section is a work in progress.
 
-The Azle type `nat16` corresponds to the [Candid type nat16](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [JavaScript Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number) at runtime.
+The Kybra type `nat16` corresponds to the [Candid type nat16](https://internetcomputer.org/docs/current/references/candid-ref#type-natn-and-intn) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { nat16, $query } from 'azle';
+```python
+from kybra import ic, nat16, query
 
-$query;
-export function get_nat16(): nat16 {
-    return 65_535;
-}
+@query
+def get_nat16() -> nat16:
+    return 65_535
 
-$query;
-export function print_nat16(nat16: nat16): nat16 {
-    console.log(typeof nat16);
-    return nat16;
-}
+@query
+def print_nat16(nat16: nat16) -> nat16:
+    ic.print(type(nat16))
+    return nat16
 ```
 
 Candid:
 
-```
-service : () -> {
-    get_nat16 : () -> (nat16) query;
-    print_nat16 : (nat16) -> (nat16) query;
+```python
+service: {
+    "get_nat16": () -> (nat16) query;
+    "print_nat16": (nat16) -> (nat16) query;
 }
-```
-
-dfx:
-
-```bash
-dfx canister call candid_canister print_nat16 '(65_535 : nat16)'
-(65_535 : nat16)
 ```

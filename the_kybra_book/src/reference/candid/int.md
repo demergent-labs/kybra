@@ -2,37 +2,28 @@
 
 This section is a work in progress.
 
-The Azle type `int` corresponds to the [Candid type int](https://internetcomputer.org/docs/current/references/candid-ref#type-int) and will become a [JavaScript BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) at runtime.
+The Kybra type `int` corresponds to the [Candid type int](https://internetcomputer.org/docs/current/references/candid-ref#type-int) and will become a [Python int](https://docs.python.org/3/library/functions.html#int) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { int, $query } from 'azle';
+```python
+from kybra import ic, int, query
 
-$query;
-export function get_int(): int {
-    return 170_141_183_460_469_231_731_687_303_715_884_105_727n;
-}
+@query
+def get_int() -> int:
+    return 170_141_183_460_469_231_731_687_303_715_884_105_727
 
-$query;
-export function print_int(int: int): int {
-    console.log(typeof int);
-    return int;
-}
+@query
+def print_int(int: int) -> int:
+    ic.print(type(int))
+    return int
 ```
 
 Candid:
 
-```
-service : () -> {
-    get_int : () -> (int) query;
-    print_int : (int) -> (int) query;
+```python
+service: {
+    "get_int": () -> (int) query;
+    "print_int": (int) -> (int) query;
 }
-```
-
-dfx:
-
-```bash
-dfx canister call candid_canister print_int '(170_141_183_460_469_231_731_687_303_715_884_105_727 : int)'
-(170_141_183_460_469_231_731_687_303_715_884_105_727 : int)
 ```

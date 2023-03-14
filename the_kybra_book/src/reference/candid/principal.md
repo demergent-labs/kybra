@@ -2,37 +2,28 @@
 
 This section is a work in progress.
 
-The Azle type `Principal` corresponds to the [Candid type principal](https://internetcomputer.org/docs/current/references/candid-ref#type-principal) and will become an [@dfinity/principal](https://www.npmjs.com/package/@dfinity/principal) at runtime.
+The Kybra type `Principal` corresponds to the [Candid type principal](https://internetcomputer.org/docs/current/references/candid-ref#type-principal) and will become an [ic-py Principal](https://github.com/rocklabs-io/ic-py) at runtime.
 
-TypeScript:
+Python:
 
-```typescript
-import { Principal, $query } from 'azle';
+```python
+from kybra import ic, Principal, query
 
-$query;
-export function get_principal(): Principal {
-    return Principal.fromText('rrkah-fqaaa-aaaaa-aaaaq-cai');
-}
+@query
+def get_principal() -> Principal:
+    return Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai')
 
-$query;
-export function print_principal(principal: Principal): Principal {
-    console.log(typeof principal);
-    return principal;
-}
+@query
+def print_principal(principal: Principal) -> Principal:
+    ic.print(type(principal))
+    return principal
 ```
 
 Candid:
 
-```
-service : () -> {
-    get_principal : () -> (principal) query;
-    print_principal : (principal) -> (principal) query;
+```python
+service: {
+    "get_principal": () -> (principal) query;
+    "print_principal": (principal) -> (principal) query;
 }
-```
-
-dfx:
-
-```bash
-dfx canister call candid_canister print_principal '(principal "rrkah-fqaaa-aaaaa-aaaaq-cai")'
-(principal "rrkah-fqaaa-aaaaa-aaaaq-cai")
 ```
