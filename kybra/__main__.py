@@ -14,6 +14,7 @@ from kybra.colors import red, yellow, green, dim
 from kybra.timed import timed, timed_inline
 from kybra.types import Args, Paths
 from kybra.cargotoml import generate_cargo_toml
+from kybra.candid import generate_candid_file  # type: ignore
 
 
 @timed
@@ -63,19 +64,20 @@ def main():
         paths, cargo_env, verbose=is_verbose, label="[1/3] 🔨 Compiling Python..."
     )
 
-    generate_candid_file_or_exit(
-        paths,
-        cargo_env,
-        verbose=is_verbose,
-        label=f"[2/3] 📝 Generating Candid file...{encourage_patience(is_initial_compile)}",
-    )
-
     build_wasm_binary_or_exit(
         paths,
         canister_name,
         cargo_env,
         verbose=is_verbose,
-        label=f"[3/3] 🚧 Building Wasm binary...{show_empathy(is_initial_compile)}",
+        label=f"[2/3] 🚧 Building Wasm binary...{show_empathy(is_initial_compile)}",
+    )
+
+    optimize_wasm_binary_or_exit(
+        paths,
+        canister_name,
+        cargo_env,
+        verbose=is_verbose,
+        label=f"[3/3] 🚀 Optimizing Wasm binary...{show_empathy(is_initial_compile)}",
     )
 
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
@@ -355,12 +357,25 @@ def build_wasm_binary_or_exit(
         print("💀 Build failed")
         sys.exit(1)
 
+    shutil.copy(
+        f"{paths['global_kybra_target_dir']}/wasm32-unknown-unknown/release/{canister_name}.wasm",
+        paths["wasm"],
+    )
+
+    candid_file = generate_candid_file(paths)
+    create_file(paths["did"], candid_file)
+
+
+@timed_inline
+def optimize_wasm_binary_or_exit(
+    paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
+):
     # Optimize the Wasm binary
     # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/43?u=lastmjs
     optimization_result = subprocess.run(
         [
             f"{paths['global_kybra_bin_dir']}/ic-cdk-optimizer",
-            f"{paths['global_kybra_target_dir']}/wasm32-unknown-unknown/release/{canister_name}.wasm",
+            paths["wasm"],
             f"-o={paths['wasm']}",
         ],
         capture_output=not verbose,
@@ -439,30 +454,6 @@ def show_empathy(is_initial_compile: bool) -> str:
         if is_initial_compile
         else ""
     )
-
-
-@timed_inline
-def generate_candid_file_or_exit(
-    paths: Paths, cargo_env: dict[str, str], verbose: bool = False
-):
-    generate_candid_result = subprocess.run(
-        [
-            f"{paths['global_kybra_bin_dir']}/cargo",
-            "test",
-            f"--manifest-path={paths['canister']}/Cargo.toml",
-        ],
-        capture_output=not verbose,
-        env=cargo_env,
-    )
-
-    if generate_candid_result.returncode != 0:
-        print(red("\n💣 Error generating candid:"))
-        print(generate_candid_result.stderr.decode("utf-8"))
-        print("💀 Build failed")
-        sys.exit(1)
-
-    # Copy the generated Candid file to the developer's source directory
-    os.system(f"cp {paths['generated_did']} {paths['did']}")
 
 
 def create_file(file_path: str, contents: str):

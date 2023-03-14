@@ -1,4 +1,4 @@
-from kybra import GuardResult, ic, manual, query
+from kybra import GuardResult, ic, manual, update, query
 
 
 @query(guard='adelante')
@@ -13,6 +13,11 @@ def guarded_manual() -> manual[bool]:
 
 @query(guard='unpassable')
 def inaccessible() -> bool:
+    return False
+
+
+@update(guard='unpassable')
+def inaccessible_update() -> bool:
     return False
 
 

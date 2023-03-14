@@ -1,4 +1,4 @@
-from kybra import opt, Record, query, update
+from kybra import opt, Record, query, update, void
 
 
 class Entry(Record):
@@ -10,7 +10,7 @@ phone_book: dict[str, Entry] = {}
 
 
 @update
-def insert(name: str, entry: Entry):
+def insert(name: str, entry: Entry) -> void:
     phone_book[name] = entry
 
 

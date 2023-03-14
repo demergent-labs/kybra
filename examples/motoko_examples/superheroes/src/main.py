@@ -1,6 +1,6 @@
-from kybra import nat32, opt, query, Record, update
+from kybra import alias, nat32, opt, query, Record, update
 
-SuperheroId = nat32
+SuperheroId = alias[nat32]
 
 List = tuple[str, opt['List']]
 

@@ -40,6 +40,22 @@ export function get_tests(
             }
         },
         {
+            name: 'inaccessible update',
+            test: async () => {
+                try {
+                    const result =
+                        await function_guard_canister.inaccessible_update();
+                    return {
+                        ok: false
+                    };
+                } catch (err: any) {
+                    return {
+                        ok: err.toString().includes('You shall not pass!')
+                    };
+                }
+            }
+        },
+        {
             name: 'unguarded',
             test: async () => {
                 const result = await function_guard_canister.unguarded();
