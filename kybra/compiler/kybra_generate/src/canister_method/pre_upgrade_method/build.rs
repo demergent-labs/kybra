@@ -21,6 +21,7 @@ impl PyAst {
 
         Ok(Some(PreUpgradeMethod {
             body: rust::generate(pre_upgrade_function_def_option)?,
+            guard_function_name: None,
         }))
     }
 }

@@ -25,6 +25,10 @@ impl PyAst {
 
         let body = rust::generate(init_function_def_option, &self.entry_module_name)?;
 
-        Ok(Some(InitMethod { params, body }))
+        Ok(Some(InitMethod {
+            params,
+            body,
+            guard_function_name: None,
+        }))
     }
 }

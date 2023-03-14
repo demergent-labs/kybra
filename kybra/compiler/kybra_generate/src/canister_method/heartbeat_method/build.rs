@@ -21,7 +21,10 @@ impl PyAst {
         Ok(
             if let Some(heartbeat_function_def) = heartbeat_function_def_option {
                 let body = rust::generate(heartbeat_function_def)?;
-                Some(HeartbeatMethod { body })
+                Some(HeartbeatMethod {
+                    body,
+                    guard_function_name: None,
+                })
             } else {
                 None
             },

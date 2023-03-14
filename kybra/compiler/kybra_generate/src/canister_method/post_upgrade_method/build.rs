@@ -28,6 +28,10 @@ impl PyAst {
 
         let body = rust::generate(post_upgrade_function_def_option, &self.entry_module_name)?;
 
-        Ok(Some(PostUpgradeMethod { params, body }))
+        Ok(Some(PostUpgradeMethod {
+            params,
+            body,
+            guard_function_name: None,
+        }))
     }
 }
