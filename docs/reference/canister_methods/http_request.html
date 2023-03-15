@@ -148,7 +148,6 @@
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
 <pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
-from typing import TypeAlias
 
 
 class HttpRequest(Record):
@@ -178,7 +177,7 @@ class CallbackStrategy(Record):
     token: &quot;Token&quot;
 
 
-Callback: TypeAlias = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&quot;])  # type: ignore
+Callback = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&quot;])
 
 
 class StreamingCallbackHttpResponse(Record):

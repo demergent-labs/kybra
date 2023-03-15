@@ -1,5 +1,4 @@
 from kybra import blob, Func, nat, nat64, null, opt, Query, Record, Variant
-from typing import TypeAlias
 
 
 class HttpMethod(Variant, total=False):
@@ -24,8 +23,7 @@ class HttpTransformArgs(Record):
     context: blob
 
 
-HttpTransformFunc: TypeAlias = Func(
-    Query[[HttpTransformArgs], HttpResponse])  # type: ignore
+HttpTransformFunc = Func(Query[[HttpTransformArgs], HttpResponse])
 
 
 class HttpTransform(Record):

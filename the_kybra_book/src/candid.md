@@ -61,7 +61,6 @@ from kybra import (
     Query,
     Record
 )
-from typing import TypeAlias
 
 class Candid(Record):
     text: str
@@ -95,7 +94,7 @@ class CandidVariant(Variant, total=False):
     Tag2: null
     Tag3: int
 
-CandidFunc: TypeAlias = Func(Query[[], Candid]) # type: ignore
+CandidFunc = Func(Query[[], Candid])
 
 @query
 def candid_types() -> Candid:
@@ -781,17 +780,12 @@ type Firework = record {
 
 #### func
 
-WARNING: `Func` currently [causes type errors in VS Code](https://github.com/demergent-labs/kybra/issues/229). Get around this by ending your `Func` type declaration with the following comment: `# type: ignore`
-
 The Kybra type `Func` corresponds to the [Candid type func](https://internetcomputer.org/docs/current/references/candid-ref#type-func---) and at runtime will become a Python tuple with two elements, the first being an [ic-py Principal](https://github.com/rocklabs-io/ic-py) and the second being a [Python str](https://docs.python.org/3/library/stdtypes.html#textseq). The `ic-py Principal` represents the `principal` of the canister/service where the function exists, and the `str` represents the function's name.
-
-Note that an explicit `TypeAlias` must be used when defining a `func`.
 
 Python:
 
 ```python
 from kybra import Func, nat64, null, Principal, query, Query, Record, Update, Variant
-from typing import TypeAlias
 
 
 class User(Record):
@@ -807,17 +801,17 @@ class Reaction(Variant, total=False):
     ComplexFunc: "ComplexFunc"
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
-ComplexFunc: TypeAlias = Func(Update[[User, Reaction], nat64])  # type: ignore
+BasicFunc = Func(Query[[str], str])
+ComplexFunc = Func(Update[[User, Reaction], nat64])
 
 
 @query
-def get_basic_func() -> BasicFunc:  # type: ignore
+def get_basic_func() -> BasicFunc:
     return (Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"), "simple_function_name")
 
 
 @query
-def get_complex_func() -> ComplexFunc:  # type: ignore
+def get_complex_func() -> ComplexFunc:
     return (Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"), "complex_function_name")
 ```
 

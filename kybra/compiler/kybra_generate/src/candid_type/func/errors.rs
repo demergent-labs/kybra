@@ -1,4 +1,4 @@
-use rustpython_parser::ast::{ExprKind, Located};
+use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
     errors::{CreateMessage, Message},
@@ -16,5 +16,11 @@ impl SourceMapped<&Located<ExprKind>> {
 
     pub fn inline_func_not_supported(&self) -> Vec<Message> {
         vec![self.create_error_message("Inline Func Not supported", "", None)]
+    }
+}
+
+impl SourceMapped<&Located<StmtKind>> {
+    pub fn multiple_func_targets_error(&self) -> Vec<Message> {
+        vec![self.create_error_message("Only one target is supported", "", None)]
     }
 }
