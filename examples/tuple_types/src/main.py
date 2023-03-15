@@ -1,6 +1,6 @@
 # TODO Add in Canister types like in the Azle tuple_types example
 
-from kybra import nat64, null, Principal, query, Record, Variant
+from kybra import nat8, nat64, null, Principal, query, Record, Variant
 
 
 class User(Record):
@@ -224,3 +224,8 @@ def tuple_array_variant_field() -> StreamingCallbackType:
             ('Accept-Ranges', 'bytes')
         ]
     }
+
+
+@query
+def nested_tuple_query(param: tuple[tuple[str, tuple[nat8, nat8]], int]) -> tuple[tuple[str, tuple[nat8, nat8]], int]:
+    return param
