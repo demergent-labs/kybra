@@ -15,6 +15,6 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn pre_upgrade_method_must_return_void_error(&self) -> Vec<Message> {
-        vec![self.create_error_message("Pre-upgrade method must return void explicitly", "", None)]
+        vec![self.create_error_message("PreUpgrade method must return void explicitly", "", None)]
     }
 }

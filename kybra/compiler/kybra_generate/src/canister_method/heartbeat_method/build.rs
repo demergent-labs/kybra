@@ -1,11 +1,7 @@
-use cdk_framework::act::node::{
-    candid::Primitive,
-    canister_method::{CanisterMethodType, HeartbeatMethod},
-    CandidType,
-};
+use cdk_framework::act::node::canister_method::{CanisterMethodType, HeartbeatMethod};
 
 use super::rust;
-use crate::{errors::KybraResult, py_ast::PyAst};
+use crate::{canister_method, errors::KybraResult, py_ast::PyAst};
 
 impl PyAst {
     pub fn build_heartbeat_method(&self) -> KybraResult<Option<HeartbeatMethod>> {
@@ -24,16 +20,8 @@ impl PyAst {
 
         Ok(
             if let Some(heartbeat_function_def) = heartbeat_function_def_option {
-                if let CandidType::Primitive(primitive) =
-                    heartbeat_function_def.build_return_type()?
-                {
-                    if let Primitive::Void = primitive {
-                        ()
-                    } else {
-                        return Err(
-                            heartbeat_function_def.heartbeat_method_must_return_void_error()
-                        );
-                    }
+                if !canister_method::is_void(heartbeat_function_def.build_return_type()?) {
+                    return Err(heartbeat_function_def.heartbeat_method_must_return_void_error());
                 }
                 let body = rust::generate(heartbeat_function_def)?;
                 Some(HeartbeatMethod {

@@ -16,7 +16,7 @@ impl SourceMapped<&Located<StmtKind>> {
 
     pub fn inspect_message_method_must_return_void_error(&self) -> Vec<Message> {
         vec![self.create_error_message(
-            "Inspect message method must return void explicitly",
+            "InspectMessage method must return void explicitly",
             "",
             None,
         )]
