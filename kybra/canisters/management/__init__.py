@@ -35,6 +35,14 @@ from kybra.canisters.management.basic import (
     ProvisionalCreateCanisterWithCyclesResult as ProvisionalCreateCanisterWithCyclesResult,
     ProvisionalTopUpCanisterArgs as ProvisionalTopUpCanisterArgs,
 )
+from kybra.canisters.management.tecdsa import (
+    EcdsaCurve as EcdsaCurve,
+    EcdsaPublicKeyArgs as EcdsaPublicKeyArgs,
+    EcdsaPublicKeyResult as EcdsaPublicKeyResult,
+    KeyId as KeyId,
+    SignWithEcdsaArgs as SignWithEcdsaArgs,
+    SignWithEcdsaResult as SignWithEcdsaResult,
+)
 from kybra.canisters.management.http import (
     HttpRequestArgs as HttpRequestArgs,
     HttpResponse as HttpResponse,
@@ -123,6 +131,14 @@ class ManagementCanister(Canister):
 
     @service_update
     def http_request(self, args: HttpRequestArgs) -> HttpResponse:
+        ...
+
+    @service_update
+    def ecdsa_public_key(self, args: EcdsaPublicKeyArgs) -> EcdsaPublicKeyResult:
+        ...
+
+    @service_update
+    def sign_with_ecdsa(self, args: SignWithEcdsaArgs) -> SignWithEcdsaResult:
         ...
 
 

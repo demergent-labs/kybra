@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "threshold_ecdsa": {
+            "type": "custom",
+            "build": "python -m kybra threshold_ecdsa src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".kybra/threshold_ecdsa/threshold_ecdsa.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/threshold_ecdsa",
+                "node_compatibility": true
+            }
+        }
+    }
+}
