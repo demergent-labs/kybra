@@ -33,6 +33,7 @@
 
     </head>
     <body>
+    <div id="body-container">
         <!-- Provide site root to javascript -->
         <script>
             var path_to_root = "";
@@ -70,10 +71,12 @@
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
             var html = document.querySelector('html');
-            var sidebar = 'hidden';
+            var sidebar = null;
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
             }
             html.classList.remove('sidebar-visible');
             html.classList.add("sidebar-" + sidebar);
@@ -2184,7 +2187,7 @@ stable_storage = StableBTreeMap[str, str](memory_id=0, max_key_size=20, max_valu
 
 
 @init
-def init_(ethereum_url: str):
+def init_(ethereum_url: str) -&gt; void:
     stable_storage.insert('ethereum_url', ethereum_url)
 
 
@@ -2282,15 +2285,15 @@ def random_bytes() -&gt; Async[RandomBytesResult]:
 <pre><code class="language-python">from kybra import init, post_upgrade, pre_upgrade
 
 @init
-def init_():
+def init_() -&gt; void:
     print('runs on first canister install')
 
 @pre_upgrade
-def pre_upgrade_():
+def pre_upgrade_() -&gt; void:
     print('runs before canister upgrade')
 
 @post_upgrade
-def post_upgrade_():
+def post_upgrade_() -&gt; void:
     print('runs after canister upgrade')
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="timers"><a class="header" href="#timers">Timers</a></h1>
@@ -2528,7 +2531,7 @@ def repeat_cross_canister_timer_callback() -&gt; Async[blob]:
 
 
 @inspect_message
-def inspect_message_():
+def inspect_message_() -&gt; void:
     ic.accept_message()
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="arg-data-raw"><a class="header" href="#arg-data-raw">arg data raw</a></h1>
@@ -2774,7 +2777,7 @@ def caller() -&gt; Principal:
 
 
 @inspect_message
-def inspect_message_():
+def inspect_message_() -&gt; void:
     ic.print(&quot;inspect_message called&quot;)
 
     if ic.method_name() == &quot;accessible&quot;:
@@ -4056,7 +4059,7 @@ def init_() -&gt; void:
 
 
 @inspect_message
-def inspect_message_():
+def inspect_message_() -&gt; void:
     ic.print(&quot;inspect_message called&quot;)
 
     if ic.method_name() == &quot;accessible&quot;:
@@ -5038,5 +5041,6 @@ def timer_callback():
         });
         </script>
 
+    </div>
     </body>
 </html>
