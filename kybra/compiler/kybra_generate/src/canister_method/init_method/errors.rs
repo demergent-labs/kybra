@@ -15,6 +15,10 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn init_method_must_return_void_error(&self) -> Vec<Message> {
-        vec![self.create_error_message("Init method must return void explicitly", "", None)]
+        vec![self.create_error_message(
+            "Init method must have an explicit void return type annotation",
+            "",
+            None,
+        )]
     }
 }
