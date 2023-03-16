@@ -37,7 +37,7 @@ def init_(somebody: Principal) -> void:
 
 
 @post_upgrade
-def post_upgrade_(somebody: Principal):
+def post_upgrade_(somebody: Principal) -> void:
     global install
     global someone
 
