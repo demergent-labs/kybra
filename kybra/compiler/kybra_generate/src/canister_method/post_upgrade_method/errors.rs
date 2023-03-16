@@ -13,4 +13,8 @@ impl SourceMapped<&Located<StmtKind>> {
             None,
         )
     }
+
+    pub fn post_upgrade_method_must_return_void_error(&self) -> Vec<Message> {
+        vec![self.create_error_message("Post upgrade method must return void explicitly", "", None)]
+    }
 }

@@ -1,4 +1,8 @@
-use cdk_framework::act::node::canister_method::{CanisterMethodType, PreUpgradeMethod};
+use cdk_framework::act::node::{
+    candid::Primitive,
+    canister_method::{CanisterMethodType, PreUpgradeMethod},
+    CandidType,
+};
 
 use super::rust;
 use crate::{errors::KybraResult, py_ast::PyAst};
@@ -18,6 +22,20 @@ impl PyAst {
         }
 
         let pre_upgrade_function_def_option = pre_upgrade_function_defs.get(0);
+
+        if let Some(pre_upgrade_function_def) = pre_upgrade_function_def_option {
+            if let CandidType::Primitive(primitive) =
+                pre_upgrade_function_def.build_return_type()?
+            {
+                if let Primitive::Void = primitive {
+                    ()
+                } else {
+                    return Err(
+                        pre_upgrade_function_def.pre_upgrade_method_must_return_void_error()
+                    );
+                }
+            }
+        }
 
         Ok(Some(PreUpgradeMethod {
             body: rust::generate(pre_upgrade_function_def_option)?,
