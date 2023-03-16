@@ -1,8 +1,8 @@
-from kybra import Canister, method, nat, Variant
+from kybra import Canister, nat, query, Variant
 
 
 class Canister1(Canister):
-    @method
+    @query
     def inc_counter(self) -> nat: ...
 
 

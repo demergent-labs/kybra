@@ -93,41 +93,26 @@ fn ensure_decorated_as_method_or_err(
     canister_name: &String,
     method_name: &String,
 ) -> KybraResult<()> {
-    let decorator_name = "@method".to_string();
-
     if decorator_list.len() == 0 {
-        return Err(method_stmt.missing_decorator_error(
-            canister_name,
-            method_name,
-            &decorator_name,
-        ));
+        return Err(method_stmt.missing_decorator_error(canister_name, method_name));
     }
 
     if decorator_list.len() > 1 {
-        return Err(method_stmt.too_many_decorators_error(
-            canister_name,
-            method_name,
-            &decorator_name,
-        ));
+        return Err(method_stmt.too_many_decorators_error(canister_name, method_name));
     }
 
     match &decorator_list[0].node {
         ExprKind::Name { id, ctx: _ } => {
-            if id != "method" {
+            if id != "update" || id != "query" {
                 return Err(method_stmt.wrong_decorator_error(
                     canister_name,
                     method_name,
-                    &decorator_name,
                     &id.to_string(),
                 ));
             }
         }
         _ => {
-            return Err(method_stmt.invalid_decorator_error(
-                canister_name,
-                method_name,
-                &decorator_name,
-            ));
+            return Err(method_stmt.invalid_decorator_error(canister_name, method_name));
         }
     }
 

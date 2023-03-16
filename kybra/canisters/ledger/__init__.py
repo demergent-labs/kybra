@@ -3,14 +3,15 @@ from kybra import (
     blob,
     Canister,
     Func,
-    method,
     nat32,
     nat64,
     null,
     opt,
     Principal,
+    query,
     Query,
     Record,
+    update,
     Variant,
 )
 
@@ -297,41 +298,41 @@ class Ledger(Canister):
     # Transfers tokens from a subaccount of the caller to the destination address.
     # The source address is computed from the principal of the caller and the specified subaccount.
     # When successful, returns the index of the block containing the transaction.
-    @method
+    @update
     def transfer(self, transfer_args: TransferArgs) -> TransferResult:
         ...
 
     # Returns the amount of Tokens on the specified account.
-    @method
+    @query
     def account_balance(self, account_balance_args: AccountBalanceArgs) -> Tokens:
         ...
 
     # Returns the current transfer_fee.
-    @method
+    @query
     def transfer_fee(self, transfer_fee_arg: TransferFeeArg) -> TransferFee:
         ...
 
     # Queries blocks in the specified range.
-    @method
+    @query
     def query_blocks(self, get_blocks_args: GetBlocksArgs) -> QueryBlocksResponse:
         ...
 
     # Returns token symbol.
-    @method
+    @query
     def symbol(self) -> SymbolResult:
         ...
 
     # Returns token name.
-    @method
+    @query
     def name(self) -> NameResult:
         ...
 
     # Returns token decimals.
-    @method
+    @query
     def decimals(self) -> DecimalsResult:
         ...
 
     # Returns the existing archive canisters information.
-    @method
+    @query
     def archives(self) -> Archives:
         ...

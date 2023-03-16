@@ -1,13 +1,15 @@
-from kybra import Canister, empty, method, Principal
+from kybra import Canister, empty, Principal, query
+
 
 class SomeService(Canister):
-    @method
+    @query
     def reject(self, message: str) -> empty: ...
 
-    @method
+    @query
     def accept(self) -> bool: ...
 
-    @method
+    @query
     def error(self) -> empty: ...
+
 
 some_service = SomeService(Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'))

@@ -16,7 +16,7 @@
 
 # Taken in part from: https://github.com/dfinity/interface-spec/blob/master/spec/ic.did
 
-from kybra import blob, Canister, method, Principal, void
+from kybra import blob, Canister, Principal, update, void
 
 # The as expressions are reexporting these variables
 from kybra.canisters.management.basic import (
@@ -53,75 +53,75 @@ from kybra.canisters.management.bitcoin import (
 
 
 class ManagementCanister(Canister):
-    @method
+    @update
     def bitcoin_get_balance(self, args: GetBalanceArgs) -> Satoshi:
         ...
 
-    @method
+    @update
     def bitcoin_get_current_fee_percentiles(
         self, args: GetCurrentFeePercentilesArgs
     ) -> list[MillisatoshiPerByte]:
         ...
 
-    @method
+    @update
     def bitcoin_get_utxos(self, args: GetUtxosArgs) -> GetUtxosResult:
         ...
 
-    @method
+    @update
     def bitcoin_send_transaction(self, args: SendTransactionArgs) -> void:
         ...
 
-    @method
+    @update
     def create_canister(self, args: CreateCanisterArgs) -> CreateCanisterResult:
         ...
 
-    @method
+    @update
     def update_settings(self, args: UpdateSettingsArgs) -> void:
         ...
 
-    @method
+    @update
     def install_code(self, args: InstallCodeArgs) -> void:
         ...
 
-    @method
+    @update
     def uninstall_code(self, args: UninstallCodeArgs) -> void:
         ...
 
-    @method
+    @update
     def start_canister(self, args: StartCanisterArgs) -> void:
         ...
 
-    @method
+    @update
     def stop_canister(self, args: StopCanisterArgs) -> void:
         ...
 
-    @method
+    @update
     def canister_status(self, args: CanisterStatusArgs) -> CanisterStatusResult:
         ...
 
-    @method
+    @update
     def delete_canister(self, args: DeleteCanisterArgs) -> void:
         ...
 
-    @method
+    @update
     def deposit_cycles(self, args: DepositCyclesArgs) -> void:
         ...
 
-    @method
+    @update
     def raw_rand(self) -> blob:
         ...
 
-    @method
+    @update
     def provisional_create_canister_with_cycles(
         self, args: ProvisionalCreateCanisterWithCyclesArgs
     ) -> ProvisionalCreateCanisterWithCyclesResult:
         ...
 
-    @method
+    @update
     def provisional_top_up_canister(self, args: ProvisionalTopUpCanisterArgs) -> void:
         ...
 
-    @method
+    @update
     def http_request(self, args: HttpRequestArgs) -> HttpResponse:
         ...
 

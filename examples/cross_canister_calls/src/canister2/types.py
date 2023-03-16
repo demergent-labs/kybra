@@ -1,4 +1,4 @@
-from kybra import Canister, method, nat64, opt, Record, void
+from kybra import Canister, nat64, opt, query, Record, update, void
 from typing import TypedDict
 
 
@@ -12,22 +12,22 @@ class AccountArgs(Record):
 
 
 class Canister2(Canister):
-    @method
+    @update
     def transfer(self, from_: str, to: str, amount: nat64) -> nat64: ...
 
-    @method
+    @query
     def balance(self, id: str) -> nat64: ...
 
-    @method
+    @query
     def account(self, account_args: AccountArgs) -> opt[Account]: ...
 
-    @method
+    @query
     def accounts(self) -> list[Account]: ...
 
-    @method
+    @query
     def trap(self) -> str: ...
 
-    @method
+    @update
     def receive_notification(self, message: str) -> void: ...
 
 
