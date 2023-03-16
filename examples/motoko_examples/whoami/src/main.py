@@ -1,4 +1,4 @@
-from kybra import Async, Canister, CanisterResult, ic, init, method, post_upgrade, Principal, query, update, Variant
+from kybra import Async, Canister, CanisterResult, ic, init, method, post_upgrade, Principal, query, update, Variant, void
 
 
 class WhoAmICanister(Canister):
@@ -28,7 +28,7 @@ someone: Principal = Principal.from_str('aaaaa-aa')
 
 
 @init
-def init_(somebody: Principal):
+def init_(somebody: Principal) -> void:
     global install
     global someone
 

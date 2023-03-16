@@ -1,10 +1,11 @@
-from kybra import init, nat, query, StableBTreeMap, update
+from kybra import init, nat, query, StableBTreeMap, update, void
 
-stable_storage = StableBTreeMap[str, nat](memory_id=0, max_key_size=15, max_value_size=1_000)
+stable_storage = StableBTreeMap[str, nat](
+    memory_id=0, max_key_size=15, max_value_size=1_000)
 
 
 @init
-def init_():
+def init_() -> void:
     stable_storage.insert('counter', 0)
 
 

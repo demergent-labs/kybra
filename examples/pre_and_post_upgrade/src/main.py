@@ -18,7 +18,7 @@ entries: dict[str, nat64] = {}
 
 
 @init
-def init_():
+def init_() -> void:
     ic.print("init_")
 
     stable_storage.insert('entries', [])

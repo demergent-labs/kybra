@@ -6,7 +6,7 @@ This chapter is a work in progress.
 from kybra import init, post_upgrade, pre_upgrade
 
 @init
-def init_():
+def init_() -> void:
     print('runs on first canister install')
 
 @pre_upgrade

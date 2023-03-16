@@ -81,7 +81,7 @@ stable_storage = StableBTreeMap[str, str](memory_id=0, max_key_size=20, max_valu
 
 
 @init
-def init_(ethereum_url: str):
+def init_(ethereum_url: str) -> void:
     stable_storage.insert('ethereum_url', ethereum_url)
 
 
