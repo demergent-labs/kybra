@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "complex_init": {
+            "type": "custom",
+            "build": "python -m kybra complex_init src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".kybra/complex_init/complex_init.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/complex_init",
+                "node_compatibility": true
+            }
+        }
+    }
+}
