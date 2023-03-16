@@ -43,10 +43,10 @@ def transfer(to: Principal, amount: nat64) -> nat64:
 Here's how you would create its external canister definition:
 
 ```python
-from kybra import Canister, method, nat64, Principal
+from kybra import Canister, nat64, Principal, update
 
 class TokenCanister(Canister):
-    @method
+    @update
     def transfer(self, to: Principal, amount: nat64) -> nat64: ...
 ```
 
@@ -63,10 +63,10 @@ token_canister = TokenCanister(
 And here's a more complete example of a canister called `payout_canister` that performs a cross-canister call to `token_canister`:
 
 ```python
-from kybra import Async, Canister, CanisterResult, method, nat64, Principal, update, Variant
+from kybra import Async, Canister, CanisterResult, nat64, Principal, update, Variant
 
 class TokenCanister(Canister):
-    @method
+    @update
     def transfer(self, to: Principal, amount: nat64) -> nat64: ...
 
 token_canister = TokenCanister(
@@ -140,10 +140,10 @@ def transfer(to: Principal, amount: nat64) -> TransferResult:
 `payout_canister`:
 
 ```python
-from kybra import Async, Canister, CanisterResult, method, nat64, Principal, update, Variant
+from kybra import Async, Canister, CanisterResult, nat64, Principal, update, Variant
 
 class TokenCanister(Canister):
-    @method
+    @update
     def transfer(self, to: Principal, amount: nat64) -> 'TransferResult': ...
 
 class TransferResult(Variant, total=False):
@@ -196,10 +196,10 @@ Cross-canister calls can also be initiated from query methods (not yet live on I
 Here's an example of a composite query method:
 
 ```python
-from kybra import Async, Canister, CanisterResult, method, Principal, query, Variant
+from kybra import Async, Canister, CanisterResult, Principal, query, Variant
 
 class SomeCanister(Canister):
-    @method
+    @query
     def query_for_boolean(self) -> bool: ...
 
 some_canister = SomeCanister(
@@ -229,10 +229,10 @@ You can expect cross-canister calls within the same subnet to take up to a few s
 If you don't need to wait for your cross-canister call to return, you can use `notify`:
 
 ```python
-from kybra import Canister, method, null, Principal, query, RejectionCode, Variant, void
+from kybra import Canister, null, Principal, query, RejectionCode, update, Variant, void
 
 class SomeCanister(Canister):
-    @method
+    @update
     def receive_notification(self) -> void: ...
 
 some_canister = SomeCanister(
@@ -251,10 +251,10 @@ def send_notification() -> ReceiveNotificationResult:
 If you need to send cycles with your cross-canister call, you can call `with_cycles` before calling `call` or `notify`:
 
 ```python
-from kybra import Canister, method, null, Principal, query, RejectionCode, Variant, void
+from kybra import Canister, null, Principal, query, RejectionCode, update, Variant, void
 
 class SomeCanister(Canister):
-    @method
+    @update
     def receive_notification(self) -> void: ...
 
 some_canister = SomeCanister(

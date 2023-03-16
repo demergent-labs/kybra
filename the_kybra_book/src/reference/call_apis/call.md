@@ -23,7 +23,6 @@ from kybra import (
     Async,
     Canister,
     CanisterResult,
-    method,
     nat64,
     Principal,
     update,
@@ -32,7 +31,7 @@ from kybra import (
 
 
 class TokenCanister(Canister):
-    @method
+    @update
     def transfer(self, to: Principal, amount: nat64) -> nat64:
         ...
 
