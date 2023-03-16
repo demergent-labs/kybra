@@ -20,9 +20,4 @@ def init_(tuple: tuple[str, User]):
 
 @query
 def greet_user() -> str:
-    if not user:
-        name = "??"
-    else:
-        name = user["id"]
-
-    return f"{greeting} {name}"
+    return f"{greeting} {user['id'] if user else '??'}"
