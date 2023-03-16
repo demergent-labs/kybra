@@ -1,7 +1,8 @@
-from kybra import ic, inspect_message, update;
+from kybra import ic, inspect_message, update, void
+
 
 @inspect_message
-def inspect_message_():
+def inspect_message_() -> void:
     ic.print('inspect_message called')
 
     if ic.method_name() == 'accessible':
@@ -13,13 +14,16 @@ def inspect_message_():
 
     raise Exception('Method ' + ic.method_name() + ' is not allowed')
 
+
 @update
 def accessible() -> bool:
     return True
 
+
 @update
 def inaccessible() -> bool:
     return False
+
 
 @update
 def also_inaccessible() -> bool:
