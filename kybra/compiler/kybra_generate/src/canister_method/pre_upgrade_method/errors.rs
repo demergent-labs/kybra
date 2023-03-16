@@ -16,7 +16,7 @@ impl SourceMapped<&Located<StmtKind>> {
 
     pub fn pre_upgrade_method_must_return_void_error(&self) -> Vec<Message> {
         vec![self.create_error_message(
-            "PreUpgrade method must have an explicit void return type annotation.",
+            "PreUpgrade method must have an explicit void return type annotation",
             "",
             None,
         )]
