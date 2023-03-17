@@ -117,26 +117,28 @@ enum GuardFunctionError {
 }
 
 fn get_guard_function_name_from_keywords(
-    keywords: &Vec<Located<KeywordData>>,
+    keywords: &[Located<KeywordData>],
 ) -> Result<Option<String>, GuardFunctionError> {
     for keyword in keywords {
         if let Some(arg) = &keyword.node.arg {
             if arg != "guard" {
                 continue;
             }
-            if let ExprKind::Constant { value, .. } = &keyword.node.value.node {
-                if let Constant::Str(string) = value {
-                    return Ok(Some(string.to_string()));
-                }
-            }
-            return Err(GuardFunctionError::InvalidName);
+            return match &keyword.node.value.node {
+                ExprKind::Name { id, .. } => Ok(Some(id.clone())),
+                ExprKind::Constant {
+                    value: Constant::Str(string),
+                    ..
+                } => Ok(Some(string.to_string())),
+                _ => Err(GuardFunctionError::InvalidName),
+            };
         }
     }
     Ok(None)
 }
 
 fn get_guard_function_name_from_decorator_list(
-    decorator_list: &Vec<Located<ExprKind>>,
+    decorator_list: &[Located<ExprKind>],
 ) -> Result<Option<String>, GuardFunctionError> {
     for decorator in decorator_list {
         if let ExprKind::Call { keywords, .. } = &decorator.node {
