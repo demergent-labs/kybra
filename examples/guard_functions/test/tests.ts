@@ -1,15 +1,15 @@
 import { ActorSubclass } from '@dfinity/agent';
 import { Test } from 'azle/test';
-import { _SERVICE } from './dfx_generated/function_guards/function_guards.did';
+import { _SERVICE } from './dfx_generated/guard_functions/guard_functions.did';
 
 export function get_tests(
-    function_guard_canister: ActorSubclass<_SERVICE>
+    guard_functions_canister: ActorSubclass<_SERVICE>
 ): Test[] {
     return [
         {
             name: 'accessible',
             test: async () => {
-                const result = await function_guard_canister.accessible();
+                const result = await guard_functions_canister.accessible();
                 return {
                     ok: result === true
                 };
@@ -18,7 +18,7 @@ export function get_tests(
         {
             name: 'guarded manual',
             test: async () => {
-                const result = await function_guard_canister.guarded_manual();
+                const result = await guard_functions_canister.guarded_manual();
                 return {
                     ok: result === true
                 };
@@ -28,7 +28,8 @@ export function get_tests(
             name: 'inaccessible',
             test: async () => {
                 try {
-                    const result = await function_guard_canister.inaccessible();
+                    const result =
+                        await guard_functions_canister.inaccessible();
                     return {
                         ok: false
                     };
@@ -44,7 +45,7 @@ export function get_tests(
             test: async () => {
                 try {
                     const result =
-                        await function_guard_canister.inaccessible_update();
+                        await guard_functions_canister.inaccessible_update();
                     return {
                         ok: false
                     };
@@ -58,7 +59,7 @@ export function get_tests(
         {
             name: 'unguarded',
             test: async () => {
-                const result = await function_guard_canister.unguarded();
+                const result = await guard_functions_canister.unguarded();
                 return {
                     ok: result === true
                 };

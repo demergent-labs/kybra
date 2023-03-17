@@ -1,6 +1,6 @@
 import { run_tests } from 'azle/test';
 import { get_tests } from './tests';
-import { createActor } from './dfx_generated/function_guards';
+import { createActor } from './dfx_generated/guard_functions';
 
 const function_guard_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
