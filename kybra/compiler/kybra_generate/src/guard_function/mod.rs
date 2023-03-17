@@ -1,26 +1,26 @@
 pub mod errors;
 mod guard_function;
 
-use std::{collections::HashSet, ops::Deref};
-
-use cdk_framework::act::node::GuardFunction;
-use rustpython_parser::ast::{ExprKind, Located, Mod, StmtKind};
+use cdk_framework::act::node::{CandidType, GuardFunction};
+use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn is_guard_function(&self, guard_function_names: &Vec<String>) -> bool {
-        match &self.node {
-            StmtKind::FunctionDef { name, .. } => guard_function_names.contains(name),
-            _ => false,
+    pub fn is_guard_function(&self) -> bool {
+        match self.build_return_type() {
+            Ok(return_type) => {
+                if let CandidType::TypeRef(type_ref) = return_type {
+                    return type_ref.name == "GuardResult";
+                }
+                false
+            }
+            Err(_) => false,
         }
     }
 
-    pub fn as_guard_function(
-        &self,
-        guard_function_names: &Vec<String>,
-    ) -> KybraResult<Option<GuardFunction>> {
-        if !self.is_guard_function(guard_function_names) {
+    pub fn as_guard_function(&self) -> KybraResult<Option<GuardFunction>> {
+        if !self.is_guard_function() {
             return Ok(None);
         }
         match &self.node {
@@ -65,45 +65,16 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 }
 
-impl SourceMapped<Mod> {
-    fn get_guard_function_names(&self) -> Vec<String> {
-        let guard_function_names: HashSet<_> = match &self.deref() {
-            Mod::Module { body, .. } => body
-                .iter()
-                .filter_map(|stmt_kind| {
-                    SourceMapped::new(stmt_kind, self.source_map.clone()).get_guard_function_name()
-                })
-                .collect(),
-            _ => HashSet::new(),
-        };
-        guard_function_names.iter().cloned().collect()
-    }
-}
-
 impl PyAst {
     pub fn build_guard_functions(&self) -> KybraResult<Vec<GuardFunction>> {
-        let guard_function_names = self.get_guard_function_names();
         Ok(crate::errors::collect_kybra_results(
             self.get_stmt_kinds()
                 .iter()
-                .map(|source_mapped_stmt_kind| {
-                    source_mapped_stmt_kind.as_guard_function(&guard_function_names)
-                })
+                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_guard_function())
                 .collect(),
         )?
         .drain(..)
         .filter_map(|x| x)
         .collect())
-    }
-
-    pub fn get_guard_function_names(&self) -> Vec<String> {
-        let guard_function_names =
-            self.source_mapped_mods
-                .iter()
-                .fold(HashSet::new(), |mut acc, kybra_program| {
-                    acc.extend(kybra_program.get_guard_function_names());
-                    acc
-                });
-        guard_function_names.iter().cloned().collect()
     }
 }
