@@ -25,7 +25,7 @@ impl PyAst {
                 }
                 (
                     init_function_def.build_params(InternalOrExternal::Internal)?,
-                    init_function_def.get_guard_function_name(),
+                    init_function_def.get_guard_function_name()?,
                 )
             } else {
                 (vec![], None)

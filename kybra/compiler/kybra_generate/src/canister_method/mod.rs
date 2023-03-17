@@ -88,12 +88,17 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn get_guard_function_name(&self) -> Option<String> {
+    pub fn get_guard_function_name(&self) -> KybraResult<Option<String>> {
         match &self.node {
             StmtKind::FunctionDef { decorator_list, .. } => {
-                get_guard_function_name_from_decorator_list(decorator_list)
+                match get_guard_function_name_from_decorator_list(decorator_list) {
+                    Ok(name) => Ok(name),
+                    Err(err) => match err {
+                        GuardFunctionError::InvalidName => Err(self.guard_function_name_error()),
+                    },
+                }
             }
-            _ => None,
+            _ => Ok(None),
         }
     }
 }
@@ -107,7 +112,13 @@ pub fn is_void(candid_type: CandidType) -> bool {
     return false;
 }
 
-fn get_guard_function_name_from_keywords(keywords: &Vec<Located<KeywordData>>) -> Option<String> {
+enum GuardFunctionError {
+    InvalidName,
+}
+
+fn get_guard_function_name_from_keywords(
+    keywords: &Vec<Located<KeywordData>>,
+) -> Result<Option<String>, GuardFunctionError> {
     for keyword in keywords {
         if let Some(arg) = &keyword.node.arg {
             if arg != "guard" {
@@ -115,21 +126,22 @@ fn get_guard_function_name_from_keywords(keywords: &Vec<Located<KeywordData>>) -
             }
             if let ExprKind::Constant { value, .. } = &keyword.node.value.node {
                 if let Constant::Str(string) = value {
-                    return Some(string.to_string());
+                    return Ok(Some(string.to_string()));
                 }
             }
+            return Err(GuardFunctionError::InvalidName);
         }
     }
-    None
+    Ok(None)
 }
 
 fn get_guard_function_name_from_decorator_list(
     decorator_list: &Vec<Located<ExprKind>>,
-) -> Option<String> {
+) -> Result<Option<String>, GuardFunctionError> {
     for decorator in decorator_list {
         if let ExprKind::Call { keywords, .. } = &decorator.node {
             return get_guard_function_name_from_keywords(&keywords);
         }
     }
-    None
+    Ok(None)
 }

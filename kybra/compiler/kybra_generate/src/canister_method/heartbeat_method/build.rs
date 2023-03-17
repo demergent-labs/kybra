@@ -25,7 +25,7 @@ impl PyAst {
                 }
                 Some(HeartbeatMethod {
                     body: rust::generate(heartbeat_function_def)?,
-                    guard_function_name: heartbeat_function_def.get_guard_function_name(),
+                    guard_function_name: heartbeat_function_def.get_guard_function_name()?,
                 })
             } else {
                 None
