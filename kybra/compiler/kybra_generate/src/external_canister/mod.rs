@@ -103,7 +103,7 @@ fn ensure_decorated_as_method_or_err(
 
     match &decorator_list[0].node {
         ExprKind::Name { id, ctx: _ } => {
-            if id != "update" || id != "query" {
+            if id != "update" && id != "query" {
                 return Err(method_stmt.wrong_decorator_error(
                     canister_name,
                     method_name,
