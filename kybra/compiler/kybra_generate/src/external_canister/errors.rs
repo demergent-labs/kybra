@@ -23,11 +23,10 @@ impl SourceMapped<&Located<StmtKind>> {
         &self,
         canister_name: &String,
         method_name: &String,
-        decorator_name: &String,
     ) -> Vec<Message> {
         let title = format!(
-            "{}.{} is missing a \"{}\" decorator. Please add it above the method",
-            canister_name, method_name, decorator_name
+            "{}.{} is missing a @service_query or @service_update decorator. Please add it above the method",
+            canister_name, method_name
         );
         vec![self.create_error_message(title.as_str(), "", None)]
     }
@@ -36,11 +35,10 @@ impl SourceMapped<&Located<StmtKind>> {
         &self,
         canister_name: &String,
         method_name: &String,
-        decorator_name: &String,
     ) -> Vec<Message> {
         let title = format!(
-            "{}.{} has too many decorators. Please remove all but \"{}\"",
-            canister_name, method_name, decorator_name
+            "{}.{} has too many decorators. Please remove all but either @service_update or @service_query",
+            canister_name, method_name
         );
         vec![self.create_error_message(title.as_str(), "", None)]
     }
@@ -49,12 +47,11 @@ impl SourceMapped<&Located<StmtKind>> {
         &self,
         canister_name: &String,
         method_name: &String,
-        decorator_name: &String,
         id: &String,
     ) -> Vec<Message> {
         let title = format!(
-            "{}.{} has the wrong decorator: expected \"{}\", got \"@{}\"",
-            canister_name, method_name, decorator_name, id
+            "{}.{} has the wrong decorator: expected @service_update or @service_query, got \"@{}\"",
+            canister_name, method_name, id
         );
         vec![self.create_error_message(title.as_str(), "", None)]
     }
@@ -63,11 +60,10 @@ impl SourceMapped<&Located<StmtKind>> {
         &self,
         canister_name: &String,
         method_name: &String,
-        decorator_name: &String,
     ) -> Vec<Message> {
         let title = format!(
-            "{}.{} has an invalid decorator. Change it to \"{}\"",
-            canister_name, method_name, decorator_name
+            "{}.{} has an invalid decorator. Change it to either @service_update or @service_query",
+            canister_name, method_name
         );
         vec![self.create_error_message(title.as_str(), "", None)]
     }

@@ -1,10 +1,12 @@
-from kybra import Canister, method, nat, nat64, Principal
+from kybra import Canister, nat, nat64, Principal, service_update
+
 
 class Cycles(Canister):
-    @method
+    @service_update
     def receive_cycles(self) -> nat64: ...
 
-    @method
+    @service_update
     def receive_cycles128(self) -> nat: ...
+
 
 cycles = Cycles(Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'))

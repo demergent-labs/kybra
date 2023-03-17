@@ -7,11 +7,11 @@ Examples:
 -   [rejections](https://github.com/demergent-labs/kybra/tree/main/examples/rejections)
 
 ```python
-from kybra import Async, Canister, ic, method, Principal, RejectionCode, update, void
+from kybra import Async, Canister, ic, Principal, RejectionCode, service_update, update, void
 
 
 class Nonexistent(Canister):
-    @method
+    @service_update
     def method(self) -> void:
         ...
 

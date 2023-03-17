@@ -1,6 +1,6 @@
-from kybra import Canister, method
+from kybra import Canister, service_query
 
 
 class Canister3(Canister):
-    @method
+    @service_query
     def deep_query(self) -> str: ...

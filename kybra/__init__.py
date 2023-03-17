@@ -460,7 +460,7 @@ class AsyncInfo:
 
 # TODO this decorator is removing the static type checking of the self parameter for instance methods
 # TODO watch out for *kwargs
-def method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
+def service_method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
     def intermediate_func(*args):  # type: ignore
         the_self = args[0]  # type: ignore
         selfless_args = args[1:]  # type: ignore
@@ -471,6 +471,14 @@ def method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
         )
 
     return intermediate_func  # type: ignore
+
+
+def service_query(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
+    return service_method(func)
+
+
+def service_update(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
+    return service_method(func)
 
 
 K = TypeVar("K")

@@ -1,20 +1,20 @@
-from kybra import Async, Canister, CanisterResult, ic, init, method, post_upgrade, Principal, query, update, Variant, void
+from kybra import Async, Canister, CanisterResult, ic, init, post_upgrade, Principal, query, service_query, service_update, update, Variant, void
 
 
 class WhoAmICanister(Canister):
-    @method
+    @service_query
     def installer(self) -> Principal: ...
 
-    @method
+    @service_query
     def argument(self) -> Principal: ...
 
-    @method
+    @service_update
     def whoami(self) -> Principal: ...
 
-    @method
+    @service_update
     def id(self) -> Principal: ...
 
-    @method
+    @service_query
     def idQuick(self) -> Principal: ...
 
 
