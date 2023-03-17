@@ -166,16 +166,16 @@
     Async,
     Canister,
     CanisterResult,
-    method,
     nat64,
     Principal,
+    service_update,
     update,
     Variant,
 )
 
 
 class TokenCanister(Canister):
-    @method
+    @service_update
     def transfer(self, to: Principal, amount: nat64) -&gt; nat64:
         ...
 
