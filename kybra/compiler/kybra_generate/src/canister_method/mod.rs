@@ -12,7 +12,9 @@ use std::ops::Deref;
 use cdk_framework::act::node::candid::Primitive;
 use cdk_framework::act::node::canister_method::CanisterMethodType;
 use cdk_framework::act::node::CandidType;
+use rustpython_parser::ast::Constant;
 use rustpython_parser::ast::ExprKind;
+use rustpython_parser::ast::KeywordData;
 use rustpython_parser::ast::Located;
 use rustpython_parser::ast::Mod;
 use rustpython_parser::ast::StmtKind;
@@ -85,6 +87,15 @@ impl SourceMapped<&Located<StmtKind>> {
             _ => Err(crate::errors::unreachable()),
         }
     }
+
+    pub fn get_guard_function_name(&self) -> Option<String> {
+        match &self.node {
+            StmtKind::FunctionDef { decorator_list, .. } => {
+                get_guard_function_name_from_decorator_list(decorator_list)
+            }
+            _ => None,
+        }
+    }
 }
 
 pub fn is_void(candid_type: CandidType) -> bool {
@@ -94,4 +105,31 @@ pub fn is_void(candid_type: CandidType) -> bool {
         };
     }
     return false;
+}
+
+fn get_guard_function_name_from_keywords(keywords: &Vec<Located<KeywordData>>) -> Option<String> {
+    for keyword in keywords {
+        if let Some(arg) = &keyword.node.arg {
+            if arg != "guard" {
+                continue;
+            }
+            if let ExprKind::Constant { value, .. } = &keyword.node.value.node {
+                if let Constant::Str(string) = value {
+                    return Some(string.to_string());
+                }
+            }
+        }
+    }
+    None
+}
+
+fn get_guard_function_name_from_decorator_list(
+    decorator_list: &Vec<Located<ExprKind>>,
+) -> Option<String> {
+    for decorator in decorator_list {
+        if let ExprKind::Call { keywords, .. } = &decorator.node {
+            return get_guard_function_name_from_keywords(&keywords);
+        }
+    }
+    None
 }

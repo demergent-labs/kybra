@@ -19,15 +19,20 @@ impl PyAst {
 
         let pre_upgrade_function_def_option = pre_upgrade_function_defs.get(0);
 
-        if let Some(pre_upgrade_function_def) = pre_upgrade_function_def_option {
-            if !canister_method::is_void(pre_upgrade_function_def.build_return_type()?) {
-                return Err(pre_upgrade_function_def.post_upgrade_method_must_return_void_error());
-            }
-        }
-
-        Ok(Some(PreUpgradeMethod {
-            body: rust::generate(pre_upgrade_function_def_option)?,
-            guard_function_name: None,
-        }))
+        Ok(
+            if let Some(pre_upgrade_function_def) = pre_upgrade_function_def_option {
+                if !canister_method::is_void(pre_upgrade_function_def.build_return_type()?) {
+                    return Err(
+                        pre_upgrade_function_def.post_upgrade_method_must_return_void_error()
+                    );
+                }
+                Some(PreUpgradeMethod {
+                    body: rust::generate(pre_upgrade_function_def)?,
+                    guard_function_name: pre_upgrade_function_def.get_guard_function_name(),
+                })
+            } else {
+                None
+            },
+        )
     }
 }

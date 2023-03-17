@@ -6,7 +6,7 @@ use crate::{
 };
 
 impl PyAst {
-    pub fn build_init_method(&self) -> KybraResult<Option<InitMethod>> {
+    pub fn build_init_method(&self) -> KybraResult<InitMethod> {
         let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
 
         if init_function_defs.len() > 1 {
@@ -18,25 +18,23 @@ impl PyAst {
 
         let init_function_def_option = init_function_defs.get(0);
 
-        if let Some(init_function_def) = init_function_def_option {
-            if !canister_method::is_void(init_function_def.build_return_type()?) {
-                return Err(init_function_def.init_method_must_return_void_error());
-            }
-        }
+        let (params, guard_function_name) =
+            if let Some(init_function_def) = init_function_def_option {
+                if !canister_method::is_void(init_function_def.build_return_type()?) {
+                    return Err(init_function_def.init_method_must_return_void_error());
+                }
+                (
+                    init_function_def.build_params(InternalOrExternal::Internal)?,
+                    init_function_def.get_guard_function_name(),
+                )
+            } else {
+                (vec![], None)
+            };
 
-        let params = match init_function_def_option {
-            Some(init_function_def) => {
-                init_function_def.build_params(InternalOrExternal::Internal)?
-            }
-            None => vec![],
-        };
-
-        let body = rust::generate(init_function_def_option, &self.entry_module_name)?;
-
-        Ok(Some(InitMethod {
+        Ok(InitMethod {
             params,
-            body,
-            guard_function_name: None,
-        }))
+            body: rust::generate(init_function_def_option, &self.entry_module_name)?,
+            guard_function_name,
+        })
     }
 }

@@ -6,7 +6,7 @@ use crate::{
 };
 
 impl PyAst {
-    pub fn build_post_upgrade_method(&self) -> KybraResult<Option<PostUpgradeMethod>> {
+    pub fn build_post_upgrade_method(&self) -> KybraResult<PostUpgradeMethod> {
         let post_upgrade_function_defs =
             self.get_canister_stmt_of_type(CanisterMethodType::PostUpgrade);
 
@@ -21,25 +21,24 @@ impl PyAst {
 
         let post_upgrade_function_def_option = post_upgrade_function_defs.get(0);
 
-        if let Some(post_upgrade_function_def) = post_upgrade_function_def_option {
+        let (params, guard_function_name) = if let Some(post_upgrade_function_def) =
+            post_upgrade_function_def_option
+        {
             if !canister_method::is_void(post_upgrade_function_def.build_return_type()?) {
                 return Err(post_upgrade_function_def.post_upgrade_method_must_return_void_error());
             }
-        }
-
-        let params = match &post_upgrade_function_def_option {
-            Some(post_upgrade_function_def) => {
-                post_upgrade_function_def.build_params(InternalOrExternal::Internal)?
-            }
-            None => vec![],
+            (
+                post_upgrade_function_def.build_params(InternalOrExternal::Internal)?,
+                post_upgrade_function_def.get_guard_function_name(),
+            )
+        } else {
+            (vec![], None)
         };
 
-        let body = rust::generate(post_upgrade_function_def_option, &self.entry_module_name)?;
-
-        Ok(Some(PostUpgradeMethod {
+        Ok(PostUpgradeMethod {
             params,
-            body,
-            guard_function_name: None,
-        }))
+            body: rust::generate(post_upgrade_function_def_option, &self.entry_module_name)?,
+            guard_function_name,
+        })
     }
 }
