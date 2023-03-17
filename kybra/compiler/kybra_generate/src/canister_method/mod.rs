@@ -12,7 +12,6 @@ use std::ops::Deref;
 use cdk_framework::act::node::candid::Primitive;
 use cdk_framework::act::node::canister_method::CanisterMethodType;
 use cdk_framework::act::node::CandidType;
-use rustpython_parser::ast::Constant;
 use rustpython_parser::ast::ExprKind;
 use rustpython_parser::ast::KeywordData;
 use rustpython_parser::ast::Located;
@@ -126,10 +125,6 @@ fn get_guard_function_name_from_keywords(
             }
             return match &keyword.node.value.node {
                 ExprKind::Name { id, .. } => Ok(Some(id.clone())),
-                ExprKind::Constant {
-                    value: Constant::Str(string),
-                    ..
-                } => Ok(Some(string.to_string())),
                 _ => Err(GuardFunctionError::InvalidName),
             };
         }
