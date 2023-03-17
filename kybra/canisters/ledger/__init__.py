@@ -8,10 +8,10 @@ from kybra import (
     null,
     opt,
     Principal,
-    query,
     Query,
     Record,
-    update,
+    service_query,
+    service_update,
     Variant,
 )
 
@@ -298,41 +298,41 @@ class Ledger(Canister):
     # Transfers tokens from a subaccount of the caller to the destination address.
     # The source address is computed from the principal of the caller and the specified subaccount.
     # When successful, returns the index of the block containing the transaction.
-    @update
+    @service_update
     def transfer(self, transfer_args: TransferArgs) -> TransferResult:
         ...
 
     # Returns the amount of Tokens on the specified account.
-    @query
+    @service_query
     def account_balance(self, account_balance_args: AccountBalanceArgs) -> Tokens:
         ...
 
     # Returns the current transfer_fee.
-    @query
+    @service_query
     def transfer_fee(self, transfer_fee_arg: TransferFeeArg) -> TransferFee:
         ...
 
     # Queries blocks in the specified range.
-    @query
+    @service_query
     def query_blocks(self, get_blocks_args: GetBlocksArgs) -> QueryBlocksResponse:
         ...
 
     # Returns token symbol.
-    @query
+    @service_query
     def symbol(self) -> SymbolResult:
         ...
 
     # Returns token name.
-    @query
+    @service_query
     def name(self) -> NameResult:
         ...
 
     # Returns token decimals.
-    @query
+    @service_query
     def decimals(self) -> DecimalsResult:
         ...
 
     # Returns the existing archive canisters information.
-    @query
+    @service_query
     def archives(self) -> Archives:
         ...

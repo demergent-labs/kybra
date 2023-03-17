@@ -1,19 +1,19 @@
-from kybra import Canister, nat, query, update
+from kybra import Canister, nat, service_query, service_update
 from src.canister1.types import StringQueryResult
 
 
 class Canister2(Canister):
-    @query
+    @service_query
     def simple_query(self) -> str: ...
 
-    @query
+    @service_query
     def manual_query(self) -> str: ...
 
-    @update
+    @service_update
     def update_query(self) -> str: ...
 
-    @query
+    @service_query
     def deep_query(self) -> StringQueryResult: ...
 
-    @query
+    @service_query
     def inc_counter(self) -> nat: ...

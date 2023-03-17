@@ -1,14 +1,14 @@
-from kybra import Canister, empty, Principal, query
+from kybra import Canister, empty, Principal, service_query
 
 
 class SomeService(Canister):
-    @query
+    @service_query
     def reject(self, message: str) -> empty: ...
 
-    @query
+    @service_query
     def accept(self) -> bool: ...
 
-    @query
+    @service_query
     def error(self) -> empty: ...
 
 

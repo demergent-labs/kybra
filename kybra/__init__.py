@@ -458,6 +458,29 @@ class AsyncInfo:
         return getattr(_kybra_ic, notify_function_name)(self.args)  # type: ignore
 
 
+# TODO this decorator is removing the static type checking of the self parameter for instance methods
+# TODO watch out for *kwargs
+def service_method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
+    def intermediate_func(*args):  # type: ignore
+        the_self = args[0]  # type: ignore
+        selfless_args = args[1:]  # type: ignore
+
+        return AsyncInfo(
+            "call",
+            [the_self.canister_id, func.__qualname__, *selfless_args],  # type: ignore
+        )
+
+    return intermediate_func  # type: ignore
+
+
+def service_query(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
+    return service_method(func)
+
+
+def service_update(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
+    return service_method(func)
+
+
 K = TypeVar("K")
 V = TypeVar("V")
 

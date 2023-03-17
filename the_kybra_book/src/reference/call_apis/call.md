@@ -25,13 +25,14 @@ from kybra import (
     CanisterResult,
     nat64,
     Principal,
+    service_update,
     update,
     Variant,
 )
 
 
 class TokenCanister(Canister):
-    @update
+    @service_update
     def transfer(self, to: Principal, amount: nat64) -> nat64:
         ...
 

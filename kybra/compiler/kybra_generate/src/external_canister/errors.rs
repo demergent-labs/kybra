@@ -25,7 +25,7 @@ impl SourceMapped<&Located<StmtKind>> {
         method_name: &String,
     ) -> Vec<Message> {
         let title = format!(
-            "{}.{} is missing a @query or @update decorator. Please add it above the method",
+            "{}.{} is missing a @service_query or @service_update decorator. Please add it above the method",
             canister_name, method_name
         );
         vec![self.create_error_message(title.as_str(), "", None)]
@@ -37,7 +37,7 @@ impl SourceMapped<&Located<StmtKind>> {
         method_name: &String,
     ) -> Vec<Message> {
         let title = format!(
-            "{}.{} has too many decorators. Please remove all but either @update or @query",
+            "{}.{} has too many decorators. Please remove all but either @service_update or @service_query",
             canister_name, method_name
         );
         vec![self.create_error_message(title.as_str(), "", None)]
@@ -50,7 +50,7 @@ impl SourceMapped<&Located<StmtKind>> {
         id: &String,
     ) -> Vec<Message> {
         let title = format!(
-            "{}.{} has the wrong decorator: expected @update or @query, got \"@{}\"",
+            "{}.{} has the wrong decorator: expected @service_update or @service_query, got \"@{}\"",
             canister_name, method_name, id
         );
         vec![self.create_error_message(title.as_str(), "", None)]
@@ -62,7 +62,7 @@ impl SourceMapped<&Located<StmtKind>> {
         method_name: &String,
     ) -> Vec<Message> {
         let title = format!(
-            "{}.{} has an invalid decorator. Change it to either @update or @query",
+            "{}.{} has an invalid decorator. Change it to either @service_update or @service_query",
             canister_name, method_name
         );
         vec![self.create_error_message(title.as_str(), "", None)]
