@@ -8,14 +8,18 @@ use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_guard_function(&self) -> bool {
-        match self.build_return_type() {
-            Ok(return_type) => {
-                if let CandidType::TypeRef(type_ref) = return_type {
-                    return type_ref.name == "GuardResult";
+        if let StmtKind::FunctionDef { .. } = self.node {
+            match self.build_return_type() {
+                Ok(return_type) => {
+                    if let CandidType::TypeRef(type_ref) = return_type {
+                        return type_ref.name == "GuardResult";
+                    }
+                    false
                 }
-                false
+                Err(_) => false,
             }
-            Err(_) => false,
+        } else {
+            false
         }
     }
 
