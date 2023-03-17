@@ -52,7 +52,7 @@ stable_storage = StableBTreeMap[str, StableFunc](
 
 
 @init
-def init_():
+def init_() -> void:
     stable_storage.insert(
         "stable_func", (Principal.from_str("aaaaa-aa"), "start_canister")
     )
@@ -109,7 +109,8 @@ def complex_func_return_type() -> ComplexFunc:
 def get_notifier_from_notifiers_canister() -> Async[
     GetNotifierFromNotifiersCanisterResult
 ]:
-    notifiers_canister = Notifier(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
+    notifiers_canister = Notifier(
+        Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
 
     result: CanisterResult[NotifierFunc] = yield notifiers_canister.get_notifier()
 

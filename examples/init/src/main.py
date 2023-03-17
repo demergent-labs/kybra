@@ -1,4 +1,4 @@
-from kybra import init, null, opt, Principal, query, Record, Variant
+from kybra import init, null, opt, Principal, query, Record, Variant, void
 
 
 class User(Record):
@@ -16,7 +16,7 @@ owner: opt[Principal] = None
 
 
 @init
-def init_(init_user: User, init_reaction: Reaction, init_owner: Principal):
+def init_(init_user: User, init_reaction: Reaction, init_owner: Principal) -> void:
     global user
     global reaction
     global owner

@@ -1,7 +1,9 @@
 use cdk_framework::act::node::canister_method::{CanisterMethodType, PostUpgradeMethod};
 
 use super::rust;
-use crate::{errors::KybraResult, method_utils::params::InternalOrExternal, py_ast::PyAst};
+use crate::{
+    canister_method, errors::KybraResult, method_utils::params::InternalOrExternal, py_ast::PyAst,
+};
 
 impl PyAst {
     pub fn build_post_upgrade_method(&self) -> KybraResult<Option<PostUpgradeMethod>> {
@@ -18,6 +20,12 @@ impl PyAst {
         }
 
         let post_upgrade_function_def_option = post_upgrade_function_defs.get(0);
+
+        if let Some(post_upgrade_function_def) = post_upgrade_function_def_option {
+            if !canister_method::is_void(post_upgrade_function_def.build_return_type()?) {
+                return Err(post_upgrade_function_def.post_upgrade_method_must_return_void_error());
+            }
+        }
 
         let params = match &post_upgrade_function_def_option {
             Some(post_upgrade_function_def) => {

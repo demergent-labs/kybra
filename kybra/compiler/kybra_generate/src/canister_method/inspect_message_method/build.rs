@@ -1,7 +1,7 @@
 use cdk_framework::act::node::canister_method::{CanisterMethodType, InspectMessageMethod};
 
 use super::rust;
-use crate::{errors::KybraResult, py_ast::PyAst};
+use crate::{canister_method, errors::KybraResult, py_ast::PyAst};
 
 impl PyAst {
     pub fn build_inspect_method(&self) -> KybraResult<Option<InspectMessageMethod>> {
@@ -21,6 +21,11 @@ impl PyAst {
 
         Ok(
             if let Some(inspect_method_function_def) = inspect_message_function_def_option {
+                if !canister_method::is_void(inspect_method_function_def.build_return_type()?) {
+                    return Err(
+                        inspect_method_function_def.inspect_message_method_must_return_void_error()
+                    );
+                }
                 Some(InspectMessageMethod {
                     body: rust::generate(inspect_method_function_def)?,
                     guard_function_name: None,

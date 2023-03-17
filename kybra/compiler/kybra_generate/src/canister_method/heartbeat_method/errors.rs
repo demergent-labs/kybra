@@ -13,4 +13,12 @@ impl SourceMapped<&Located<StmtKind>> {
             None,
         )
     }
+
+    pub fn heartbeat_method_must_return_void_error(&self) -> Vec<Message> {
+        vec![self.create_error_message(
+            "Heartbeat method must have an explicit void return type annotation",
+            "",
+            None,
+        )]
+    }
 }

@@ -32,6 +32,7 @@
 
     </head>
     <body>
+    <div id="body-container">
         <!-- Provide site root to javascript -->
         <script>
             var path_to_root = "";
@@ -69,10 +70,12 @@
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
             var html = document.querySelector('html');
-            var sidebar = 'hidden';
+            var sidebar = null;
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
             }
             html.classList.remove('sidebar-visible');
             html.classList.add("sidebar-" + sidebar);
@@ -217,7 +220,7 @@ stable_storage = StableBTreeMap[str, str](memory_id=0, max_key_size=20, max_valu
 
 
 @init
-def init_(ethereum_url: str):
+def init_(ethereum_url: str) -&gt; void:
     stable_storage.insert('ethereum_url', ethereum_url)
 
 
@@ -335,5 +338,6 @@ def eth_transform(args: HttpTransformArgs) -&gt; HttpResponse:
         <!-- Custom JS scripts -->
 
 
+    </div>
     </body>
 </html>

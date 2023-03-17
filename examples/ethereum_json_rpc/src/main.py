@@ -1,4 +1,4 @@
-from kybra import alias, Async, CanisterResult, ic, init, nat32, query, StableBTreeMap, update
+from kybra import alias, Async, CanisterResult, ic, init, nat32, query, StableBTreeMap, update, void
 from kybra.canisters.management import management_canister
 from kybra.canisters.management.http import HttpResponse, HttpTransformArgs
 
@@ -10,7 +10,7 @@ stable_storage = StableBTreeMap[str, str](
 
 
 @init
-def init_(ethereum_url: str):
+def init_(ethereum_url: str) -> void:
     stable_storage.insert('ethereum_url', ethereum_url)
 
 

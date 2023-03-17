@@ -11,7 +11,7 @@ from kybra import ic, inspect_message, update
 
 
 @inspect_message
-def inspect_message_():
+def inspect_message_() -> void:
     ic.print("inspect_message called")
 
     if ic.method_name() == "accessible":

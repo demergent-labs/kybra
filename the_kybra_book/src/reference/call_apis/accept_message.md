@@ -11,6 +11,6 @@ from kybra import ic, inspect_message
 
 
 @inspect_message
-def inspect_message_():
+def inspect_message_() -> void:
     ic.accept_message()
 ```

@@ -18,14 +18,14 @@ entries: dict[str, nat64] = {}
 
 
 @init
-def init_():
+def init_() -> void:
     ic.print("init_")
 
     stable_storage.insert('entries', [])
 
 
 @pre_upgrade
-def pre_upgrade_():
+def pre_upgrade_() -> void:
     ic.print("pre_upgrade_")
 
     stable_storage.insert('entries',
@@ -39,7 +39,7 @@ def pre_upgrade_():
 
 
 @post_upgrade
-def post_upgrade_():
+def post_upgrade_() -> void:
     ic.print("post_upgrade_")
 
     stable_entries = stable_storage.get('entries')

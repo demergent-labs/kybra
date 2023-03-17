@@ -32,6 +32,7 @@
 
     </head>
     <body>
+    <div id="body-container">
         <!-- Provide site root to javascript -->
         <script>
             var path_to_root = "../../";
@@ -69,10 +70,12 @@
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
             var html = document.querySelector('html');
-            var sidebar = 'hidden';
+            var sidebar = null;
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
             }
             html.classList.remove('sidebar-visible');
             html.classList.add("sidebar-" + sidebar);
@@ -151,7 +154,7 @@
 
 
 @inspect_message
-def inspect_message_():
+def inspect_message_() -&gt; void:
     ic.print(&quot;inspect_message called&quot;)
 
     if ic.method_name() == &quot;accessible&quot;:
@@ -227,5 +230,6 @@ def also_inaccessible() -&gt; bool:
         <!-- Custom JS scripts -->
 
 
+    </div>
     </body>
 </html>

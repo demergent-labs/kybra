@@ -32,6 +32,7 @@
 
     </head>
     <body>
+    <div id="body-container">
         <!-- Provide site root to javascript -->
         <script>
             var path_to_root = "";
@@ -69,10 +70,12 @@
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
             var html = document.querySelector('html');
-            var sidebar = 'hidden';
+            var sidebar = null;
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
             }
             html.classList.remove('sidebar-visible');
             html.classList.add("sidebar-" + sidebar);
@@ -146,15 +149,15 @@
 <pre><code class="language-python">from kybra import init, post_upgrade, pre_upgrade
 
 @init
-def init_():
+def init_() -&gt; void:
     print('runs on first canister install')
 
 @pre_upgrade
-def pre_upgrade_():
+def pre_upgrade_() -&gt; void:
     print('runs before canister upgrade')
 
 @post_upgrade
-def post_upgrade_():
+def post_upgrade_() -&gt; void:
     print('runs after canister upgrade')
 </code></pre>
 
@@ -206,5 +209,6 @@ def post_upgrade_():
         <!-- Custom JS scripts -->
 
 
+    </div>
     </body>
 </html>

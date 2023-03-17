@@ -9,7 +9,9 @@ mod rust;
 
 use std::ops::Deref;
 
+use cdk_framework::act::node::candid::Primitive;
 use cdk_framework::act::node::canister_method::CanisterMethodType;
+use cdk_framework::act::node::CandidType;
 use rustpython_parser::ast::ExprKind;
 use rustpython_parser::ast::Located;
 use rustpython_parser::ast::Mod;
@@ -83,4 +85,13 @@ impl SourceMapped<&Located<StmtKind>> {
             _ => Err(crate::errors::unreachable()),
         }
     }
+}
+
+pub fn is_void(candid_type: CandidType) -> bool {
+    if let CandidType::Primitive(primitive) = candid_type {
+        if let Primitive::Void = primitive {
+            return true;
+        };
+    }
+    return false;
 }

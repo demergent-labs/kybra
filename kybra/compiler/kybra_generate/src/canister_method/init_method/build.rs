@@ -1,7 +1,9 @@
 use super::rust;
 use cdk_framework::act::node::canister_method::{CanisterMethodType, InitMethod};
 
-use crate::{errors::KybraResult, method_utils::params::InternalOrExternal, py_ast::PyAst};
+use crate::{
+    canister_method, errors::KybraResult, method_utils::params::InternalOrExternal, py_ast::PyAst,
+};
 
 impl PyAst {
     pub fn build_init_method(&self) -> KybraResult<Option<InitMethod>> {
@@ -15,6 +17,12 @@ impl PyAst {
         }
 
         let init_function_def_option = init_function_defs.get(0);
+
+        if let Some(init_function_def) = init_function_def_option {
+            if !canister_method::is_void(init_function_def.build_return_type()?) {
+                return Err(init_function_def.init_method_must_return_void_error());
+            }
+        }
 
         let params = match init_function_def_option {
             Some(init_function_def) => {
