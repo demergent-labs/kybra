@@ -60,7 +60,12 @@ TimerId = alias[nat64]
 Duration = alias[nat64]
 
 
-GuardType = Callable[..., Any]
+class GuardResult(Variant, total=False):
+    ok: null
+    err: str
+
+
+GuardType = Callable[..., GuardResult]
 
 
 def query(
@@ -165,11 +170,6 @@ class CanisterResult(Generic[T]):
 # class CanisterResult(Variant, Generic[T], total=False):
 #     ok: T
 #     err: str
-
-
-class GuardResult(Variant, total=False):
-    ok: null
-    err: str
 
 
 class RejectionCode(Variant, total=False):

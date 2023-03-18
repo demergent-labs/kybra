@@ -118,16 +118,14 @@ enum GuardFunctionError {
 fn get_guard_function_name_from_keywords(
     keywords: &[Located<KeywordData>],
 ) -> Result<Option<String>, GuardFunctionError> {
-    for keyword in keywords {
-        if let Some(arg) = &keyword.node.arg {
-            if arg != "guard" {
-                continue;
-            }
-            return match &keyword.node.value.node {
-                ExprKind::Name { id, .. } => Ok(Some(id.clone())),
-                _ => Err(GuardFunctionError::InvalidName),
-            };
-        }
+    if let Some(keyword) = keywords
+        .iter()
+        .find(|keyword| keyword.node.arg.as_deref() == Some("guard"))
+    {
+        return match &keyword.node.value.node {
+            ExprKind::Name { id, .. } => Ok(Some(id.clone())),
+            _ => Err(GuardFunctionError::InvalidName),
+        };
     }
     Ok(None)
 }
@@ -135,10 +133,13 @@ fn get_guard_function_name_from_keywords(
 fn get_guard_function_name_from_decorator_list(
     decorator_list: &[Located<ExprKind>],
 ) -> Result<Option<String>, GuardFunctionError> {
-    for decorator in decorator_list {
-        if let ExprKind::Call { keywords, .. } = &decorator.node {
-            return get_guard_function_name_from_keywords(&keywords);
-        }
-    }
-    Ok(None)
+    Ok(decorator_list
+        .iter()
+        .map(|decorator| match &decorator.node {
+            ExprKind::Call { keywords, .. } => get_guard_function_name_from_keywords(keywords),
+            _ => Ok(None),
+        })
+        .collect::<Result<Vec<Option<String>>, GuardFunctionError>>()?
+        .into_iter()
+        .find_map(|name_option| name_option))
 }
