@@ -28,7 +28,7 @@ impl PyAst {
                 }
                 Some(InspectMessageMethod {
                     body: rust::generate(inspect_method_function_def)?,
-                    guard_function_name: None,
+                    guard_function_name: inspect_method_function_def.get_guard_function_name()?,
                 })
             } else {
                 None

@@ -13,6 +13,7 @@ use cdk_framework::act::node::candid::Primitive;
 use cdk_framework::act::node::canister_method::CanisterMethodType;
 use cdk_framework::act::node::CandidType;
 use rustpython_parser::ast::ExprKind;
+use rustpython_parser::ast::KeywordData;
 use rustpython_parser::ast::Located;
 use rustpython_parser::ast::Mod;
 use rustpython_parser::ast::StmtKind;
@@ -85,6 +86,20 @@ impl SourceMapped<&Located<StmtKind>> {
             _ => Err(crate::errors::unreachable()),
         }
     }
+
+    pub fn get_guard_function_name(&self) -> KybraResult<Option<String>> {
+        match &self.node {
+            StmtKind::FunctionDef { decorator_list, .. } => {
+                match get_guard_function_name_from_decorator_list(decorator_list) {
+                    Ok(name) => Ok(name),
+                    Err(err) => match err {
+                        GuardFunctionError::InvalidName => Err(self.guard_function_name_error()),
+                    },
+                }
+            }
+            _ => Ok(None),
+        }
+    }
 }
 
 pub fn is_void(candid_type: CandidType) -> bool {
@@ -94,4 +109,37 @@ pub fn is_void(candid_type: CandidType) -> bool {
         };
     }
     return false;
+}
+
+enum GuardFunctionError {
+    InvalidName,
+}
+
+fn get_guard_function_name_from_keywords(
+    keywords: &[Located<KeywordData>],
+) -> Result<Option<String>, GuardFunctionError> {
+    if let Some(keyword) = keywords
+        .iter()
+        .find(|keyword| keyword.node.arg.as_deref() == Some("guard"))
+    {
+        return match &keyword.node.value.node {
+            ExprKind::Name { id, .. } => Ok(Some(id.clone())),
+            _ => Err(GuardFunctionError::InvalidName),
+        };
+    }
+    Ok(None)
+}
+
+fn get_guard_function_name_from_decorator_list(
+    decorator_list: &[Located<ExprKind>],
+) -> Result<Option<String>, GuardFunctionError> {
+    Ok(decorator_list
+        .iter()
+        .map(|decorator| match &decorator.node {
+            ExprKind::Call { keywords, .. } => get_guard_function_name_from_keywords(keywords),
+            _ => Ok(None),
+        })
+        .collect::<Result<Vec<Option<String>>, GuardFunctionError>>()?
+        .into_iter()
+        .find_map(|name_option| name_option))
 }

@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "guard_functions": {
+            "type": "custom",
+            "build": "python -m kybra guard_functions src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".kybra/guard_functions/guard_functions.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/guard_functions",
+                "node_compatibility": true
+            }
+        }
+    }
+}

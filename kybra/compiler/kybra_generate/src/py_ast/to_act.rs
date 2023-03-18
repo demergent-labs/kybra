@@ -18,9 +18,9 @@ impl PyAst {
 
         let canister_methods = CanisterMethods {
             heartbeat_method: self.build_heartbeat_method()?,
-            init_method: self.build_init_method()?,
+            init_method: Some(self.build_init_method()?),
             inspect_message_method: self.build_inspect_method()?,
-            post_upgrade_method: self.build_post_upgrade_method()?,
+            post_upgrade_method: Some(self.build_post_upgrade_method()?),
             pre_upgrade_method: self.build_pre_upgrade_method()?,
             query_methods: self.build_query_methods()?,
             update_methods: self.build_update_methods()?,

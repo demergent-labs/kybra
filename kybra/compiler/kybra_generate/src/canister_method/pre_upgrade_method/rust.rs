@@ -5,14 +5,10 @@ use rustpython_parser::ast::{Located, StmtKind};
 use crate::{errors::KybraResult, source_map::SourceMapped};
 
 pub fn generate(
-    pre_upgrade_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
+    pre_upgrade_function_def: &SourceMapped<&Located<StmtKind>>,
 ) -> KybraResult<TokenStream> {
-    let call_to_pre_upgrade_py_function = match pre_upgrade_function_def_option {
-        Some(pre_upgrade_function_def) => {
-            pre_upgrade_function_def.generate_call_to_py_function()?
-        }
-        None => quote!(),
-    };
+    let call_to_pre_upgrade_py_function =
+        pre_upgrade_function_def.generate_call_to_py_function()?;
 
     Ok(quote! {
         unsafe {

@@ -23,10 +23,9 @@ impl PyAst {
                 if !canister_method::is_void(heartbeat_function_def.build_return_type()?) {
                     return Err(heartbeat_function_def.heartbeat_method_must_return_void_error());
                 }
-                let body = rust::generate(heartbeat_function_def)?;
                 Some(HeartbeatMethod {
-                    body,
-                    guard_function_name: None,
+                    body: rust::generate(heartbeat_function_def)?,
+                    guard_function_name: heartbeat_function_def.get_guard_function_name()?,
                 })
             } else {
                 None
