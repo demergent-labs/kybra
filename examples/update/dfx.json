@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".kybra/update/update.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/update"
+                "output": "test/dfx_generated/update",
+                "node_compatibility": true
             }
         }
     }

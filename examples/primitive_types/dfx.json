@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".kybra/primitive_types/primitive_types.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/primitive_types"
+                "output": "test/dfx_generated/primitive_types",
+                "node_compatibility": true
             }
         }
     }

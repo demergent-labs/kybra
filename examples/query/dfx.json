@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".kybra/query/query.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/query"
+                "output": "test/dfx_generated/query",
+                "node_compatibility": true
             }
         }
     }
