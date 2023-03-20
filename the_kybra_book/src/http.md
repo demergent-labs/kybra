@@ -71,8 +71,7 @@ Examples:
 
 ```python
 from kybra import Async, CanisterResult, ic, init, nat32, query, StableBTreeMap, update
-from kybra.canisters.management import management_canister
-from kybra.canisters.management.http import HttpResponse, HttpTransformArgs
+from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
 
 JSON = str
 

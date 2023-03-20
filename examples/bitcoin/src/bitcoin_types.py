@@ -1,5 +1,5 @@
 from kybra import null, Variant
-from kybra.canisters.management.bitcoin import GetUtxosResult, MillisatoshiPerByte, Satoshi
+from kybra.canisters.management import GetUtxosResult, MillisatoshiPerByte, Satoshi
 
 
 class ExecuteGetBalanceResult(Variant, total=False):
