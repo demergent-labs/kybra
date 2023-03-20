@@ -1,6 +1,5 @@
-import { run_tests, Test } from 'azle/test';
+import { run_tests } from 'azle/test';
 import { get_tests } from 'azle/examples/generators/test/tests';
-import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/generators';
 
 const generators_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
@@ -9,22 +8,4 @@ const generators_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-const tests: Test[] = [
-    {
-        name: 'deploy',
-        prep: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-
-            execSync(`dfx canister uninstall-code generators || true`, {
-                stdio: 'inherit'
-            });
-
-            execSync(`dfx deploy generators`, {
-                stdio: 'inherit'
-            });
-        }
-    },
-    ...get_tests(generators_canister as any)
-];
-
-run_tests(tests);
+run_tests(get_tests(generators_canister as any));

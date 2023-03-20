@@ -1,6 +1,5 @@
 import { Principal } from '@dfinity/principal';
 import { run_tests, Test } from 'azle/test';
-import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/keywords';
 import {
     KeywordRecord,
@@ -15,20 +14,6 @@ const keywords_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const tests: Test[] = [
-    {
-        name: 'deploy',
-        prep: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-
-            execSync(`dfx canister uninstall-code keywords || true`, {
-                stdio: 'inherit'
-            });
-
-            execSync(`dfx deploy keywords`, {
-                stdio: 'inherit'
-            });
-        }
-    },
     {
         name: 'keyword_variant',
         test: async () => {

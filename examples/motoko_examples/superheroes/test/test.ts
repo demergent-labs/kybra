@@ -1,6 +1,5 @@
 import { run_tests, Test } from 'azle/test';
 import { get_tests } from 'azle/examples/motoko_examples/superheroes/test/tests';
-import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/superheroes';
 import { Superhero } from './dfx_generated/superheroes/superheroes.did';
 
@@ -11,20 +10,6 @@ const superheroes_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const tests: Test[] = [
-    {
-        name: 'deploy',
-        prep: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-
-            execSync(`dfx canister uninstall-code superheroes || true`, {
-                stdio: 'inherit'
-            });
-
-            execSync(`dfx deploy superheroes`, {
-                stdio: 'inherit'
-            });
-        }
-    },
     ...get_tests(superheroes_canister as any).filter(
         (value) =>
             value.name != 'update when adding superpowers' &&

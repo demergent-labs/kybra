@@ -1,6 +1,5 @@
 import { run_tests, Test } from 'azle/test';
 import { get_tests } from 'azle/examples/primitive_types/test/tests';
-import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/primitive_types';
 
 const primitive_types_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
@@ -10,20 +9,6 @@ const primitive_types_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const tests: Test[] = [
-    {
-        name: 'deploy',
-        prep: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-
-            execSync(`dfx canister uninstall-code primitive_types || true`, {
-                stdio: 'inherit'
-            });
-
-            execSync(`dfx deploy primitive_types`, {
-                stdio: 'inherit'
-            });
-        }
-    },
     ...get_tests(primitive_types_canister as any),
     // TODO once Azle has these tests, remove these tests and just use Azle's
     {

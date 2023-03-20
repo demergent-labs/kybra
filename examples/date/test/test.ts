@@ -1,5 +1,4 @@
 import { run_tests, Test } from 'azle/test';
-import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/date';
 
 const date_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
@@ -9,20 +8,6 @@ const date_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const tests: Test[] = [
-    {
-        name: 'deploy',
-        prep: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-
-            execSync(`dfx canister uninstall-code date || true`, {
-                stdio: 'inherit'
-            });
-
-            execSync(`dfx deploy date`, {
-                stdio: 'inherit'
-            });
-        }
-    },
     {
         name: 'get_time',
         test: async () => {
