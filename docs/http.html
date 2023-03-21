@@ -210,8 +210,7 @@ def http_request(req: HttpRequest) -&gt; HttpResponse:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
 <pre><code class="language-python">from kybra import Async, CanisterResult, ic, init, nat32, query, StableBTreeMap, update
-from kybra.canisters.management import management_canister
-from kybra.canisters.management.http import HttpResponse, HttpTransformArgs
+from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
 
 JSON = str
 

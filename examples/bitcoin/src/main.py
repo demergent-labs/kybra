@@ -1,6 +1,5 @@
 from kybra import Async, blob, CanisterResult, update, void
-from kybra.canisters.management.bitcoin import GetUtxosResult, MillisatoshiPerByte, Satoshi
-from kybra.canisters.management import management_canister
+from kybra.canisters.management import GetUtxosResult, management_canister, MillisatoshiPerByte, Satoshi
 from bitcoin_types import ExecuteGetBalanceResult, ExecuteGetCurrentFeePercentiles, ExecuteGetUtxosResult, ExecuteSendTransactionResult
 
 BITCOIN_API_CYCLE_COST = 100_000_000

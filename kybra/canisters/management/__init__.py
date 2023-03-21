@@ -20,33 +20,50 @@ from kybra import blob, Canister, Principal, service_update, void
 
 # The as expressions are reexporting these variables
 from kybra.canisters.management.basic import (
+    CanisterSettings as CanisterSettings,
+    CanisterStatus as CanisterStatus,
+    CanisterStatusArgs as CanisterStatusArgs,
     CanisterStatusResult as CanisterStatusResult,
-    DepositCyclesArgs as DepositCyclesArgs,
-    DeleteCanisterArgs as DeleteCanisterArgs,
     CreateCanisterArgs as CreateCanisterArgs,
     CreateCanisterResult as CreateCanisterResult,
+    DefiniteCanisterSettings as DefiniteCanisterSettings,
+    DeleteCanisterArgs as DeleteCanisterArgs,
+    DepositCyclesArgs as DepositCyclesArgs,
     InstallCodeArgs as InstallCodeArgs,
-    UninstallCodeArgs as UninstallCodeArgs,
-    UpdateSettingsArgs as UpdateSettingsArgs,
-    StartCanisterArgs as StartCanisterArgs,
-    StopCanisterArgs as StopCanisterArgs,
-    CanisterStatusArgs as CanisterStatusArgs,
+    InstallCodeMode as InstallCodeMode,
     ProvisionalCreateCanisterWithCyclesArgs as ProvisionalCreateCanisterWithCyclesArgs,
     ProvisionalCreateCanisterWithCyclesResult as ProvisionalCreateCanisterWithCyclesResult,
     ProvisionalTopUpCanisterArgs as ProvisionalTopUpCanisterArgs,
+    StartCanisterArgs as StartCanisterArgs,
+    StopCanisterArgs as StopCanisterArgs,
+    UninstallCodeArgs as UninstallCodeArgs,
+    UpdateSettingsArgs as UpdateSettingsArgs,
 )
 from kybra.canisters.management.http import (
+    HttpHeader as HttpHeader,
+    HttpMethod as HttpMethod,
     HttpRequestArgs as HttpRequestArgs,
     HttpResponse as HttpResponse,
+    HttpTransform as HttpTransform,
+    HttpTransformArgs as HttpTransformArgs,
+    HttpTransformFunc as HttpTransformFunc
 )
 from kybra.canisters.management.bitcoin import (
+    BitcoinAddress as BitcoinAddress,
+    BitcoinNetwork as BitcoinNetwork,
+    BlockHash as BlockHash,
     GetBalanceArgs as GetBalanceArgs,
     GetCurrentFeePercentilesArgs as GetCurrentFeePercentilesArgs,
     GetUtxosArgs as GetUtxosArgs,
     GetUtxosResult as GetUtxosResult,
+    Page as Page,
     MillisatoshiPerByte as MillisatoshiPerByte,
+    Outpoint as Outpoint,
     Satoshi as Satoshi,
     SendTransactionArgs as SendTransactionArgs,
+    SendTransactionError as SendTransactionError,
+    Utxo as Utxo,
+    UtxosFilter as UtxosFilter,
 )
 
 # TODO change the return types to void

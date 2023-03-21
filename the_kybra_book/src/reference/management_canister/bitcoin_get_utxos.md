@@ -8,8 +8,7 @@ Examples:
 
 ```python
 from kybra import Async, CanisterResult, update, Variant
-from kybra.canisters.management.bitcoin import GetUtxosResult
-from kybra.canisters.management import management_canister
+from kybra.canisters.management import GetUtxosResult, management_canister
 
 BITCOIN_API_CYCLE_COST = 100_000_000
 

@@ -2177,8 +2177,7 @@ def http_request(req: HttpRequest) -&gt; HttpResponse:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
 <pre><code class="language-python">from kybra import Async, CanisterResult, ic, init, nat32, query, StableBTreeMap, update
-from kybra.canisters.management import management_canister
-from kybra.canisters.management.http import HttpResponse, HttpTransformArgs
+from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
 
 JSON = str
 
@@ -4169,8 +4168,7 @@ def set_message(new_message: str) -&gt; void:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
 <pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
-from kybra.canisters.management.bitcoin import Satoshi
-from kybra.canisters.management import management_canister
+from kybra.canisters.management import management_canister, Satoshi
 
 BITCOIN_API_CYCLE_COST = 100_000_000
 
@@ -4202,8 +4200,7 @@ def get_balance(address: str) -&gt; Async[ExecuteGetBalanceResult]:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
 <pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
-from kybra.canisters.management.bitcoin import MillisatoshiPerByte
-from kybra.canisters.management import management_canister
+from kybra.canisters.management import management_canister, MillisatoshiPerByte
 
 BITCOIN_API_CYCLE_COST = 100_000_000
 
@@ -4235,8 +4232,7 @@ def get_current_fee_percentiles() -&gt; Async[GetCurrentFeePercentilesResult]:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
 <pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
-from kybra.canisters.management.bitcoin import GetUtxosResult
-from kybra.canisters.management import management_canister
+from kybra.canisters.management import GetUtxosResult, management_canister
 
 BITCOIN_API_CYCLE_COST = 100_000_000
 
@@ -4421,8 +4417,7 @@ def execute_deposit_cycles(canister_id: Principal) -&gt; Async[DefaultResult]:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
 <pre><code class="language-python">from kybra import Async, CanisterResult, ic, query, update
-from kybra.canisters.management import management_canister
-from kybra.canisters.management.http import HttpResponse, HttpTransformArgs
+from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
 
 
 @update

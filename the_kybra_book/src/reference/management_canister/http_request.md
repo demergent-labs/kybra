@@ -9,8 +9,7 @@ Examples:
 
 ```python
 from kybra import Async, CanisterResult, ic, query, update
-from kybra.canisters.management import management_canister
-from kybra.canisters.management.http import HttpResponse, HttpTransformArgs
+from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
 
 
 @update

@@ -32,20 +32,18 @@ class UpdateSettingsArgs(Record):
     canister_id: Principal
     settings: CanisterSettings
 
-# TODO this should be below InstallCodeArgs once double quote type syntax is allowed
+
+class InstallCodeArgs(Record):
+    mode: "InstallCodeMode"
+    canister_id: Principal
+    wasm_module: blob
+    arg: blob
 
 
 class InstallCodeMode(Variant, total=False):
     install: null
     reinstall: null
     upgrade: null
-
-
-class InstallCodeArgs(Record):
-    mode: InstallCodeMode
-    canister_id: Principal
-    wasm_module: blob
-    arg: blob
 
 
 class UninstallCodeArgs(Record):
@@ -63,21 +61,19 @@ class StopCanisterArgs(Record):
 class CanisterStatusArgs(Record):
     canister_id: Principal
 
-# TODO this should be below CanisterStatusResult once double quote type syntax is allowed
+
+class CanisterStatusResult(Record):
+    status: "CanisterStatus"
+    settings: DefiniteCanisterSettings
+    module_hash: opt[blob]
+    memory_size: nat
+    cycles: nat
 
 
 class CanisterStatus(Variant):
     running: null
     stopping: null
     stopped: null
-
-
-class CanisterStatusResult(Record):
-    status: CanisterStatus
-    settings: DefiniteCanisterSettings
-    module_hash: opt[blob]
-    memory_size: nat
-    cycles: nat
 
 
 class DeleteCanisterArgs(Record):
