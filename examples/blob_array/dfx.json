@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".kybra/blob_array/blob_array.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/blob_array"
+                "output": "test/dfx_generated/blob_array",
+                "node_compatibility": true
             }
         }
     }

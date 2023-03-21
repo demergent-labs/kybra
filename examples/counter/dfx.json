@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".kybra/counter/counter.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/counter"
+                "output": "test/dfx_generated/counter",
+                "node_compatibility": true
             }
         }
     }

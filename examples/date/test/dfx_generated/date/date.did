@@ -1,4 +1,0 @@
-service : () -> {
-  get_strftime : () -> (text) query;
-  get_time : () -> (float64) query;
-}

@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".kybra/simple_user_accounts/simple_user_accounts.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/simple_user_accounts"
+                "output": "test/dfx_generated/simple_user_accounts",
+                "node_compatibility": true
             }
         }
     }

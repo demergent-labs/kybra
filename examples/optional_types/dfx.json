@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".kybra/optional_types/optional_types.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/optional_types"
+                "output": "test/dfx_generated/optional_types",
+                "node_compatibility": true
             }
         }
     }

@@ -3,7 +3,6 @@ import {
     impure_setup,
     while_running_bitcoin_daemon
 } from 'azle/examples/bitcoin/test/setup';
-import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/bitcoin';
 import { wallets } from 'azle/examples/bitcoin/test/wallets';
 import { State } from 'azle/examples/bitcoin/test/test';
@@ -22,18 +21,8 @@ const state: State = {
 const tests: Test[] = [
     ...impure_setup(wallets, state),
     {
-        name: 'deploy',
-        prep: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-
-            execSync(`dfx canister uninstall-code bitcoin || true`, {
-                stdio: 'inherit'
-            });
-
-            execSync(`dfx deploy bitcoin`, {
-                stdio: 'inherit'
-            });
-        }
+        name: 'wait for blockchain balance to reflect',
+        wait: 30_000
     },
     ...test_canister_functionality()
 ];

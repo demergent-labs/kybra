@@ -6,7 +6,8 @@
             "candid": "src/main.did",
             "wasm": ".kybra/inspect_message/inspect_message.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/inspect_message"
+                "output": "test/dfx_generated/inspect_message",
+                "node_compatibility": true
             }
         }
     }

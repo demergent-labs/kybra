@@ -6,7 +6,8 @@
             "candid": "src/complex_types.did",
             "wasm": ".kybra/complex_types/complex_types.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/complex_types"
+                "output": "test/dfx_generated/complex_types",
+                "node_compatibility": true
             }
         }
     }

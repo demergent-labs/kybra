@@ -1,6 +1,5 @@
 import { run_tests, Test } from 'azle/test';
 import { get_tests } from 'azle/examples/imports/test/tests';
-import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/imports';
 
 const imports_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
@@ -10,20 +9,6 @@ const imports_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const tests: Test[] = [
-    {
-        name: 'deploy',
-        prep: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-
-            execSync(`dfx canister uninstall-code imports || true`, {
-                stdio: 'inherit'
-            });
-
-            execSync(`dfx deploy imports`, {
-                stdio: 'inherit'
-            });
-        }
-    },
     ...get_tests(imports_canister as any),
     {
         name: 'get_math_message',
