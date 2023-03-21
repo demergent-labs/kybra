@@ -33,13 +33,13 @@ def execute_create_canister() -> Async[ExecuteCreateCanisterResult]:
     # TODO in Azle the amount we send is much smaller, I think something changed from dfx 11 to dfx 12, look into it
 
     if create_canister_result_canister_result.err is not None:
-        return {"err": create_canister_result_canister_result.err}
+        return {"Err": create_canister_result_canister_result.err}
 
     create_canister_result = create_canister_result_canister_result.ok
 
     state["created_canister_id"] = create_canister_result["canister_id"]
 
-    return {"ok": create_canister_result}
+    return {"Ok": create_canister_result}
 
 
 @update
@@ -57,9 +57,9 @@ def execute_update_settings(canister_id: Principal) -> Async[DefaultResult]:
     )
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
-    return {"ok": True}
+    return {"Ok": True}
 
 
 @update
@@ -76,9 +76,9 @@ def execute_install_code(
     ).with_cycles(100_000_000_000)
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
-    return {"ok": True}
+    return {"Ok": True}
 
 
 @update
@@ -88,9 +88,9 @@ def execute_uninstall_code(canister_id: Principal) -> Async[DefaultResult]:
     )
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
-    return {"ok": True}
+    return {"Ok": True}
 
 
 @update
@@ -100,9 +100,9 @@ def execute_start_canister(canister_id: Principal) -> Async[DefaultResult]:
     )
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
-    return {"ok": True}
+    return {"Ok": True}
 
 
 @update
@@ -112,9 +112,9 @@ def execute_stop_canister(canister_id: Principal) -> Async[DefaultResult]:
     )
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
-    return {"ok": True}
+    return {"Ok": True}
 
 
 @update
@@ -124,11 +124,11 @@ def get_canister_status(args: CanisterStatusArgs) -> Async[GetCanisterStatusResu
     ] = yield management_canister.canister_status({"canister_id": args["canister_id"]})
 
     if canister_status_result_canister_result.err is not None:
-        return {"err": canister_status_result_canister_result.err}
+        return {"Err": canister_status_result_canister_result.err}
 
     canister_status_result = canister_status_result_canister_result.ok
 
-    return {"ok": canister_status_result}
+    return {"Ok": canister_status_result}
 
 
 @update
@@ -138,9 +138,9 @@ def execute_delete_canister(canister_id: Principal) -> Async[DefaultResult]:
     )
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
-    return {"ok": True}
+    return {"Ok": True}
 
 
 @update
@@ -150,9 +150,9 @@ def execute_deposit_cycles(canister_id: Principal) -> Async[DefaultResult]:
     ).with_cycles(1_000_000)
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
-    return {"ok": True}
+    return {"Ok": True}
 
 
 @update
@@ -162,11 +162,11 @@ def get_raw_rand() -> Async[RawRandResult]:
     ] = yield management_canister.raw_rand()
 
     if raw_rand_canister_result.err is not None:
-        return {"err": raw_rand_canister_result.err}
+        return {"Err": raw_rand_canister_result.err}
 
     randomness = raw_rand_canister_result.ok
 
-    return {"ok": randomness}
+    return {"Ok": randomness}
 
 
 # TODO needs tests
@@ -183,11 +183,11 @@ def provisional_create_canister_with_cycles() -> Async[
     )
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
     provisional_create_canister_with_cycles_result = canister_result.ok
 
-    return {"ok": provisional_create_canister_with_cycles_result}
+    return {"Ok": provisional_create_canister_with_cycles_result}
 
 
 @update
@@ -201,9 +201,9 @@ def provisional_top_up_canister(
     )
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
-    return {"ok": True}
+    return {"Ok": True}
 
 
 @query

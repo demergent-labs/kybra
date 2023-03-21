@@ -1,22 +1,22 @@
-import { run_tests, Test } from 'azle/test';
-import { get_tests } from 'azle/examples/imports/test/tests';
+import { runTests, Test } from 'azle/test';
+import { getTests } from 'azle/examples/imports/test/tests';
 import { createActor } from './dfx_generated/imports';
 
-const imports_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const importsCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
 });
 
 const tests: Test[] = [
-    ...get_tests(imports_canister as any),
+    ...getTests(importsCanister as any),
     {
         name: 'get_math_message',
         test: async () => {
-            const result = await imports_canister.get_math_message();
+            const result = await importsCanister.get_math_message();
 
             return {
-                ok: result === 11n
+                Ok: result === 11n
             };
         }
     }
@@ -33,4 +33,4 @@ const tests: Test[] = [
     // }
 ];
 
-run_tests(tests);
+runTests(tests);

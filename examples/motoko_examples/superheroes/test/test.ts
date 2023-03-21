@@ -1,16 +1,16 @@
-import { run_tests, Test } from 'azle/test';
-import { get_tests } from 'azle/examples/motoko_examples/superheroes/test/tests';
+import { runTests, Test } from 'azle/test';
+import { getTests } from 'azle/examples/motoko_examples/superheroes/test/tests';
 import { createActor } from './dfx_generated/superheroes';
 import { Superhero } from './dfx_generated/superheroes/superheroes.did';
 
-const superheroes_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const superheroesCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
 });
 
 const tests: Test[] = [
-    ...get_tests(superheroes_canister as any).filter(
+    ...getTests(superheroesCanister as any).filter(
         (value) =>
             value.name != 'update when adding superpowers' &&
             value.name != 'update removing superpowers' &&
@@ -33,10 +33,10 @@ const tests: Test[] = [
                     ]
                 ]
             };
-            const result = await superheroes_canister.update_(0, spiderman);
+            const result = await superheroesCanister.update_(0, spiderman);
 
             return {
-                ok: result === true
+                Ok: result === true
             };
         }
     },
@@ -47,23 +47,23 @@ const tests: Test[] = [
                 name: 'Superman',
                 superpowers: []
             };
-            const result = await superheroes_canister.update_(1, superman);
+            const result = await superheroesCanister.update_(1, superman);
 
             return {
-                ok: result === true
+                Ok: result === true
             };
         }
     },
     {
         name: 'delete with a valid id',
         test: async () => {
-            const result = await superheroes_canister.delete_hero(0);
+            const result = await superheroesCanister.delete_hero(0);
 
             return {
-                ok: result === true
+                Ok: result === true
             };
         }
     }
 ];
 
-run_tests(tests);
+runTests(tests);

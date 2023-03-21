@@ -1,5 +1,5 @@
 import { Principal } from '@dfinity/principal';
-import { run_tests, Test } from 'azle/test';
+import { runTests, Test } from 'azle/test';
 import { createActor } from './dfx_generated/keywords';
 import {
     KeywordRecord,
@@ -7,7 +7,7 @@ import {
     SimpleRecord
 } from './dfx_generated/keywords/keywords.did';
 
-const keywords_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const keywordsCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
@@ -18,22 +18,22 @@ const tests: Test[] = [
         name: 'keyword_variant',
         test: async () => {
             const keyword_variant: KeywordVariant = { raise: null };
-            const result = await keywords_canister.keyword_variant(
+            const result = await keywordsCanister.keyword_variant(
                 keyword_variant
             );
 
             return {
-                ok: 'raise' in result
+                Ok: 'raise' in result
             };
         }
     },
     {
         name: 'rust_keyword_variant',
         test: async () => {
-            const result = await keywords_canister.rust_keyword_variant();
+            const result = await keywordsCanister.rust_keyword_variant();
 
             return {
-                ok: 'type' in result
+                Ok: 'type' in result
             };
         }
     },
@@ -43,22 +43,20 @@ const tests: Test[] = [
             const simple_record: SimpleRecord = {
                 from: 'testing'
             };
-            const result = await keywords_canister.simple_keyword(
-                simple_record
-            );
+            const result = await keywordsCanister.simple_keyword(simple_record);
 
             return {
-                ok: result.from === 'testing'
+                Ok: result.from === 'testing'
             };
         }
     },
     {
         name: 'rust_keyword',
         test: async () => {
-            const result = await keywords_canister.rust_keyword();
+            const result = await keywordsCanister.rust_keyword();
 
             return {
-                ok:
+                Ok:
                     result.abstract === false &&
                     result.become === 'Become' &&
                     result.const === 3n &&
@@ -76,7 +74,7 @@ const tests: Test[] = [
     {
         name: 'complex_keyword',
         test: async () => {
-            const result = await keywords_canister.complex_keyword();
+            const result = await keywordsCanister.complex_keyword();
 
             const expected_output: KeywordRecord = {
                 False: false,
@@ -124,7 +122,7 @@ const tests: Test[] = [
             };
 
             return {
-                ok:
+                Ok:
                     result.False === expected_output.False &&
                     result.True === expected_output.True &&
                     result.and === expected_output.and &&
@@ -183,4 +181,4 @@ const tests: Test[] = [
     }
 ];
 
-run_tests(tests);
+runTests(tests);

@@ -1,5 +1,5 @@
-import { run_tests } from 'azle/test';
-import { get_tests } from 'azle/examples/notify_raw/test/tests';
+import { runTests } from 'azle/test';
+import { getTests } from 'azle/examples/notify_raw/test/tests';
 import { createActor as createActorCanister1 } from './dfx_generated/canister1';
 import { createActor as createActorCanister2 } from './dfx_generated/canister2';
 
@@ -15,4 +15,4 @@ const canister2 = createActorCanister2('ryjl3-tyaaa-aaaaa-aaaba-cai', {
     }
 });
 
-run_tests(get_tests(canister1, canister2 as any));
+runTests(getTests(canister1, canister2 as any));

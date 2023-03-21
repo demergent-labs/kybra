@@ -1,11 +1,11 @@
-import { run_tests } from 'azle/test';
-import { get_tests } from './tests';
+import { runTests } from 'azle/test';
+import { get_tests as getTests } from './tests';
 import { createActor } from './dfx_generated/guard_functions';
 
-const function_guard_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const functionGuardCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
 });
 
-run_tests(get_tests(function_guard_canister));
+runTests(getTests(functionGuardCanister));

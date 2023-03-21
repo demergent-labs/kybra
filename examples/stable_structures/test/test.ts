@@ -1,8 +1,8 @@
-import { run_tests, Test } from 'azle/test';
+import { runTests, Test } from 'azle/test';
 import { execSync } from 'child_process';
 import {
-    pre_redeploy_tests,
-    post_redeploy_tests,
+    preRedeployTests,
+    postRedeployTests,
     insert_error_tests
 } from 'azle/examples/stable_structures/test/tests';
 import { createActor as createActorCanister1 } from './dfx_generated/canister1';
@@ -47,4 +47,4 @@ const tests: Test[] = [
     )
 ];
 
-run_tests(tests);
+runTests(tests);

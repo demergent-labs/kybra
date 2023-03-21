@@ -1,14 +1,14 @@
-import { ok, run_tests, Test } from 'azle/test';
+import { ok, runTests, Test } from 'azle/test';
 import {
-    impure_setup,
-    while_running_bitcoin_daemon
+    impure_setup as impureSetup,
+    while_running_bitcoin_daemon as whileRunningBitcoinDaemon
 } from 'azle/examples/bitcoin/test/setup';
 import { createActor } from './dfx_generated/bitcoin';
 import { wallets } from 'azle/examples/bitcoin/test/wallets';
 import { State } from 'azle/examples/bitcoin/test/test';
 import { bitcoin_cli } from 'azle/examples/bitcoin/test/bitcoin_cli';
 
-const bitcoin_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const bitcoinCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
@@ -19,22 +19,22 @@ const state: State = {
 };
 
 const tests: Test[] = [
-    ...impure_setup(wallets, state),
+    ...impureSetup(wallets, state),
     {
         name: 'wait for blockchain balance to reflect',
         wait: 30_000
     },
-    ...test_canister_functionality()
+    ...testCanisterFunctionality()
 ];
 
-while_running_bitcoin_daemon(() => run_tests(tests));
+whileRunningBitcoinDaemon(() => runTests(tests));
 
-function test_canister_functionality() {
+function testCanisterFunctionality() {
     return [
         {
             name: 'get_balance',
             test: async () => {
-                const result = await bitcoin_canister.get_balance(
+                const result = await bitcoinCanister.get_balance(
                     wallets.alice.p2wpkh
                 );
 
@@ -47,14 +47,14 @@ function test_canister_functionality() {
                 const expected_balance = block_reward * blocks_mined_in_setup;
 
                 return {
-                    ok: result.ok === expected_balance
+                    Ok: result.Ok === expected_balance
                 };
             }
         },
         {
             name: 'get_utxos',
             test: async () => {
-                const result = await bitcoin_canister.get_utxos(
+                const result = await bitcoinCanister.get_utxos(
                     wallets.alice.p2wpkh
                 );
 
@@ -63,9 +63,9 @@ function test_canister_functionality() {
                 }
 
                 return {
-                    ok:
-                        result.ok.tip_height === 101 &&
-                        result.ok.utxos.length === 101
+                    Ok:
+                        result.Ok.tip_height === 101 &&
+                        result.Ok.utxos.length === 101
                 };
             }
         },
@@ -73,14 +73,14 @@ function test_canister_functionality() {
             name: 'get_current_fee_percentiles',
             test: async () => {
                 const result =
-                    await bitcoin_canister.get_current_fee_percentiles();
+                    await bitcoinCanister.get_current_fee_percentiles();
 
                 if (!ok(result)) {
                     return { err: result.err };
                 }
 
                 return {
-                    ok: result.ok.length === 0 // TODO: This should have entries
+                    Ok: result.Ok.length === 0 // TODO: This should have entries
                 };
             }
         },
@@ -92,7 +92,7 @@ function test_canister_functionality() {
 
                 const tx_bytes = hex_string_to_bytes(state.signed_tx_hex);
 
-                const result = await bitcoin_canister.send_transaction(
+                const result = await bitcoinCanister.send_transaction(
                     Array.from(tx_bytes)
                 );
 
@@ -111,8 +111,8 @@ function test_canister_functionality() {
                     bitcoin_cli.get_received_by_address(wallets.bob.p2wpkh, 0);
 
                 return {
-                    ok:
-                        result.ok === null &&
+                    Ok:
+                        result.Ok === null &&
                         balance_before_transaction === 0 &&
                         balance_after_transaction === 1
                 };
