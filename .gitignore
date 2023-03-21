@@ -8,5 +8,3 @@ build
 kybra.egg-info
 node_modules
 __pycache__
-token_length
-threshold_ecdsa
