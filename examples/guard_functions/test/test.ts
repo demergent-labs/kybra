@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { get_tests as getTests } from './tests';
 import { createActor } from './dfx_generated/guard_functions';
 

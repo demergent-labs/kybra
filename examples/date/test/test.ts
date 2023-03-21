@@ -1,4 +1,4 @@
-import { runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
 import { getTests } from 'azle/examples/date/test/tests';
 import { createActor } from './dfx_generated/date';
 
@@ -9,7 +9,7 @@ const dateCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const tests: Test[] = [
-    ...getTests(dateCanister),
+    ...getTests(createSnakeCaseProxy(dateCanister)),
     {
         name: 'get_time',
         test: async () => {

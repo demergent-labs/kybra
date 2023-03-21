@@ -1,5 +1,5 @@
 import { getTests } from 'azle/examples/ledger_canister/test/tests';
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { createActor } from './dfx_generated/ledger_canister';
 
 const ledgerCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
@@ -8,4 +8,4 @@ const ledgerCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(ledgerCanister as any));
+runTests(getTests(createSnakeCaseProxy(ledgerCanister)));

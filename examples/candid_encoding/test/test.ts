@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { get_tests as getTests } from 'azle/examples/candid_encoding/test/tests';
 import { createActor } from './dfx_generated/candid_encoding';
 
@@ -8,4 +8,4 @@ const candidEncodingCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(candidEncodingCanister as any));
+runTests(getTests(createSnakeCaseProxy(candidEncodingCanister)));

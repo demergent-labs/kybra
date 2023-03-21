@@ -1,4 +1,4 @@
-import { runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
 import { getTests } from 'azle/examples/ic_api/test/tests';
 import { createActor } from './dfx_generated/ic_api';
 
@@ -9,7 +9,7 @@ const icApiCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const tests: Test[] = [
-    ...getTests(icApiCanister as any).filter(
+    ...getTests(createSnakeCaseProxy(icApiCanister)).filter(
         (test) => test.name !== 'performance_counter'
     ),
     {

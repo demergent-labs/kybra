@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { get_tests as getTests } from 'azle/examples/audio_recorder/test/tests';
 import { createActor } from './dfx_generated/audio_recorder';
 
@@ -8,4 +8,4 @@ const audioRecorderCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(audioRecorderCanister));
+runTests(getTests(createSnakeCaseProxy(audioRecorderCanister)));

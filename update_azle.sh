@@ -20,7 +20,7 @@ while IFS= read -r -d '' dir; do
     if [[ "$dir" != *"node_modules"* ]] && [[ -f "$dir/package.json" ]]; then
         if check_azle_dependency "$dir/package.json"; then
             cd "$dir"
-            npm uninstall azle && npm install https://github.com/demergent-labs/azle
+            npm uninstall azle && npm install https://github.com/demergent-labs/azle#test_case_converter
             cd - >/dev/null
             ((updated++))
             updated_folders+=("$dir")

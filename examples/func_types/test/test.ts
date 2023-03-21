@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { getTests } from 'azle/examples/func_types/test/tests';
 import { createActor } from './dfx_generated/func_types';
 
@@ -8,4 +8,4 @@ const funcTypesCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(funcTypesCanister as any));
+runTests(getTests(createSnakeCaseProxy(funcTypesCanister)));

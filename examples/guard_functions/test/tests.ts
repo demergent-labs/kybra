@@ -11,7 +11,7 @@ export function get_tests(
             test: async () => {
                 const result = await guard_functions_canister.accessible();
                 return {
-                    ok: result === true
+                    Ok: result === true
                 };
             }
         },
@@ -20,7 +20,7 @@ export function get_tests(
             test: async () => {
                 const result = await guard_functions_canister.guarded_manual();
                 return {
-                    ok: result === true
+                    Ok: result === true
                 };
             }
         },
@@ -31,11 +31,11 @@ export function get_tests(
                     const result =
                         await guard_functions_canister.inaccessible();
                     return {
-                        ok: false
+                        Ok: false
                     };
                 } catch (err: any) {
                     return {
-                        ok: err?.result?.reject_message == 'You shall not pass!'
+                        Ok: err?.result?.reject_message == 'You shall not pass!'
                     };
                 }
             }
@@ -47,11 +47,11 @@ export function get_tests(
                     const result =
                         await guard_functions_canister.inaccessible_update();
                     return {
-                        ok: false
+                        Ok: false
                     };
                 } catch (err: any) {
                     return {
-                        ok: err.toString().includes('You shall not pass!')
+                        Ok: err.toString().includes('You shall not pass!')
                     };
                 }
             }
@@ -61,7 +61,7 @@ export function get_tests(
             test: async () => {
                 const result = await guard_functions_canister.unguarded();
                 return {
-                    ok: result === true
+                    Ok: result === true
                 };
             }
         }

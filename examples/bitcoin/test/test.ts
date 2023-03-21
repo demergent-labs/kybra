@@ -1,4 +1,4 @@
-import { ok, runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, ok, runTests, Test } from 'azle/test';
 import {
     impure_setup as impureSetup,
     while_running_bitcoin_daemon as whileRunningBitcoinDaemon

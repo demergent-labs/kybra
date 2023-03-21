@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { get_tests as getTests } from 'azle/examples/generators/test/tests';
 import { createActor } from './dfx_generated/generators';
 
@@ -8,4 +8,4 @@ const generatorsCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(generatorsCanister as any));
+runTests(getTests(createSnakeCaseProxy(generatorsCanister)));
