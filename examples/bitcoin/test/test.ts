@@ -20,6 +20,10 @@ const state: State = {
 
 const tests: Test[] = [
     ...impure_setup(wallets, state),
+    {
+        name: 'wait for blockchain balance to reflect',
+        wait: 30_000
+    },
     ...test_canister_functionality()
 ];
 

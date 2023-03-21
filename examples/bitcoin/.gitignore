@@ -3,6 +3,7 @@
 node_modules
 target
 venv
+dfx_generated
 
 # Bitcoin
 .bitcoin/*
