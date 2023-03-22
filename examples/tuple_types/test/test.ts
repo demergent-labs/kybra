@@ -10,6 +10,6 @@ const tuple_types_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 
 runTests(
     getTests(createSnakeCaseProxy(tuple_types_canister)).filter(
-        (test) => test.name !== 'two_tuple_with_inline_records' // Kybra does not have the concept of inline records
+        (test) => test.name !== 'twoTupleWithInlineRecords' // Kybra does not have the concept of inline records
     )
 );
