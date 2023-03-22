@@ -8,4 +8,4 @@ const complexInitCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(createSnakeCaseProxy(getTests(complexInitCanister)));
+runTests(getTests(createSnakeCaseProxy(complexInitCanister)));

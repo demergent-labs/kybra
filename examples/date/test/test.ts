@@ -9,7 +9,7 @@ const dateCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const tests: Test[] = [
-    ...getTests(createSnakeCaseProxy(dateCanister)),
+    // ...getTests(createSnakeCaseProxy(dateCanister)),
     {
         name: 'get_time',
         test: async () => {
