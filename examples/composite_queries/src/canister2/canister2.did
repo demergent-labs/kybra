@@ -1,4 +1,4 @@
-type StringQueryResult = variant { ok : text; err : text };
+type StringQueryResult = variant { Ok : text; Err : text };
 service : () -> {
   deep_query : () -> (StringQueryResult) query;
   inc_counter : () -> (nat) query;

@@ -39,7 +39,7 @@ function testCanisterFunctionality() {
                 );
 
                 if (!ok(result)) {
-                    return { err: result.err };
+                    return { Err: result.Err };
                 }
 
                 const block_reward = 5_000_000_000n;
@@ -59,7 +59,7 @@ function testCanisterFunctionality() {
                 );
 
                 if (!ok(result)) {
-                    return { err: result.err };
+                    return { Err: result.Err };
                 }
 
                 return {
@@ -76,7 +76,7 @@ function testCanisterFunctionality() {
                     await bitcoinCanister.get_current_fee_percentiles();
 
                 if (!ok(result)) {
-                    return { err: result.err };
+                    return { Err: result.Err };
                 }
 
                 return {
@@ -98,7 +98,7 @@ function testCanisterFunctionality() {
 
                 if (!ok(result)) {
                     return {
-                        err: result.err
+                        Err: result.Err
                     };
                 }
 
