@@ -3,9 +3,11 @@ from kybra.canisters.ledger import Address, Archives, DecimalsResult, GetBlocksA
 
 icp_canister = Ledger(Principal.from_str('r7inp-6aaaa-aaaaa-aaabq-cai'))
 
+
 class ExecuteTransferResult(Variant, total=False):
-    ok: TransferResult
-    err: str
+    Ok: TransferResult
+    Err: str
+
 
 @update
 def execute_transfer(
@@ -31,18 +33,20 @@ def execute_transfer(
 
     if transfer_result_canister_result.err is not None:
         return {
-            'err': transfer_result_canister_result.err
+            'Err': transfer_result_canister_result.err
         }
 
     transfer_result = transfer_result_canister_result.ok
 
     return {
-        'ok': transfer_result
+        'Ok': transfer_result
     }
 
+
 class GetAccountBalanceResult(Variant, total=False):
-    ok: Tokens
-    err: str
+    Ok: Tokens
+    Err: str
+
 
 @update
 def get_account_balance(address: Address) -> Async[GetAccountBalanceResult]:
@@ -52,37 +56,41 @@ def get_account_balance(address: Address) -> Async[GetAccountBalanceResult]:
 
     if tokens_canister_result.err is not None:
         return {
-            'err': tokens_canister_result.err
+            'Err': tokens_canister_result.err
         }
 
     tokens = tokens_canister_result.ok
 
     return {
-        'ok': tokens
+        'Ok': tokens
     }
 
+
 class GetTransferFeeResult(Variant, total=False):
-    ok: TransferFee
-    err: str
+    Ok: TransferFee
+    Err: str
+
 
 @update
 def get_transfer_fee() -> Async[GetTransferFeeResult]:
-    transfer_fee_canister_result: CanisterResult[TransferFee] = yield icp_canister.transfer_fee({});
+    transfer_fee_canister_result: CanisterResult[TransferFee] = yield icp_canister.transfer_fee({})
 
     if transfer_fee_canister_result.err is not None:
         return {
-            'err': transfer_fee_canister_result.err
+            'Err': transfer_fee_canister_result.err
         }
 
     transfer_fee = transfer_fee_canister_result.ok
 
     return {
-        'ok': transfer_fee
+        'Ok': transfer_fee
     }
 
+
 class GetBlocksResult(Variant, total=False):
-    ok: QueryBlocksResponse
-    err: str
+    Ok: QueryBlocksResponse
+    Err: str
+
 
 @update
 def get_blocks(get_blocks_args: GetBlocksArgs) -> Async[GetBlocksResult]:
@@ -90,37 +98,41 @@ def get_blocks(get_blocks_args: GetBlocksArgs) -> Async[GetBlocksResult]:
 
     if canister_result.err is not None:
         return {
-            'err': canister_result.err
+            'Err': canister_result.err
         }
 
     get_blocks_result = canister_result.ok
 
     return {
-        'ok': get_blocks_result
+        'Ok': get_blocks_result
     }
 
+
 class GetSymbolResult(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
+
 
 @update
 def get_symbol() -> Async[GetSymbolResult]:
-    symbol_result_canister_result: CanisterResult[SymbolResult] = yield icp_canister.symbol();
+    symbol_result_canister_result: CanisterResult[SymbolResult] = yield icp_canister.symbol()
 
     if symbol_result_canister_result.err is not None:
         return {
-            'err': symbol_result_canister_result.err
+            'Err': symbol_result_canister_result.err
         }
 
     symbol_result = symbol_result_canister_result.ok
 
     return {
-        'ok': symbol_result['symbol']
+        'Ok': symbol_result['symbol']
     }
 
+
 class GetNameResult(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
+
 
 @update
 def get_name() -> Async[GetNameResult]:
@@ -128,18 +140,20 @@ def get_name() -> Async[GetNameResult]:
 
     if name_result_canister_result.err is not None:
         return {
-            'err': name_result_canister_result.err
+            'Err': name_result_canister_result.err
         }
 
     name_result = name_result_canister_result.ok
 
     return {
-        'ok': name_result['name']
+        'Ok': name_result['name']
     }
 
+
 class GetDecimalsResult(Variant, total=False):
-    ok: nat32
-    err: str
+    Ok: nat32
+    Err: str
+
 
 @update
 def get_decimals() -> Async[GetDecimalsResult]:
@@ -147,18 +161,20 @@ def get_decimals() -> Async[GetDecimalsResult]:
 
     if decimals_result_canister_result.err is not None:
         return {
-            'err': decimals_result_canister_result.err
+            'Err': decimals_result_canister_result.err
         }
 
     decimals_result = decimals_result_canister_result.ok
 
     return {
-        'ok': decimals_result['decimals']
+        'Ok': decimals_result['decimals']
     }
 
+
 class GetArchivesResult(Variant, total=False):
-    ok: Archives
-    err: str
+    Ok: Archives
+    Err: str
+
 
 @update
 def get_archives() -> Async[GetArchivesResult]:
@@ -166,14 +182,15 @@ def get_archives() -> Async[GetArchivesResult]:
 
     if archives_canister_result.err is not None:
         return {
-            'err': archives_canister_result.err
+            'Err': archives_canister_result.err
         }
 
     archives = archives_canister_result.ok
 
     return {
-        'ok': archives
+        'Ok': archives
     }
+
 
 @query
 def get_address_from_principal(principal: Principal) -> str:

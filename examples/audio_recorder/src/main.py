@@ -40,8 +40,8 @@ recordings = StableBTreeMap[Principal, Recording](
 
 
 class CreateUserResult(Variant, total=False):
-    ok: User
-    err: InsertError
+    Ok: User
+    Err: InsertError
 
 
 @update
@@ -57,9 +57,9 @@ def create_user(username: str) -> CreateUserResult:
     result = users.insert(user["id"], user)
 
     if result.err is not None:
-        return {"err": result.err}
+        return {"Err": result.err}
 
-    return {"ok": user}
+    return {"Ok": user}
 
 
 @query
@@ -73,8 +73,8 @@ def read_user_by_id(id: Principal) -> opt[User]:
 
 
 class DeleteUserResult(Variant, total=False):
-    ok: User
-    err: "DeleteUserErr"
+    Ok: User
+    Err: "DeleteUserErr"
 
 
 class DeleteUserErr(Variant, total=False):
@@ -86,19 +86,19 @@ def delete_user(id: Principal) -> DeleteUserResult:
     user = users.get(id)
 
     if user is None:
-        return {"err": {"UserDoesNotExist": id}}
+        return {"Err": {"UserDoesNotExist": id}}
 
     for recording_id in user["recording_ids"]:
         recordings.remove(recording_id)
 
     users.remove(user["id"])
 
-    return {"ok": user}
+    return {"Ok": user}
 
 
 class CreateRecordingResult(Variant, total=False):
-    ok: Recording
-    err: "CreateRecordingErr"
+    Ok: Recording
+    Err: "CreateRecordingErr"
 
 
 class CreateRecordingErr(Variant, total=False):
@@ -113,7 +113,7 @@ def create_recording(
     user = users.get(user_id)
 
     if user is None:
-        return {"err": {"UserDoesNotExist": user_id}}
+        return {"Err": {"UserDoesNotExist": user_id}}
 
     id = generate_id()
     recording: Recording = {
@@ -127,7 +127,7 @@ def create_recording(
     create_recording_result = recordings.insert(recording["id"], recording)
 
     if create_recording_result.err is not None:
-        return {"err": {"InsertError": create_recording_result.err}}
+        return {"Err": {"InsertError": create_recording_result.err}}
 
     updated_user: User = {
         **user,
@@ -137,9 +137,9 @@ def create_recording(
     update_user_result = users.insert(updated_user["id"], updated_user)
 
     if update_user_result.err is not None:
-        return {"err": {"InsertError": update_user_result.err}}
+        return {"Err": {"InsertError": update_user_result.err}}
 
-    return {"ok": recording}
+    return {"Ok": recording}
 
 
 @query
@@ -153,8 +153,8 @@ def read_recording_by_id(id: Principal) -> opt[Recording]:
 
 
 class DeleteRecordingResult(Variant, total=False):
-    ok: Recording
-    err: "DeleteRecordingError"
+    Ok: Recording
+    Err: "DeleteRecordingError"
 
 
 class DeleteRecordingError(Variant, total=False):
@@ -168,18 +168,19 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
     recording = recordings.get(id)
 
     if recording is None:
-        return {"err": {"RecordingDoesNotExist": id}}
+        return {"Err": {"RecordingDoesNotExist": id}}
 
     user = users.get(recording["user_id"])
 
     if user is None:
-        return {"err": {"UserDoesNotExist": recording["user_id"]}}
+        return {"Err": {"UserDoesNotExist": recording["user_id"]}}
 
     updated_user: User = {
         **user,
         "recording_ids": list(
             filter(
-                lambda recording_id: recording_id.to_str() != recording["id"].to_str(),
+                lambda recording_id: recording_id.to_str(
+                ) != recording["id"].to_str(),
                 user["recording_ids"],
             )
         ),
@@ -188,11 +189,11 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
     update_user_result = users.insert(updated_user["id"], updated_user)
 
     if update_user_result.err is not None:
-        return {"err": {"InsertError": update_user_result.err}}
+        return {"Err": {"InsertError": update_user_result.err}}
 
     recordings.remove(id)
 
-    return {"ok": recording}
+    return {"Ok": recording}
 
 
 def generate_id() -> Principal:
