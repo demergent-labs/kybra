@@ -26,7 +26,7 @@ def update_query() -> str:
 
 @query
 def manual_query() -> manual[str]:
-    ic.reply("Hello from Canister 2 manual_query")
+    ic.reply("Hello from Canister 2 manual query")
 
 
 @query
