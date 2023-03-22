@@ -12,8 +12,8 @@ from kybra import (
 
 
 class ExecuteCallRawResult(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
 
 
 @update
@@ -25,14 +25,14 @@ def execute_call_raw(
     )
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
-    return {"ok": ic.candid_decode(canister_result.ok)}
+    return {"Ok": ic.candid_decode(canister_result.ok)}
 
 
 class ExecuteCallRaw128Result(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
 
 
 @update
@@ -44,6 +44,6 @@ def execute_call_raw128(
     )
 
     if canister_result.err is not None:
-        return {"err": canister_result.err}
+        return {"Err": canister_result.err}
 
-    return {"ok": ic.candid_decode(canister_result.ok)}
+    return {"Ok": ic.candid_decode(canister_result.ok)}
