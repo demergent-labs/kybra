@@ -1,4 +1,4 @@
-import { runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
 import { getTests } from 'azle/examples/motoko_examples/superheroes/test/tests';
 import { createActor } from './dfx_generated/superheroes';
 import { Superhero } from './dfx_generated/superheroes/superheroes.did';
@@ -10,7 +10,7 @@ const superheroesCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const tests: Test[] = [
-    ...getTests(superheroesCanister as any).filter(
+    ...getTests(createSnakeCaseProxy(superheroesCanister)).filter(
         (value) =>
             value.name != 'update when adding superpowers' &&
             value.name != 'update removing superpowers' &&

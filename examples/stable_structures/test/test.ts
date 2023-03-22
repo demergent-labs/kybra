@@ -1,33 +1,37 @@
-import { runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
 import { execSync } from 'child_process';
 import {
     preRedeployTests,
     postRedeployTests,
-    insert_error_tests
+    insertErrorTests
 } from 'azle/examples/stable_structures/test/tests';
 import { createActor as createActorCanister1 } from './dfx_generated/canister1';
 import { createActor as createActorCanister2 } from './dfx_generated/canister2';
 import { createActor as createActorCanister3 } from './dfx_generated/canister3';
 
-const stable_structures_canister_1 = createActorCanister1(
+const stableStructuresCanister1 = createActorCanister1(
     'rrkah-fqaaa-aaaaa-aaaaq-cai',
     { agentOptions: { host: 'http://127.0.0.1:8000' } }
 );
 
-const stable_structures_canister_2 = createActorCanister2(
+const stableStructuresCanister2 = createActorCanister2(
     'ryjl3-tyaaa-aaaaa-aaaba-cai',
     { agentOptions: { host: 'http://127.0.0.1:8000' } }
 );
 
-const stable_structures_canister_3 = createActorCanister3(
+const stableStructuresCanister3 = createActorCanister3(
     'r7inp-6aaaa-aaaaa-aaabq-cai',
     { agentOptions: { host: 'http://127.0.0.1:8000' } }
 );
 
 const tests: Test[] = [
-    ...pre_redeploy_tests(stable_structures_canister_1 as any, 0, 4),
-    ...pre_redeploy_tests(stable_structures_canister_2 as any, 5, 9),
-    ...pre_redeploy_tests(stable_structures_canister_3 as any, 10, 13),
+    ...preRedeployTests(createSnakeCaseProxy(stableStructuresCanister1), 0, 4),
+    ...preRedeployTests(createSnakeCaseProxy(stableStructuresCanister2), 5, 9),
+    ...preRedeployTests(
+        createSnakeCaseProxy(stableStructuresCanister3),
+        10,
+        13
+    ),
     {
         name: 'redeploy canisters',
         prep: async () => {
@@ -38,12 +42,16 @@ const tests: Test[] = [
             });
         }
     },
-    ...post_redeploy_tests(stable_structures_canister_1 as any, 0, 4),
-    ...post_redeploy_tests(stable_structures_canister_2 as any, 5, 9),
-    ...post_redeploy_tests(stable_structures_canister_3 as any, 10, 13),
-    ...insert_error_tests(
-        stable_structures_canister_1 as any,
-        stable_structures_canister_3 as any
+    ...postRedeployTests(createSnakeCaseProxy(stableStructuresCanister1), 0, 4),
+    ...postRedeployTests(createSnakeCaseProxy(stableStructuresCanister2), 5, 9),
+    ...postRedeployTests(
+        createSnakeCaseProxy(stableStructuresCanister3),
+        10,
+        13
+    ),
+    ...insertErrorTests(
+        stableStructuresCanister1 as any,
+        stableStructuresCanister3 as any
     )
 ];
 

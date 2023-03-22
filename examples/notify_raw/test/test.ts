@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { getTests } from 'azle/examples/notify_raw/test/tests';
 import { createActor as createActorCanister1 } from './dfx_generated/canister1';
 import { createActor as createActorCanister2 } from './dfx_generated/canister2';
@@ -15,4 +15,6 @@ const canister2 = createActorCanister2('ryjl3-tyaaa-aaaaa-aaaba-cai', {
     }
 });
 
-runTests(getTests(canister1, canister2 as any));
+runTests(
+    getTests(createSnakeCaseProxy(canister1), createSnakeCaseProxy(canister2))
+);

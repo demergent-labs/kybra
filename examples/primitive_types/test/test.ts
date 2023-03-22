@@ -1,4 +1,4 @@
-import { runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
 import { getTests } from 'azle/examples/primitive_types/test/tests';
 import { createActor } from './dfx_generated/primitive_types';
 
@@ -9,7 +9,7 @@ const primitiveTypesCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const tests: Test[] = [
-    ...getTests(primitiveTypesCanister as any),
+    ...getTests(createSnakeCaseProxy(primitiveTypesCanister)),
     // TODO once Azle has these tests, remove these tests and just use Azle's
     {
         name: 'get_text',

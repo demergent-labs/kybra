@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { getTests } from 'azle/examples/motoko_examples/echo/test/tests';
 import { createActor } from './dfx_generated/echo';
 
@@ -8,4 +8,4 @@ const echoCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(echoCanister));
+runTests(getTests(createSnakeCaseProxy(echoCanister)));

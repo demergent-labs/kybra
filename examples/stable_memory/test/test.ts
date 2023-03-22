@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { getTests } from 'azle/examples/stable_memory/test/tests';
 import { createActor } from './dfx_generated/stable_memory';
 
@@ -9,7 +9,7 @@ const stable_memory_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 runTests(
-    getTests(stable_memory_canister as any).filter(
+    getTests(createSnakeCaseProxy(stable_memory_canister)).filter(
         (test) => test.name !== 'stable64 grow out of memory'
     )
 );

@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { getTests } from 'azle/examples/motoko_examples/quicksort/test/tests';
 import { createActor } from './dfx_generated/quicksort';
 
@@ -8,4 +8,4 @@ const quicksortCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(quicksortCanister as any));
+runTests(getTests(createSnakeCaseProxy(quicksortCanister)));

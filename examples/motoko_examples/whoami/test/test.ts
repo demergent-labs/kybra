@@ -1,4 +1,4 @@
-import { runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
 import {
     callingIdentity,
     canisterId,
@@ -17,7 +17,7 @@ const whoamiCanister = createActor(canisterId, {
 const callingPrincipal = callingIdentity.getPrincipal().toString();
 
 const tests: Test[] = [
-    ...getTests(whoamiCanister as any).filter((test) => {
+    ...getTests(createSnakeCaseProxy(whoamiCanister)).filter((test) => {
         return test.name !== 'redeploy' && test.name !== 'updated argument';
     }),
     {

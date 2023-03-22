@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { getTests } from 'azle/examples/pre_and_post_upgrade/test/tests';
 import { createActor } from './dfx_generated/pre_and_post_upgrade';
 
@@ -8,4 +8,4 @@ const preAndPostCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(preAndPostCanister));
+runTests(getTests(createSnakeCaseProxy(preAndPostCanister)));

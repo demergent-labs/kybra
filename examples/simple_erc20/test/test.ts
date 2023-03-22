@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { getTests } from 'azle/examples/simple_erc20/test/tests';
 import { createActor } from './dfx_generated/simple_erc20';
 
@@ -8,4 +8,4 @@ const simpleErc20Canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(simpleErc20Canister));
+runTests(getTests(createSnakeCaseProxy(simpleErc20Canister)));

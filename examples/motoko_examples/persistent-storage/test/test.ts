@@ -1,4 +1,4 @@
-import { runTests } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import { getTests } from 'azle/examples/motoko_examples/persistent-storage/test/tests';
 import { createActor } from './dfx_generated/persistent_storage';
 
@@ -8,4 +8,4 @@ const persistentStorageCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(persistentStorageCanister as any));
+runTests(getTests(createSnakeCaseProxy(persistentStorageCanister)));
