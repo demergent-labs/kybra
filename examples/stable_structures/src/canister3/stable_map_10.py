@@ -4,8 +4,8 @@ from kybra import float32
 
 
 class StableMap10InsertResult(Variant, total=False):
-    ok: opt[opt[bool]]
-    err: InsertError
+    Ok: opt[opt[bool]]
+    Err: InsertError
 
 
 stable_map_10 = StableBTreeMap[float32, opt[bool]](
@@ -21,13 +21,13 @@ def stable_map_10_get(key: float32) -> opt[opt[bool]]:
 def stable_map_10_insert(key: float32, value: opt[bool]) -> StableMap10InsertResult:
     result = stable_map_10.insert(key, value)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 

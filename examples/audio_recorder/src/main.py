@@ -56,8 +56,8 @@ def create_user(username: str) -> CreateUserResult:
 
     result = users.insert(user["id"], user)
 
-    if result.err is not None:
-        return {"Err": result.err}
+    if result.Err is not None:
+        return {"Err": result.Err}
 
     return {"Ok": user}
 
@@ -126,8 +126,8 @@ def create_recording(
 
     create_recording_result = recordings.insert(recording["id"], recording)
 
-    if create_recording_result.err is not None:
-        return {"Err": {"InsertError": create_recording_result.err}}
+    if create_recording_result.Err is not None:
+        return {"Err": {"InsertError": create_recording_result.Err}}
 
     updated_user: User = {
         **user,
@@ -136,8 +136,8 @@ def create_recording(
 
     update_user_result = users.insert(updated_user["id"], updated_user)
 
-    if update_user_result.err is not None:
-        return {"Err": {"InsertError": update_user_result.err}}
+    if update_user_result.Err is not None:
+        return {"Err": {"InsertError": update_user_result.Err}}
 
     return {"Ok": recording}
 
@@ -188,8 +188,8 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
 
     update_user_result = users.insert(updated_user["id"], updated_user)
 
-    if update_user_result.err is not None:
-        return {"Err": {"InsertError": update_user_result.err}}
+    if update_user_result.Err is not None:
+        return {"Err": {"InsertError": update_user_result.Err}}
 
     recordings.remove(id)
 

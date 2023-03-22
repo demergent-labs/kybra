@@ -3,8 +3,8 @@ from kybra import nat64, nat16
 
 
 class StableMap1InsertResult(Variant, total=False):
-    ok: opt[blob]
-    err: InsertError
+    Ok: opt[blob]
+    Err: InsertError
 
 
 stable_map_1 = StableBTreeMap[nat16, blob](
@@ -20,13 +20,13 @@ def stable_map_1_get(key: nat16) -> opt[blob]:
 def stable_map_1_insert(key: nat16, value: blob) -> StableMap1InsertResult:
     result = stable_map_1.insert(key, value)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 

@@ -33,11 +33,11 @@ def manual_query() -> manual[str]:
 def deep_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister3.deep_query()
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }

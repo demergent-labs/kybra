@@ -23,12 +23,12 @@ def xkcd() -> Async[HttpResponse]:
         },
     }).with_cycles(cycle_cost_total)
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
+    if http_result.Err is not None:
+        if http_result.Err:
+            ic.trap(http_result.Err)
         ic.trap('http_result had an error')
 
-    return http_result.ok
+    return http_result.Ok
 
 
 @update
@@ -63,12 +63,12 @@ def xkcd_raw() -> Async[manual[HttpResponse]]:
         cycle_cost_total
     )
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
+    if http_result.Err is not None:
+        if http_result.Err:
+            ic.trap(http_result.Err)
         ic.trap('http_result had an error')
 
-    ic.reply_raw(http_result.ok)
+    ic.reply_raw(http_result.Ok)
 
 
 @query

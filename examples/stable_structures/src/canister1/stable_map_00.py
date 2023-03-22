@@ -11,8 +11,8 @@ from kybra import (
 
 
 class StableMap0InsertResult(Variant, total=False):
-    ok: opt[str]
-    err: InsertError
+    Ok: opt[str]
+    Err: InsertError
 
 
 stable_map_0 = StableBTreeMap[nat8, str](
@@ -28,13 +28,13 @@ def stable_map_0_get(key: nat8) -> opt[str]:
 def stable_map_0_insert(key: nat8, value: str) -> StableMap0InsertResult:
     result = stable_map_0.insert(key, value)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 

@@ -13,8 +13,8 @@ class User(Record):
 
 
 class StableMap4InsertResult(Variant, total=False):
-    ok: opt[float32]
-    err: InsertError
+    Ok: opt[float32]
+    Err: InsertError
 
 
 stable_map_4 = StableBTreeMap[User, float32](
@@ -30,13 +30,13 @@ def stable_map_4_get(key: User) -> opt[float32]:
 def stable_map_4_insert(key: User, value: float32) -> StableMap4InsertResult:
     result = stable_map_4.insert(key, value)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 

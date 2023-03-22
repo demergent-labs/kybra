@@ -13,13 +13,13 @@ counter: nat = 0
 def simple_composite_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.simple_query()
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 
@@ -28,13 +28,13 @@ def simple_composite_query() -> Async[StringQueryResult]:
 def manual_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.manual_query()
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 
@@ -44,13 +44,13 @@ def totally_manual_query() -> Async[manual[StringQueryResult]]:
     result: CanisterResult[str] = yield canister2.manual_query()
     # ic.reply(result)
 
-    if result.err is not None:
+    if result.Err is not None:
         ic.reply({
-            'err': result.err
+            'Err': result.Err
         })
 
     ic.reply({
-        'ok': result.ok
+        'Ok': result.Ok
     })
 
 
@@ -59,21 +59,21 @@ def totally_manual_query() -> Async[manual[StringQueryResult]]:
 def deep_query() -> Async[StringQueryResult]:
     result: CanisterResult[StringQueryResult] = yield canister2.deep_query()
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
-    if 'err' in result.ok:
+    if 'Err' in result.Ok:
         return {
-            'err': result.ok['err']
+            'Err': result.Ok['Err']
         }
-    if 'ok' not in result.ok:
+    if 'Ok' not in result.Ok:
         return {
-            'err': 'Unreachable'
+            'Err': 'Unreachable'
         }
 
     return {
-        'ok': result.ok['ok']
+        'Ok': result.Ok['Ok']
     }
 
 
@@ -82,13 +82,13 @@ def deep_query() -> Async[StringQueryResult]:
 def update_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.update_query()
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 
@@ -97,13 +97,13 @@ def update_query() -> Async[StringQueryResult]:
 def simple_update() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.deep_query()
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 
@@ -122,19 +122,19 @@ def inc_canister1() -> Async[NatQueryResult]:
     counter += 1
 
     canister1_a_result: CanisterResult[nat] = yield canister1.inc_counter()
-    if canister1_a_result.err is not None:
+    if canister1_a_result.Err is not None:
         return {
-            'err': canister1_a_result.err
+            'Err': canister1_a_result.Err
         }
 
     canister1_b_result: CanisterResult[nat] = yield canister1.inc_counter()
-    if canister1_b_result.err is not None:
+    if canister1_b_result.Err is not None:
         return {
-            'err': canister1_b_result.err
+            'Err': canister1_b_result.Err
         }
 
     return {
-        'ok': counter + canister1_a_result.ok + canister1_b_result.ok
+        'Ok': counter + canister1_a_result .Ok + canister1_b_result.Ok
     }
 
 
@@ -145,17 +145,17 @@ def inc_canister2() -> Async[NatQueryResult]:
     counter += 1
 
     canister2_a_result: CanisterResult[nat] = yield canister2.inc_counter()
-    if canister2_a_result.err is not None:
+    if canister2_a_result.Err is not None:
         return {
-            'err': canister2_a_result.err
+            'Err': canister2_a_result.Err
         }
 
     canister2_b_result: CanisterResult[nat] = yield canister2.inc_counter()
-    if canister2_b_result.err is not None:
+    if canister2_b_result.Err is not None:
         return {
-            'err': canister2_b_result.err
+            'Err': canister2_b_result.Err
         }
 
     return {
-        'ok': counter + canister2_a_result.ok + canister2_b_result.ok
+        'Ok': counter + canister2_a_result .Ok + canister2_b_result.Ok
     }

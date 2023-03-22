@@ -16,8 +16,8 @@ class Reaction(Variant):
 
 
 class StableMap3InsertResult(Variant, total=False):
-    ok: opt[int]
-    err: InsertError
+    Ok: opt[int]
+    Err: InsertError
 
 
 stable_map_3 = StableBTreeMap[Reaction, int](
@@ -33,13 +33,13 @@ def stable_map_3_get(key: Reaction) -> opt[int]:
 def stable_map_3_insert(key: Reaction, value: int) -> StableMap3InsertResult:
     result = stable_map_3.insert(key, value)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 

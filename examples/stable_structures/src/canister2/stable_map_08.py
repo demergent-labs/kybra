@@ -6,8 +6,8 @@ stable_map_8 = StableBTreeMap[bool, null](
 
 
 class StableMap8InsertResult(Variant, total=False):
-    ok: opt[null]
-    err: InsertError
+    Ok: opt[null]
+    Err: InsertError
 
 
 @query
@@ -19,13 +19,13 @@ def stable_map_8_get(key: bool) -> opt[null]:
 def stable_map_8_insert(key: bool, value: null) -> StableMap8InsertResult:
     result = stable_map_8.insert(key, value)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 

@@ -31,12 +31,12 @@ def execute_transfer(
         }
     })
 
-    if transfer_result_canister_result.err is not None:
+    if transfer_result_canister_result.Err is not None:
         return {
-            'Err': transfer_result_canister_result.err
+            'Err': transfer_result_canister_result.Err
         }
 
-    transfer_result = transfer_result_canister_result.ok
+    transfer_result = transfer_result_canister_result.Ok
 
     return {
         'Ok': transfer_result
@@ -54,12 +54,12 @@ def get_account_balance(address: Address) -> Async[GetAccountBalanceResult]:
         'account': bytes.fromhex(address)
     })
 
-    if tokens_canister_result.err is not None:
+    if tokens_canister_result.Err is not None:
         return {
-            'Err': tokens_canister_result.err
+            'Err': tokens_canister_result.Err
         }
 
-    tokens = tokens_canister_result.ok
+    tokens = tokens_canister_result.Ok
 
     return {
         'Ok': tokens
@@ -75,12 +75,12 @@ class GetTransferFeeResult(Variant, total=False):
 def get_transfer_fee() -> Async[GetTransferFeeResult]:
     transfer_fee_canister_result: CanisterResult[TransferFee] = yield icp_canister.transfer_fee({})
 
-    if transfer_fee_canister_result.err is not None:
+    if transfer_fee_canister_result.Err is not None:
         return {
-            'Err': transfer_fee_canister_result.err
+            'Err': transfer_fee_canister_result.Err
         }
 
-    transfer_fee = transfer_fee_canister_result.ok
+    transfer_fee = transfer_fee_canister_result.Ok
 
     return {
         'Ok': transfer_fee
@@ -96,12 +96,12 @@ class GetBlocksResult(Variant, total=False):
 def get_blocks(get_blocks_args: GetBlocksArgs) -> Async[GetBlocksResult]:
     canister_result: CanisterResult[QueryBlocksResponse] = yield icp_canister.query_blocks(get_blocks_args)
 
-    if canister_result.err is not None:
+    if canister_result.Err is not None:
         return {
-            'Err': canister_result.err
+            'Err': canister_result.Err
         }
 
-    get_blocks_result = canister_result.ok
+    get_blocks_result = canister_result.Ok
 
     return {
         'Ok': get_blocks_result
@@ -117,12 +117,12 @@ class GetSymbolResult(Variant, total=False):
 def get_symbol() -> Async[GetSymbolResult]:
     symbol_result_canister_result: CanisterResult[SymbolResult] = yield icp_canister.symbol()
 
-    if symbol_result_canister_result.err is not None:
+    if symbol_result_canister_result.Err is not None:
         return {
-            'Err': symbol_result_canister_result.err
+            'Err': symbol_result_canister_result.Err
         }
 
-    symbol_result = symbol_result_canister_result.ok
+    symbol_result = symbol_result_canister_result.Ok
 
     return {
         'Ok': symbol_result['symbol']
@@ -138,12 +138,12 @@ class GetNameResult(Variant, total=False):
 def get_name() -> Async[GetNameResult]:
     name_result_canister_result: CanisterResult[NameResult] = yield icp_canister.name()
 
-    if name_result_canister_result.err is not None:
+    if name_result_canister_result.Err is not None:
         return {
-            'Err': name_result_canister_result.err
+            'Err': name_result_canister_result.Err
         }
 
-    name_result = name_result_canister_result.ok
+    name_result = name_result_canister_result.Ok
 
     return {
         'Ok': name_result['name']
@@ -159,12 +159,12 @@ class GetDecimalsResult(Variant, total=False):
 def get_decimals() -> Async[GetDecimalsResult]:
     decimals_result_canister_result: CanisterResult[DecimalsResult] = yield icp_canister.decimals()
 
-    if decimals_result_canister_result.err is not None:
+    if decimals_result_canister_result.Err is not None:
         return {
-            'Err': decimals_result_canister_result.err
+            'Err': decimals_result_canister_result.Err
         }
 
-    decimals_result = decimals_result_canister_result.ok
+    decimals_result = decimals_result_canister_result.Ok
 
     return {
         'Ok': decimals_result['decimals']
@@ -180,12 +180,12 @@ class GetArchivesResult(Variant, total=False):
 def get_archives() -> Async[GetArchivesResult]:
     archives_canister_result: CanisterResult[Archives] = yield icp_canister.archives()
 
-    if archives_canister_result.err is not None:
+    if archives_canister_result.Err is not None:
         return {
-            'Err': archives_canister_result.err
+            'Err': archives_canister_result.Err
         }
 
-    archives = archives_canister_result.ok
+    archives = archives_canister_result.Ok
 
     return {
         'Ok': archives

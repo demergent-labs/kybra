@@ -34,12 +34,12 @@ def eth_get_balance(ethereum_address: str) -> Async[JSON]:
         },
     }).with_cycles(cycle_cost_total)
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
+    if http_result.Err is not None:
+        if http_result.Err:
+            ic.trap(http_result.Err)
         ic.trap('http_result had an error')
 
-    return http_result.ok['body'].decode('utf-8')
+    return http_result.Ok['body'].decode('utf-8')
 
 
 @update
@@ -63,12 +63,12 @@ def eth_get_block_by_number(number: nat32) -> Async[JSON]:
         },
     }).with_cycles(cycle_cost_total)
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
+    if http_result.Err is not None:
+        if http_result.Err:
+            ic.trap(http_result.Err)
         ic.trap('http_result had an error')
 
-    return http_result.ok['body'].decode('utf-8')
+    return http_result.Ok['body'].decode('utf-8')
 
 
 @query

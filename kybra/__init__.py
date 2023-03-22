@@ -61,8 +61,8 @@ Duration = alias[nat64]
 
 
 class GuardResult(Variant, total=False):
-    ok: null
-    err: str
+    Ok: null
+    Err: str
 
 
 GuardType = Callable[..., GuardResult]
@@ -147,12 +147,12 @@ Oneway = Callable
 
 
 class CanisterResult(Generic[T]):
-    ok: T
-    err: Optional[str]
+    Ok: T
+    Err: Optional[str]
 
-    def __init__(self, ok: T, err: str):
-        self.ok = ok
-        self.err = err
+    def __init__(self, Ok: T, Err: str):
+        self.Ok = Ok
+        self.Err = Err
 
     def notify(self) -> "NotifyResult":
         ...
@@ -168,8 +168,8 @@ class CanisterResult(Generic[T]):
 # TODO The problem is that you can't really use generics with TypedDict yet: https://github.com/python/cpython/issues/89026
 # TODO We could also consider a hack where we remove all references to CanisterResult before runtime, since this is really an analysis-time consideration
 # class CanisterResult(Variant, Generic[T], total=False):
-#     ok: T
-#     err: str
+#     Ok: T
+#     Err: str
 
 
 class RejectionCode(Variant, total=False):
@@ -184,8 +184,8 @@ class RejectionCode(Variant, total=False):
 
 # TODO we might want this to act more like CanisterResult
 class NotifyResult(Variant, total=False):
-    ok: null
-    err: RejectionCode
+    Ok: null
+    Err: RejectionCode
 
 
 class StableMemoryError(Variant, total=False):
@@ -194,13 +194,13 @@ class StableMemoryError(Variant, total=False):
 
 
 class StableGrowResult(Variant, total=False):
-    ok: nat32
-    err: StableMemoryError
+    Ok: nat32
+    Err: StableMemoryError
 
 
 class Stable64GrowResult(Variant, total=False):
-    ok: nat64
-    err: StableMemoryError
+    Ok: nat64
+    Err: StableMemoryError
 
 
 FuncTuple = tuple[Principal, str]
@@ -503,12 +503,12 @@ class InsertError(Variant, total=False):
 
 
 class InsertResult(Generic[V]):
-    ok: V
-    err: Optional[InsertError]
+    Ok: V
+    Err: Optional[InsertError]
 
-    def __init__(self, ok: V, err: InsertError):
-        self.ok = ok
-        self.err = err
+    def __init__(self, Ok: V, Err: InsertError):
+        self.Ok = Ok
+        self.Err = Err
 
 
 class StableBTreeMap(Generic[K, V]):

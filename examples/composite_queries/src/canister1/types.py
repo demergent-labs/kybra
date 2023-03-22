@@ -7,10 +7,10 @@ class Canister1(Canister):
 
 
 class StringQueryResult(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
 
 
 class NatQueryResult(Variant, total=False):
-    ok: nat
-    err: str
+    Ok: nat
+    Err: str

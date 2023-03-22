@@ -4,8 +4,8 @@ from kybra import float64
 
 
 class StableMap9InsertResult(Variant, total=False):
-    ok: opt[list[str]]
-    err: InsertError
+    Ok: opt[list[str]]
+    Err: InsertError
 
 
 stable_map_9 = StableBTreeMap[float64, list[str]](
@@ -21,13 +21,13 @@ def stable_map_9_get(key: float64) -> opt[list[str]]:
 def stable_map_9_insert(key: float64, value: list[str]) -> StableMap9InsertResult:
     result = stable_map_9.insert(key, value)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 
