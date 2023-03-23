@@ -4,11 +4,11 @@
         "test": "cd .. && ts-node --transpile-only --ignore=false test/test.ts"
     },
     "devDependencies": {
-        "@dfinity/agent": "0.15.1",
         "ts-node": "10.7.0",
         "typescript": "4.6.3"
     },
     "dependencies": {
+        "@dfinity/agent": "^0.15.4",
         "azle": "github:demergent-labs/azle#test_case_converter"
     }
 }

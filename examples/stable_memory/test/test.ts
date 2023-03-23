@@ -8,8 +8,4 @@ const stable_memory_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(
-    getTests(createSnakeCaseProxy(stable_memory_canister)).filter(
-        (test) => test.name !== 'stable64 grow out of memory'
-    )
-);
+runTests(getTests(createSnakeCaseProxy(stable_memory_canister)));
