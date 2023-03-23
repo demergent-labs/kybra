@@ -8,20 +8,4 @@ const icApiCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-const tests: Test[] = [
-    ...getTests(createSnakeCaseProxy(icApiCanister)).filter(
-        (test) => test.name !== 'performance_counter'
-    ),
-    {
-        name: 'performance_counter',
-        test: async () => {
-            const result = await icApiCanister.performance_counter();
-
-            return {
-                Ok: result >= 50_000n && result <= 90_000n
-            };
-        }
-    }
-];
-
-runTests(tests);
+runTests(getTests(createSnakeCaseProxy(icApiCanister)));
