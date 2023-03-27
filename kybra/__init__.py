@@ -11,6 +11,7 @@ from typing import (
     TypedDict,
     TypeVar,
     TypeAlias,
+    Union,
 )
 
 # TODO I think we can simplify this just like we're doing with canisters
@@ -225,19 +226,19 @@ def get_first_frame(current_frame: Any) -> Any:
 
 
 class ic(Generic[T]):
-    @ staticmethod
+    @staticmethod
     def accept_message():
         _kybra_ic._kybra_accept_message()  # type: ignore
 
-    @ staticmethod
+    @staticmethod
     def arg_data_raw() -> blob:
         return _kybra_ic._kybra_arg_data_raw()  # type: ignore
 
-    @ staticmethod
+    @staticmethod
     def arg_data_raw_size() -> nat32:
         return _kybra_ic._kybra_arg_data_raw_size()  # type: ignore
 
-    @ staticmethod
+    @staticmethod
     def call_raw(
         canister_id: Principal, method: str, args_raw: blob, payment: nat64
     ) -> CanisterResult[T]:
@@ -295,9 +296,7 @@ class ic(Generic[T]):
 
     @staticmethod
     def msg_cycles_accept128(max_amount: nat) -> nat:
-        return (
-            _kybra_ic._kybra_msg_cycles_accept128(max_amount)  # type: ignore
-        )
+        return _kybra_ic._kybra_msg_cycles_accept128(max_amount)  # type: ignore
 
     @staticmethod
     def msg_cycles_available() -> nat64:
@@ -325,9 +324,7 @@ class ic(Generic[T]):
 
     @staticmethod
     def performance_counter(counter_type: nat32) -> nat64:
-        return (
-            _kybra_ic._kybra_performance_counter(counter_type)  # type: ignore
-        )
+        return _kybra_ic._kybra_performance_counter(counter_type)  # type: ignore
 
     @staticmethod
     def print(x: Any):
@@ -348,10 +345,7 @@ class ic(Generic[T]):
     @staticmethod
     def reply(value: Any):
         first_called_function_name = get_first_called_function_name()
-        (
-            _kybra_ic._kybra_reply(  # type: ignore
-                first_called_function_name, value)
-        )
+        (_kybra_ic._kybra_reply(first_called_function_name, value))  # type: ignore
 
     @staticmethod
     def reply_raw(x: Any):
@@ -367,9 +361,7 @@ class ic(Generic[T]):
 
     @staticmethod
     def set_timer_interval(interval: Duration, func: Callable[[], Any]) -> TimerId:
-        return (
-            _kybra_ic._kybra_set_timer_interval(interval, func)  # type: ignore
-        )
+        return _kybra_ic._kybra_set_timer_interval(interval, func)  # type: ignore
 
     @staticmethod
     def stable_bytes() -> blob:
@@ -451,9 +443,7 @@ class AsyncInfo:
             f'_kybra_notify_{with_payment}{qualname.replace(".", "_")}_wrapper'
         )
 
-        return (
-            getattr(_kybra_ic, notify_function_name)(self.args)  # type: ignore
-        )
+        return getattr(_kybra_ic, notify_function_name)(self.args)  # type: ignore
 
 
 # TODO this decorator is removing the static type checking of the self parameter for instance methods
@@ -465,11 +455,7 @@ def service_method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
 
         return AsyncInfo(
             "call",
-            [
-                the_self.canister_id,  # type: ignore
-                func.__qualname__,
-                *selfless_args
-            ],
+            [the_self.canister_id, func.__qualname__, *selfless_args],  # type: ignore
         )
 
     return intermediate_func  # type: ignore
@@ -606,3 +592,18 @@ class StableBTreeMap(Generic[K, V]):
         :return: A list of all values in the map.
         """
         return _kybra_ic._kybra_stable_b_tree_map_values(self.memory_id)  # type: ignore
+
+
+def match(
+    variant: Union[TypedDict, object], matcher: dict[str, Callable[[Any], T]]
+) -> T:
+    if isinstance(variant, dict):
+        for key, value in matcher.items():
+            if key in variant:
+                return value(variant[key])
+    else:
+        for key, value in matcher.items():
+            if hasattr(variant, key):
+                return value(getattr(variant, key))
+
+    raise Exception("No matching case found")
