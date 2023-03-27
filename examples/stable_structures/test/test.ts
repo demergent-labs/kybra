@@ -1,6 +1,7 @@
 import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
-import { execSync } from 'child_process';
+// import { execSync } from 'child_process';
 import {
+    getTests,
     preRedeployTests,
     postRedeployTests,
     insertErrorTests
@@ -24,35 +25,41 @@ const stableStructuresCanister3 = createActorCanister3(
     { agentOptions: { host: 'http://127.0.0.1:8000' } }
 );
 
-const tests: Test[] = [
-    ...preRedeployTests(createSnakeCaseProxy(stableStructuresCanister1), 0, 4),
-    ...preRedeployTests(createSnakeCaseProxy(stableStructuresCanister2), 5, 9),
-    ...preRedeployTests(
-        createSnakeCaseProxy(stableStructuresCanister3),
-        10,
-        13
-    ),
-    {
-        name: 'redeploy canisters',
-        prep: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 5000));
+// const tests: Test[] = [
+//     ...preRedeployTests(createSnakeCaseProxy(stableStructuresCanister1), 0, 4),
+//     ...preRedeployTests(createSnakeCaseProxy(stableStructuresCanister2), 5, 9),
+//     ...preRedeployTests(
+//         createSnakeCaseProxy(stableStructuresCanister3),
+//         10,
+//         13
+//     ),
+//     {
+//         name: 'redeploy canisters',
+//         prep: async () => {
+//             await new Promise((resolve) => setTimeout(resolve, 5000));
 
-            execSync(`dfx deploy`, {
-                stdio: 'inherit'
-            });
-        }
-    },
-    ...postRedeployTests(createSnakeCaseProxy(stableStructuresCanister1), 0, 4),
-    ...postRedeployTests(createSnakeCaseProxy(stableStructuresCanister2), 5, 9),
-    ...postRedeployTests(
-        createSnakeCaseProxy(stableStructuresCanister3),
-        10,
-        13
-    ),
-    ...insertErrorTests(
+//             execSync(`dfx deploy`, {
+//                 stdio: 'inherit'
+//             });
+//         }
+//     },
+//     ...postRedeployTests(createSnakeCaseProxy(stableStructuresCanister1), 0, 4),
+//     ...postRedeployTests(createSnakeCaseProxy(stableStructuresCanister2), 5, 9),
+//     ...postRedeployTests(
+//         createSnakeCaseProxy(stableStructuresCanister3),
+//         10,
+//         13
+//     ),
+//     ...insertErrorTests(
+//         createSnakeCaseProxy(stableStructuresCanister1),
+//         createSnakeCaseProxy(stableStructuresCanister3)
+//     )
+// ];
+
+runTests(
+    getTests(
         createSnakeCaseProxy(stableStructuresCanister1),
+        createSnakeCaseProxy(stableStructuresCanister2),
         createSnakeCaseProxy(stableStructuresCanister3)
     )
-];
-
-runTests(tests);
+);
