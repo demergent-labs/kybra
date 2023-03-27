@@ -1,10 +1,9 @@
-import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
 import {
     callingIdentity,
     canisterId,
     getTests
 } from 'azle/examples/motoko_examples/whoami/test/tests';
-import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/whoami';
 
 const whoamiCanister = createActor(canisterId, {
@@ -14,33 +13,4 @@ const whoamiCanister = createActor(canisterId, {
     }
 });
 
-const callingPrincipal = callingIdentity.getPrincipal().toString();
-
-const tests: Test[] = [
-    ...getTests(createSnakeCaseProxy(whoamiCanister)).filter((test) => {
-        return test.name !== 'redeploy' && test.name !== 'updated argument';
-    }),
-    {
-        name: 'redeploy',
-        prep: async () => {
-            execSync(
-                `dfx deploy --argument '(principal "${callingPrincipal}")'`,
-                {
-                    stdio: 'inherit'
-                }
-            );
-        }
-    },
-    {
-        name: 'updated argument',
-        test: async () => {
-            const result = await whoamiCanister.argument();
-
-            return {
-                Ok: result.toString() === callingPrincipal
-            };
-        }
-    }
-];
-
-runTests(tests);
+runTests(getTests(createSnakeCaseProxy(whoamiCanister), 'whoami'));
