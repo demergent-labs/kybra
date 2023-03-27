@@ -9,7 +9,7 @@ class BlogPost(Record):
 
 class User(Record):
     username: str
-    blog_posts: list['BlogPost']
+    posts: list['BlogPost']
 
 
 class StableMap4InsertResult(Variant, total=False):
@@ -17,18 +17,18 @@ class StableMap4InsertResult(Variant, total=False):
     Err: InsertError
 
 
-stable_map_4 = StableBTreeMap[User, float32](
+stable_map4 = StableBTreeMap[User, float32](
     memory_id=4, max_key_size=100, max_value_size=1_000)
 
 
 @query
-def stable_map_4_get(key: User) -> opt[float32]:
-    return stable_map_4.get(key)
+def stable_map4_get(key: User) -> opt[float32]:
+    return stable_map4.get(key)
 
 
 @update
-def stable_map_4_insert(key: User, value: float32) -> StableMap4InsertResult:
-    result = stable_map_4.insert(key, value)
+def stable_map4_insert(key: User, value: float32) -> StableMap4InsertResult:
+    result = stable_map4.insert(key, value)
 
     if result.Err is not None:
         return {
@@ -41,35 +41,35 @@ def stable_map_4_insert(key: User, value: float32) -> StableMap4InsertResult:
 
 
 @update
-def stable_map_4_remove(key: User) -> opt[float32]:
-    return stable_map_4.remove(key)
+def stable_map4_remove(key: User) -> opt[float32]:
+    return stable_map4.remove(key)
 
 
 @query
-def stable_map_4_contains_key(key: User) -> bool:
-    return stable_map_4.contains_key(key)
+def stable_map4_contains_key(key: User) -> bool:
+    return stable_map4.contains_key(key)
 
 
 @query
-def stable_map_4_is_empty() -> bool:
-    return stable_map_4.is_empty()
+def stable_map4_is_empty() -> bool:
+    return stable_map4.is_empty()
 
 
 @query
-def stable_map_4_keys() -> list[User]:
-    return stable_map_4.keys()
+def stable_map4_keys() -> list[User]:
+    return stable_map4.keys()
 
 
 @query
-def stable_map_4_values() -> list[float32]:
-    return stable_map_4.values()
+def stable_map4_values() -> list[float32]:
+    return stable_map4.values()
 
 
 @query
-def stable_map_4_items() -> list[tuple[User, float32]]:
-    return stable_map_4.items()
+def stable_map4_items() -> list[tuple[User, float32]]:
+    return stable_map4.items()
 
 
 @query
-def stable_map_4_len() -> nat64:
-    return stable_map_4.len()
+def stable_map4_len() -> nat64:
+    return stable_map4.len()

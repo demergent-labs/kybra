@@ -50,8 +50,8 @@ const tests: Test[] = [
         13
     ),
     ...insertErrorTests(
-        stableStructuresCanister1 as any,
-        stableStructuresCanister3 as any
+        createSnakeCaseProxy(stableStructuresCanister1),
+        createSnakeCaseProxy(stableStructuresCanister3)
     )
 ];
 

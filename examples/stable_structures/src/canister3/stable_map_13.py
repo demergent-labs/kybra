@@ -7,18 +7,18 @@ class StableMap13InsertResult(Variant, total=False):
     Err: InsertError
 
 
-stable_map_13 = StableBTreeMap[str, Principal](
+stable_map13 = StableBTreeMap[str, Principal](
     memory_id=13, max_key_size=100, max_value_size=1_000)
 
 
 @query
-def stable_map_13_get(key: str) -> opt[Principal]:
-    return stable_map_13.get(key)
+def stable_map13_get(key: str) -> opt[Principal]:
+    return stable_map13.get(key)
 
 
 @update
-def stable_map_13_insert(key: str, value: Principal) -> StableMap13InsertResult:
-    result = stable_map_13.insert(key, value)
+def stable_map13_insert(key: str, value: Principal) -> StableMap13InsertResult:
+    result = stable_map13.insert(key, value)
 
     if result.Err is not None:
         return {
@@ -31,35 +31,35 @@ def stable_map_13_insert(key: str, value: Principal) -> StableMap13InsertResult:
 
 
 @update
-def stable_map_13_remove(key: str) -> opt[Principal]:
-    return stable_map_13.remove(key)
+def stable_map13_remove(key: str) -> opt[Principal]:
+    return stable_map13.remove(key)
 
 
 @query
-def stable_map_13_contains_key(key: str) -> bool:
-    return stable_map_13.contains_key(key)
+def stable_map13_contains_key(key: str) -> bool:
+    return stable_map13.contains_key(key)
 
 
 @query
-def stable_map_13_is_empty() -> bool:
-    return stable_map_13.is_empty()
+def stable_map13_is_empty() -> bool:
+    return stable_map13.is_empty()
 
 
 @query
-def stable_map_13_keys() -> list[str]:
-    return stable_map_13.keys()
+def stable_map13_keys() -> list[str]:
+    return stable_map13.keys()
 
 
 @query
-def stable_map_13_values() -> list[Principal]:
-    return stable_map_13.values()
+def stable_map13_values() -> list[Principal]:
+    return stable_map13.values()
 
 
 @query
-def stable_map_13_items() -> list[tuple[str, Principal]]:
-    return stable_map_13.items()
+def stable_map13_items() -> list[tuple[str, Principal]]:
+    return stable_map13.items()
 
 
 @query
-def stable_map_13_len() -> nat64:
-    return stable_map_13.len()
+def stable_map13_len() -> nat64:
+    return stable_map13.len()

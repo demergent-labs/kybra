@@ -7,18 +7,18 @@ class StableMap7InsertResult(Variant, total=False):
     Err: InsertError
 
 
-stable_map_7 = StableBTreeMap[null, null](
+stable_map7 = StableBTreeMap[null, null](
     memory_id=7, max_key_size=100, max_value_size=1_000)
 
 
 @query
-def stable_map_7_get(key: null) -> opt[null]:
-    return stable_map_7.get(key)
+def stable_map7_get(key: null) -> opt[null]:
+    return stable_map7.get(key)
 
 
 @update
-def stable_map_7_insert(key: null, value: null) -> StableMap7InsertResult:
-    result = stable_map_7.insert(key, value)
+def stable_map7_insert(key: null, value: null) -> StableMap7InsertResult:
+    result = stable_map7.insert(key, value)
 
     if result.Err is not None:
         return {
@@ -31,35 +31,35 @@ def stable_map_7_insert(key: null, value: null) -> StableMap7InsertResult:
 
 
 @update
-def stable_map_7_remove(key: null) -> opt[null]:
-    return stable_map_7.remove(key)
+def stable_map7_remove(key: null) -> opt[null]:
+    return stable_map7.remove(key)
 
 
 @query
-def stable_map_7_contains_key(key: null) -> bool:
-    return stable_map_7.contains_key(key)
+def stable_map7_contains_key(key: null) -> bool:
+    return stable_map7.contains_key(key)
 
 
 @query
-def stable_map_7_is_empty() -> bool:
-    return stable_map_7.is_empty()
+def stable_map7_is_empty() -> bool:
+    return stable_map7.is_empty()
 
 
 @query
-def stable_map_7_keys() -> list[null]:
-    return stable_map_7.keys()
+def stable_map7_keys() -> list[null]:
+    return stable_map7.keys()
 
 
 @query
-def stable_map_7_values() -> list[null]:
-    return stable_map_7.values()
+def stable_map7_values() -> list[null]:
+    return stable_map7.values()
 
 
 @query
-def stable_map_7_items() -> list[tuple[null, null]]:
-    return stable_map_7.items()
+def stable_map7_items() -> list[tuple[null, null]]:
+    return stable_map7.items()
 
 
 @query
-def stable_map_7_len() -> nat64:
-    return stable_map_7.len()
+def stable_map7_len() -> nat64:
+    return stable_map7.len()
