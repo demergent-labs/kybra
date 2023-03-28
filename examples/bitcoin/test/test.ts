@@ -1,12 +1,12 @@
-import { createSnakeCaseProxy, ok, runTests, Test } from 'azle/test';
+import { ok, runTests, Test } from 'azle/test';
 import {
-    impure_setup as impureSetup,
-    while_running_bitcoin_daemon as whileRunningBitcoinDaemon
+    impureSetup,
+    whileRunningBitcoinDaemon
 } from 'azle/examples/bitcoin/test/setup';
 import { createActor } from './dfx_generated/bitcoin';
 import { wallets } from 'azle/examples/bitcoin/test/wallets';
 import { State } from 'azle/examples/bitcoin/test/test';
-import { bitcoin_cli } from 'azle/examples/bitcoin/test/bitcoin_cli';
+import { bitcoinCli } from 'azle/examples/bitcoin/test/bitcoin_cli';
 
 const bitcoinCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
@@ -15,7 +15,7 @@ const bitcoinCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 });
 
 const state: State = {
-    signed_tx_hex: ''
+    signedTxHex: ''
 };
 
 const tests: Test[] = [
@@ -88,13 +88,11 @@ function testCanisterFunctionality() {
             name: 'send transaction',
             test: async () => {
                 const balance_before_transaction =
-                    bitcoin_cli.get_received_by_address(wallets.bob.p2wpkh);
+                    bitcoinCli.getReceivedByAddress(wallets.bob.p2wpkh);
 
-                const tx_bytes = hex_string_to_bytes(state.signed_tx_hex);
+                const tx_bytes = hex_string_to_bytes(state.signedTxHex);
 
-                const result = await bitcoinCanister.send_transaction(
-                    Array.from(tx_bytes)
-                );
+                const result = await bitcoinCanister.send_transaction(tx_bytes);
 
                 if (!ok(result)) {
                     return {
@@ -102,17 +100,17 @@ function testCanisterFunctionality() {
                     };
                 }
 
-                bitcoin_cli.generate_to_address(1, wallets.alice.p2wpkh);
+                bitcoinCli.generateToAddress(1, wallets.alice.p2wpkh);
 
                 // Wait for generated block to be pulled into replica
                 await new Promise((resolve) => setTimeout(resolve, 5000));
 
                 const balance_after_transaction =
-                    bitcoin_cli.get_received_by_address(wallets.bob.p2wpkh, 0);
+                    bitcoinCli.getReceivedByAddress(wallets.bob.p2wpkh, 0);
 
                 return {
                     Ok:
-                        result.Ok === null &&
+                        result.Ok === true &&
                         balance_before_transaction === 0 &&
                         balance_after_transaction === 1
                 };

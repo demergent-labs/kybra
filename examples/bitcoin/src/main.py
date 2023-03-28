@@ -72,4 +72,4 @@ def send_transaction(
             'Err': canister_result.Err
         }
 
-    return {'Ok': canister_result.Ok}
+    return {'Ok': True}
