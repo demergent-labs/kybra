@@ -16,7 +16,7 @@ service : () -> {
   get_null : () -> (null) query;
   get_principal : () -> (principal) query;
   get_reserved : () -> (reserved) query;
-  get_str : () -> (text) query;
+  get_string : () -> (text) query;
   get_text : () -> (text) query;
   print_bool : (bool) -> (bool) query;
   print_empty : (empty) -> (empty) query;
@@ -35,6 +35,6 @@ service : () -> {
   print_null : (null) -> (null) query;
   print_principal : (principal) -> (principal) query;
   print_reserved : (reserved) -> (reserved) query;
-  print_str : (text) -> (text) query;
+  print_string : (text) -> (text) query;
   print_text : (text) -> (text) query;
 }
