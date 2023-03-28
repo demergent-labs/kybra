@@ -1,10 +1,10 @@
 from kybra import (
     Async,
     blob,
-    Canister,
     CanisterResult,
     match,
     Principal,
+    Service,
     service_update,
     update,
 )
@@ -12,7 +12,7 @@ from kybra import (
 # TODO create a special system canisters module like in Azle
 
 
-class ManagementCanister(Canister):
+class ManagementCanister(Service):
     @service_update
     def raw_rand(self) -> blob:
         ...

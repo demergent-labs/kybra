@@ -1,5 +1,8 @@
 use cdk_framework::{
-    act::{node::CandidType, ToTypeAnnotation},
+    act::{
+        node::{CandidType, Context},
+        ToTypeAnnotation,
+    },
     traits::ToIdent,
 };
 use proc_macro2::TokenStream;
@@ -14,10 +17,11 @@ pub fn generate(
     key_or_value: &str,
 ) -> (Ident, TokenStream) {
     let wrapper_struct_name = format!("StableBTreeMap{}{}Type", memory_id, key_or_value);
-    let key_type = &candid_type.to_type_annotation(
-        &keywords::get_python_keywords(),
-        wrapper_struct_name.clone(),
-    );
+    let context = Context {
+        keyword_list: keywords::get_python_keywords(),
+        cdk_name: "kybra".to_string(),
+    };
+    let key_type = &candid_type.to_type_annotation(&context, wrapper_struct_name.clone());
     let wrapper_struct_name_ident = wrapper_struct_name.to_ident();
 
     (

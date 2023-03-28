@@ -21,17 +21,17 @@ Examples:
 ```python
 from kybra import (
     Async,
-    Canister,
     CanisterResult,
     nat64,
     Principal,
+    Service,
     service_update,
     update,
     Variant,
 )
 
 
-class TokenCanister(Canister):
+class TokenCanister(Service):
     @service_update
     def transfer(self, to: Principal, amount: nat64) -> nat64:
         ...

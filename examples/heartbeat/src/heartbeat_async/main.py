@@ -1,16 +1,28 @@
-from kybra import Async, blob, Canister, CanisterResult, match, Principal, heartbeat, query, service_update, void
+from kybra import (
+    Async,
+    blob,
+    CanisterResult,
+    match,
+    Principal,
+    heartbeat,
+    query,
+    Service,
+    service_update,
+    void,
+)
 
 initialized: blob = bytes()
 
 
-class ManagementCanister(Canister):
+class ManagementCanister(Service):
     @service_update
-    def raw_rand(self) -> blob: ...
+    def raw_rand(self) -> blob:
+        ...
 
 
 @heartbeat
 def heartbeat_() -> Async[void]:
-    management_canister = ManagementCanister(Principal.from_str('aaaaa-aa'))
+    management_canister = ManagementCanister(Principal.from_str("aaaaa-aa"))
 
     randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
 
@@ -22,10 +34,7 @@ def heartbeat_() -> Async[void]:
         global initialized
         initialized = bytes()
 
-    match(randomness_result, {
-        "Ok": handle_ok,
-        "Err": handle_err
-    })
+    match(randomness_result, {"Ok": handle_ok, "Err": handle_err})
 
 
 @query

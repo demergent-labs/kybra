@@ -1,14 +1,16 @@
-use cdk_framework::act::{node::external_canister::ExternalCanister, ToTypeAnnotation};
+use cdk_framework::act::{
+    node::{candid::Service, Context},
+    ToTypeAnnotation,
+};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
 use crate::{keywords, tuple};
 
-pub fn generate(external_canisters: &Vec<ExternalCanister>) -> TokenStream {
-    let call_match_arms = generate_call_match_arms(external_canisters);
-    let call_with_payment_match_arms = generate_call_with_payment_match_arms(external_canisters);
-    let call_with_payment128_match_arms =
-        generate_call_with_payment128_match_arms(external_canisters);
+pub fn generate(services: &Vec<Service>) -> TokenStream {
+    let call_match_arms = generate_call_match_arms(services);
+    let call_with_payment_match_arms = generate_call_with_payment_match_arms(services);
+    let call_with_payment128_match_arms = generate_call_with_payment128_match_arms(services);
 
     quote! {
         #[async_recursion::async_recursion(?Send)]
@@ -175,7 +177,7 @@ CanisterResult
     }
 }
 
-fn generate_call_match_arms(external_canisters: &Vec<ExternalCanister>) -> Vec<TokenStream> {
+fn generate_call_match_arms(external_canisters: &Vec<Service>) -> Vec<TokenStream> {
     external_canisters
     .iter()
     .map(|external_canister| {
@@ -192,9 +194,14 @@ fn generate_call_match_arms(external_canisters: &Vec<ExternalCanister>) -> Vec<T
 
                 let cross_canister_function_call_name_ident = format_ident!("{}", cross_canister_function_call_name);
 
+                let context = Context {
+                    keyword_list: keywords::get_python_keywords(),
+                    cdk_name: "kybra".to_string(),
+                };
+
                 let param_variable_definitions: Vec<TokenStream> = method.params.iter().enumerate().map(|(index, param)| {
                     let variable_name = format_ident!("{}", param.get_prefixed_name());
-                    let variable_type = param.to_type_annotation(&keywords::get_python_keywords(), method.create_qualified_name(&external_canister.name));
+                    let variable_type = param.to_type_annotation(&context, method.create_qualified_name(&external_canister.name));
                     let actual_index = index + 2;
 
                     quote! {
@@ -227,9 +234,7 @@ fn generate_call_match_arms(external_canisters: &Vec<ExternalCanister>) -> Vec<T
     .collect()
 }
 
-fn generate_call_with_payment_match_arms(
-    external_canisters: &Vec<ExternalCanister>,
-) -> Vec<TokenStream> {
+fn generate_call_with_payment_match_arms(external_canisters: &Vec<Service>) -> Vec<TokenStream> {
     external_canisters
     .iter()
     .map(|external_canister| {
@@ -246,9 +251,14 @@ fn generate_call_with_payment_match_arms(
 
                 let cross_canister_function_call_with_payment_name_ident = format_ident!("{}", cross_canister_function_call_with_payment_name);
 
+                let context = Context {
+                    keyword_list: keywords::get_python_keywords(),
+                    cdk_name: "kybra".to_string(),
+                };
+
                 let param_variable_definitions: Vec<TokenStream> = method.params.iter().enumerate().map(|(index, param)| {
                     let variable_name = format_ident!("{}", param.get_prefixed_name());
-                    let variable_type = param.to_type_annotation(&keywords::get_python_keywords(), method.create_qualified_name(&external_canister.name));
+                    let variable_type = param.to_type_annotation(&context, method.create_qualified_name(&external_canister.name));
                     let actual_index = index + 2;
 
                     quote! {
@@ -285,9 +295,7 @@ fn generate_call_with_payment_match_arms(
     .collect()
 }
 
-fn generate_call_with_payment128_match_arms(
-    external_canisters: &Vec<ExternalCanister>,
-) -> Vec<TokenStream> {
+fn generate_call_with_payment128_match_arms(external_canisters: &Vec<Service>) -> Vec<TokenStream> {
     external_canisters
     .iter()
     .map(|external_canister| {
@@ -304,9 +312,14 @@ fn generate_call_with_payment128_match_arms(
 
                 let cross_canister_function_call_with_payment128_name_ident = format_ident!("{}", cross_canister_function_call_with_payment128_name);
 
+                let context = Context {
+                    keyword_list: keywords::get_python_keywords(),
+                    cdk_name: "kybra".to_string(),
+                };
+
                 let param_variable_definitions: Vec<TokenStream> = method.params.iter().enumerate().map(|(index, param)| {
                     let variable_name = format_ident!("{}", param.get_prefixed_name());
-                    let variable_type = param.to_type_annotation(&keywords::get_python_keywords(), method.create_qualified_name(&external_canister.name));
+                    let variable_type = param.to_type_annotation(&context, method.create_qualified_name(&external_canister.name));
                     let actual_index = index + 2;
 
                     quote! {

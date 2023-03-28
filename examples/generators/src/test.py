@@ -8,7 +8,9 @@ default = cast(Any, '')
 T = TypeVar('T')
 
 # TODO I wonder if we can loop through each method defined by the user and manually override
-class Canister:
+
+
+class Service:
     canister_id: str
 
     def __init__(self, canister_id: str):
@@ -17,21 +19,23 @@ class Canister:
 # TODO https://stackoverflow.com/questions/2704434/intercept-method-calls-in-python
 # TODO try to get rid of the need for the call decorator by iterating over the methods in the superclass
 # TODO watch out for *kwargs
+
+
 def call(func: T) -> T:
-    def intermediate_func(*args): # type: ignore
-        the_self = args[0] # type: ignore
-        selfless_args = args[1:] # type: ignore
+    def intermediate_func(*args):  # type: ignore
+        the_self = args[0]  # type: ignore
+        selfless_args = args[1:]  # type: ignore
 
         return {
             'name': 'call',
             'args': [
-                func.__qualname__, # type: ignore
-                the_self.canister_id, # type: ignore
+                func.__qualname__,  # type: ignore
+                the_self.canister_id,  # type: ignore
                 *selfless_args
             ]
-        } # type: ignore
+        }  # type: ignore
 
-    return intermediate_func # type: ignore
+    return intermediate_func  # type: ignore
 
 # def staticmethod():
 #     pass
@@ -39,7 +43,7 @@ def call(func: T) -> T:
 # def test(func: T) -> staticmethod[T]:
 #     return staticmethod(func)
 
-# class ManagementCanister(Canister):
+# class ManagementCanister(Service):
 #     # @staticmethod
 #     @cross_canister_call
 #     def raw_rand(string: str) -> bytes: ...
@@ -50,16 +54,14 @@ def call(func: T) -> T:
 
 # print(canister_result)
 
+
 CanisterResult = tuple
 
 
-
-
-
-
-class ManagementCanister(Canister):
+class ManagementCanister(Service):
     @call
     def raw_rand(self) -> CanisterResult[bytes, str]: ...
+
 
 management_canister = ManagementCanister('aaaaa-aa')
 

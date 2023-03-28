@@ -104,7 +104,7 @@ pub fn generate() -> TokenStream {
 
         impl KybraTryFromVec for ic_cdk::export::Principal {}
 
-        impl KybraTryFromVec for ic_cdk::timer::TimerId {}
+        impl KybraTryFromVec for ic_cdk_timers::TimerId {}
 
         impl KybraTryFromVec for ic_cdk::export::candid::Int {}
 

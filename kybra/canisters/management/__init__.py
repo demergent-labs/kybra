@@ -16,7 +16,7 @@
 
 # Taken in part from: https://github.com/dfinity/interface-spec/blob/master/spec/ic.did
 
-from kybra import blob, Canister, Principal, service_update, void
+from kybra import blob, Principal, Service, service_update, void
 
 # The as expressions are reexporting these variables
 from kybra.canisters.management.basic import (
@@ -77,7 +77,7 @@ from kybra.canisters.management.bitcoin import (
 # TODO change the return types to void
 
 
-class ManagementCanister(Canister):
+class ManagementCanister(Service):
     @service_update
     def bitcoin_get_balance(self, args: GetBalanceArgs) -> Satoshi:
         ...
