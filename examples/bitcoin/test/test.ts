@@ -1,45 +1,45 @@
-import { ok, run_tests, Test } from 'azle/test';
+import { ok, runTests, Test } from 'azle/test';
 import {
-    impure_setup,
-    while_running_bitcoin_daemon
+    impureSetup,
+    whileRunningBitcoinDaemon
 } from 'azle/examples/bitcoin/test/setup';
 import { createActor } from './dfx_generated/bitcoin';
 import { wallets } from 'azle/examples/bitcoin/test/wallets';
 import { State } from 'azle/examples/bitcoin/test/test';
-import { bitcoin_cli } from 'azle/examples/bitcoin/test/bitcoin_cli';
+import { bitcoinCli } from 'azle/examples/bitcoin/test/bitcoin_cli';
 
-const bitcoin_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const bitcoinCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
 });
 
 const state: State = {
-    signed_tx_hex: ''
+    signedTxHex: ''
 };
 
 const tests: Test[] = [
-    ...impure_setup(wallets, state),
+    ...impureSetup(wallets, state),
     {
         name: 'wait for blockchain balance to reflect',
         wait: 30_000
     },
-    ...test_canister_functionality()
+    ...testCanisterFunctionality()
 ];
 
-while_running_bitcoin_daemon(() => run_tests(tests));
+whileRunningBitcoinDaemon(() => runTests(tests));
 
-function test_canister_functionality() {
+function testCanisterFunctionality() {
     return [
         {
             name: 'get_balance',
             test: async () => {
-                const result = await bitcoin_canister.get_balance(
+                const result = await bitcoinCanister.get_balance(
                     wallets.alice.p2wpkh
                 );
 
                 if (!ok(result)) {
-                    return { err: result.err };
+                    return { Err: result.Err };
                 }
 
                 const block_reward = 5_000_000_000n;
@@ -47,25 +47,25 @@ function test_canister_functionality() {
                 const expected_balance = block_reward * blocks_mined_in_setup;
 
                 return {
-                    ok: result.ok === expected_balance
+                    Ok: result.Ok === expected_balance
                 };
             }
         },
         {
             name: 'get_utxos',
             test: async () => {
-                const result = await bitcoin_canister.get_utxos(
+                const result = await bitcoinCanister.get_utxos(
                     wallets.alice.p2wpkh
                 );
 
                 if (!ok(result)) {
-                    return { err: result.err };
+                    return { Err: result.Err };
                 }
 
                 return {
-                    ok:
-                        result.ok.tip_height === 101 &&
-                        result.ok.utxos.length === 101
+                    Ok:
+                        result.Ok.tip_height === 101 &&
+                        result.Ok.utxos.length === 101
                 };
             }
         },
@@ -73,14 +73,14 @@ function test_canister_functionality() {
             name: 'get_current_fee_percentiles',
             test: async () => {
                 const result =
-                    await bitcoin_canister.get_current_fee_percentiles();
+                    await bitcoinCanister.get_current_fee_percentiles();
 
                 if (!ok(result)) {
-                    return { err: result.err };
+                    return { Err: result.Err };
                 }
 
                 return {
-                    ok: result.ok.length === 0 // TODO: This should have entries
+                    Ok: result.Ok.length === 0 // TODO: This should have entries
                 };
             }
         },
@@ -88,31 +88,29 @@ function test_canister_functionality() {
             name: 'send transaction',
             test: async () => {
                 const balance_before_transaction =
-                    bitcoin_cli.get_received_by_address(wallets.bob.p2wpkh);
+                    bitcoinCli.getReceivedByAddress(wallets.bob.p2wpkh);
 
-                const tx_bytes = hex_string_to_bytes(state.signed_tx_hex);
+                const tx_bytes = hex_string_to_bytes(state.signedTxHex);
 
-                const result = await bitcoin_canister.send_transaction(
-                    Array.from(tx_bytes)
-                );
+                const result = await bitcoinCanister.send_transaction(tx_bytes);
 
                 if (!ok(result)) {
                     return {
-                        err: result.err
+                        Err: result.Err
                     };
                 }
 
-                bitcoin_cli.generate_to_address(1, wallets.alice.p2wpkh);
+                bitcoinCli.generateToAddress(1, wallets.alice.p2wpkh);
 
                 // Wait for generated block to be pulled into replica
                 await new Promise((resolve) => setTimeout(resolve, 5000));
 
                 const balance_after_transaction =
-                    bitcoin_cli.get_received_by_address(wallets.bob.p2wpkh, 0);
+                    bitcoinCli.getReceivedByAddress(wallets.bob.p2wpkh, 0);
 
                 return {
-                    ok:
-                        result.ok === null &&
+                    Ok:
+                        result.Ok === true &&
                         balance_before_transaction === 0 &&
                         balance_after_transaction === 1
                 };

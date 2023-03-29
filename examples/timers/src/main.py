@@ -118,12 +118,12 @@ def single_cross_canister_timer_callback() -> Async[blob]:
 
     result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if result.err is not None:
+    if result.Err is not None:
         return bytes()
 
-    status["single_cross_canister"] = result.ok
+    status["single_cross_canister"] = result.Ok
 
-    return result.ok
+    return result.Ok
 
 
 # TODO It would probably be better for this to have a return type of Async[void] once we have void types working
@@ -132,9 +132,9 @@ def repeat_cross_canister_timer_callback() -> Async[blob]:
 
     result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if result.err is not None:
+    if result.Err is not None:
         return bytes()
 
-    status["repeat_cross_canister"] += result.ok
+    status["repeat_cross_canister"] += result.Ok
 
-    return result.ok
+    return result.Ok

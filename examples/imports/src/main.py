@@ -6,21 +6,26 @@ import math
 # from sample_adds.add import add_one #type: ignore TODO add an externally installed pip library in the future
 import hashlib
 
+
 @query
-def getOne() -> str:
+def get_one() -> str:
     return import1.get_message()
 
+
 @query
-def getTwo() -> str:
+def get_two() -> str:
     return import2.get_message()
 
-@query
-def getThree() -> str:
-    return import2.import3.get_message()
 
 @query
-def sha224Hash(message: str) -> str:
+def get_three() -> str:
+    return import2.import3.get_message()
+
+
+@query
+def sha224_hash(message: str) -> str:
     return hashlib.sha224(message.encode()).hexdigest()
+
 
 @query
 def get_math_message() -> int:

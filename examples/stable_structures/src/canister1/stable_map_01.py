@@ -3,63 +3,63 @@ from kybra import nat64, nat16
 
 
 class StableMap1InsertResult(Variant, total=False):
-    ok: opt[blob]
-    err: InsertError
+    Ok: opt[blob]
+    Err: InsertError
 
 
-stable_map_1 = StableBTreeMap[nat16, blob](
+stable_map1 = StableBTreeMap[nat16, blob](
     memory_id=1, max_key_size=100, max_value_size=1_000)
 
 
 @query
-def stable_map_1_get(key: nat16) -> opt[blob]:
-    return stable_map_1.get(key)
+def stable_map1_get(key: nat16) -> opt[blob]:
+    return stable_map1.get(key)
 
 
 @update
-def stable_map_1_insert(key: nat16, value: blob) -> StableMap1InsertResult:
-    result = stable_map_1.insert(key, value)
+def stable_map1_insert(key: nat16, value: blob) -> StableMap1InsertResult:
+    result = stable_map1.insert(key, value)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
 
 
 @update
-def stable_map_1_remove(key: nat16) -> opt[blob]:
-    return stable_map_1.remove(key)
+def stable_map1_remove(key: nat16) -> opt[blob]:
+    return stable_map1.remove(key)
 
 
 @query
-def stable_map_1_contains_key(key: nat16) -> bool:
-    return stable_map_1.contains_key(key)
+def stable_map1_contains_key(key: nat16) -> bool:
+    return stable_map1.contains_key(key)
 
 
 @query
-def stable_map_1_is_empty() -> bool:
-    return stable_map_1.is_empty()
+def stable_map1_is_empty() -> bool:
+    return stable_map1.is_empty()
 
 
 @query
-def stable_map_1_keys() -> list[nat16]:
-    return stable_map_1.keys()
+def stable_map1_keys() -> list[nat16]:
+    return stable_map1.keys()
 
 
 @query
-def stable_map_1_values() -> list[blob]:
-    return stable_map_1.values()
+def stable_map1_values() -> list[blob]:
+    return stable_map1.values()
 
 
 @query
-def stable_map_1_items() -> list[tuple[nat16, blob]]:
-    return stable_map_1.items()
+def stable_map1_items() -> list[tuple[nat16, blob]]:
+    return stable_map1.items()
 
 
 @query
-def stable_map_1_len() -> nat64:
-    return stable_map_1.len()
+def stable_map1_len() -> nat64:
+    return stable_map1.len()

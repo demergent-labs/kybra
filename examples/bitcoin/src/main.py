@@ -17,12 +17,12 @@ def get_balance(address: str) -> Async[ExecuteGetBalanceResult]:
         }
     ).with_cycles(BITCOIN_API_CYCLE_COST)
 
-    if canister_result.err is not None:
+    if canister_result.Err is not None:
         return {
-            'err': canister_result.err
+            'Err': canister_result.Err
         }
 
-    return {'ok': canister_result.ok}
+    return {'Ok': canister_result.Ok}
 
 
 @update
@@ -31,12 +31,12 @@ def get_current_fee_percentiles() -> Async[ExecuteGetCurrentFeePercentiles]:
         'network': {'Regtest': None}
     }).with_cycles(BITCOIN_API_CYCLE_COST)
 
-    if canister_result.err is not None:
+    if canister_result.Err is not None:
         return {
-            'err': canister_result.err
+            'Err': canister_result.Err
         }
 
-    return {'ok': canister_result.ok}
+    return {'Ok': canister_result.Ok}
 
 
 @update
@@ -47,12 +47,12 @@ def get_utxos(address: str) -> Async[ExecuteGetUtxosResult]:
         'network': {'Regtest': None}
     }).with_cycles(BITCOIN_API_CYCLE_COST)
 
-    if canister_result.err is not None:
+    if canister_result.Err is not None:
         return {
-            'err': canister_result.err
+            'Err': canister_result.Err
         }
 
-    return {'ok': canister_result.ok}
+    return {'Ok': canister_result.Ok}
 
 
 @update
@@ -67,9 +67,9 @@ def send_transaction(
         'network': {'Regtest': None}
     }).with_cycles(transaction_fee)
 
-    if canister_result.err is not None:
+    if canister_result.Err is not None:
         return {
-            'err': canister_result.err
+            'Err': canister_result.Err
         }
 
-    return {'ok': canister_result.ok}
+    return {'Ok': True}

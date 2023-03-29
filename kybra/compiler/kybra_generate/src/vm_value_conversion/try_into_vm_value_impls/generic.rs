@@ -42,14 +42,14 @@ pub fn generate() -> TokenStream {
                     Ok(ok) => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("ok", ok.try_into_vm_value(vm).unwrap(), vm);
+                        dict.set_item("Ok", ok.try_into_vm_value(vm).unwrap(), vm);
 
                         Ok(dict.into())
                     },
                     Err(err) => {
                         let dict = vm.ctx.new_dict();
 
-                        dict.set_item("err", err.try_into_vm_value(vm).unwrap(), vm);
+                        dict.set_item("Err", err.try_into_vm_value(vm).unwrap(), vm);
 
                         Ok(dict.into())
                     }

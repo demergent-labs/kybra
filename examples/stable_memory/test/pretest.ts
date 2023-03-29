@@ -14,6 +14,13 @@ async function pretest() {
     execSync(`dfx generate`, {
         stdio: 'inherit'
     });
+
+    execSync(
+        `dfx ledger fabricate-cycles --canister stable_memory --cycles 100000000000000`,
+        {
+            stdio: 'inherit'
+        }
+    );
 }
 
 pretest();

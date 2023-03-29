@@ -1,22 +1,22 @@
-from kybra import null, Variant
+from kybra import Variant
 from kybra.canisters.management import GetUtxosResult, MillisatoshiPerByte, Satoshi
 
 
 class ExecuteGetBalanceResult(Variant, total=False):
-    ok: Satoshi
-    err: str
+    Ok: Satoshi
+    Err: str
 
 
 class ExecuteGetCurrentFeePercentiles(Variant, total=False):
-    ok: list[MillisatoshiPerByte]
-    err: str
+    Ok: list[MillisatoshiPerByte]
+    Err: str
 
 
 class ExecuteGetUtxosResult(Variant, total=False):
-    ok: GetUtxosResult
-    err: str
+    Ok: GetUtxosResult
+    Err: str
 
 
 class ExecuteSendTransactionResult(Variant, total=False):
-    ok: null
-    err: str
+    Ok: bool
+    Err: str

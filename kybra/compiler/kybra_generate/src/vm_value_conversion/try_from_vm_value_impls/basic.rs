@@ -69,11 +69,11 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<Result<(), String>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Result<(), String>, CdkActTryFromVmValueError> {
-                let err = self.get_item("err", vm);
+                let err = self.get_item("Err", vm);
                 if let Ok(error_message) = err {
                     return Ok(Err(error_message.try_from_vm_value(vm).unwrap()));
                 }
-                let ok = self.get_item("ok", vm);
+                let ok = self.get_item("Ok", vm);
                 if let Ok(value) = ok {
                     let result: Result<(), CdkActTryFromVmValueError> = value.try_from_vm_value(vm);
                     match result {
