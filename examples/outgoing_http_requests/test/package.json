@@ -9,7 +9,7 @@
         "typescript": "4.6.3"
     },
     "dependencies": {
-        "azle": "github:demergent-labs/azle#test_case_converter",
+        "azle": "github:demergent-labs/azle",
         "decode-utf8": "1.0.1"
     }
 }

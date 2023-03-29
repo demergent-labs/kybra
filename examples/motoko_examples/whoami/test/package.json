@@ -5,7 +5,7 @@
     },
     "dependencies": {
         "@dfinity/identity": "0.14.1",
-        "azle": "github:demergent-labs/azle#test_case_converter"
+        "azle": "github:demergent-labs/azle"
     },
     "devDependencies": {
         "@dfinity/agent": "0.14.1",

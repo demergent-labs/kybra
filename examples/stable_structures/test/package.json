@@ -9,6 +9,6 @@
     },
     "dependencies": {
         "@dfinity/agent": "^0.15.4",
-        "azle": "github:demergent-labs/azle#test_case_converter"
+        "azle": "github:demergent-labs/azle"
     }
 }
