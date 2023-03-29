@@ -3,21 +3,21 @@ type CreateRecordingErr = variant {
   UserDoesNotExist : principal;
 };
 type CreateRecordingResult = variant {
-  ok : Recording;
-  err : CreateRecordingErr;
+  Ok : Recording;
+  Err : CreateRecordingErr;
 };
-type CreateUserResult = variant { ok : User; err : InsertError };
+type CreateUserResult = variant { Ok : User; Err : InsertError };
 type DeleteRecordingError = variant {
   RecordingDoesNotExist : principal;
   InsertError : InsertError;
   UserDoesNotExist : principal;
 };
 type DeleteRecordingResult = variant {
-  ok : Recording;
-  err : DeleteRecordingError;
+  Ok : Recording;
+  Err : DeleteRecordingError;
 };
 type DeleteUserErr = variant { UserDoesNotExist : principal };
-type DeleteUserResult = variant { ok : User; err : DeleteUserErr };
+type DeleteUserResult = variant { Ok : User; Err : DeleteUserErr };
 type InsertError = variant {
   ValueTooLarge : KeyTooLarge;
   KeyTooLarge : KeyTooLarge;

@@ -1,27 +1,34 @@
 from kybra import Async, CanisterResult, nat64, NotifyResult, opt, Principal, update, Variant
 from src.canister2.types import Account, AccountArgs, Canister2
 
+
 class TransferResult(Variant, total=False):
-    ok: nat64
-    err: str
+    Ok: nat64
+    Err: str
+
 
 class BalanceResult(Variant, total=False):
-    ok: nat64
-    err: str
+    Ok: nat64
+    Err: str
+
 
 class AccountResult(Variant, total=False):
-    ok: opt[Account]
-    err: str
+    Ok: opt[Account]
+    Err: str
+
 
 class AccountsResult(Variant, total=False):
-    ok: list[Account]
-    err: str
+    Ok: list[Account]
+    Err: str
+
 
 class TrapResult(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
+
 
 canister2 = Canister2(Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'))
+
 
 @update
 def transfer(
@@ -31,66 +38,71 @@ def transfer(
 ) -> Async[TransferResult]:
     result: CanisterResult[nat64] = yield canister2.transfer(from_, to, amount)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
+
 
 @update
 def balance(id: str) -> Async[BalanceResult]:
     result: CanisterResult[nat64] = yield canister2.balance(id)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
+
 
 @update
 def account(args: AccountArgs) -> Async[AccountResult]:
     result: CanisterResult[opt[Account]] = yield canister2.account(args)
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
+
 
 @update
 def accounts() -> Async[AccountsResult]:
     result: CanisterResult[list[Account]] = yield canister2.accounts()
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
+
 
 @update
 def trap() -> Async[TrapResult]:
     result: CanisterResult[str] = yield canister2.trap()
 
-    if result.err is not None:
+    if result.Err is not None:
         return {
-            'err': result.err
+            'Err': result.Err
         }
 
     return {
-        'ok': result.ok
+        'Ok': result.Ok
     }
+
 
 @update
 def send_notification() -> NotifyResult:

@@ -1,12 +1,22 @@
 {
     "canisters": {
-        "heartbeat": {
+        "heartbeat_async": {
             "type": "custom",
-            "build": "python -m kybra heartbeat src/main.py src/main.did",
-            "candid": "src/main.did",
-            "wasm": ".kybra/heartbeat/heartbeat.wasm.gz",
+            "build": "python -m kybra heartbeat_async src/heartbeat_async/main.py src/heartbeat_async/main.did",
+            "candid": "src/heartbeat_async/main.did",
+            "wasm": ".kybra/heartbeat_async/heartbeat_async.wasm.gz",
             "declarations": {
-                "output": "test/dfx_generated/heartbeat",
+                "output": "test/dfx_generated/heartbeat_async",
+                "node_compatibility": true
+            }
+        },
+        "heartbeat_sync": {
+            "type": "custom",
+            "build": "python -m kybra heartbeat_sync src/heartbeat_sync/main.py src/heartbeat_sync/main.did",
+            "candid": "src/heartbeat_sync/main.did",
+            "wasm": ".kybra/heartbeat_sync/heartbeat_sync.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/heartbeat_sync",
                 "node_compatibility": true
             }
         }

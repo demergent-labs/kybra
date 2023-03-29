@@ -152,7 +152,7 @@ CanisterResult
                     // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
                     // let dict = vm.ctx.new_dict();
 
-                    // dict.set_item("ok", ok.try_into_vm_value(vm).unwrap(), vm);
+                    // dict.set_item("Ok", ok.try_into_vm_value(vm).unwrap(), vm);
 
                     // dict
                 },
@@ -166,7 +166,7 @@ CanisterResult
                     // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
                     // let dict = vm.ctx.new_dict();
 
-                    // dict.set_item("err", err_string.try_into_vm_value(vm).unwrap(), vm);
+                    // dict.set_item("Err", err_string.try_into_vm_value(vm).unwrap(), vm);
 
                     // dict
                 }

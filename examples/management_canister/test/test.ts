@@ -1,14 +1,11 @@
-import { run_tests, Test } from 'azle/test';
-import { get_tests } from 'azle/examples/management_canister/test/tests';
-import { execSync } from 'child_process';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
+import { getTests } from 'azle/examples/management_canister/test/tests';
 import { createActor } from './dfx_generated/management_canister';
 
-const management_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const managementCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
 });
 
-const tests: Test[] = [...get_tests(management_canister)];
-
-run_tests(tests);
+runTests(getTests(createSnakeCaseProxy(managementCanister)));

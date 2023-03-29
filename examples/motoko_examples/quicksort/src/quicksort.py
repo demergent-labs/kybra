@@ -10,11 +10,11 @@ def sort_by(xs: list[X], f: Callable[[X, X], int]) -> list[X]:
         return xs
     else:
         result = xs.copy()
-        sortByHelper(result, 0, n - 1, f)
+        sort_by_helper(result, 0, n - 1, f)
         return result
 
 
-def sortByHelper(xs: list[X], l: int, r: int, f: Callable[[X, X], int]):
+def sort_by_helper(xs: list[X], l: int, r: int, f: Callable[[X, X], int]):
     if l < r:
         i = l
         j = r
@@ -35,7 +35,7 @@ def sortByHelper(xs: list[X], l: int, r: int, f: Callable[[X, X], int]):
                 j -= 1
 
         if (l < j):
-            sortByHelper(xs, l, j, f)
+            sort_by_helper(xs, l, j, f)
 
         if (i < r):
-            sortByHelper(xs, i, r, f)
+            sort_by_helper(xs, i, r, f)

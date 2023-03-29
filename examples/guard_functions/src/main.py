@@ -4,14 +4,14 @@ from kybra import GuardResult, ic, manual, update, query
 def unpassable() -> GuardResult:
     ic.print("We are in the unpassable")
     return {
-        'err': "You shall not pass!"
+        'Err': "You shall not pass!"
     }
 
 
 def adelante() -> GuardResult:
     ic.print("We are in the adelante")
     return {
-        'ok': None,
+        'Ok': None,
     }
 
 

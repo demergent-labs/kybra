@@ -19,13 +19,13 @@ class Signature(Record):
 
 
 class PublicKeyResult(Variant, total=False):
-    ok: PublicKey
-    err: str
+    Ok: PublicKey
+    Err: str
 
 
 class SignResult(Variant, total=False):
-    ok: Signature
-    err: str
+    Ok: Signature
+    Err: str
 
 
 @update
@@ -39,10 +39,10 @@ def public_key() -> Async[PublicKeyResult]:
         }
     )
 
-    if canister_result.err is not None:
-        return {'err': canister_result.err}
+    if canister_result.Err is not None:
+        return {'Err': canister_result.Err}
 
-    return {'ok': canister_result.ok}
+    return {'Ok': canister_result.Ok}
 
 
 @update
@@ -58,7 +58,7 @@ def sign(message_hash: blob) -> Async[SignResult]:
         'key_id': {'curve': {'secp256k1': None}, 'name': 'dfx_test_key'}
     }).with_cycles(10_000_000_000)
 
-    if canister_result.err is not None:
-        return {'err': canister_result.err}
+    if canister_result.Err is not None:
+        return {'Err': canister_result.Err}
 
-    return {'ok': canister_result.ok}
+    return {'Ok': canister_result.Ok}

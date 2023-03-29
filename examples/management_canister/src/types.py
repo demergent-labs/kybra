@@ -3,25 +3,25 @@ from kybra.canisters.management import CanisterStatusResult, CreateCanisterResul
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 class ExecuteCreateCanisterResult(Variant, total=False):
-    ok: CreateCanisterResult
-    err: str
+    Ok: CreateCanisterResult
+    Err: str
 
 
 class ExecuteProvisionalCreateCanisterWithCyclesResult(Variant, total=False):
-    ok: CreateCanisterResult
-    err: str
+    Ok: CreateCanisterResult
+    Err: str
 
 
 class GetCanisterStatusResult(Variant, total=False):
-    ok: CanisterStatusResult
-    err: str
+    Ok: CanisterStatusResult
+    Err: str
 
 
 class RawRandResult(Variant, total=False):
-    ok: blob
-    err: str
+    Ok: blob
+    Err: str

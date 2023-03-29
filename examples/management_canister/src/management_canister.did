@@ -8,7 +8,7 @@ type CanisterStatusResult = record {
   module_hash : opt vec nat8;
 };
 type CreateCanisterResult = record { canister_id : principal };
-type DefaultResult = variant { ok : bool; err : text };
+type DefaultResult = variant { Ok : bool; Err : text };
 type DefiniteCanisterSettings = record {
   freezing_threshold : nat;
   controllers : vec principal;
@@ -16,14 +16,14 @@ type DefiniteCanisterSettings = record {
   compute_allocation : nat;
 };
 type ExecuteCreateCanisterResult = variant {
-  ok : CanisterStatusArgs;
-  err : text;
+  Ok : CanisterStatusArgs;
+  Err : text;
 };
 type GetCanisterStatusResult = variant {
-  ok : CanisterStatusResult;
-  err : text;
+  Ok : CanisterStatusResult;
+  Err : text;
 };
-type RawRandResult = variant { ok : vec nat8; err : text };
+type RawRandResult = variant { Ok : vec nat8; Err : text };
 service : () -> {
   execute_create_canister : () -> (ExecuteCreateCanisterResult);
   execute_delete_canister : (principal) -> (DefaultResult);

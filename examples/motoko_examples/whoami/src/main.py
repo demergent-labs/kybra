@@ -64,7 +64,7 @@ def whoami() -> Principal:
 def id() -> Async[Principal]:
     thisCanister = WhoAmICanister(ic.id())
     result: CanisterResult[Principal] = yield thisCanister.whoami()
-    return result.ok if result.ok is not None else Principal.from_str('aaaaa-aa')
+    return result.Ok if result.Ok is not None else Principal.from_str('aaaaa-aa')
 
 
 @query

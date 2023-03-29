@@ -12,8 +12,8 @@ type Reaction = variant {
   Good;
 };
 type StreamingCallbackType = variant {
-  without_headers;
-  with_headers : vec record { text; text };
+  WithHeaders : vec record { text; text };
+  WithoutHeaders;
 };
 type User = record { id : text; primitive_two_tuple : record { text; nat64 } };
 service : () -> {

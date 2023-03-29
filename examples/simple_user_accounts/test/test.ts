@@ -1,5 +1,5 @@
-import { run_tests } from 'azle/test';
-import { get_tests } from 'azle/examples/simple_user_accounts/test/tests';
+import { createSnakeCaseProxy, runTests } from 'azle/test';
+import { getTests } from 'azle/examples/simple_user_accounts/test/tests';
 import { createActor } from './dfx_generated/simple_user_accounts';
 
 const simple_user_accounts_canister = createActor(
@@ -11,4 +11,4 @@ const simple_user_accounts_canister = createActor(
     }
 );
 
-run_tests(get_tests(simple_user_accounts_canister));
+runTests(getTests(createSnakeCaseProxy(simple_user_accounts_canister)));

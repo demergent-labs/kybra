@@ -1,8 +1,10 @@
 from kybra import ic, Principal, RejectionCode, update, Variant
 
+
 class SendNotificationResult(Variant, total=False):
-    ok: bool
-    err: RejectionCode
+    Ok: bool
+    Err: RejectionCode
+
 
 @update
 def send_notification() -> SendNotificationResult:
@@ -13,11 +15,11 @@ def send_notification() -> SendNotificationResult:
         0
     )
 
-    if 'err' in result:
+    if 'Err' in result:
         return {
-            'err': result['err']
+            'Err': result['Err']
         }
 
     return {
-        'ok': True
+        'Ok': True
     }

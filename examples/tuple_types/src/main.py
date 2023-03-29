@@ -29,8 +29,8 @@ class HttpResponse(Record):
 
 
 class StreamingCallbackType(Variant, total=False):
-    with_headers: list[Header]
-    without_headers: null
+    WithHeaders: list[Header]
+    WithoutHeaders: null
 
 
 @query
@@ -219,7 +219,7 @@ def tuple_array_record_field() -> HttpResponse:
 @query
 def tuple_array_variant_field() -> StreamingCallbackType:
     return {
-        'with_headers': [
+        'WithHeaders': [
             ('Content-Type', 'application/json'),
             ('Accept-Ranges', 'bytes')
         ]

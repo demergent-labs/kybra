@@ -34,8 +34,8 @@ class Reaction(Variant, total=False):
 
 
 class GetNotifierFromNotifiersCanisterResult(Variant, total=False):
-    ok: "NotifierFunc"
-    err: str
+    Ok: "NotifierFunc"
+    Err: str
 
 
 BasicFunc = Func(Query[[str], str])
@@ -114,7 +114,7 @@ def get_notifier_from_notifiers_canister() -> Async[
 
     result: CanisterResult[NotifierFunc] = yield notifiers_canister.get_notifier()
 
-    if result.err is not None:
-        return {"err": result.err}
+    if result.Err is not None:
+        return {"Err": result.Err}
 
-    return {"ok": result.ok}
+    return {"Ok": result.Ok}
