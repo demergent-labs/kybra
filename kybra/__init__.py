@@ -594,6 +594,7 @@ class StableBTreeMap(Generic[K, V]):
         return _kybra_ic._kybra_stable_b_tree_map_values(self.memory_id)  # type: ignore
 
 
+# TODO add the underscore catch-all
 def match(
     variant: Union[TypedDict, object], matcher: dict[str, Callable[[Any], T]]
 ) -> T:
