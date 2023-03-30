@@ -1,10 +1,20 @@
-from kybra import Async, CanisterResult, nat, Principal, query, update, manual, ic
+from kybra import (
+    Async,
+    CanisterResult,
+    match,
+    nat,
+    Principal,
+    query,
+    update,
+    manual,
+    ic,
+)
 from src.canister1.types import Canister1, NatQueryResult, StringQueryResult
 from src.canister2.types import Canister2
 
 
-canister1 = Canister1(Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'))
-canister2 = Canister2(Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai'))
+canister1 = Canister1(Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"))
+canister2 = Canister2(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
 counter: nat = 0
 
 
@@ -13,14 +23,7 @@ counter: nat = 0
 def simple_composite_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.simple_query()
 
-    if result.Err is not None:
-        return {
-            'Err': result.Err
-        }
-
-    return {
-        'Ok': result.Ok
-    }
+    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
 
 # Composite query calling a manual query
@@ -28,14 +31,7 @@ def simple_composite_query() -> Async[StringQueryResult]:
 def manual_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.manual_query()
 
-    if result.Err is not None:
-        return {
-            'Err': result.Err
-        }
-
-    return {
-        'Ok': result.Ok
-    }
+    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
 
 # Manual composite query calling a manual query
@@ -44,14 +40,13 @@ def totally_manual_query() -> Async[manual[StringQueryResult]]:
     result: CanisterResult[str] = yield canister2.manual_query()
     # ic.reply(result)
 
-    if result.Err is not None:
-        ic.reply({
-            'Err': result.Err
-        })
-
-    ic.reply({
-        'Ok': result.Ok
-    })
+    match(
+        result,
+        {
+            "Ok": lambda ok: ic.reply({"Ok": ok}),
+            "Err": lambda err: ic.reply({"Err": err}),
+        },
+    )
 
 
 # Composite query calling another composite query
@@ -59,22 +54,19 @@ def totally_manual_query() -> Async[manual[StringQueryResult]]:
 def deep_query() -> Async[StringQueryResult]:
     result: CanisterResult[StringQueryResult] = yield canister2.deep_query()
 
-    if result.Err is not None:
-        return {
-            'Err': result.Err
-        }
-    if 'Err' in result.Ok:
-        return {
-            'Err': result.Ok['Err']
-        }
-    if 'Ok' not in result.Ok:
-        return {
-            'Err': 'Unreachable'
-        }
-
-    return {
-        'Ok': result.Ok['Ok']
-    }
+    return match(
+        result,
+        {
+            "Ok": lambda string_query_result: match(
+                string_query_result,
+                {
+                    "Ok": lambda string_query: {"Ok": string_query},
+                    "Err": lambda err: {"Err": err},
+                },
+            ),
+            "Err": lambda err: {"Err": err},
+        },
+    )
 
 
 # Composite query calling an update method. SHOULDN'T WORK
@@ -82,14 +74,7 @@ def deep_query() -> Async[StringQueryResult]:
 def update_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.update_query()
 
-    if result.Err is not None:
-        return {
-            'Err': result.Err
-        }
-
-    return {
-        'Ok': result.Ok
-    }
+    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
 
 # Composite query being called by an update method. SHOULDN'T WORK
@@ -97,14 +82,7 @@ def update_query() -> Async[StringQueryResult]:
 def simple_update() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister2.deep_query()
 
-    if result.Err is not None:
-        return {
-            'Err': result.Err
-        }
-
-    return {
-        'Ok': result.Ok
-    }
+    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
 
 # Composite query that modifies the state. Should revert after the call is done
@@ -122,20 +100,23 @@ def inc_canister1() -> Async[NatQueryResult]:
     counter += 1
 
     canister1_a_result: CanisterResult[nat] = yield canister1.inc_counter()
-    if canister1_a_result.Err is not None:
-        return {
-            'Err': canister1_a_result.Err
-        }
+    canister1_b_result: CanisterResult[nat] = (yield canister1.inc_counter())
 
-    canister1_b_result: CanisterResult[nat] = yield canister1.inc_counter()
-    if canister1_b_result.Err is not None:
-        return {
-            'Err': canister1_b_result.Err
-        }
-
-    return {
-        'Ok': counter + canister1_a_result .Ok + canister1_b_result.Ok
-    }
+    return match(
+        canister1_a_result,
+        {
+            "Ok": lambda canister1_a_ok: match(
+                canister1_b_result,
+                {
+                    "Ok": lambda canister1_b_ok: {
+                        "Ok": counter + canister1_a_ok + canister1_b_ok
+                    },
+                    "Err": lambda err: {"Err": err},
+                },
+            ),
+            "Err": lambda err: {"Err": err},
+        },
+    )
 
 
 # Composite query calling queries that modify the state
@@ -145,17 +126,20 @@ def inc_canister2() -> Async[NatQueryResult]:
     counter += 1
 
     canister2_a_result: CanisterResult[nat] = yield canister2.inc_counter()
-    if canister2_a_result.Err is not None:
-        return {
-            'Err': canister2_a_result.Err
-        }
+    canister2_b_result: CanisterResult[nat] = (yield canister2.inc_counter())
 
-    canister2_b_result: CanisterResult[nat] = yield canister2.inc_counter()
-    if canister2_b_result.Err is not None:
-        return {
-            'Err': canister2_b_result.Err
-        }
-
-    return {
-        'Ok': counter + canister2_a_result .Ok + canister2_b_result.Ok
-    }
+    return match(
+        canister2_a_result,
+        {
+            "Ok": lambda canister2_a_ok: match(
+                canister2_b_result,
+                {
+                    "Ok": lambda canister2_b_ok: {
+                        "Ok": counter + canister2_a_ok + canister2_b_ok
+                    },
+                    "Err": lambda err: {"Err": err},
+                },
+            ),
+            "Err": lambda err: {"Err": err},
+        },
+    )

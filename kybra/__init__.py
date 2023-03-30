@@ -594,7 +594,6 @@ class StableBTreeMap(Generic[K, V]):
         return _kybra_ic._kybra_stable_b_tree_map_values(self.memory_id)  # type: ignore
 
 
-# TODO add the underscore catch-all
 def match(
     variant: Union[TypedDict, object], matcher: dict[str, Callable[[Any], T]]
 ) -> T:
@@ -602,9 +601,15 @@ def match(
         for key, value in matcher.items():
             if key in variant:
                 return value(variant[key])
+
+            if key == "_":
+                return value(None)
     else:
         for key, value in matcher.items():
             if hasattr(variant, key):
                 return value(getattr(variant, key))
+
+            if key == "_":
+                return value(None)
 
     raise Exception("No matching case found")

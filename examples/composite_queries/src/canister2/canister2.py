@@ -1,4 +1,4 @@
-from kybra import Async, CanisterResult, ic, manual, nat, Principal, query, update
+from kybra import Async, CanisterResult, ic, manual, match, nat, Principal, query, update
 from src.canister1.types import StringQueryResult
 from src.canister3.types import Canister3
 
@@ -33,11 +33,7 @@ def manual_query() -> manual[str]:
 def deep_query() -> Async[StringQueryResult]:
     result: CanisterResult[str] = yield canister3.deep_query()
 
-    if result.Err is not None:
-        return {
-            'Err': result.Err
-        }
-
-    return {
-        'Ok': result.Ok
-    }
+    return match(result, {
+        "Ok": lambda ok: {"Ok": ok},
+        "Err": lambda err: {"Err": err}
+    })

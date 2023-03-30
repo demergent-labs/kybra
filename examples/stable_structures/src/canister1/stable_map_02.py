@@ -1,4 +1,4 @@
-from kybra import InsertError, opt, query, StableBTreeMap, update, Variant
+from kybra import InsertError, match, opt, query, StableBTreeMap, update, Variant
 from kybra import nat, nat64, nat32
 
 
@@ -8,7 +8,8 @@ class StableMap2InsertResult(Variant, total=False):
 
 
 stable_map2 = StableBTreeMap[nat32, nat](
-    memory_id=2, max_key_size=100, max_value_size=1_000)
+    memory_id=2, max_key_size=100, max_value_size=1_000
+)
 
 
 @query
@@ -20,14 +21,7 @@ def stable_map2_get(key: nat32) -> opt[nat]:
 def stable_map2_insert(key: nat32, value: nat) -> StableMap2InsertResult:
     result = stable_map2.insert(key, value)
 
-    if result.Err is not None:
-        return {
-            'Err': result.Err
-        }
-
-    return {
-        'Ok': result.Ok
-    }
+    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
 
 @update
