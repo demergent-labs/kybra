@@ -605,11 +605,13 @@ def match(
             if key == "_":
                 return value(None)
     else:
-        for key, value in matcher.items():
-            if hasattr(variant, key) and getattr(variant, key) is not None:
-                return value(getattr(variant, key))
+        # This only works for Result (Ok, Err) objects
+        # This is temporary until we either use dataclasses for all variants or TypedDicts for all variants
+        err_value = getattr(variant, "Err", None)
 
-            if key == "_":
-                return value(None)
+        if err_value is not None:
+            return matcher["Err"](err_value)
+
+        return matcher["Ok"](getattr(variant, "Ok"))
 
     raise Exception("No matching case found")
