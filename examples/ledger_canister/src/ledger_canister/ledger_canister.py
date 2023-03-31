@@ -134,7 +134,7 @@ def get_symbol() -> Async[GetSymbolResult]:
     return match(
         symbol_result_canister_result,
         {
-            "Ok": lambda symbol_result: {"Ok": symbol_result},
+            "Ok": lambda symbol_result: {"Ok": symbol_result["symbol"]},
             "Err": lambda err: {"Err": err},
         },
     )
@@ -152,7 +152,7 @@ def get_name() -> Async[GetNameResult]:
     return match(
         name_result_canister_result,
         {
-            "Ok": lambda name_result: {"Ok": name_result},
+            "Ok": lambda name_result: {"Ok": name_result["name"]},
             "Err": lambda err: {"Err": err},
         },
     )
@@ -172,7 +172,7 @@ def get_decimals() -> Async[GetDecimalsResult]:
     return match(
         decimals_result_canister_result,
         {
-            "Ok": lambda decimals_result: {"Ok": decimals_result},
+            "Ok": lambda decimals_result: {"Ok": decimals_result["decimals"]},
             "Err": lambda err: {"Err": err},
         },
     )
