@@ -606,7 +606,7 @@ def match(
                 return value(None)
     else:
         for key, value in matcher.items():
-            if hasattr(variant, key):
+            if hasattr(variant, key) and getattr(variant, key) is not None:
                 return value(getattr(variant, key))
 
             if key == "_":
