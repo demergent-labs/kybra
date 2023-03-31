@@ -29,7 +29,8 @@ pub fn generate(
                         "binascii",
                         "hashlib",
                         "math",
-                        "zlib"
+                        "zlib",
+                        "_random"
                     ].contains(&item.0.as_ref())
                 }));
                 vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
