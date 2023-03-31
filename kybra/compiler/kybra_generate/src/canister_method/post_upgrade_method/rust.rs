@@ -21,6 +21,17 @@ pub fn generate(
                 // TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
                 // vm.add_frozen(rustpython_pylib::frozen_stdlib());
                 // vm.add_native_modules(rustpython_stdlib::get_module_inits());
+
+                // TODO Because of the Wasm binary size limit, we are forced to only compile the absolute minimum stdlib
+                // TODO we should be able to remove this code once the Wasm binary limit is lifted
+                vm.add_native_modules(rustpython_stdlib::get_module_inits().filter(|item| {
+                    [
+                        "binascii",
+                        "hashlib",
+                        "math",
+                        "zlib"
+                    ].contains(&item.0.as_ref())
+                }));
                 vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
             });
             let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
