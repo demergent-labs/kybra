@@ -1,4 +1,4 @@
-from kybra import Async, blob, Canister, CanisterResult, Principal, heartbeat, query, service_update, void
+from kybra import Async, blob, Canister, CanisterResult, match, Principal, heartbeat, query, service_update, void
 
 initialized: blob = bytes()
 
@@ -10,14 +10,22 @@ class ManagementCanister(Canister):
 
 @heartbeat
 def heartbeat_() -> Async[void]:
-    global initialized
     management_canister = ManagementCanister(Principal.from_str('aaaaa-aa'))
+
     randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if randomness_result.Err is not None:
+    def handle_ok(ok: blob) -> void:
+        global initialized
+        initialized = ok
+
+    def handle_err(_) -> void:
+        global initialized
         initialized = bytes()
 
-    initialized = randomness_result.Ok
+    match(randomness_result, {
+        "Ok": handle_ok,
+        "Err": handle_err
+    })
 
 
 @query
