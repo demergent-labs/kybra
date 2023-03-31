@@ -7,9 +7,7 @@ edition = "2018"
 
 [profile.release]
 opt-level = 'z'
-
-[profile.test]
-opt-level = 'z'
+codegen-units = 1
 
 [lib]
 crate-type = ["cdylib"]
