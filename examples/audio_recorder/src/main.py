@@ -5,6 +5,7 @@ from kybra import (
     blob,
     ic,
     InsertError,
+    match,
     nat64,
     opt,
     Principal,
@@ -56,10 +57,9 @@ def create_user(username: str) -> CreateUserResult:
 
     result = users.insert(user["id"], user)
 
-    if result.Err is not None:
-        return {"Err": result.Err}
-
-    return {"Ok": user}
+    return match(
+        result, {"Ok": lambda _: {"Ok": user}, "Err": lambda err: {"Err": err}}
+    )
 
 
 @query
@@ -126,20 +126,29 @@ def create_recording(
 
     create_recording_result = recordings.insert(recording["id"], recording)
 
-    if create_recording_result.Err is not None:
-        return {"Err": {"InsertError": create_recording_result.Err}}
+    def handle_recording_result_ok(_) -> CreateRecordingResult:
+        updated_user: User = {
+            **user,
+            "recording_ids": [*user["recording_ids"], recording["id"]],
+        }
 
-    updated_user: User = {
-        **user,
-        "recording_ids": [*user["recording_ids"], recording["id"]],
-    }
+        update_user_result = users.insert(updated_user["id"], updated_user)
 
-    update_user_result = users.insert(updated_user["id"], updated_user)
+        return match(
+            update_user_result,
+            {
+                "Ok": lambda _: {"Ok": recording},
+                "Err": lambda err: {"Err": {"InsertError": err}},
+            },
+        )
 
-    if update_user_result.Err is not None:
-        return {"Err": {"InsertError": update_user_result.Err}}
-
-    return {"Ok": recording}
+    return match(
+        create_recording_result,
+        {
+            "Ok": handle_recording_result_ok,
+            "Err": lambda err: {"Err": {"InsertError": err}},
+        },
+    )
 
 
 @query
@@ -179,8 +188,7 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
         **user,
         "recording_ids": list(
             filter(
-                lambda recording_id: recording_id.to_str(
-                ) != recording["id"].to_str(),
+                lambda recording_id: recording_id.to_str() != recording["id"].to_str(),
                 user["recording_ids"],
             )
         ),
@@ -188,12 +196,18 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
 
     update_user_result = users.insert(updated_user["id"], updated_user)
 
-    if update_user_result.Err is not None:
-        return {"Err": {"InsertError": update_user_result.Err}}
+    def handle_update_user_result_ok(_) -> DeleteRecordingResult:
+        recordings.remove(id)
 
-    recordings.remove(id)
+        return {"Ok": recording}
 
-    return {"Ok": recording}
+    return match(
+        update_user_result,
+        {
+            "Ok": handle_update_user_result_ok,
+            "Err": lambda err: {"Err": {"InsertError": err}},
+        },
+    )
 
 
 def generate_id() -> Principal:

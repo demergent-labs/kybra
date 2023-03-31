@@ -1,5 +1,19 @@
-from kybra import Async, blob, CanisterResult, ic, Principal, query, update, manual
-from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
+from kybra import (
+    Async,
+    blob,
+    CanisterResult,
+    ic,
+    match,
+    Principal,
+    query,
+    update,
+    manual,
+)
+from kybra.canisters.management import (
+    HttpResponse,
+    HttpTransformArgs,
+    management_canister,
+)
 
 
 @update
@@ -11,24 +25,18 @@ def xkcd() -> Async[HttpResponse]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request({
-        'url': 'https://xkcd.com/642/info.0.json',
-        'max_response_bytes': max_response_bytes,
-        'method': {'get': None},
-        'headers': [],
-        'body': None,
-        'transform': {
-            'function': (ic.id(), 'xkcd_transform'),
-            'context': bytes()
-        },
-    }).with_cycles(cycle_cost_total)
+    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request(
+        {
+            "url": "https://xkcd.com/642/info.0.json",
+            "max_response_bytes": max_response_bytes,
+            "method": {"get": None},
+            "headers": [],
+            "body": None,
+            "transform": {"function": (ic.id(), "xkcd_transform"), "context": bytes()},
+        }
+    ).with_cycles(cycle_cost_total)
 
-    if http_result.Err is not None:
-        if http_result.Err:
-            ic.trap(http_result.Err)
-        ic.trap('http_result had an error')
-
-    return http_result.Ok
+    return match(http_result, {"Ok": lambda ok: ok, "Err": lambda err: ic.trap(err)})
 
 
 @update
@@ -41,8 +49,8 @@ def xkcd_raw() -> Async[manual[HttpResponse]]:
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
     http_result: CanisterResult[blob] = yield ic.call_raw(
-        Principal.from_str('aaaaa-aa'),
-        'http_request',
+        Principal.from_str("aaaaa-aa"),
+        "http_request",
         ic.candid_encode(
             f"""
                 (
@@ -60,20 +68,15 @@ def xkcd_raw() -> Async[manual[HttpResponse]]:
                 )
             """
         ),
-        cycle_cost_total
+        cycle_cost_total,
     )
 
-    if http_result.Err is not None:
-        if http_result.Err:
-            ic.trap(http_result.Err)
-        ic.trap('http_result had an error')
-
-    ic.reply_raw(http_result.Ok)
+    match(
+        http_result,
+        {"Ok": lambda ok: ic.reply_raw(ok), "Err": lambda err: ic.trap(err)},
+    )
 
 
 @query
 def xkcd_transform(args: HttpTransformArgs) -> HttpResponse:
-    return {
-        **args['response'],
-        'headers': []
-    }
+    return {**args["response"], "headers": []}

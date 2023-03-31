@@ -4,6 +4,7 @@ from kybra import (
     CanisterResult,
     Duration,
     ic,
+    match,
     nat8,
     query,
     Record,
@@ -72,8 +73,7 @@ def set_timers(delay: Duration, interval: Duration) -> TimerIds:
 
     repeat_id = ic.set_timer_interval(interval, repeat_timer_callback)
 
-    single_cross_canister_id = ic.set_timer(
-        delay, single_cross_canister_timer_callback)
+    single_cross_canister_id = ic.set_timer(delay, single_cross_canister_timer_callback)
 
     repeat_cross_canister_id = ic.set_timer_interval(
         interval, repeat_cross_canister_timer_callback
@@ -118,12 +118,11 @@ def single_cross_canister_timer_callback() -> Async[blob]:
 
     result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if result.Err is not None:
-        return bytes()
+    def handle_ok(ok: blob) -> blob:
+        status["single_cross_canister"] = ok
+        return ok
 
-    status["single_cross_canister"] = result.Ok
-
-    return result.Ok
+    return match(result, {"Ok": handle_ok, "Err": lambda _: bytes()})
 
 
 # TODO It would probably be better for this to have a return type of Async[void] once we have void types working
@@ -132,9 +131,8 @@ def repeat_cross_canister_timer_callback() -> Async[blob]:
 
     result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if result.Err is not None:
-        return bytes()
+    def handle_ok(ok: blob) -> blob:
+        status["repeat_cross_canister"] += ok
+        return ok
 
-    status["repeat_cross_canister"] += result.Ok
-
-    return result.Ok
+    return match(result, {"Ok": handle_ok, "Err": lambda _: bytes()})

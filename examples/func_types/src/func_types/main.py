@@ -3,6 +3,7 @@ from kybra import (
     Func,
     CanisterResult,
     init,
+    match,
     nat64,
     null,
     opt,
@@ -109,12 +110,14 @@ def complex_func_return_type() -> ComplexFunc:
 def get_notifier_from_notifiers_canister() -> Async[
     GetNotifierFromNotifiersCanisterResult
 ]:
-    notifiers_canister = Notifier(
-        Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
+    notifiers_canister = Notifier(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
 
     result: CanisterResult[NotifierFunc] = yield notifiers_canister.get_notifier()
 
-    if result.Err is not None:
-        return {"Err": result.Err}
-
-    return {"Ok": result.Ok}
+    return match(
+        result,
+        {
+            "Ok": lambda ok: {"Ok": ok},
+            "Err": lambda err: {"Err": err},
+        },
+    )

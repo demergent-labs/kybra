@@ -3,6 +3,7 @@ from kybra import (
     blob,
     CanisterResult,
     ic,
+    match,
     nat,
     nat64,
     Principal,
@@ -24,10 +25,13 @@ def execute_call_raw(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
-    if canister_result.Err is not None:
-        return {"Err": canister_result.Err}
-
-    return {"Ok": ic.candid_decode(canister_result.Ok)}
+    return match(
+        canister_result,
+        {
+            "Ok": lambda ok: {"Ok": ic.candid_decode(ok)},
+            "Err": lambda err: {"Err": err},
+        },
+    )
 
 
 class ExecuteCallRaw128Result(Variant, total=False):
@@ -43,7 +47,10 @@ def execute_call_raw128(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
-    if canister_result.Err is not None:
-        return {"Err": canister_result.Err}
-
-    return {"Ok": ic.candid_decode(canister_result.Ok)}
+    return match(
+        canister_result,
+        {
+            "Ok": lambda ok: {"Ok": ic.candid_decode(ok)},
+            "Err": lambda err: {"Err": err},
+        },
+    )

@@ -1,4 +1,14 @@
-from kybra import InsertError, blob, null, opt, query, StableBTreeMap, update, Variant
+from kybra import (
+    InsertError,
+    blob,
+    match,
+    null,
+    opt,
+    query,
+    StableBTreeMap,
+    update,
+    Variant,
+)
 from kybra import nat64
 
 
@@ -13,7 +23,8 @@ class StableMap12InsertResult(Variant, total=False):
 
 
 stable_map12 = StableBTreeMap[blob, Reaction](
-    memory_id=12, max_key_size=100, max_value_size=1_000)
+    memory_id=12, max_key_size=100, max_value_size=1_000
+)
 
 
 @query
@@ -25,14 +36,7 @@ def stable_map12_get(key: blob) -> opt[Reaction]:
 def stable_map12_insert(key: blob, value: Reaction) -> StableMap12InsertResult:
     result = stable_map12.insert(key, value)
 
-    if result.Err is not None:
-        return {
-            'Err': result.Err
-        }
-
-    return {
-        'Ok': result.Ok
-    }
+    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
 
 @update

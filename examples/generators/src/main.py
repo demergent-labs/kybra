@@ -1,23 +1,30 @@
-from kybra import Async, blob, Canister, CanisterResult, Principal, service_update, update
+from kybra import (
+    Async,
+    blob,
+    Canister,
+    CanisterResult,
+    match,
+    Principal,
+    service_update,
+    update,
+)
 
 # TODO create a special system canisters module like in Azle
 
 
 class ManagementCanister(Canister):
     @service_update
-    def raw_rand(self) -> blob: ...
+    def raw_rand(self) -> blob:
+        ...
 
 
 @update
 def get_randomness_directly() -> Async[blob]:
-    management_canister = ManagementCanister(Principal.from_str('aaaaa-aa'))
+    management_canister = ManagementCanister(Principal.from_str("aaaaa-aa"))
 
     randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if randomness_result.Err is not None:
-        return bytes()
-
-    return randomness_result.Ok
+    return match(randomness_result, {"Ok": lambda ok: ok, "Err": lambda _: bytes()})
 
 
 @update
@@ -52,11 +59,8 @@ def get_randomness_level2() -> Async[blob]:
 
 
 def get_randomness() -> Async[blob]:
-    management_canister = ManagementCanister(Principal.from_str('aaaaa-aa'))
+    management_canister = ManagementCanister(Principal.from_str("aaaaa-aa"))
 
     randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
 
-    if randomness_result.Err is not None:
-        return bytes()
-
-    return randomness_result.Ok
+    return match(randomness_result, {"Ok": lambda ok: ok, "Err": lambda _: bytes()})
