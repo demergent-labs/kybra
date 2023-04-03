@@ -178,28 +178,3 @@ def error_string_guarded() -> bool:
 def custom_error_guarded() -> bool:
     ic.print("custom_error_guarded called")
     return True
-
-
-@query(guard=adelante)
-def accessible() -> bool:
-    return True
-
-
-@query(guard=adelante)
-def guarded_manual() -> manual[bool]:
-    ic.reply(True)
-
-
-@query(guard=unpassable)
-def inaccessible() -> bool:
-    return False
-
-
-@update(guard=unpassable)
-def inaccessible_update() -> bool:
-    return False
-
-
-@query
-def unguarded() -> bool:
-    return True
