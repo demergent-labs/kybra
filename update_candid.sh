@@ -3,10 +3,11 @@
 # set path to kybra package
 KYBRA_PATH=$1
 
-# loop through subdirectories of examples
-for dir in examples/*; do
+# loop through immediate subdirectories of current directory
+for dir in */; do
   # check if dfx.json file exists in directory
   if [ -f "$dir/dfx.json" ]; then
+    echo "Processing directory: $dir"
     # deactivate current virtual environment if running
     deactivate 2>/dev/null
     # start a new virtual environment
