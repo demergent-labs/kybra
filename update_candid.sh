@@ -1,32 +1,35 @@
 #!/bin/bash
 
-# set path to kybra package
-KYBRA_PATH=$1
+for d in */ ; do
+  if [ -f "${d}dfx.json" ]; then
+    echo "Processing ${d}..."
 
-# loop through immediate subdirectories of current directory
-for dir in */; do
-  # check if dfx.json file exists in directory
-  if [ -f "$dir/dfx.json" ]; then
-    echo "Processing directory: $dir"
-    # deactivate current virtual environment if running
-    deactivate 2>/dev/null
-    # start a new virtual environment
+    # deactivate any existing Python virtual environment
+    deactivate &>/dev/null || true
+
+    # start a new Python virtual environment
     ~/.pyenv/versions/3.10.7/bin/python -m venv venv
-    # activate new virtual environment
     source venv/bin/activate
+
     # install kybra package
-    pip install $KYBRA_PATH
-    # start dfx replica in background
+    pip install "$1"
+
+    # start dfx replica
     dfx start --host 127.0.0.1:8000 &
-    # save PID of dfx process
-    PID=$!
-    # wait for dfx replica to start up
-    while ! grep -q "Dashboard: http://localhost:[0-9]\{4,\}/_/" <(dfx identity list 2>&1); do
+    while ! output=$(dfx identity list) || ! [[ "$output" =~ "Dashboard: http://localhost:[0-9]{4,}/_/" ]]; do
+      echo "Waiting for dfx replica to start up... ($output)"
       sleep 1
     done
+
     # deploy project
     dfx deploy
-    # kill dfx process
-    kill $PID
+
+    # kill dfx replica process
+    pkill -f "dfx start"
+
+    # deactivate Python virtual environment
+    deactivate
+
+    echo "${d} processed."
   fi
 done
