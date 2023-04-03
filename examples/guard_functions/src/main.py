@@ -94,6 +94,26 @@ def prevent_upgrades() -> GuardResult:
     return {"Err": "Upgrades to this canister are disabled"}
 
 
+def return_invalid_type() -> GuardResult:
+    ic.print("return_invalid_type called")
+    return "Something other than a guard result"
+
+
+def return_non_guard_result_object() -> GuardResult:
+    ic.print("return_non_guard_result_object called")
+    return {badProp: "Something other than a guard result"}
+
+
+def return_non_null_ok_value() -> GuardResult:
+    ic.print("non_null_ok_value called")
+    return {Ok: "Something other than null"}
+
+
+def return_non_string_err_value() -> GuardResult:
+    ic.print("non_string_err_value called")
+    return {Err: {badProp: "Something other than a string"}}
+
+
 @query
 def get_state() -> State:
     return state
@@ -149,6 +169,11 @@ def loosely_guarded() -> bool:
     return True
 
 
+@query(guard=allow_all)
+def loosely_guarded_manual() -> manual[bool]:
+    ic.reply(True)
+
+
 @update(guard=increment_counter_and_allow_all)
 def modify_state_guarded() -> bool:
     ic.print("modify_state_guarded called")
@@ -177,4 +202,29 @@ def error_string_guarded() -> bool:
 @query(guard=throw_custom_error)
 def custom_error_guarded() -> bool:
     ic.print("custom_error_guarded called")
+    return True
+
+
+# Execution halted by runtime error
+@query(guard=return_invalid_type)
+def invalid_return_type_guarded() -> bool:
+    ic.print("invalidReturnTypeGuarded called")
+    return True
+
+
+@query(guard=return_non_guard_result_object)
+def bad_object_guarded() -> bool:
+    ic.print("badObjectGuarded called")
+    return True
+
+
+@query(guard=return_non_null_ok_value)
+def non_null_ok_value_guarded() -> bool:
+    ic.print("nonNullOkValueGuarded called")
+    return True
+
+
+@query(guard=return_non_string_err_value)
+def non_string_err_value_guarded() -> bool:
+    ic.print("nonStringErrValueGuarded called")
     return True
