@@ -177,13 +177,13 @@ CanisterResult
     }
 }
 
-fn generate_call_match_arms(external_canisters: &Vec<Service>) -> Vec<TokenStream> {
-    external_canisters
+fn generate_call_match_arms(services: &Vec<Service>) -> Vec<TokenStream> {
+    services
     .iter()
-    .map(|external_canister| {
-        let canister_name = &external_canister.name;
+    .map(|service| {
+        let canister_name = &service.name;
 
-        let arms: Vec<TokenStream> = external_canister
+        let arms: Vec<TokenStream> = service
             .methods
             .iter()
             .map(|method| {
@@ -201,7 +201,7 @@ fn generate_call_match_arms(external_canisters: &Vec<Service>) -> Vec<TokenStrea
 
                 let param_variable_definitions: Vec<TokenStream> = method.params.iter().enumerate().map(|(index, param)| {
                     let variable_name = format_ident!("{}", param.get_prefixed_name());
-                    let variable_type = param.to_type_annotation(&context, method.create_qualified_name(&external_canister.name));
+                    let variable_type = param.to_type_annotation(&context, method.create_qualified_name(&service.name));
                     let actual_index = index + 2;
 
                     quote! {
@@ -234,13 +234,13 @@ fn generate_call_match_arms(external_canisters: &Vec<Service>) -> Vec<TokenStrea
     .collect()
 }
 
-fn generate_call_with_payment_match_arms(external_canisters: &Vec<Service>) -> Vec<TokenStream> {
-    external_canisters
+fn generate_call_with_payment_match_arms(services: &Vec<Service>) -> Vec<TokenStream> {
+    services
     .iter()
-    .map(|external_canister| {
-        let canister_name = &external_canister.name;
+    .map(|service| {
+        let canister_name = &service.name;
 
-        let arms: Vec<TokenStream> = external_canister
+        let arms: Vec<TokenStream> = service
             .methods
             .iter()
             .map(|method| {
@@ -258,7 +258,7 @@ fn generate_call_with_payment_match_arms(external_canisters: &Vec<Service>) -> V
 
                 let param_variable_definitions: Vec<TokenStream> = method.params.iter().enumerate().map(|(index, param)| {
                     let variable_name = format_ident!("{}", param.get_prefixed_name());
-                    let variable_type = param.to_type_annotation(&context, method.create_qualified_name(&external_canister.name));
+                    let variable_type = param.to_type_annotation(&context, method.create_qualified_name(&service.name));
                     let actual_index = index + 2;
 
                     quote! {
@@ -295,13 +295,13 @@ fn generate_call_with_payment_match_arms(external_canisters: &Vec<Service>) -> V
     .collect()
 }
 
-fn generate_call_with_payment128_match_arms(external_canisters: &Vec<Service>) -> Vec<TokenStream> {
-    external_canisters
+fn generate_call_with_payment128_match_arms(services: &Vec<Service>) -> Vec<TokenStream> {
+    services
     .iter()
-    .map(|external_canister| {
-        let canister_name = &external_canister.name;
+    .map(|service| {
+        let canister_name = &service.name;
 
-        let arms: Vec<TokenStream> = external_canister
+        let arms: Vec<TokenStream> = service
             .methods
             .iter()
             .map(|method| {
@@ -319,7 +319,7 @@ fn generate_call_with_payment128_match_arms(external_canisters: &Vec<Service>) -
 
                 let param_variable_definitions: Vec<TokenStream> = method.params.iter().enumerate().map(|(index, param)| {
                     let variable_name = format_ident!("{}", param.get_prefixed_name());
-                    let variable_type = param.to_type_annotation(&context, method.create_qualified_name(&external_canister.name));
+                    let variable_type = param.to_type_annotation(&context, method.create_qualified_name(&service.name));
                     let actual_index = index + 2;
 
                     quote! {

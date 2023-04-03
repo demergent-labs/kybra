@@ -18,9 +18,9 @@ Examples:
 
 Canisters are generally able to call the query or update methods of other canisters in any subnet. We refer to these types of calls as cross-canister calls.
 
-A cross-canister call begins with a definition of the canister to be called, referred to as an external canister.
+A cross-canister call begins with a definition of the canister to be called, referred to as a service.
 
-Imagine a simple external canister called `token_canister`:
+Imagine a simple service called `token_canister`:
 
 ```python
 from kybra import ic, nat64, Principal, StableBTreeMap, update
@@ -40,7 +40,7 @@ def transfer(to: Principal, amount: nat64) -> nat64:
     return amount
 ```
 
-Here's how you would create its external canister definition:
+Here's how you would create its service definition:
 
 ```python
 from kybra import nat64, Principal, Service, service_update, update
@@ -50,7 +50,7 @@ class TokenCanister(Service):
     def transfer(self, to: Principal, amount: nat64) -> nat64: ...
 ```
 
-Once you have a canister definition you can instantiate it with the canister's `Principal` and then invoke its methods.
+Once you have a service definition you can instantiate it with the service's `Principal` and then invoke its methods.
 
 Here's how to instantiate `TokenCanister`:
 
@@ -60,7 +60,7 @@ token_canister = TokenCanister(
 )
 ```
 
-And here's a more complete example of a canister called `payout_canister` that performs a cross-canister call to `token_canister`:
+And here's a more complete example of a service called `payout_canister` that performs a cross-canister call to `token_canister`:
 
 ```python
 from kybra import Async, CanisterResult, nat64, Principal, Service, service_update, update, Variant
