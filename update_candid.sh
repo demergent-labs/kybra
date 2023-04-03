@@ -21,7 +21,7 @@ for dir in */; do
     # save PID of dfx process
     PID=$!
     # wait for dfx replica to start up
-    while ! grep -q "Dashboard: http://localhost:[0-9]*/_/dashboard" <(dfx identity list 2>&1); do
+    while ! grep -q "Dashboard: http://localhost:[0-9]\{4,\}/_/" <(dfx identity list 2>&1); do
       sleep 1
     done
     # deploy project
