@@ -1,5 +1,5 @@
 import { createSnakeCaseProxy, runTests } from 'azle/test';
-import { get_tests as getTests } from './tests';
+import { getTests } from 'azle/examples/guard_functions/test/tests';
 import { createActor } from './dfx_generated/guard_functions';
 
 const functionGuardCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
@@ -8,4 +8,4 @@ const functionGuardCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(getTests(functionGuardCanister));
+runTests(getTests(createSnakeCaseProxy(functionGuardCanister)));
