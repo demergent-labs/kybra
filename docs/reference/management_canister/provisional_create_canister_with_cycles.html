@@ -150,7 +150,7 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
 from kybra.canisters.management import (
     CreateCanisterResult,
     management_canister,
@@ -167,7 +167,7 @@ class ExecuteProvisionalCreateCanisterWithCyclesResult(Variant, total=False):
 def provisional_create_canister_with_cycles() -&gt; (
     Async[ExecuteProvisionalCreateCanisterWithCyclesResult]
 ):
-    canister_result: CanisterResult[
+    canister_result: CallResult[
         ProvisionalCreateCanisterWithCyclesResult
     ] = yield management_canister.provisional_create_canister_with_cycles(
         {&quot;amount&quot;: None, &quot;settings&quot;: None}

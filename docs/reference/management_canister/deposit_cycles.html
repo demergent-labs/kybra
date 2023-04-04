@@ -152,7 +152,7 @@
 </ul>
 <pre><code class="language-python">@update
 def execute_deposit_cycles(canister_id: Principal) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.deposit_cycles(
+    canister_result: CallResult[void] = yield management_canister.deposit_cycles(
         {&quot;canister_id&quot;: canister_id}
     ).with_cycles(1_000_000)
 

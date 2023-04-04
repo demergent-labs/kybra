@@ -152,7 +152,7 @@
 </ul>
 <pre><code class="language-python">from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     nat,
     Principal,
     update,
@@ -171,7 +171,7 @@ class DefaultResult(Variant, total=False):
 def provisional_top_up_canister(
     canister_id: Principal, amount: nat
 ) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[
+    canister_result: CallResult[
         void
     ] = yield management_canister.provisional_top_up_canister(
         {&quot;canister_id&quot;: canister_id, &quot;amount&quot;: amount}

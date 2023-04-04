@@ -151,7 +151,7 @@
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, ic, query, update
+<pre><code class="language-python">from kybra import Async, CallResult, ic, query, update
 from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
 
 
@@ -164,7 +164,7 @@ def xkcd() -&gt; Async[HttpResponse]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request(
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request(
         {
             &quot;url&quot;: &quot;https://xkcd.com/642/info.0.json&quot;,
             &quot;max_response_bytes&quot;: max_response_bytes,
