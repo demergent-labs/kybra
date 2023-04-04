@@ -163,7 +163,7 @@ class ExecuteGetUtxosResult(Variant, total=False):
 
 @update
 def get_utxos(address: str) -&gt; Async[ExecuteGetUtxosResult]:
-    canister_result: CallResult[
+    call_result: CallResult[
         GetUtxosResult
     ] = yield management_canister.bitcoin_get_utxos(
         {&quot;address&quot;: address, &quot;filter&quot;: None, &quot;network&quot;: {&quot;Regtest&quot;: None}}
@@ -171,10 +171,10 @@ def get_utxos(address: str) -&gt; Async[ExecuteGetUtxosResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
-    return {&quot;ok&quot;: canister_result.ok}
+    return {&quot;ok&quot;: call_result.ok}
 </code></pre>
 
                     </main>

@@ -167,16 +167,16 @@ class ExecuteProvisionalCreateCanisterWithCyclesResult(Variant, total=False):
 def provisional_create_canister_with_cycles() -&gt; (
     Async[ExecuteProvisionalCreateCanisterWithCyclesResult]
 ):
-    canister_result: CallResult[
+    call_result: CallResult[
         ProvisionalCreateCanisterWithCyclesResult
     ] = yield management_canister.provisional_create_canister_with_cycles(
         {&quot;amount&quot;: None, &quot;settings&quot;: None}
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
-    provisional_create_canister_with_cycles_result = canister_result.ok
+    provisional_create_canister_with_cycles_result = call_result.ok
 
     return {&quot;ok&quot;: provisional_create_canister_with_cycles_result}
 </code></pre>
