@@ -1,7 +1,7 @@
 from kybra import (
     Async,
     Func,
-    CanisterResult,
+    CallResult,
     init,
     match,
     nat64,
@@ -107,12 +107,12 @@ def complex_func_return_type() -> ComplexFunc:
 
 
 @update
-def get_notifier_from_notifiers_canister() -> Async[
-    GetNotifierFromNotifiersCanisterResult
-]:
+def get_notifier_from_notifiers_canister() -> (
+    Async[GetNotifierFromNotifiersCanisterResult]
+):
     notifiers_canister = Notifier(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
 
-    result: CanisterResult[NotifierFunc] = yield notifiers_canister.get_notifier()
+    result: CallResult[NotifierFunc] = yield notifiers_canister.get_notifier()
 
     return match(
         result,

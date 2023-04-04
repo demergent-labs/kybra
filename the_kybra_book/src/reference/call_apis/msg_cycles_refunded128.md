@@ -9,7 +9,7 @@ Examples:
 ```python
 from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     ic,
     nat,
     update,
@@ -26,7 +26,7 @@ class SendCyclesResult128(Variant, total=False):
 # Reports the number of cycles returned from the Cycles canister
 @update
 def send_cycles128() -> Async[SendCyclesResult128]:
-    result: CanisterResult[nat] = yield cycles.receive_cycles128().with_cycles128(
+    result: CallResult[nat] = yield cycles.receive_cycles128().with_cycles128(
         1_000_000
     )
 

@@ -1,7 +1,7 @@
 from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     match,
     nat,
     Principal,
@@ -35,7 +35,7 @@ state: State = {"created_canister_id": Principal.from_str("aaaaa-aa")}
 
 @update
 def execute_create_canister() -> Async[ExecuteCreateCanisterResult]:
-    create_canister_result_canister_result: CanisterResult[
+    create_canister_result_canister_result: CallResult[
         CreateCanisterResult
     ] = yield management_canister.create_canister({"settings": None}).with_cycles(
         50_000_000_000_000
@@ -57,7 +57,7 @@ def execute_create_canister() -> Async[ExecuteCreateCanisterResult]:
 
 @update
 def execute_update_settings(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.update_settings(
+    canister_result: CallResult[void] = yield management_canister.update_settings(
         {
             "canister_id": canister_id,
             "settings": {
@@ -78,7 +78,7 @@ def execute_update_settings(canister_id: Principal) -> Async[DefaultResult]:
 def execute_install_code(
     canister_id: Principal, wasm_module: blob
 ) -> Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.install_code(
+    canister_result: CallResult[void] = yield management_canister.install_code(
         {
             "mode": {"install": None},
             "canister_id": canister_id,
@@ -94,7 +94,7 @@ def execute_install_code(
 
 @update
 def execute_uninstall_code(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.uninstall_code(
+    canister_result: CallResult[void] = yield management_canister.uninstall_code(
         {"canister_id": canister_id}
     )
 
@@ -105,7 +105,7 @@ def execute_uninstall_code(canister_id: Principal) -> Async[DefaultResult]:
 
 @update
 def execute_start_canister(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.start_canister(
+    canister_result: CallResult[void] = yield management_canister.start_canister(
         {"canister_id": canister_id}
     )
 
@@ -116,7 +116,7 @@ def execute_start_canister(canister_id: Principal) -> Async[DefaultResult]:
 
 @update
 def execute_stop_canister(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.stop_canister(
+    canister_result: CallResult[void] = yield management_canister.stop_canister(
         {"canister_id": canister_id}
     )
 
@@ -127,7 +127,7 @@ def execute_stop_canister(canister_id: Principal) -> Async[DefaultResult]:
 
 @update
 def get_canister_status(args: CanisterStatusArgs) -> Async[GetCanisterStatusResult]:
-    canister_status_result_canister_result: CanisterResult[
+    canister_status_result_canister_result: CallResult[
         CanisterStatusResult
     ] = yield management_canister.canister_status({"canister_id": args["canister_id"]})
 
@@ -142,7 +142,7 @@ def get_canister_status(args: CanisterStatusArgs) -> Async[GetCanisterStatusResu
 
 @update
 def execute_delete_canister(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.delete_canister(
+    canister_result: CallResult[void] = yield management_canister.delete_canister(
         {"canister_id": canister_id}
     )
 
@@ -153,7 +153,7 @@ def execute_delete_canister(canister_id: Principal) -> Async[DefaultResult]:
 
 @update
 def execute_deposit_cycles(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.deposit_cycles(
+    canister_result: CallResult[void] = yield management_canister.deposit_cycles(
         {"canister_id": canister_id}
     ).with_cycles(1_000_000)
 
@@ -164,9 +164,7 @@ def execute_deposit_cycles(canister_id: Principal) -> Async[DefaultResult]:
 
 @update
 def get_raw_rand() -> Async[RawRandResult]:
-    raw_rand_canister_result: CanisterResult[
-        blob
-    ] = yield management_canister.raw_rand()
+    raw_rand_canister_result: CallResult[blob] = yield management_canister.raw_rand()
 
     return match(
         raw_rand_canister_result,
@@ -181,10 +179,10 @@ def get_raw_rand() -> Async[RawRandResult]:
 
 
 @update
-def provisional_create_canister_with_cycles() -> Async[
-    ExecuteProvisionalCreateCanisterWithCyclesResult
-]:
-    canister_result: CanisterResult[
+def provisional_create_canister_with_cycles() -> (
+    Async[ExecuteProvisionalCreateCanisterWithCyclesResult]
+):
+    canister_result: CallResult[
         ProvisionalCreateCanisterWithCyclesResult
     ] = yield management_canister.provisional_create_canister_with_cycles(
         {"amount": None, "settings": None}
@@ -205,7 +203,7 @@ def provisional_create_canister_with_cycles() -> Async[
 def provisional_top_up_canister(
     canister_id: Principal, amount: nat
 ) -> Async[DefaultResult]:
-    canister_result: CanisterResult[
+    canister_result: CallResult[
         void
     ] = yield management_canister.provisional_top_up_canister(
         {"canister_id": canister_id, "amount": amount}

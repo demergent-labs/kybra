@@ -9,7 +9,7 @@ Examples:
 ```python
 @update
 def execute_deposit_cycles(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.deposit_cycles(
+    canister_result: CallResult[void] = yield management_canister.deposit_cycles(
         {"canister_id": canister_id}
     ).with_cycles(1_000_000)
 

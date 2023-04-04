@@ -7,7 +7,7 @@ Examples:
 -   [bitcoin](https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin)
 
 ```python
-from kybra import Async, blob, CanisterResult, null, update, Variant, void
+from kybra import Async, blob, CallResult, null, update, Variant, void
 from kybra.canisters.management import management_canister
 
 BITCOIN_BASE_TRANSACTION_COST = 5_000_000_000
@@ -26,7 +26,7 @@ def send_transaction(transaction: blob) -> Async[SendTransactionResult]:
         + len(transaction) * BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE
     )
 
-    canister_result: CanisterResult[
+    canister_result: CallResult[
         void
     ] = yield management_canister.bitcoin_send_transaction(
         {"transaction": transaction, "network": {"Regtest": None}}

@@ -10,13 +10,13 @@ Examples:
 -   [timers](https://github.com/demergent-labs/kybra/tree/main/examples/timers)
 
 ```python
-from kybra import Async, blob, CanisterResult, update
+from kybra import Async, blob, CallResult, update
 from kybra.canisters.management import management_canister
 
 
 @update
 def get_randomness_directly() -> Async[blob]:
-    randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
+    randomness_result: CallResult[blob] = yield management_canister.raw_rand()
 
     if randomness_result.err is not None:
         return bytes()

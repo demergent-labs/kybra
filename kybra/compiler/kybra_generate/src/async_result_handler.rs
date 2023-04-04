@@ -139,9 +139,9 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             let canister_result_class = _kybra_unwrap_rust_python_result(vm.run_block_expr(
                 vm.new_scope_with_builtins(),
                 r#"
-from kybra import CanisterResult
+from kybra import CallResult
 
-CanisterResult
+CallResult
                 "#
             ), vm);
 

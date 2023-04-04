@@ -1,4 +1,4 @@
-from kybra import Async, blob, CanisterResult, ic, match, Record, update, Variant
+from kybra import Async, blob, CallResult, ic, match, Record, update, Variant
 from kybra.canisters.management import (
     management_canister,
     EcdsaPublicKeyResult,
@@ -27,7 +27,7 @@ class SignResult(Variant, total=False):
 @update
 def public_key() -> Async[PublicKeyResult]:
     caller = ic.caller().bytes
-    canister_result: CanisterResult[
+    canister_result: CallResult[
         EcdsaPublicKeyResult
     ] = yield management_canister.ecdsa_public_key(
         {
@@ -49,7 +49,7 @@ def sign(message_hash: blob) -> Async[SignResult]:
 
     caller = ic.caller().bytes
 
-    canister_result: CanisterResult[
+    canister_result: CallResult[
         SignWithEcdsaResult
     ] = yield management_canister.sign_with_ecdsa(
         {

@@ -1,6 +1,6 @@
 from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     match,
     nat64,
     NotifyResult,
@@ -42,7 +42,7 @@ canister2 = Canister2(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
 
 @update
 def transfer(from_: str, to: str, amount: nat64) -> Async[TransferResult]:
-    result: CanisterResult[nat64] = yield canister2.transfer(from_, to, amount)
+    result: CallResult[nat64] = yield canister2.transfer(from_, to, amount)
 
     return match(
         result,
@@ -55,7 +55,7 @@ def transfer(from_: str, to: str, amount: nat64) -> Async[TransferResult]:
 
 @update
 def balance(id: str) -> Async[BalanceResult]:
-    result: CanisterResult[nat64] = yield canister2.balance(id)
+    result: CallResult[nat64] = yield canister2.balance(id)
 
     return match(
         result,
@@ -68,7 +68,7 @@ def balance(id: str) -> Async[BalanceResult]:
 
 @update
 def account(args: AccountArgs) -> Async[AccountResult]:
-    result: CanisterResult[opt[Account]] = yield canister2.account(args)
+    result: CallResult[opt[Account]] = yield canister2.account(args)
 
     return match(
         result,
@@ -81,7 +81,7 @@ def account(args: AccountArgs) -> Async[AccountResult]:
 
 @update
 def accounts() -> Async[AccountsResult]:
-    result: CanisterResult[list[Account]] = yield canister2.accounts()
+    result: CallResult[list[Account]] = yield canister2.accounts()
 
     return match(
         result,
@@ -94,7 +94,7 @@ def accounts() -> Async[AccountsResult]:
 
 @update
 def trap() -> Async[TrapResult]:
-    result: CanisterResult[str] = yield canister2.trap()
+    result: CallResult[str] = yield canister2.trap()
 
     return match(
         result,

@@ -1,6 +1,6 @@
 from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     match,
     nat,
     Principal,
@@ -21,7 +21,7 @@ counter: nat = 0
 # Composite query calling a query
 @query
 def simple_composite_query() -> Async[StringQueryResult]:
-    result: CanisterResult[str] = yield canister2.simple_query()
+    result: CallResult[str] = yield canister2.simple_query()
 
     return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
@@ -29,7 +29,7 @@ def simple_composite_query() -> Async[StringQueryResult]:
 # Composite query calling a manual query
 @query
 def manual_query() -> Async[StringQueryResult]:
-    result: CanisterResult[str] = yield canister2.manual_query()
+    result: CallResult[str] = yield canister2.manual_query()
 
     return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
@@ -37,7 +37,7 @@ def manual_query() -> Async[StringQueryResult]:
 # Manual composite query calling a manual query
 @query
 def totally_manual_query() -> Async[manual[StringQueryResult]]:
-    result: CanisterResult[str] = yield canister2.manual_query()
+    result: CallResult[str] = yield canister2.manual_query()
     # ic.reply(result)
 
     match(
@@ -52,7 +52,7 @@ def totally_manual_query() -> Async[manual[StringQueryResult]]:
 # Composite query calling another composite query
 @query
 def deep_query() -> Async[StringQueryResult]:
-    result: CanisterResult[StringQueryResult] = yield canister2.deep_query()
+    result: CallResult[StringQueryResult] = yield canister2.deep_query()
 
     return match(
         result,
@@ -72,7 +72,7 @@ def deep_query() -> Async[StringQueryResult]:
 # Composite query calling an update method. SHOULDN'T WORK
 @query
 def update_query() -> Async[StringQueryResult]:
-    result: CanisterResult[str] = yield canister2.update_query()
+    result: CallResult[str] = yield canister2.update_query()
 
     return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
@@ -80,7 +80,7 @@ def update_query() -> Async[StringQueryResult]:
 # Composite query being called by an update method. SHOULDN'T WORK
 @update
 def simple_update() -> Async[StringQueryResult]:
-    result: CanisterResult[str] = yield canister2.deep_query()
+    result: CallResult[str] = yield canister2.deep_query()
 
     return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
@@ -99,8 +99,8 @@ def inc_canister1() -> Async[NatQueryResult]:
     global counter
     counter += 1
 
-    canister1_a_result: CanisterResult[nat] = yield canister1.inc_counter()
-    canister1_b_result: CanisterResult[nat] = (yield canister1.inc_counter())
+    canister1_a_result: CallResult[nat] = yield canister1.inc_counter()
+    canister1_b_result: CallResult[nat] = (yield canister1.inc_counter())
 
     return match(
         canister1_a_result,
@@ -125,8 +125,8 @@ def inc_canister2() -> Async[NatQueryResult]:
     global counter
     counter += 1
 
-    canister2_a_result: CanisterResult[nat] = yield canister2.inc_counter()
-    canister2_b_result: CanisterResult[nat] = (yield canister2.inc_counter())
+    canister2_a_result: CallResult[nat] = yield canister2.inc_counter()
+    canister2_b_result: CallResult[nat] = (yield canister2.inc_counter())
 
     return match(
         canister2_a_result,

@@ -1,8 +1,8 @@
-from kybra import Async, CanisterResult, ic, manual, match, nat, Principal, query, update
+from kybra import Async, CallResult, ic, manual, match, nat, Principal, query, update
 from src.canister1.types import StringQueryResult
 from src.canister3.types import Canister3
 
-canister3 = Canister3(Principal.from_str('r7inp-6aaaa-aaaaa-aaabq-cai'))
+canister3 = Canister3(Principal.from_str("r7inp-6aaaa-aaaaa-aaabq-cai"))
 
 counter: nat = 0
 
@@ -31,9 +31,6 @@ def manual_query() -> manual[str]:
 
 @query
 def deep_query() -> Async[StringQueryResult]:
-    result: CanisterResult[str] = yield canister3.deep_query()
+    result: CallResult[str] = yield canister3.deep_query()
 
-    return match(result, {
-        "Ok": lambda ok: {"Ok": ok},
-        "Err": lambda err: {"Err": err}
-    })
+    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})

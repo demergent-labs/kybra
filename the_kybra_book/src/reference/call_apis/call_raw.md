@@ -11,7 +11,7 @@ Examples:
 from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     ic,
     nat64,
     Principal,
@@ -29,7 +29,7 @@ class ExecuteCallRawResult(Variant, total=False):
 def execute_call_raw(
     canister_id: Principal, method: str, candid_args: str, payment: nat64
 ) -> Async[ExecuteCallRawResult]:
-    canister_result: CanisterResult[blob] = yield ic.call_raw(
+    canister_result: CallResult[blob] = yield ic.call_raw(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 

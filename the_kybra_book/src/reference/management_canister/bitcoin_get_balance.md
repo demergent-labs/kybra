@@ -7,7 +7,7 @@ Examples:
 -   [bitcoin](https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin)
 
 ```python
-from kybra import Async, CanisterResult, update, Variant
+from kybra import Async, CallResult, update, Variant
 from kybra.canisters.management import management_canister, Satoshi
 
 BITCOIN_API_CYCLE_COST = 100_000_000
@@ -20,7 +20,7 @@ class ExecuteGetBalanceResult(Variant, total=False):
 
 @update
 def get_balance(address: str) -> Async[ExecuteGetBalanceResult]:
-    canister_result: CanisterResult[
+    canister_result: CallResult[
         Satoshi
     ] = yield management_canister.bitcoin_get_balance(
         {"address": address, "min_confirmations": None, "network": {"Regtest": None}}

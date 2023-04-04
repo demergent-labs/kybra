@@ -10,7 +10,7 @@ Examples:
 from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     Principal,
     update,
     Variant,
@@ -28,7 +28,7 @@ class DefaultResult(Variant, total=False):
 def execute_install_code(
     canister_id: Principal, wasm_module: blob
 ) -> Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.install_code(
+    canister_result: CallResult[void] = yield management_canister.install_code(
         {
             "mode": {"install": None},
             "canister_id": canister_id,

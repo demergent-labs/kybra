@@ -1,6 +1,6 @@
 from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     ic,
     match,
     nat,
@@ -28,7 +28,7 @@ class SendCyclesResult128(Variant, total=False):
 
 @update
 def send_cycles() -> Async[SendCyclesResult]:
-    result: CanisterResult[nat64] = yield cycles.receive_cycles().with_cycles(1_000_000)
+    result: CallResult[nat64] = yield cycles.receive_cycles().with_cycles(1_000_000)
 
     return match(
         result,
@@ -49,9 +49,7 @@ def send_cycles_notify() -> NotifyResult:
 
 @update
 def send_cycles128() -> Async[SendCyclesResult128]:
-    result: CanisterResult[nat] = yield cycles.receive_cycles128().with_cycles128(
-        1_000_000
-    )
+    result: CallResult[nat] = yield cycles.receive_cycles128().with_cycles128(1_000_000)
 
     return match(
         result,

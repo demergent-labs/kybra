@@ -21,7 +21,7 @@ Examples:
 ```python
 from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     nat64,
     Principal,
     Service,
@@ -47,7 +47,7 @@ class PayoutResult(Variant, total=False):
 
 @update
 def payout(to: Principal, amount: nat64) -> Async[PayoutResult]:
-    result: CanisterResult[nat64] = yield token_canister.transfer(to, amount)
+    result: CallResult[nat64] = yield token_canister.transfer(to, amount)
 
     if result.err is not None:
         return {"err": result.err}

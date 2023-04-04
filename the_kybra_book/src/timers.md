@@ -6,7 +6,7 @@ This chapter is a work in progress.
 from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     Duration,
     ic,
     nat8,
@@ -119,7 +119,7 @@ def update_capture_status(value: str):
 def single_cross_canister_timer_callback() -> Async[blob]:
     ic.print("single_cross_canister_timer_callback")
 
-    result: CanisterResult[blob] = yield management_canister.raw_rand()
+    result: CallResult[blob] = yield management_canister.raw_rand()
 
     if result.err is not None:
         return bytes()
@@ -133,7 +133,7 @@ def single_cross_canister_timer_callback() -> Async[blob]:
 def repeat_cross_canister_timer_callback() -> Async[blob]:
     ic.print("repeat_cross_canister_timer_callback")
 
-    result: CanisterResult[blob] = yield management_canister.raw_rand()
+    result: CallResult[blob] = yield management_canister.raw_rand()
 
     if result.err is not None:
         return bytes()

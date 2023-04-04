@@ -1,6 +1,6 @@
 from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     match,
     nat32,
     nat64,
@@ -36,7 +36,7 @@ class ExecuteTransferResult(Variant, total=False):
 def execute_transfer(
     to: Address, amount: nat64, fee: nat64, created_at_time: opt[nat64]
 ) -> Async[ExecuteTransferResult]:
-    transfer_result_canister_result: CanisterResult[
+    transfer_result_canister_result: CallResult[
         TransferResult
     ] = yield icp_canister.transfer(
         {
@@ -67,7 +67,7 @@ class GetAccountBalanceResult(Variant, total=False):
 
 @update
 def get_account_balance(address: Address) -> Async[GetAccountBalanceResult]:
-    tokens_canister_result: CanisterResult[Tokens] = yield icp_canister.account_balance(
+    tokens_canister_result: CallResult[Tokens] = yield icp_canister.account_balance(
         {"account": bytes.fromhex(address)}
     )
 
@@ -87,7 +87,7 @@ class GetTransferFeeResult(Variant, total=False):
 
 @update
 def get_transfer_fee() -> Async[GetTransferFeeResult]:
-    transfer_fee_canister_result: CanisterResult[
+    transfer_fee_canister_result: CallResult[
         TransferFee
     ] = yield icp_canister.transfer_fee({})
 
@@ -107,9 +107,9 @@ class GetBlocksResult(Variant, total=False):
 
 @update
 def get_blocks(get_blocks_args: GetBlocksArgs) -> Async[GetBlocksResult]:
-    canister_result: CanisterResult[
-        QueryBlocksResponse
-    ] = yield icp_canister.query_blocks(get_blocks_args)
+    canister_result: CallResult[QueryBlocksResponse] = yield icp_canister.query_blocks(
+        get_blocks_args
+    )
 
     return match(
         canister_result,
@@ -127,7 +127,7 @@ class GetSymbolResult(Variant, total=False):
 
 @update
 def get_symbol() -> Async[GetSymbolResult]:
-    symbol_result_canister_result: CanisterResult[
+    symbol_result_canister_result: CallResult[
         SymbolResult
     ] = yield icp_canister.symbol()
 
@@ -147,7 +147,7 @@ class GetNameResult(Variant, total=False):
 
 @update
 def get_name() -> Async[GetNameResult]:
-    name_result_canister_result: CanisterResult[NameResult] = yield icp_canister.name()
+    name_result_canister_result: CallResult[NameResult] = yield icp_canister.name()
 
     return match(
         name_result_canister_result,
@@ -165,7 +165,7 @@ class GetDecimalsResult(Variant, total=False):
 
 @update
 def get_decimals() -> Async[GetDecimalsResult]:
-    decimals_result_canister_result: CanisterResult[
+    decimals_result_canister_result: CallResult[
         DecimalsResult
     ] = yield icp_canister.decimals()
 
@@ -185,7 +185,7 @@ class GetArchivesResult(Variant, total=False):
 
 @update
 def get_archives() -> Async[GetArchivesResult]:
-    archives_canister_result: CanisterResult[Archives] = yield icp_canister.archives()
+    archives_canister_result: CallResult[Archives] = yield icp_canister.archives()
 
     return match(
         archives_canister_result,
