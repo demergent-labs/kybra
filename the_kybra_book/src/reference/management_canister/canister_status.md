@@ -22,14 +22,14 @@ class GetCanisterStatusResult(Variant, total=False):
 
 @update
 def get_canister_status(args: CanisterStatusArgs) -> Async[GetCanisterStatusResult]:
-    canister_status_result_canister_result: CallResult[
+    canister_status_result_call_result: CallResult[
         CanisterStatusResult
     ] = yield management_canister.canister_status({"canister_id": args["canister_id"]})
 
-    if canister_status_result_canister_result.err is not None:
-        return {"err": canister_status_result_canister_result.err}
+    if canister_status_result_call_result.err is not None:
+        return {"err": canister_status_result_call_result.err}
 
-    canister_status_result = canister_status_result_canister_result.ok
+    canister_status_result = canister_status_result_call_result.ok
 
     return {"ok": canister_status_result}
 ```

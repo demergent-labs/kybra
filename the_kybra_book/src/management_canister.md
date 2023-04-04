@@ -14,15 +14,15 @@ class RandomBytesResult(Variant, total=False):
 
 @update
 def random_bytes() -> Async[RandomBytesResult]:
-    canister_result: CallResult[blob] = yield management_canister.raw_rand()
+    call_result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if canister_result.err is not None:
+    if call_result.err is not None:
         return {
-            'err': canister_result.err
+            'err': call_result.err
         }
 
     return {
-        'ok': canister_result.ok
+        'ok': call_result.ok
     }
 ```
 

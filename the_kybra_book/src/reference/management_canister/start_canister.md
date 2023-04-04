@@ -25,12 +25,12 @@ class DefaultResult(Variant, total=False):
 
 @update
 def execute_start_canister(canister_id: Principal) -> Async[DefaultResult]:
-    canister_result: CallResult[void] = yield management_canister.start_canister(
+    call_result: CallResult[void] = yield management_canister.start_canister(
         {"canister_id": canister_id}
     )
 
-    if canister_result.err is not None:
-        return {"err": canister_result.err}
+    if call_result.err is not None:
+        return {"err": call_result.err}
 
     return {"ok": True}
 ```

@@ -20,7 +20,7 @@ class ExecuteGetBalanceResult(Variant, total=False):
 
 @update
 def get_balance(address: str) -> Async[ExecuteGetBalanceResult]:
-    canister_result: CallResult[
+    call_result: CallResult[
         Satoshi
     ] = yield management_canister.bitcoin_get_balance(
         {"address": address, "min_confirmations": None, "network": {"Regtest": None}}
@@ -28,8 +28,8 @@ def get_balance(address: str) -> Async[ExecuteGetBalanceResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if canister_result.err is not None:
-        return {"err": canister_result.err}
+    if call_result.err is not None:
+        return {"err": call_result.err}
 
-    return {"ok": canister_result.ok}
+    return {"ok": call_result.ok}
 ```

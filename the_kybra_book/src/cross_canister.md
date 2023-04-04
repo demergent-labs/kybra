@@ -166,14 +166,14 @@ def payout(
     to: Principal,
     amount: nat64
 ) -> Async[PayoutResult]:
-    canister_result: CallResult[TransferResult] = yield token_canister.transfer(to, amount)
+    call_result: CallResult[TransferResult] = yield token_canister.transfer(to, amount)
 
-    if canister_result.err is not None:
+    if call_result.err is not None:
         return {
-            'err': canister_result.err
+            'err': call_result.err
         }
 
-    transfer_result = canister_result.ok
+    transfer_result = call_result.ok
 
     if 'err' in transfer_result:
         return {
@@ -212,15 +212,15 @@ class QuerySomeCanisterResult(Variant, total=False):
 
 @query
 def query_some_canister() -> Async[QuerySomeCanisterResult]:
-    canister_result: CallResult[bool] = yield some_canister.query_for_boolean()
+    call_result: CallResult[bool] = yield some_canister.query_for_boolean()
 
-    if canister_result.err is not None:
+    if call_result.err is not None:
         return {
-            'err': canister_result.err
+            'err': call_result.err
         }
 
     return {
-        'ok': canister_result.ok
+        'ok': call_result.ok
     }
 ```
 

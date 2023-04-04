@@ -18,16 +18,16 @@ class ExecuteCreateCanisterResult(Variant, total=False):
 
 @update
 def execute_create_canister() -> Async[ExecuteCreateCanisterResult]:
-    create_canister_result_canister_result: CallResult[
+    create_canister_result_call_result: CallResult[
         CreateCanisterResult
     ] = yield management_canister.create_canister({"settings": None}).with_cycles(
         50_000_000_000_000
     )
 
-    if create_canister_result_canister_result.err is not None:
-        return {"err": create_canister_result_canister_result.err}
+    if create_canister_result_call_result.err is not None:
+        return {"err": create_canister_result_call_result.err}
 
-    create_canister_result = create_canister_result_canister_result.ok
+    create_canister_result = create_canister_result_call_result.ok
 
     return {"ok": create_canister_result}
 ```

@@ -27,7 +27,7 @@ class SignResult(Variant, total=False):
 @update
 def public_key() -> Async[PublicKeyResult]:
     caller = ic.caller().bytes
-    canister_result: CallResult[
+    call_result: CallResult[
         EcdsaPublicKeyResult
     ] = yield management_canister.ecdsa_public_key(
         {
@@ -38,7 +38,7 @@ def public_key() -> Async[PublicKeyResult]:
     )
 
     return match(
-        canister_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+        call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
     )
 
 
@@ -49,7 +49,7 @@ def sign(message_hash: blob) -> Async[SignResult]:
 
     caller = ic.caller().bytes
 
-    canister_result: CallResult[
+    call_result: CallResult[
         SignWithEcdsaResult
     ] = yield management_canister.sign_with_ecdsa(
         {
@@ -62,5 +62,5 @@ def sign(message_hash: blob) -> Async[SignResult]:
     )
 
     return match(
-        canister_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+        call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
     )

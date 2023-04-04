@@ -29,12 +29,12 @@ class ExecuteCallRawResult(Variant, total=False):
 def execute_call_raw(
     canister_id: Principal, method: str, candid_args: str, payment: nat64
 ) -> Async[ExecuteCallRawResult]:
-    canister_result: CallResult[blob] = yield ic.call_raw(
+    call_result: CallResult[blob] = yield ic.call_raw(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
-    if canister_result.err is not None:
-        return {"err": canister_result.err}
+    if call_result.err is not None:
+        return {"err": call_result.err}
 
-    return {"ok": ic.candid_decode(canister_result.ok)}
+    return {"ok": ic.candid_decode(call_result.ok)}
 ```

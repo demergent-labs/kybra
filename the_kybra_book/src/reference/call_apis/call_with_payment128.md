@@ -16,7 +16,7 @@ from src.types import DefaultResult
 def execute_install_code(
     canister_id: Principal, wasm_module: blob
 ) -> Async[DefaultResult]:
-    canister_result: CallResult[void] = yield management_canister.install_code(
+    call_result: CallResult[void] = yield management_canister.install_code(
         {
             "mode": {"install": None},
             "canister_id": canister_id,
@@ -25,8 +25,8 @@ def execute_install_code(
         }
     ).with_cycles128(100_000_000_000)
 
-    if canister_result.err is not None:
-        return {"err": canister_result.err}
+    if call_result.err is not None:
+        return {"err": call_result.err}
 
     return {"ok": True}
 ```

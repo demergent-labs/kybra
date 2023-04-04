@@ -136,7 +136,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
         fn _kybra_create_call_result_instance<T>(vm: &rustpython::vm::VirtualMachine, call_result: CallResult<T>) -> PyObjectRef
             where T: for<'a> CdkActTryIntoVmValue<&'a rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef>
         {
-            let canister_result_class = _kybra_unwrap_rust_python_result(vm.run_block_expr(
+            let call_result_class = _kybra_unwrap_rust_python_result(vm.run_block_expr(
                 vm.new_scope_with_builtins(),
                 r#"
 from kybra import CallResult
@@ -147,7 +147,7 @@ CallResult
 
             match call_result {
                 Ok(ok) => {
-                    let method_result = vm.invoke(&canister_result_class, (ok.try_into_vm_value(vm).unwrap(), vm.ctx.none()));
+                    let method_result = vm.invoke(&call_result_class, (ok.try_into_vm_value(vm).unwrap(), vm.ctx.none()));
 
                     _kybra_unwrap_rust_python_result(method_result, vm)
 
@@ -161,7 +161,7 @@ CallResult
                 Err(err) => {
                     let err_string = format!("Rejection code {rejection_code}, {error_message}", rejection_code = (err.0 as i32).to_string(), error_message = err.1);
 
-                    let method_result = vm.invoke(&canister_result_class, (vm.ctx.none(), err_string.try_into_vm_value(vm).unwrap()));
+                    let method_result = vm.invoke(&call_result_class, (vm.ctx.none(), err_string.try_into_vm_value(vm).unwrap()));
 
                     _kybra_unwrap_rust_python_result(method_result, vm)
 

@@ -20,7 +20,7 @@ class GetCurrentFeePercentilesResult(Variant, total=False):
 
 @update
 def get_current_fee_percentiles() -> Async[GetCurrentFeePercentilesResult]:
-    canister_result: CallResult[
+    call_result: CallResult[
         list[MillisatoshiPerByte]
     ] = yield management_canister.bitcoin_get_current_fee_percentiles(
         {"network": {"Regtest": None}}
@@ -28,8 +28,8 @@ def get_current_fee_percentiles() -> Async[GetCurrentFeePercentilesResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if canister_result.err is not None:
-        return {"err": canister_result.err}
+    if call_result.err is not None:
+        return {"err": call_result.err}
 
-    return {"ok": canister_result.ok}
+    return {"ok": call_result.ok}
 ```

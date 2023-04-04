@@ -26,7 +26,7 @@ def send_transaction(transaction: blob) -> Async[SendTransactionResult]:
         + len(transaction) * BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE
     )
 
-    canister_result: CallResult[
+    call_result: CallResult[
         void
     ] = yield management_canister.bitcoin_send_transaction(
         {"transaction": transaction, "network": {"Regtest": None}}
@@ -34,8 +34,8 @@ def send_transaction(transaction: blob) -> Async[SendTransactionResult]:
         transaction_fee
     )
 
-    if canister_result.err is not None:
-        return {"err": canister_result.err}
+    if call_result.err is not None:
+        return {"err": call_result.err}
 
-    return {"ok": canister_result.ok}
+    return {"ok": call_result.ok}
 ```
