@@ -1,4 +1,4 @@
-service : {
+service : () -> {
   balance : (text) -> (nat64) query;
   initialize_supply : (text, text, text, nat64) -> (bool);
   name : () -> (text) query;

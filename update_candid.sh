@@ -1,35 +1,49 @@
 #!/bin/bash
 
-for d in */ ; do
-  if [ -f "${d}dfx.json" ]; then
-    echo "Processing ${d}..."
+# Usage:
+# cd examples
+# ../update_candid
+# cd motoko_examples
+# ../update_candid ../..
 
-    # deactivate any existing Python virtual environment
-    deactivate &>/dev/null || true
+# set path to kybra package. Default to ../ (for when run from example dir)
+KYBRA_PATH="${1:-../}"
 
-    # start a new Python virtual environment
+upgrade_cadid()
+{
+    # deactivate current virtual environment if running
+    deactivate 2>/dev/null
+    # start a new virtual environment
     ~/.pyenv/versions/3.10.7/bin/python -m venv venv
+    # activate new virtual environment
     source venv/bin/activate
-
     # install kybra package
-    pip install "$1"
+    pip install $KYBRA_PATH
+    # start dfx replica in background
+    dfx start --host 127.0.0.1:8000 --clean &
 
-    # start dfx replica
-    dfx start --host 127.0.0.1:8000 &
-    while ! output=$(dfx identity list) || ! [[ "$output" =~ "Dashboard: http://localhost:[0-9]{4,}/_/" ]]; do
-      echo "Waiting for dfx replica to start up... ($output)"
-      sleep 1
-    done
+    sleep 7
 
-    # deploy project
-    dfx deploy
+  dfx canister create --all
+  dfx build
+    deactivate 2>/dev/null
+  killall dfx
+}
 
-    # kill dfx replica process
-    pkill -f "dfx start"
+upgrade_all()
+{
 
-    # deactivate Python virtual environment
-    deactivate
-
-    echo "${d} processed."
+for dir in */; do
+  echo "Looking at directory: $dir"
+  # check if dfx.json file exists in directory
+  if [ -f "$dir/dfx.json" ]; then
+    echo "Processing directory: $dir"
+    cd $dir
+    upgrade_cadid
+    sleep 5
+    cd ..
   fi
 done
+}
+
+upgrade_all
