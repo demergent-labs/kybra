@@ -408,7 +408,7 @@ class ic(Generic[T]):
         _kybra_ic._kybra_trap(message)  # type: ignore
 
 
-class Canister:
+class Service:
     canister_id: Principal
 
     def __init__(self, canister_id: Principal):

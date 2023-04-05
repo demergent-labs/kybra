@@ -75,7 +75,6 @@ impl SourceMapped<&Located<StmtKind>> {
                 name: name.clone(),
                 return_type: ReturnType::new(self.build_return_type()?),
                 is_async: self.is_async(),
-                cdk_name: "kybra".to_string(),
                 guard_function_name: self.get_guard_function_name()?,
             }),
             _ => Err(crate::errors::unreachable()),

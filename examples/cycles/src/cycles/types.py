@@ -1,7 +1,7 @@
-from kybra import Canister, nat, nat64, Principal, service_update
+from kybra import nat, nat64, Principal, Service, service_update
 
 
-class Cycles(Canister):
+class Cycles(Service):
     @service_update
     def receive_cycles(self) -> nat64: ...
 

@@ -37,7 +37,7 @@ pub fn generate() -> TokenStream {
                 }
             };
 
-            ic_cdk::timer::set_timer_interval(interval, closure).try_into_vm_value(vm).unwrap()
+            ic_cdk_timers::set_timer_interval(interval, closure).try_into_vm_value(vm).unwrap()
         }
     }
 }

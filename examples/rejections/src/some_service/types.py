@@ -1,7 +1,7 @@
-from kybra import Canister, empty, Principal, service_query
+from kybra import empty, Principal, Service, service_query
 
 
-class SomeService(Canister):
+class SomeService(Service):
     @service_query
     def reject(self, message: str) -> empty: ...
 

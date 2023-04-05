@@ -1,0 +1,17 @@
+type Update1Result = variant { Ok : text; Err : text };
+service : () -> {
+  service_cross_canister_call : (
+      service { query1 : () -> (bool) query; update1 : () -> (text) },
+    ) -> (Update1Result);
+  service_list : (
+      vec service { query1 : () -> (bool) query; update1 : () -> (text) },
+    ) -> (vec service { query1 : () -> (bool) query; update1 : () -> (text) });
+  service_param : (
+      service { query1 : () -> (bool) query; update1 : () -> (text) },
+    ) -> (
+      service { query1 : () -> (bool) query; update1 : () -> (text) },
+    ) query;
+  service_return_type : () -> (
+      service { query1 : () -> (bool) query; update1 : () -> (text) },
+    ) query;
+}

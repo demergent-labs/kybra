@@ -9,6 +9,7 @@ pub mod func;
 pub mod opt;
 pub mod primitive;
 pub mod record;
+pub mod service;
 pub mod tuple;
 pub mod type_alias;
 pub mod type_ref;

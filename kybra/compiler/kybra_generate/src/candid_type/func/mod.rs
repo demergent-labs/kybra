@@ -1,5 +1,6 @@
 use cdk_framework::act::node::{
-    candid::{func::Mode, Func, Primitive},
+    candid::{Func, Primitive},
+    node_parts::mode::Mode,
     CandidType, ReturnType,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};

@@ -18,7 +18,7 @@ pub fn generate() -> TokenStream {
 
         impl KybraTryIntoVec for ic_cdk::export::Principal {}
 
-        impl KybraTryIntoVec for ic_cdk::timer::TimerId {}
+        impl KybraTryIntoVec for ic_cdk_timers::TimerId {}
 
         impl KybraTryIntoVec for ic_cdk::api::call::RejectionCode {}
 

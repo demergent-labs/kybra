@@ -1,8 +1,8 @@
-from kybra import Async, Canister, ic, Principal, RejectionCode, service_update, update, void
+from kybra import Async, ic, Principal, RejectionCode, Service, service_update, update, void
 from src.some_service.types import some_service
 
 
-class Nonexistent(Canister):
+class Nonexistent(Service):
     @service_update
     def method(self) -> void: ...
 
