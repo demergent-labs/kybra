@@ -51,10 +51,10 @@ pub fn generate() -> TokenStream {
             }
         }
 
-        impl CdkActTryFromVmValue<ic_cdk::timer::TimerId, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::timer::TimerId, CdkActTryFromVmValueError> {
+        impl CdkActTryFromVmValue<ic_cdk_timers::TimerId, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk_timers::TimerId, CdkActTryFromVmValueError> {
                 let vm_value_as_u64: u64 = _kybra_unwrap_rust_python_result(self.try_into_value(vm), vm);
-                Ok(ic_cdk::timer::TimerId::from(slotmap::KeyData::from_ffi(vm_value_as_u64)))
+                Ok(ic_cdk_timers::TimerId::from(slotmap::KeyData::from_ffi(vm_value_as_u64)))
             }
         }
 

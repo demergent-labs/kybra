@@ -1,9 +1,9 @@
-from kybra import blob, Func, Canister, Oneway, service_query, void
+from kybra import blob, Func, Oneway, Service, service_query, void
 
 NotifierFunc = Func(Oneway[[blob], void])
 
 
-class Notifier(Canister):
+class Notifier(Service):
     @service_query
     def get_notifier(self) -> NotifierFunc:
         ...

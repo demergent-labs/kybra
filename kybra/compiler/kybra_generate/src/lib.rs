@@ -8,7 +8,6 @@ pub mod candid_type;
 pub mod canister_method;
 pub mod debug;
 mod errors;
-pub mod external_canister;
 pub mod get_name;
 pub mod guard_function;
 pub mod header;

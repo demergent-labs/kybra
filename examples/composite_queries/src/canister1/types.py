@@ -1,7 +1,7 @@
-from kybra import Canister, nat, service_query, Variant
+from kybra import nat, Service, service_query, Variant
 
 
-class Canister1(Canister):
+class Canister1(Service):
     @service_query
     def inc_counter(self) -> nat: ...
 

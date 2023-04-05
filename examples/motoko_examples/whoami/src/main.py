@@ -1,7 +1,7 @@
-from kybra import Async, Canister, CanisterResult, ic, init, post_upgrade, Principal, query, service_query, service_update, update, Variant, void
+from kybra import Async, CanisterResult, ic, init, post_upgrade, Principal, query, Service, service_query, service_update, update, Variant, void
 
 
-class WhoAmICanister(Canister):
+class WhoAmICanister(Service):
     @service_query
     def installer(self) -> Principal: ...
 

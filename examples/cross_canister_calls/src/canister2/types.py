@@ -1,4 +1,4 @@
-from kybra import Canister, nat64, opt, Record, service_query, service_update, void
+from kybra import nat64, opt, Record, Service, service_query, service_update, void
 from typing import TypedDict
 
 
@@ -11,7 +11,7 @@ class AccountArgs(Record):
     id: str
 
 
-class Canister2(Canister):
+class Canister2(Service):
     @service_update
     def transfer(self, from_: str, to: str, amount: nat64) -> nat64: ...
 

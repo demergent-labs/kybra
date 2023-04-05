@@ -1,6 +1,6 @@
 use cdk_framework::act::node::{
+    candid::Service,
     canister_method::{QueryMethod, UpdateMethod},
-    ExternalCanister,
 };
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -24,7 +24,7 @@ mod functions;
 pub fn generate(
     update_methods: &Vec<UpdateMethod>,
     query_methods: &Vec<QueryMethod>,
-    external_canisters: &Vec<ExternalCanister>,
+    services: &Vec<Service>,
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
 ) -> TokenStream {
     let accept_message = accept_message::generate();
@@ -45,10 +45,9 @@ pub fn generate(
     let msg_cycles_available128 = msg_cycles_available128::generate();
     let msg_cycles_refunded = msg_cycles_refunded::generate();
     let msg_cycles_refunded128 = msg_cycles_refunded128::generate();
-    let notify_functions = notify_functions::generate(external_canisters);
+    let notify_functions = notify_functions::generate(services);
     let notify_raw = notify_raw::generate();
-    let notify_with_payment128_functions =
-        notify_with_payment128_functions::generate(external_canisters);
+    let notify_with_payment128_functions = notify_with_payment128_functions::generate(services);
     let performance_counter = performance_counter::generate();
     let print = print::generate();
     let reject = reject::generate();

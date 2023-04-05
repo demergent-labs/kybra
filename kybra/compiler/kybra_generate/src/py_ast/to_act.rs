@@ -14,7 +14,7 @@ use crate::{
 impl PyAst {
     pub fn to_act(&self) -> KybraResult<AbstractCanisterTree> {
         let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes()?;
-        let external_canisters = self.build_external_canisters()?;
+        let services = self.build_services()?;
 
         let canister_methods = CanisterMethods {
             heartbeat_method: self.build_heartbeat_method()?,
@@ -32,6 +32,7 @@ impl PyAst {
             tuples: self.build_tuples()?,
             type_aliases: self.build_type_aliases()?,
             variants: self.build_variants()?,
+            services: services.clone(),
         };
 
         let vm_value_conversion = VmValueConversion {
@@ -45,12 +46,11 @@ impl PyAst {
             body: body::generate(
                 &canister_methods.update_methods,
                 &canister_methods.query_methods,
-                &external_canisters,
+                &services,
                 &stable_b_tree_map_nodes,
             ),
             candid_types,
             canister_methods,
-            external_canisters,
             guard_functions: self.build_guard_functions()?,
             vm_value_conversion,
             keywords: keywords::get_python_keywords(),

@@ -7,17 +7,16 @@ edition = "2018"
 
 [profile.release]
 opt-level = 'z'
-
-[profile.test]
-opt-level = 'z'
+codegen-units = 1
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-ic-cdk = {{ version = "0.6.8", features = ["timers"] }}
+ic-cdk = "0.8.0-beta"
 ic-cdk-macros = "0.6.8"
-candid = "0.8.4"
+ic-cdk-timers = "0.1.0"
+candid = {{ version = "0.9.0-beta.2", features = ["parser"] }}
 kybra-vm-value-derive = {{ path = "./kybra_vm_value_derive" }}
 # TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
 # rustpython = {{ git = "https://github.com/demergent-labs/RustPython", rev = "9ca024b30446249cc2a584543bbc658ab4b65c6f", default-features = false, features = ["stdlib", "freeze-stdlib"] }}
