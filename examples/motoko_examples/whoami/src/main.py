@@ -1,21 +1,40 @@
-from kybra import Async, CanisterResult, ic, init, post_upgrade, Principal, query, Service, service_query, service_update, update, Variant, void
+from kybra import (
+    Async,
+    CanisterResult,
+    ic,
+    init,
+    post_upgrade,
+    Principal,
+    query,
+    Service,
+    service_query,
+    service_update,
+    update,
+    Variant,
+    void,
+)
 
 
 class WhoAmICanister(Service):
     @service_query
-    def installer(self) -> Principal: ...
+    def installer(self) -> Principal:
+        ...
 
     @service_query
-    def argument(self) -> Principal: ...
+    def argument(self) -> Principal:
+        ...
 
     @service_update
-    def whoami(self) -> Principal: ...
+    def whoami(self) -> Principal:
+        ...
 
     @service_update
-    def id(self) -> Principal: ...
+    def id(self) -> Principal:
+        ...
 
     @service_query
-    def idQuick(self) -> Principal: ...
+    def idQuick(self) -> Principal:
+        ...
 
 
 class WhoAmIResult(Variant, total=False):
@@ -23,8 +42,8 @@ class WhoAmIResult(Variant, total=False):
     err: str
 
 
-install: Principal = Principal.from_str('aaaaa-aa')
-someone: Principal = Principal.from_str('aaaaa-aa')
+install: Principal = Principal.from_str("aaaaa-aa")
+someone: Principal = Principal.from_str("aaaaa-aa")
 
 
 @init
@@ -64,7 +83,7 @@ def whoami() -> Principal:
 def id() -> Async[Principal]:
     thisCanister = WhoAmICanister(ic.id())
     result: CanisterResult[Principal] = yield thisCanister.whoami()
-    return result.Ok if result.Ok is not None else Principal.from_str('aaaaa-aa')
+    return result.Ok if result.Ok is not None else Principal.from_str("aaaaa-aa")
 
 
 @query

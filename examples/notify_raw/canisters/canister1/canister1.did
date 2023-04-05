@@ -7,5 +7,5 @@ type RejectionCode = variant {
   SysFatal;
   CanisterReject;
 };
-type SendNotificationResult = variant { ok : bool; err : RejectionCode };
+type SendNotificationResult = variant { Ok : bool; Err : RejectionCode };
 service : () -> { send_notification : () -> (SendNotificationResult) }
