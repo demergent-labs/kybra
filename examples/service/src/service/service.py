@@ -1,6 +1,6 @@
 from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     Principal,
     query,
     Service,
@@ -46,7 +46,7 @@ def service_list(some_services: list[SomeService]) -> list[SomeService]:
 
 @update
 def service_cross_canister_call(some_service: SomeService) -> Async[Update1Result]:
-    result: CanisterResult[str] = yield some_service.update1()
+    result: CallResult[str] = yield some_service.update1()
 
     if result.Err is not None:
         return {"Err": result.Err}
