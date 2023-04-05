@@ -78,6 +78,11 @@ def update_float32() -> manual[float32]:
 
 
 @update
+def update_inline_type() -> manual[tuple[str, str]]:
+    ic.reply(('Hello', 'World'))
+
+
+@update
 def update_int8() -> manual[int8]:
     ic.reply(-100)
 

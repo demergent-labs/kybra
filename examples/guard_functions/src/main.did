@@ -1,7 +1,18 @@
+type State = record { counter : int32; heartbeat_tick : int32 };
 service : () -> {
-  accessible : () -> (bool) query;
-  guarded_manual : () -> (bool) query;
-  inaccessible : () -> (bool) query;
-  inaccessible_update : () -> (bool);
-  unguarded : () -> (bool) query;
+  bad_object_guarded : () -> (bool) query;
+  call_expression_with_empty_options_object : () -> (bool) query;
+  call_expression_without_options_object : () -> (bool) query;
+  custom_error_guarded : () -> (bool) query;
+  error_string_guarded : () -> (bool) query;
+  get_state : () -> (State) query;
+  identifier_annotation : () -> (bool) query;
+  invalid_return_type_guarded : () -> (bool) query;
+  loosely_guarded : () -> (bool) query;
+  loosely_guarded_manual : () -> (bool) query;
+  modify_state_guarded : () -> (bool);
+  non_null_ok_value_guarded : () -> (bool) query;
+  non_string_err_value_guarded : () -> (bool) query;
+  tightly_guarded : () -> (bool) query;
+  unallowed_method : () -> (bool);
 }

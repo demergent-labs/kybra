@@ -26,6 +26,7 @@ service : () -> {
   reply_raw : () -> (ManualReply_1) query;
   update_blob : () -> (vec nat8);
   update_float32 : () -> (float32);
+  update_inline_type : () -> (record { text; text });
   update_int8 : () -> (int8);
   update_nat : () -> (nat);
   update_null : () -> (null);

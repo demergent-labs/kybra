@@ -8,8 +8,4 @@ const manualReplyCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(
-    getTests(createSnakeCaseProxy(manualReplyCanister)).filter(
-        (test) => test.name !== 'update reply with inlineType'
-    )
-);
+runTests(getTests(createSnakeCaseProxy(manualReplyCanister)));
