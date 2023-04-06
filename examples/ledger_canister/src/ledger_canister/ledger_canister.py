@@ -1,6 +1,6 @@
 from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     match,
     nat32,
     nat64,
@@ -36,7 +36,7 @@ class ExecuteTransferResult(Variant, total=False):
 def execute_transfer(
     to: Address, amount: nat64, fee: nat64, created_at_time: opt[nat64]
 ) -> Async[ExecuteTransferResult]:
-    transfer_result_canister_result: CanisterResult[
+    transfer_result_call_result: CallResult[
         TransferResult
     ] = yield icp_canister.transfer(
         {
@@ -52,7 +52,7 @@ def execute_transfer(
     )
 
     return match(
-        transfer_result_canister_result,
+        transfer_result_call_result,
         {
             "Ok": lambda transfer_result: {"Ok": transfer_result},
             "Err": lambda err: {"Err": err},
@@ -67,12 +67,12 @@ class GetAccountBalanceResult(Variant, total=False):
 
 @update
 def get_account_balance(address: Address) -> Async[GetAccountBalanceResult]:
-    tokens_canister_result: CanisterResult[Tokens] = yield icp_canister.account_balance(
+    tokens_call_result: CallResult[Tokens] = yield icp_canister.account_balance(
         {"account": bytes.fromhex(address)}
     )
 
     return match(
-        tokens_canister_result,
+        tokens_call_result,
         {
             "Ok": lambda tokens: {"Ok": tokens},
             "Err": lambda err: {"Err": err},
@@ -87,12 +87,12 @@ class GetTransferFeeResult(Variant, total=False):
 
 @update
 def get_transfer_fee() -> Async[GetTransferFeeResult]:
-    transfer_fee_canister_result: CanisterResult[
-        TransferFee
-    ] = yield icp_canister.transfer_fee({})
+    transfer_fee_call_result: CallResult[TransferFee] = yield icp_canister.transfer_fee(
+        {}
+    )
 
     return match(
-        transfer_fee_canister_result,
+        transfer_fee_call_result,
         {
             "Ok": lambda transfer_fee: {"Ok": transfer_fee},
             "Err": lambda err: {"Err": err},
@@ -107,12 +107,12 @@ class GetBlocksResult(Variant, total=False):
 
 @update
 def get_blocks(get_blocks_args: GetBlocksArgs) -> Async[GetBlocksResult]:
-    canister_result: CanisterResult[
-        QueryBlocksResponse
-    ] = yield icp_canister.query_blocks(get_blocks_args)
+    call_result: CallResult[QueryBlocksResponse] = yield icp_canister.query_blocks(
+        get_blocks_args
+    )
 
     return match(
-        canister_result,
+        call_result,
         {
             "Ok": lambda get_blocks_result: {"Ok": get_blocks_result},
             "Err": lambda err: {"Err": err},
@@ -127,12 +127,10 @@ class GetSymbolResult(Variant, total=False):
 
 @update
 def get_symbol() -> Async[GetSymbolResult]:
-    symbol_result_canister_result: CanisterResult[
-        SymbolResult
-    ] = yield icp_canister.symbol()
+    symbol_result_call_result: CallResult[SymbolResult] = yield icp_canister.symbol()
 
     return match(
-        symbol_result_canister_result,
+        symbol_result_call_result,
         {
             "Ok": lambda symbol_result: {"Ok": symbol_result["symbol"]},
             "Err": lambda err: {"Err": err},
@@ -147,10 +145,10 @@ class GetNameResult(Variant, total=False):
 
 @update
 def get_name() -> Async[GetNameResult]:
-    name_result_canister_result: CanisterResult[NameResult] = yield icp_canister.name()
+    name_result_call_result: CallResult[NameResult] = yield icp_canister.name()
 
     return match(
-        name_result_canister_result,
+        name_result_call_result,
         {
             "Ok": lambda name_result: {"Ok": name_result["name"]},
             "Err": lambda err: {"Err": err},
@@ -165,12 +163,12 @@ class GetDecimalsResult(Variant, total=False):
 
 @update
 def get_decimals() -> Async[GetDecimalsResult]:
-    decimals_result_canister_result: CanisterResult[
+    decimals_result_call_result: CallResult[
         DecimalsResult
     ] = yield icp_canister.decimals()
 
     return match(
-        decimals_result_canister_result,
+        decimals_result_call_result,
         {
             "Ok": lambda decimals_result: {"Ok": decimals_result["decimals"]},
             "Err": lambda err: {"Err": err},
@@ -185,10 +183,10 @@ class GetArchivesResult(Variant, total=False):
 
 @update
 def get_archives() -> Async[GetArchivesResult]:
-    archives_canister_result: CanisterResult[Archives] = yield icp_canister.archives()
+    archives_call_result: CallResult[Archives] = yield icp_canister.archives()
 
     return match(
-        archives_canister_result,
+        archives_call_result,
         {
             "Ok": lambda archives: {"Ok": archives},
             "Err": lambda err: {"Err": err},

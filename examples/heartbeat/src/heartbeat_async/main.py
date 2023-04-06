@@ -1,7 +1,7 @@
 from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     match,
     Principal,
     heartbeat,
@@ -24,7 +24,7 @@ class ManagementCanister(Service):
 def heartbeat_() -> Async[void]:
     management_canister = ManagementCanister(Principal.from_str("aaaaa-aa"))
 
-    randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
+    randomness_result: CallResult[blob] = yield management_canister.raw_rand()
 
     def handle_ok(ok: blob) -> void:
         global initialized

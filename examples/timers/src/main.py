@@ -1,7 +1,7 @@
 from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     Duration,
     ic,
     match,
@@ -116,7 +116,7 @@ def update_capture_status(value: str):
 def single_cross_canister_timer_callback() -> Async[blob]:
     ic.print("single_cross_canister_timer_callback")
 
-    result: CanisterResult[blob] = yield management_canister.raw_rand()
+    result: CallResult[blob] = yield management_canister.raw_rand()
 
     def handle_ok(ok: blob) -> blob:
         status["single_cross_canister"] = ok
@@ -129,7 +129,7 @@ def single_cross_canister_timer_callback() -> Async[blob]:
 def repeat_cross_canister_timer_callback() -> Async[blob]:
     ic.print("repeat_cross_canister_timer_callback")
 
-    result: CanisterResult[blob] = yield management_canister.raw_rand()
+    result: CallResult[blob] = yield management_canister.raw_rand()
 
     def handle_ok(ok: blob) -> blob:
         status["repeat_cross_canister"] += ok

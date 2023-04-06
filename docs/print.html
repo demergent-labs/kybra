@@ -1926,7 +1926,7 @@ class TokenCanister(Service):
 )
 </code></pre>
 <p>And here's a more complete example of a service called <code>payout_canister</code> that performs a cross-canister call to <code>token_canister</code>:</p>
-<pre><code class="language-python">from kybra import Async, CanisterResult, nat64, Principal, Service, service_update, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, nat64, Principal, Service, service_update, update, Variant
 
 class TokenCanister(Service):
     @service_update
@@ -1945,7 +1945,7 @@ def payout(
     to: Principal,
     amount: nat64
 ) -&gt; Async[PayoutResult]:
-    result: CanisterResult[nat64] = yield token_canister.transfer(to, amount)
+    result: CallResult[nat64] = yield token_canister.transfer(to, amount)
 
     if result.err is not None:
         return {
@@ -1956,8 +1956,8 @@ def payout(
         'ok': result.ok
     }
 </code></pre>
-<p>Notice that the <code>token_canister.transfer</code> method, because it is a cross-canister method, returns a <code>CanisterResult</code>. All cross-canister calls return <code>CanisterResult</code>, which has an <code>ok</code> or <code>err</code> property depending on if the cross-canister call was successful or not.</p>
-<p>The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a <code>CanisterResult</code>. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a <code>try...except</code> most likely won't do anything useful.</p>
+<p>Notice that the <code>token_canister.transfer</code> method, because it is a cross-canister method, returns a <code>CallResult</code>. All cross-canister calls return <code>CallResult</code>, which has an <code>ok</code> or <code>err</code> property depending on if the cross-canister call was successful or not.</p>
+<p>The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a <code>CallResult</code>. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a <code>try...except</code> most likely won't do anything useful.</p>
 <p>Let's add to our example code and explore adding some practical result-based error-handling to stop people from stealing tokens.</p>
 <p><code>token_canister</code>:</p>
 <pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update, Variant
@@ -1994,7 +1994,7 @@ def transfer(to: Principal, amount: nat64) -&gt; TransferResult:
     }
 </code></pre>
 <p><code>payout_canister</code>:</p>
-<pre><code class="language-python">from kybra import Async, CanisterResult, nat64, Principal, Service, service_update, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, nat64, Principal, Service, service_update, update, Variant
 
 class TokenCanister(Service):
     @service_update
@@ -2020,14 +2020,14 @@ def payout(
     to: Principal,
     amount: nat64
 ) -&gt; Async[PayoutResult]:
-    canister_result: CanisterResult[TransferResult] = yield token_canister.transfer(to, amount)
+    call_result: CallResult[TransferResult] = yield token_canister.transfer(to, amount)
 
-    if canister_result.err is not None:
+    if call_result.err is not None:
         return {
-            'err': canister_result.err
+            'err': call_result.err
         }
 
-    transfer_result = canister_result.ok
+    transfer_result = call_result.ok
 
     if 'err' in transfer_result:
         return {
@@ -2045,7 +2045,7 @@ def payout(
 <p>So far we have only shown a cross-canister call from an update method. Update methods can call other update methods or query methods (but not composite query methods as discussed below). If an update method calls a query method, that query method will be called in replicated mode. Replicated mode engages the consensus process, but for queries the state will still be discarded.</p>
 <p>Cross-canister calls can also be initiated from query methods (not yet live on IC mainnet but this works locally). These are known as composite queries, and in Kybra they are simply query methods that return a generator using the <code>Async</code> type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.</p>
 <p>Here's an example of a composite query method:</p>
-<pre><code class="language-python">from kybra import Async, CanisterResult, Principal, query, Service, service_query, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, Principal, query, Service, service_query, Variant
 
 class SomeCanister(Service):
     @service_query
@@ -2061,15 +2061,15 @@ class QuerySomeCanisterResult(Variant, total=False):
 
 @query
 def query_some_canister() -&gt; Async[QuerySomeCanisterResult]:
-    canister_result: CanisterResult[bool] = yield some_canister.query_for_boolean()
+    call_result: CallResult[bool] = yield some_canister.query_for_boolean()
 
-    if canister_result.err is not None:
+    if call_result.err is not None:
         return {
-            'err': canister_result.err
+            'err': call_result.err
         }
 
     return {
-        'ok': canister_result.ok
+        'ok': call_result.ok
     }
 </code></pre>
 <p>You can expect cross-canister calls within the same subnet to take up to a few seconds to complete, and cross-canister calls across subnets <a href="https://forum.dfinity.org/t/can-i-run-multiple-inter-canister-update-calls-in-parallel/13115/6">take about double that time</a>.</p>
@@ -2176,7 +2176,7 @@ def http_request(req: HttpRequest) -&gt; HttpResponse:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, ic, init, nat32, query, StableBTreeMap, update
+<pre><code class="language-python">from kybra import Async, CallResult, ic, init, nat32, query, StableBTreeMap, update
 from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
 
 JSON = str
@@ -2199,7 +2199,7 @@ def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request({
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request({
         'url': stable_storage.get('ethereum_url') or '',
         'max_response_bytes': max_response_bytes,
         'method': {'post': None},
@@ -2228,7 +2228,7 @@ def eth_get_block_by_number(number: nat32) -&gt; Async[JSON]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request({
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request({
         'url': stable_storage.get('ethereum_url') or '',
         'max_response_bytes': max_response_bytes,
         'method': {'post': None},
@@ -2258,7 +2258,7 @@ def eth_transform(args: HttpTransformArgs) -&gt; HttpResponse:
 <div style="break-before: page; page-break-before: always;"></div><h1 id="management-canister"><a class="header" href="#management-canister">Management Canister</a></h1>
 <p>This chapter is a work in progress.</p>
 <p>You can access the management canister like this:</p>
-<pre><code class="language-python">from kybra import Async, blob, CanisterResult, update, Variant
+<pre><code class="language-python">from kybra import Async, blob, CallResult, update, Variant
 from kybra.canisters.management import management_canister
 
 class RandomBytesResult(Variant, total=False):
@@ -2267,15 +2267,15 @@ class RandomBytesResult(Variant, total=False):
 
 @update
 def random_bytes() -&gt; Async[RandomBytesResult]:
-    canister_result: CanisterResult[blob] = yield management_canister.raw_rand()
+    call_result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if canister_result.err is not None:
+    if call_result.err is not None:
         return {
-            'err': canister_result.err
+            'err': call_result.err
         }
 
     return {
-        'ok': canister_result.ok
+        'ok': call_result.ok
     }
 </code></pre>
 <p>See the <a href="https://github.com/demergent-labs/kybra/blob/main/kybra/canisters/management/__init__.py">management canister types</a> for all methods and their parameter and return types.</p>
@@ -2300,7 +2300,7 @@ def post_upgrade_() -&gt; void:
 <pre><code class="language-python">from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     Duration,
     ic,
     nat8,
@@ -2413,7 +2413,7 @@ def update_capture_status(value: str):
 def single_cross_canister_timer_callback() -&gt; Async[blob]:
     ic.print(&quot;single_cross_canister_timer_callback&quot;)
 
-    result: CanisterResult[blob] = yield management_canister.raw_rand()
+    result: CallResult[blob] = yield management_canister.raw_rand()
 
     if result.err is not None:
         return bytes()
@@ -2427,7 +2427,7 @@ def single_cross_canister_timer_callback() -&gt; Async[blob]:
 def repeat_cross_canister_timer_callback() -&gt; Async[blob]:
     ic.print(&quot;repeat_cross_canister_timer_callback&quot;)
 
-    result: CanisterResult[blob] = yield management_canister.raw_rand()
+    result: CallResult[blob] = yield management_canister.raw_rand()
 
     if result.err is not None:
         return bytes()
@@ -2581,7 +2581,7 @@ def arg_data_raw_size(arg1: blob, arg2: int8, arg3: bool, arg4: str) -&gt; nat32
 </ul>
 <pre><code class="language-python">from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     nat64,
     Principal,
     Service,
@@ -2607,7 +2607,7 @@ class PayoutResult(Variant, total=False):
 
 @update
 def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
-    result: CanisterResult[nat64] = yield token_canister.transfer(to, amount)
+    result: CallResult[nat64] = yield token_canister.transfer(to, amount)
 
     if result.err is not None:
         return {&quot;err&quot;: result.err}
@@ -2624,7 +2624,7 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
 <pre><code class="language-python">from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     ic,
     nat64,
     Principal,
@@ -2642,14 +2642,14 @@ class ExecuteCallRawResult(Variant, total=False):
 def execute_call_raw(
     canister_id: Principal, method: str, candid_args: str, payment: nat64
 ) -&gt; Async[ExecuteCallRawResult]:
-    canister_result: CanisterResult[blob] = yield ic.call_raw(
+    call_result: CallResult[blob] = yield ic.call_raw(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
-    return {&quot;ok&quot;: ic.candid_decode(canister_result.ok)}
+    return {&quot;ok&quot;: ic.candid_decode(call_result.ok)}
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="call-raw-128"><a class="header" href="#call-raw-128">call raw 128</a></h1>
 <p>This section is a work in progress.</p>
@@ -2660,7 +2660,7 @@ def execute_call_raw(
 <pre><code class="language-python">from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     ic,
     nat,
     Principal,
@@ -2677,7 +2677,7 @@ class ExecuteCallRaw128Result(Variant, total=False):
 def execute_call_raw128(
     canister_id: Principal, method: str, candid_args: str, payment: nat
 ) -&gt; Async[ExecuteCallRaw128Result]:
-    canister_result: CanisterResult[blob] = yield ic.call_raw128(
+    canister_result: CallResult[blob] = yield ic.call_raw128(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
@@ -2698,7 +2698,7 @@ def execute_call_raw128(
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/threshold_ecdsa">threshold_ecdsa</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CanisterResult, Principal, update, void
+<pre><code class="language-python">from kybra import Async, blob, CallResult, Principal, update, void
 from kybra.canisters.management import management_canister
 from src.types import DefaultResult
 
@@ -2707,7 +2707,7 @@ from src.types import DefaultResult
 def execute_install_code(
     canister_id: Principal, wasm_module: blob
 ) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.install_code(
+    call_result: CallResult[void] = yield management_canister.install_code(
         {
             &quot;mode&quot;: {&quot;install&quot;: None},
             &quot;canister_id&quot;: canister_id,
@@ -2716,8 +2716,8 @@ def execute_install_code(
         }
     ).with_cycles(100_000_000_000)
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>
@@ -2727,7 +2727,7 @@ def execute_install_code(
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CanisterResult, Principal, update, void
+<pre><code class="language-python">from kybra import Async, blob, CallResult, Principal, update, void
 from kybra.canisters.management import management_canister
 from src.types import DefaultResult
 
@@ -2736,7 +2736,7 @@ from src.types import DefaultResult
 def execute_install_code(
     canister_id: Principal, wasm_module: blob
 ) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.install_code(
+    call_result: CallResult[void] = yield management_canister.install_code(
         {
             &quot;mode&quot;: {&quot;install&quot;: None},
             &quot;canister_id&quot;: canister_id,
@@ -2745,8 +2745,8 @@ def execute_install_code(
         }
     ).with_cycles128(100_000_000_000)
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>
@@ -2863,7 +2863,7 @@ def receive_cycles128() -&gt; nat:
 </ul>
 <pre><code class="language-python">from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     ic,
     nat64,
     update,
@@ -2880,7 +2880,7 @@ class SendCyclesResult(Variant, total=False):
 # Reports the number of cycles returned from the Cycles canister
 @update
 def send_cycles() -&gt; Async[SendCyclesResult]:
-    result: CanisterResult[nat64] = yield cycles.receive_cycles().with_cycles(1_000_000)
+    result: CallResult[nat64] = yield cycles.receive_cycles().with_cycles(1_000_000)
 
     if result.err is not None:
         return {&quot;err&quot;: result.err}
@@ -2895,7 +2895,7 @@ def send_cycles() -&gt; Async[SendCyclesResult]:
 </ul>
 <pre><code class="language-python">from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     ic,
     nat,
     update,
@@ -2912,7 +2912,7 @@ class SendCyclesResult128(Variant, total=False):
 # Reports the number of cycles returned from the Cycles canister
 @update
 def send_cycles128() -&gt; Async[SendCyclesResult128]:
-    result: CanisterResult[nat] = yield cycles.receive_cycles128().with_cycles128(
+    result: CallResult[nat] = yield cycles.receive_cycles128().with_cycles128(
         1_000_000
     )
 
@@ -4167,7 +4167,7 @@ def set_message(new_message: str) -&gt; void:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
 from kybra.canisters.management import management_canister, Satoshi
 
 BITCOIN_API_CYCLE_COST = 100_000_000
@@ -4180,7 +4180,7 @@ class ExecuteGetBalanceResult(Variant, total=False):
 
 @update
 def get_balance(address: str) -&gt; Async[ExecuteGetBalanceResult]:
-    canister_result: CanisterResult[
+    call_result: CallResult[
         Satoshi
     ] = yield management_canister.bitcoin_get_balance(
         {&quot;address&quot;: address, &quot;min_confirmations&quot;: None, &quot;network&quot;: {&quot;Regtest&quot;: None}}
@@ -4188,10 +4188,10 @@ def get_balance(address: str) -&gt; Async[ExecuteGetBalanceResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
-    return {&quot;ok&quot;: canister_result.ok}
+    return {&quot;ok&quot;: call_result.ok}
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="bitcoin_get_current_fee_percentiles"><a class="header" href="#bitcoin_get_current_fee_percentiles">bitcoin_get_current_fee_percentiles</a></h1>
 <p>This section is a work in progress.</p>
@@ -4199,7 +4199,7 @@ def get_balance(address: str) -&gt; Async[ExecuteGetBalanceResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
 from kybra.canisters.management import management_canister, MillisatoshiPerByte
 
 BITCOIN_API_CYCLE_COST = 100_000_000
@@ -4212,7 +4212,7 @@ class GetCurrentFeePercentilesResult(Variant, total=False):
 
 @update
 def get_current_fee_percentiles() -&gt; Async[GetCurrentFeePercentilesResult]:
-    canister_result: CanisterResult[
+    call_result: CallResult[
         list[MillisatoshiPerByte]
     ] = yield management_canister.bitcoin_get_current_fee_percentiles(
         {&quot;network&quot;: {&quot;Regtest&quot;: None}}
@@ -4220,10 +4220,10 @@ def get_current_fee_percentiles() -&gt; Async[GetCurrentFeePercentilesResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
-    return {&quot;ok&quot;: canister_result.ok}
+    return {&quot;ok&quot;: call_result.ok}
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="bitcoin_get_utxos"><a class="header" href="#bitcoin_get_utxos">bitcoin_get_utxos</a></h1>
 <p>This section is a work in progress.</p>
@@ -4231,7 +4231,7 @@ def get_current_fee_percentiles() -&gt; Async[GetCurrentFeePercentilesResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
 from kybra.canisters.management import GetUtxosResult, management_canister
 
 BITCOIN_API_CYCLE_COST = 100_000_000
@@ -4244,7 +4244,7 @@ class ExecuteGetUtxosResult(Variant, total=False):
 
 @update
 def get_utxos(address: str) -&gt; Async[ExecuteGetUtxosResult]:
-    canister_result: CanisterResult[
+    call_result: CallResult[
         GetUtxosResult
     ] = yield management_canister.bitcoin_get_utxos(
         {&quot;address&quot;: address, &quot;filter&quot;: None, &quot;network&quot;: {&quot;Regtest&quot;: None}}
@@ -4252,10 +4252,10 @@ def get_utxos(address: str) -&gt; Async[ExecuteGetUtxosResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
-    return {&quot;ok&quot;: canister_result.ok}
+    return {&quot;ok&quot;: call_result.ok}
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="bitcoin_send_transaction"><a class="header" href="#bitcoin_send_transaction">bitcoin_send_transaction</a></h1>
 <p>This section is a work in progress.</p>
@@ -4263,7 +4263,7 @@ def get_utxos(address: str) -&gt; Async[ExecuteGetUtxosResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CanisterResult, null, update, Variant, void
+<pre><code class="language-python">from kybra import Async, blob, CallResult, null, update, Variant, void
 from kybra.canisters.management import management_canister
 
 BITCOIN_BASE_TRANSACTION_COST = 5_000_000_000
@@ -4282,7 +4282,7 @@ def send_transaction(transaction: blob) -&gt; Async[SendTransactionResult]:
         + len(transaction) * BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE
     )
 
-    canister_result: CanisterResult[
+    call_result: CallResult[
         void
     ] = yield management_canister.bitcoin_send_transaction(
         {&quot;transaction&quot;: transaction, &quot;network&quot;: {&quot;Regtest&quot;: None}}
@@ -4290,10 +4290,10 @@ def send_transaction(transaction: blob) -&gt; Async[SendTransactionResult]:
         transaction_fee
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
-    return {&quot;ok&quot;: canister_result.ok}
+    return {&quot;ok&quot;: call_result.ok}
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="canister_status"><a class="header" href="#canister_status">canister_status</a></h1>
 <p>This section is a work in progress.</p>
@@ -4301,7 +4301,7 @@ def send_transaction(transaction: blob) -&gt; Async[SendTransactionResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
 from kybra.canisters.management import (
     CanisterStatusArgs,
     CanisterStatusResult,
@@ -4316,14 +4316,14 @@ class GetCanisterStatusResult(Variant, total=False):
 
 @update
 def get_canister_status(args: CanisterStatusArgs) -&gt; Async[GetCanisterStatusResult]:
-    canister_status_result_canister_result: CanisterResult[
+    canister_status_result_call_result: CallResult[
         CanisterStatusResult
     ] = yield management_canister.canister_status({&quot;canister_id&quot;: args[&quot;canister_id&quot;]})
 
-    if canister_status_result_canister_result.err is not None:
-        return {&quot;err&quot;: canister_status_result_canister_result.err}
+    if canister_status_result_call_result.err is not None:
+        return {&quot;err&quot;: canister_status_result_call_result.err}
 
-    canister_status_result = canister_status_result_canister_result.ok
+    canister_status_result = canister_status_result_call_result.ok
 
     return {&quot;ok&quot;: canister_status_result}
 </code></pre>
@@ -4333,7 +4333,7 @@ def get_canister_status(args: CanisterStatusArgs) -&gt; Async[GetCanisterStatusR
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
 from kybra.canisters.management import CreateCanisterResult, management_canister
 
 
@@ -4344,16 +4344,16 @@ class ExecuteCreateCanisterResult(Variant, total=False):
 
 @update
 def execute_create_canister() -&gt; Async[ExecuteCreateCanisterResult]:
-    create_canister_result_canister_result: CanisterResult[
+    create_canister_result_call_result: CallResult[
         CreateCanisterResult
     ] = yield management_canister.create_canister({&quot;settings&quot;: None}).with_cycles(
         50_000_000_000_000
     )
 
-    if create_canister_result_canister_result.err is not None:
-        return {&quot;err&quot;: create_canister_result_canister_result.err}
+    if create_canister_result_call_result.err is not None:
+        return {&quot;err&quot;: create_canister_result_call_result.err}
 
-    create_canister_result = create_canister_result_canister_result.ok
+    create_canister_result = create_canister_result_call_result.ok
 
     return {&quot;ok&quot;: create_canister_result}
 </code></pre>
@@ -4365,7 +4365,7 @@ def execute_create_canister() -&gt; Async[ExecuteCreateCanisterResult]:
 </ul>
 <pre><code class="language-python">from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     Principal,
     update,
     Variant,
@@ -4381,12 +4381,12 @@ class DefaultResult(Variant, total=False):
 
 @update
 def execute_delete_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.delete_canister(
+    call_result: CallResult[void] = yield management_canister.delete_canister(
         {&quot;canister_id&quot;: canister_id}
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>
@@ -4398,12 +4398,12 @@ def execute_delete_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
 </ul>
 <pre><code class="language-python">@update
 def execute_deposit_cycles(canister_id: Principal) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.deposit_cycles(
+    call_result: CallResult[void] = yield management_canister.deposit_cycles(
         {&quot;canister_id&quot;: canister_id}
     ).with_cycles(1_000_000)
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>
@@ -4416,7 +4416,7 @@ def execute_deposit_cycles(canister_id: Principal) -&gt; Async[DefaultResult]:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, ic, query, update
+<pre><code class="language-python">from kybra import Async, CallResult, ic, query, update
 from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
 
 
@@ -4429,7 +4429,7 @@ def xkcd() -&gt; Async[HttpResponse]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request(
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request(
         {
             &quot;url&quot;: &quot;https://xkcd.com/642/info.0.json&quot;,
             &quot;max_response_bytes&quot;: max_response_bytes,
@@ -4461,7 +4461,7 @@ def xkcd_transform(args: HttpTransformArgs) -&gt; HttpResponse:
 <pre><code class="language-python">from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     Principal,
     update,
     Variant,
@@ -4479,7 +4479,7 @@ class DefaultResult(Variant, total=False):
 def execute_install_code(
     canister_id: Principal, wasm_module: blob
 ) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.install_code(
+    call_result: CallResult[void] = yield management_canister.install_code(
         {
             &quot;mode&quot;: {&quot;install&quot;: None},
             &quot;canister_id&quot;: canister_id,
@@ -4488,8 +4488,8 @@ def execute_install_code(
         }
     ).with_cycles(100_000_000_000)
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>
@@ -4499,7 +4499,7 @@ def execute_install_code(
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
 from kybra.canisters.management import (
     CreateCanisterResult,
     management_canister,
@@ -4516,16 +4516,16 @@ class ExecuteProvisionalCreateCanisterWithCyclesResult(Variant, total=False):
 def provisional_create_canister_with_cycles() -&gt; (
     Async[ExecuteProvisionalCreateCanisterWithCyclesResult]
 ):
-    canister_result: CanisterResult[
+    call_result: CallResult[
         ProvisionalCreateCanisterWithCyclesResult
     ] = yield management_canister.provisional_create_canister_with_cycles(
         {&quot;amount&quot;: None, &quot;settings&quot;: None}
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
-    provisional_create_canister_with_cycles_result = canister_result.ok
+    provisional_create_canister_with_cycles_result = call_result.ok
 
     return {&quot;ok&quot;: provisional_create_canister_with_cycles_result}
 </code></pre>
@@ -4537,7 +4537,7 @@ def provisional_create_canister_with_cycles() -&gt; (
 </ul>
 <pre><code class="language-python">from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     nat,
     Principal,
     update,
@@ -4556,14 +4556,14 @@ class DefaultResult(Variant, total=False):
 def provisional_top_up_canister(
     canister_id: Principal, amount: nat
 ) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[
+    call_result: CallResult[
         void
     ] = yield management_canister.provisional_top_up_canister(
         {&quot;canister_id&quot;: canister_id, &quot;amount&quot;: amount}
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>
@@ -4576,13 +4576,13 @@ def provisional_top_up_canister(
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/timers">timers</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CanisterResult, update
+<pre><code class="language-python">from kybra import Async, blob, CallResult, update
 from kybra.canisters.management import management_canister
 
 
 @update
 def get_randomness_directly() -&gt; Async[blob]:
-    randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
+    randomness_result: CallResult[blob] = yield management_canister.raw_rand()
 
     if randomness_result.err is not None:
         return bytes()
@@ -4599,7 +4599,7 @@ def get_randomness_directly() -&gt; Async[blob]:
 </ul>
 <pre><code class="language-python">from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     Principal,
     update,
     Variant,
@@ -4615,12 +4615,12 @@ class DefaultResult(Variant, total=False):
 
 @update
 def execute_start_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.start_canister(
+    call_result: CallResult[void] = yield management_canister.start_canister(
         {&quot;canister_id&quot;: canister_id}
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>
@@ -4632,7 +4632,7 @@ def execute_start_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
 </ul>
 <pre><code class="language-python">from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     Principal,
     update,
     Variant,
@@ -4648,12 +4648,12 @@ class DefaultResult(Variant, total=False):
 
 @update
 def execute_stop_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.stop_canister(
+    call_result: CallResult[void] = yield management_canister.stop_canister(
         {&quot;canister_id&quot;: canister_id}
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>
@@ -4663,7 +4663,7 @@ def execute_stop_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, Principal, update, Variant, void
+<pre><code class="language-python">from kybra import Async, CallResult, Principal, update, Variant, void
 from kybra.canisters.management import management_canister
 
 
@@ -4674,12 +4674,12 @@ class DefaultResult(Variant, total=False):
 
 @update
 def execute_uninstall_code(canister_id: Principal) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.uninstall_code(
+    call_result: CallResult[void] = yield management_canister.uninstall_code(
         {&quot;canister_id&quot;: canister_id}
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>
@@ -4689,7 +4689,7 @@ def execute_uninstall_code(canister_id: Principal) -&gt; Async[DefaultResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, Principal, update, Variant, void
+<pre><code class="language-python">from kybra import Async, CallResult, Principal, update, Variant, void
 from kybra.canisters.management import management_canister
 
 
@@ -4700,7 +4700,7 @@ class DefaultResult(Variant, total=False):
 
 @update
 def execute_update_settings(canister_id: Principal) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.update_settings(
+    call_result: CallResult[void] = yield management_canister.update_settings(
         {
             &quot;canister_id&quot;: canister_id,
             &quot;settings&quot;: {
@@ -4712,8 +4712,8 @@ def execute_update_settings(canister_id: Principal) -&gt; Async[DefaultResult]:
         }
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>

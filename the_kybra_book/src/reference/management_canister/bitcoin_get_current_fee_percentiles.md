@@ -7,7 +7,7 @@ Examples:
 -   [bitcoin](https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin)
 
 ```python
-from kybra import Async, CanisterResult, update, Variant
+from kybra import Async, CallResult, update, Variant
 from kybra.canisters.management import management_canister, MillisatoshiPerByte
 
 BITCOIN_API_CYCLE_COST = 100_000_000
@@ -20,7 +20,7 @@ class GetCurrentFeePercentilesResult(Variant, total=False):
 
 @update
 def get_current_fee_percentiles() -> Async[GetCurrentFeePercentilesResult]:
-    canister_result: CanisterResult[
+    call_result: CallResult[
         list[MillisatoshiPerByte]
     ] = yield management_canister.bitcoin_get_current_fee_percentiles(
         {"network": {"Regtest": None}}
@@ -28,8 +28,8 @@ def get_current_fee_percentiles() -> Async[GetCurrentFeePercentilesResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if canister_result.err is not None:
-        return {"err": canister_result.err}
+    if call_result.err is not None:
+        return {"err": call_result.err}
 
-    return {"ok": canister_result.ok}
+    return {"ok": call_result.ok}
 ```

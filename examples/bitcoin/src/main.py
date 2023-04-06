@@ -1,4 +1,4 @@
-from kybra import Async, blob, CanisterResult, match, update, void
+from kybra import Async, blob, CallResult, match, update, void
 from kybra.canisters.management import (
     GetUtxosResult,
     management_canister,
@@ -19,22 +19,18 @@ BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE = 20_000_000
 
 @update
 def get_balance(address: str) -> Async[ExecuteGetBalanceResult]:
-    canister_result: CanisterResult[
-        Satoshi
-    ] = yield management_canister.bitcoin_get_balance(
+    call_result: CallResult[Satoshi] = yield management_canister.bitcoin_get_balance(
         {"address": address, "min_confirmations": None, "network": {"Regtest": None}}
-    ).with_cycles(
-        BITCOIN_API_CYCLE_COST
-    )
+    ).with_cycles(BITCOIN_API_CYCLE_COST)
 
     return match(
-        canister_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+        call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
     )
 
 
 @update
 def get_current_fee_percentiles() -> Async[ExecuteGetCurrentFeePercentiles]:
-    canister_result: CanisterResult[
+    call_result: CallResult[
         list[MillisatoshiPerByte]
     ] = yield management_canister.bitcoin_get_current_fee_percentiles(
         {"network": {"Regtest": None}}
@@ -43,13 +39,13 @@ def get_current_fee_percentiles() -> Async[ExecuteGetCurrentFeePercentiles]:
     )
 
     return match(
-        canister_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+        call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
     )
 
 
 @update
 def get_utxos(address: str) -> Async[ExecuteGetUtxosResult]:
-    canister_result: CanisterResult[
+    call_result: CallResult[
         GetUtxosResult
     ] = yield management_canister.bitcoin_get_utxos(
         {"address": address, "filter": None, "network": {"Regtest": None}}
@@ -58,7 +54,7 @@ def get_utxos(address: str) -> Async[ExecuteGetUtxosResult]:
     )
 
     return match(
-        canister_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+        call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
     )
 
 
@@ -69,15 +65,11 @@ def send_transaction(transaction: blob) -> Async[ExecuteSendTransactionResult]:
         + len(transaction) * BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE
     )
 
-    canister_result: CanisterResult[
-        void
-    ] = yield management_canister.bitcoin_send_transaction(
+    call_result: CallResult[void] = yield management_canister.bitcoin_send_transaction(
         {"transaction": transaction, "network": {"Regtest": None}}
-    ).with_cycles(
-        transaction_fee
-    )
+    ).with_cycles(transaction_fee)
 
     return match(
-        canister_result,
+        call_result,
         {"Ok": lambda ok: {"Ok": True}, "Err": lambda err: {"Err": err}},
     )

@@ -152,7 +152,7 @@
 </ul>
 <pre><code class="language-python">from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     Principal,
     update,
     Variant,
@@ -168,12 +168,12 @@ class DefaultResult(Variant, total=False):
 
 @update
 def execute_stop_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.stop_canister(
+    call_result: CallResult[void] = yield management_canister.stop_canister(
         {&quot;canister_id&quot;: canister_id}
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>

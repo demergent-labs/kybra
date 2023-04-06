@@ -152,12 +152,12 @@
 </ul>
 <pre><code class="language-python">@update
 def execute_deposit_cycles(canister_id: Principal) -&gt; Async[DefaultResult]:
-    canister_result: CanisterResult[void] = yield management_canister.deposit_cycles(
+    call_result: CallResult[void] = yield management_canister.deposit_cycles(
         {&quot;canister_id&quot;: canister_id}
     ).with_cycles(1_000_000)
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
     return {&quot;ok&quot;: True}
 </code></pre>

@@ -9,7 +9,7 @@ Examples:
 ```python
 from kybra import (
     Async,
-    CanisterResult,
+    CallResult,
     nat,
     Principal,
     update,
@@ -28,14 +28,14 @@ class DefaultResult(Variant, total=False):
 def provisional_top_up_canister(
     canister_id: Principal, amount: nat
 ) -> Async[DefaultResult]:
-    canister_result: CanisterResult[
+    call_result: CallResult[
         void
     ] = yield management_canister.provisional_top_up_canister(
         {"canister_id": canister_id, "amount": amount}
     )
 
-    if canister_result.err is not None:
-        return {"err": canister_result.err}
+    if call_result.err is not None:
+        return {"err": call_result.err}
 
     return {"ok": True}
 ```

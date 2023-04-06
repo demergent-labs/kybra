@@ -150,7 +150,7 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CanisterResult, null, update, Variant, void
+<pre><code class="language-python">from kybra import Async, blob, CallResult, null, update, Variant, void
 from kybra.canisters.management import management_canister
 
 BITCOIN_BASE_TRANSACTION_COST = 5_000_000_000
@@ -169,7 +169,7 @@ def send_transaction(transaction: blob) -&gt; Async[SendTransactionResult]:
         + len(transaction) * BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE
     )
 
-    canister_result: CanisterResult[
+    call_result: CallResult[
         void
     ] = yield management_canister.bitcoin_send_transaction(
         {&quot;transaction&quot;: transaction, &quot;network&quot;: {&quot;Regtest&quot;: None}}
@@ -177,10 +177,10 @@ def send_transaction(transaction: blob) -&gt; Async[SendTransactionResult]:
         transaction_fee
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
+    if call_result.err is not None:
+        return {&quot;err&quot;: call_result.err}
 
-    return {&quot;ok&quot;: canister_result.ok}
+    return {&quot;ok&quot;: call_result.ok}
 </code></pre>
 
                     </main>

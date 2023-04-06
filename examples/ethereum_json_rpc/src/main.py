@@ -1,7 +1,7 @@
 from kybra import (
     alias,
     Async,
-    CanisterResult,
+    CallResult,
     ic,
     match,
     init,
@@ -39,7 +39,7 @@ def eth_get_balance(ethereum_address: str) -> Async[JSON]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request(
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request(
         {
             "url": stable_storage.get("ethereum_url") or "",
             "max_response_bytes": max_response_bytes,
@@ -67,7 +67,7 @@ def eth_get_block_by_number(number: nat32) -> Async[JSON]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request(
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request(
         {
             "url": stable_storage.get("ethereum_url") or "",
             "max_response_bytes": max_response_bytes,

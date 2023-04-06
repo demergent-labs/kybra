@@ -5,7 +5,7 @@ This chapter is a work in progress.
 You can access the management canister like this:
 
 ```python
-from kybra import Async, blob, CanisterResult, update, Variant
+from kybra import Async, blob, CallResult, update, Variant
 from kybra.canisters.management import management_canister
 
 class RandomBytesResult(Variant, total=False):
@@ -14,15 +14,15 @@ class RandomBytesResult(Variant, total=False):
 
 @update
 def random_bytes() -> Async[RandomBytesResult]:
-    canister_result: CanisterResult[blob] = yield management_canister.raw_rand()
+    call_result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if canister_result.err is not None:
+    if call_result.err is not None:
         return {
-            'err': canister_result.err
+            'err': call_result.err
         }
 
     return {
-        'ok': canister_result.ok
+        'ok': call_result.ok
     }
 ```
 

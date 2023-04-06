@@ -149,7 +149,7 @@
 <pre><code class="language-python">from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     Duration,
     ic,
     nat8,
@@ -262,7 +262,7 @@ def update_capture_status(value: str):
 def single_cross_canister_timer_callback() -&gt; Async[blob]:
     ic.print(&quot;single_cross_canister_timer_callback&quot;)
 
-    result: CanisterResult[blob] = yield management_canister.raw_rand()
+    result: CallResult[blob] = yield management_canister.raw_rand()
 
     if result.err is not None:
         return bytes()
@@ -276,7 +276,7 @@ def single_cross_canister_timer_callback() -&gt; Async[blob]:
 def repeat_cross_canister_timer_callback() -&gt; Async[blob]:
     ic.print(&quot;repeat_cross_canister_timer_callback&quot;)
 
-    result: CanisterResult[blob] = yield management_canister.raw_rand()
+    result: CallResult[blob] = yield management_canister.raw_rand()
 
     if result.err is not None:
         return bytes()

@@ -1,7 +1,7 @@
 from kybra import (
     Async,
     blob,
-    CanisterResult,
+    CallResult,
     match,
     Principal,
     Service,
@@ -22,7 +22,7 @@ class ManagementCanister(Service):
 def get_randomness_directly() -> Async[blob]:
     management_canister = ManagementCanister(Principal.from_str("aaaaa-aa"))
 
-    randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
+    randomness_result: CallResult[blob] = yield management_canister.raw_rand()
 
     return match(randomness_result, {"Ok": lambda ok: ok, "Err": lambda _: bytes()})
 
@@ -61,6 +61,6 @@ def get_randomness_level2() -> Async[blob]:
 def get_randomness() -> Async[blob]:
     management_canister = ManagementCanister(Principal.from_str("aaaaa-aa"))
 
-    randomness_result: CanisterResult[blob] = yield management_canister.raw_rand()
+    randomness_result: CallResult[blob] = yield management_canister.raw_rand()
 
     return match(randomness_result, {"Ok": lambda ok: ok, "Err": lambda _: bytes()})

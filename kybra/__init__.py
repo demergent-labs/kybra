@@ -147,7 +147,7 @@ Update = Callable
 Oneway = Callable
 
 
-class CanisterResult(Generic[T]):
+class CallResult(Generic[T]):
     Ok: T
     Err: Optional[str]
 
@@ -158,17 +158,17 @@ class CanisterResult(Generic[T]):
     def notify(self) -> "NotifyResult":
         ...
 
-    def with_cycles(self, cycles: nat64) -> "CanisterResult[T]":
+    def with_cycles(self, cycles: nat64) -> "CallResult[T]":
         ...
 
-    def with_cycles128(self, cycles: nat) -> "CanisterResult[T]":
+    def with_cycles128(self, cycles: nat) -> "CallResult[T]":
         ...
 
 
-# TODO Once RustPython supports Python 3.11, we can use the below and unify CanisterResult with the other Variants
+# TODO Once RustPython supports Python 3.11, we can use the below and unify CallResult with the other Variants
 # TODO The problem is that you can't really use generics with TypedDict yet: https://github.com/python/cpython/issues/89026
-# TODO We could also consider a hack where we remove all references to CanisterResult before runtime, since this is really an analysis-time consideration
-# class CanisterResult(Variant, Generic[T], total=False):
+# TODO We could also consider a hack where we remove all references to CallResult before runtime, since this is really an analysis-time consideration
+# class CallResult(Variant, Generic[T], total=False):
 #     Ok: T
 #     Err: str
 
@@ -183,7 +183,7 @@ class RejectionCode(Variant, total=False):
     Unknown: null
 
 
-# TODO we might want this to act more like CanisterResult
+# TODO we might want this to act more like CallResult
 class NotifyResult(Variant, total=False):
     Ok: null
     Err: RejectionCode
@@ -241,7 +241,7 @@ class ic(Generic[T]):
     @staticmethod
     def call_raw(
         canister_id: Principal, method: str, args_raw: blob, payment: nat64
-    ) -> CanisterResult[T]:
+    ) -> CallResult[T]:
         return AsyncInfo(
             "call_raw", [canister_id, method, args_raw, payment]
         )  # type: ignore
@@ -249,7 +249,7 @@ class ic(Generic[T]):
     @staticmethod
     def call_raw128(
         canister_id: Principal, method: str, args_raw: blob, payment: nat
-    ) -> CanisterResult[T]:
+    ) -> CallResult[T]:
         return AsyncInfo(
             "call_raw128", [canister_id, method, args_raw, payment]
         )  # type: ignore
@@ -448,7 +448,7 @@ class AsyncInfo:
 
 # TODO this decorator is removing the static type checking of the self parameter for instance methods
 # TODO watch out for *kwargs
-def service_method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
+def service_method(func: Callable[P, T]) -> Callable[P, CallResult[T]]:
     def intermediate_func(*args):  # type: ignore
         the_self = args[0]  # type: ignore
         selfless_args = args[1:]  # type: ignore
@@ -461,11 +461,11 @@ def service_method(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
     return intermediate_func  # type: ignore
 
 
-def service_query(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
+def service_query(func: Callable[P, T]) -> Callable[P, CallResult[T]]:
     return service_method(func)
 
 
-def service_update(func: Callable[P, T]) -> Callable[P, CanisterResult[T]]:
+def service_update(func: Callable[P, T]) -> Callable[P, CallResult[T]]:
     return service_method(func)
 
 

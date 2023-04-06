@@ -63,7 +63,7 @@ token_canister = TokenCanister(
 And here's a more complete example of a service called `payout_canister` that performs a cross-canister call to `token_canister`:
 
 ```python
-from kybra import Async, CanisterResult, nat64, Principal, Service, service_update, update, Variant
+from kybra import Async, CallResult, nat64, Principal, Service, service_update, update, Variant
 
 class TokenCanister(Service):
     @service_update
@@ -82,7 +82,7 @@ def payout(
     to: Principal,
     amount: nat64
 ) -> Async[PayoutResult]:
-    result: CanisterResult[nat64] = yield token_canister.transfer(to, amount)
+    result: CallResult[nat64] = yield token_canister.transfer(to, amount)
 
     if result.err is not None:
         return {
@@ -94,9 +94,9 @@ def payout(
     }
 ```
 
-Notice that the `token_canister.transfer` method, because it is a cross-canister method, returns a `CanisterResult`. All cross-canister calls return `CanisterResult`, which has an `ok` or `err` property depending on if the cross-canister call was successful or not.
+Notice that the `token_canister.transfer` method, because it is a cross-canister method, returns a `CallResult`. All cross-canister calls return `CallResult`, which has an `ok` or `err` property depending on if the cross-canister call was successful or not.
 
-The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a `CanisterResult`. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a `try...except` most likely won't do anything useful.
+The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a `CallResult`. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a `try...except` most likely won't do anything useful.
 
 Let's add to our example code and explore adding some practical result-based error-handling to stop people from stealing tokens.
 
@@ -140,7 +140,7 @@ def transfer(to: Principal, amount: nat64) -> TransferResult:
 `payout_canister`:
 
 ```python
-from kybra import Async, CanisterResult, nat64, Principal, Service, service_update, update, Variant
+from kybra import Async, CallResult, nat64, Principal, Service, service_update, update, Variant
 
 class TokenCanister(Service):
     @service_update
@@ -166,14 +166,14 @@ def payout(
     to: Principal,
     amount: nat64
 ) -> Async[PayoutResult]:
-    canister_result: CanisterResult[TransferResult] = yield token_canister.transfer(to, amount)
+    call_result: CallResult[TransferResult] = yield token_canister.transfer(to, amount)
 
-    if canister_result.err is not None:
+    if call_result.err is not None:
         return {
-            'err': canister_result.err
+            'err': call_result.err
         }
 
-    transfer_result = canister_result.ok
+    transfer_result = call_result.ok
 
     if 'err' in transfer_result:
         return {
@@ -196,7 +196,7 @@ Cross-canister calls can also be initiated from query methods (not yet live on I
 Here's an example of a composite query method:
 
 ```python
-from kybra import Async, CanisterResult, Principal, query, Service, service_query, Variant
+from kybra import Async, CallResult, Principal, query, Service, service_query, Variant
 
 class SomeCanister(Service):
     @service_query
@@ -212,15 +212,15 @@ class QuerySomeCanisterResult(Variant, total=False):
 
 @query
 def query_some_canister() -> Async[QuerySomeCanisterResult]:
-    canister_result: CanisterResult[bool] = yield some_canister.query_for_boolean()
+    call_result: CallResult[bool] = yield some_canister.query_for_boolean()
 
-    if canister_result.err is not None:
+    if call_result.err is not None:
         return {
-            'err': canister_result.err
+            'err': call_result.err
         }
 
     return {
-        'ok': canister_result.ok
+        'ok': call_result.ok
     }
 ```
 

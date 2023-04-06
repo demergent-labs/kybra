@@ -150,7 +150,7 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CanisterResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
 from kybra.canisters.management import (
     CanisterStatusArgs,
     CanisterStatusResult,
@@ -165,14 +165,14 @@ class GetCanisterStatusResult(Variant, total=False):
 
 @update
 def get_canister_status(args: CanisterStatusArgs) -&gt; Async[GetCanisterStatusResult]:
-    canister_status_result_canister_result: CanisterResult[
+    canister_status_result_call_result: CallResult[
         CanisterStatusResult
     ] = yield management_canister.canister_status({&quot;canister_id&quot;: args[&quot;canister_id&quot;]})
 
-    if canister_status_result_canister_result.err is not None:
-        return {&quot;err&quot;: canister_status_result_canister_result.err}
+    if canister_status_result_call_result.err is not None:
+        return {&quot;err&quot;: canister_status_result_call_result.err}
 
-    canister_status_result = canister_status_result_canister_result.ok
+    canister_status_result = canister_status_result_call_result.ok
 
     return {&quot;ok&quot;: canister_status_result}
 </code></pre>

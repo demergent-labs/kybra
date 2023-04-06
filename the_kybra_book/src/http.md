@@ -70,7 +70,7 @@ Examples:
 -   [outgoing_http_requests](https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests)
 
 ```python
-from kybra import Async, CanisterResult, ic, init, nat32, query, StableBTreeMap, update
+from kybra import Async, CallResult, ic, init, nat32, query, StableBTreeMap, update
 from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
 
 JSON = str
@@ -93,7 +93,7 @@ def eth_get_balance(ethereum_address: str) -> Async[JSON]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request({
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request({
         'url': stable_storage.get('ethereum_url') or '',
         'max_response_bytes': max_response_bytes,
         'method': {'post': None},
@@ -122,7 +122,7 @@ def eth_get_block_by_number(number: nat32) -> Async[JSON]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CanisterResult[HttpResponse] = yield management_canister.http_request({
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request({
         'url': stable_storage.get('ethereum_url') or '',
         'max_response_bytes': max_response_bytes,
         'method': {'post': None},
