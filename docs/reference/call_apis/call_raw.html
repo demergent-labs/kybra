@@ -156,6 +156,7 @@
     blob,
     CallResult,
     ic,
+    match,
     nat64,
     Principal,
     update,
@@ -164,8 +165,8 @@
 
 
 class ExecuteCallRawResult(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
 
 
 @update
@@ -176,10 +177,13 @@ def execute_call_raw(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: ic.candid_decode(call_result.ok)}
+    return match(
+        call_result,
+        {
+            &quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ic.candid_decode(ok)},
+            &quot;Err&quot;: lambda err: {&quot;Err&quot;: err},
+        },
+    )
 </code></pre>
 
                     </main>

@@ -151,8 +151,12 @@
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, ic, query, update
-from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
+<pre><code class="language-python">from kybra import Async, CallResult, match, ic, query, update
+from kybra.canisters.management import (
+    HttpResponse,
+    HttpTransformArgs,
+    management_canister,
+)
 
 
 @update
@@ -175,12 +179,12 @@ def xkcd() -&gt; Async[HttpResponse]:
         }
     ).with_cycles(cycle_cost_total)
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
-        ic.trap(&quot;http_result had an error&quot;)
+    def handle_http_result_err(err: str):
+        if err:
+            ic.trap(err)
+        ic.trap(err)
 
-    return http_result.ok
+    return match(http_result, {&quot;Ok&quot;: lambda ok: ok, &quot;Err&quot;: handle_http_result_err})
 
 
 @query

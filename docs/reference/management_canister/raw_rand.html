@@ -153,7 +153,7 @@
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/timers">timers</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CallResult, update
+<pre><code class="language-python">from kybra import Async, blob, CallResult, match, update
 from kybra.canisters.management import management_canister
 
 
@@ -161,10 +161,7 @@ from kybra.canisters.management import management_canister
 def get_randomness_directly() -&gt; Async[blob]:
     randomness_result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if randomness_result.err is not None:
-        return bytes()
-
-    return randomness_result.ok
+    return match(randomness_result, {&quot;Ok&quot;: lambda ok: ok, &quot;Err&quot;: lambda err: err})
 </code></pre>
 
                     </main>

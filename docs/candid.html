@@ -180,26 +180,27 @@
 <p>The following is a simple example showing how to import and use most of the Candid types available in Kybra:</p>
 <pre><code class="language-python">from kybra import (
     blob,
-    nat,
-    nat64,
-    nat32,
-    nat16,
-    nat8,
-    int64,
-    int32,
-    int16,
-    int8,
     float64,
     float32,
+    Func,
+    int8,
+    int16,
+    int32,
+    int64,
+    nat,
+    nat8,
+    nat16,
+    nat32,
+    nat64,
     null,
     opt,
     Principal,
-    Variant,
-    Func,
     query,
     Query,
-    Record
+    Record,
+    Variant,
 )
+
 
 class Candid(Record):
     text: str
@@ -217,56 +218,51 @@ class Candid(Record):
     float64: float64
     float32: float32
     bool: bool
-    opt: opt['nat']
-    record: 'CandidRecord'
-    variant: 'CandidVariant'
-    func: 'CandidFunc'
+    opt: opt[&quot;nat&quot;]
+    record: &quot;CandidRecord&quot;
+    variant: &quot;CandidVariant&quot;
+    func: &quot;CandidFunc&quot;
     principal: Principal
+
 
 class CandidRecord(Record):
     first_name: str
     last_name: str
     age: nat8
 
+
 class CandidVariant(Variant, total=False):
     Tag1: null
     Tag2: null
     Tag3: int
 
+
 CandidFunc = Func(Query[[], Candid])
+
 
 @query
 def candid_types() -&gt; Candid:
     return {
-        'text': 'text',
-        'blob': bytes(),
-        'nat': 340_282_366_920_938_463_463_374_607_431_768_211_455,
-        'nat64': 18_446_744_073_709_551_615,
-        'nat32': 4_294_967_295,
-        'nat16': 65_535,
-        'nat8': 255,
-        'int': 170_141_183_460_469_231_731_687_303_715_884_105_727,
-        'int64': 9_223_372_036_854_775_807,
-        'int32': 2_147_483_647,
-        'int16': 32_767,
-        'int8': 127,
-        'float64': 0.0,
-        'float32': 0.0,
-        'bool': True,
-        'opt': None,
-        'record': {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'age': 35
-        },
-        'variant': {
-            'Tag1': None
-        },
-        'func': (
-            Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'),
-            'candid_types'
-        ),
-        'principal': Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai')
+        &quot;text&quot;: &quot;text&quot;,
+        &quot;blob&quot;: bytes(),
+        &quot;nat&quot;: 340_282_366_920_938_463_463_374_607_431_768_211_455,
+        &quot;nat64&quot;: 18_446_744_073_709_551_615,
+        &quot;nat32&quot;: 4_294_967_295,
+        &quot;nat16&quot;: 65_535,
+        &quot;nat8&quot;: 255,
+        &quot;int&quot;: 170_141_183_460_469_231_731_687_303_715_884_105_727,
+        &quot;int64&quot;: 9_223_372_036_854_775_807,
+        &quot;int32&quot;: 2_147_483_647,
+        &quot;int16&quot;: 32_767,
+        &quot;int8&quot;: 127,
+        &quot;float64&quot;: 0.0,
+        &quot;float32&quot;: 0.0,
+        &quot;bool&quot;: True,
+        &quot;opt&quot;: None,
+        &quot;record&quot;: {&quot;first_name&quot;: &quot;John&quot;, &quot;last_name&quot;: &quot;Doe&quot;, &quot;age&quot;: 35},
+        &quot;variant&quot;: {&quot;Tag1&quot;: None},
+        &quot;func&quot;: (Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;), &quot;candid_types&quot;),
+        &quot;principal&quot;: Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;),
     }
 </code></pre>
 <p>Calling <code>candid_types</code> with <code>dfx</code> will return:</p>
@@ -304,9 +300,11 @@ def candid_types() -&gt; Candid:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query
 
+
 @query
 def get_string() -&gt; str:
-    return 'Hello world!'
+    return &quot;Hello world!&quot;
+
 
 @query
 def print_string(string: str) -&gt; str:
@@ -324,9 +322,11 @@ def print_string(string: str) -&gt; str:
 <p>Python:</p>
 <pre><code class="language-Python">from kybra import blob, ic, query
 
+
 @query
 def get_blob() -&gt; blob:
     return bytes([68, 73, 68, 76, 0, 0])
+
 
 @query
 def print_blob(blob: blob) -&gt; blob:
@@ -334,7 +334,7 @@ def print_blob(blob: blob) -&gt; blob:
     return blob
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_blob&quot;: () -&gt; (blob) query;
     &quot;print_blob&quot;: (blob) -&gt; (blob) query;
 }
@@ -344,9 +344,11 @@ def print_blob(blob: blob) -&gt; blob:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat, query
 
+
 @query
 def get_nat() -&gt; nat:
     return 340_282_366_920_938_463_463_374_607_431_768_211_455
+
 
 @query
 def print_nat(nat: nat) -&gt; nat:
@@ -354,7 +356,7 @@ def print_nat(nat: nat) -&gt; nat:
     return nat
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat&quot;: () -&gt; (nat) query;
     &quot;print_nat&quot;: (nat) -&gt; (nat) query;
 }
@@ -364,9 +366,11 @@ def print_nat(nat: nat) -&gt; nat:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat64, query
 
+
 @query
 def get_nat64() -&gt; nat64:
     return 18_446_744_073_709_551_615
+
 
 @query
 def print_nat64(nat64: nat64) -&gt; nat64:
@@ -374,7 +378,7 @@ def print_nat64(nat64: nat64) -&gt; nat64:
     return nat64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat64&quot;: () -&gt; (nat64) query;
     &quot;print_nat64&quot;: (nat64) -&gt; (nat64) query;
 }
@@ -384,9 +388,11 @@ def print_nat64(nat64: nat64) -&gt; nat64:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat32, query
 
+
 @query
 def get_nat32() -&gt; nat32:
     return 4_294_967_295
+
 
 @query
 def print_nat32(nat32: nat32) -&gt; nat32:
@@ -394,7 +400,7 @@ def print_nat32(nat32: nat32) -&gt; nat32:
     return nat32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat32&quot;: () -&gt; (nat32) query;
     &quot;print_nat32&quot;: (nat32) -&gt; (nat32) query;
 }
@@ -404,9 +410,11 @@ def print_nat32(nat32: nat32) -&gt; nat32:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat16, query
 
+
 @query
 def get_nat16() -&gt; nat16:
     return 65_535
+
 
 @query
 def print_nat16(nat16: nat16) -&gt; nat16:
@@ -414,7 +422,7 @@ def print_nat16(nat16: nat16) -&gt; nat16:
     return nat16
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat16&quot;: () -&gt; (nat16) query;
     &quot;print_nat16&quot;: (nat16) -&gt; (nat16) query;
 }
@@ -424,9 +432,11 @@ def print_nat16(nat16: nat16) -&gt; nat16:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat8, query
 
+
 @query
 def get_nat8() -&gt; nat8:
     return 255
+
 
 @query
 def print_nat8(nat8: nat8) -&gt; nat8:
@@ -434,7 +444,7 @@ def print_nat8(nat8: nat8) -&gt; nat8:
     return nat8
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat8&quot;: () -&gt; (nat8) query;
     &quot;print_nat8&quot;: (nat8) -&gt; (nat8) query;
 }
@@ -456,7 +466,7 @@ def print_int(int: int) -&gt; int:
     return int
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int&quot;: () -&gt; (int) query;
     &quot;print_int&quot;: (int) -&gt; (int) query;
 }
@@ -478,7 +488,7 @@ def print_int64(int64: int64) -&gt; int64:
     return int64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int64&quot;: () -&gt; (int64) query;
     &quot;print_int64&quot;: (int64) -&gt; (int64) query;
 }
@@ -488,9 +498,11 @@ def print_int64(int64: int64) -&gt; int64:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int32, query
 
+
 @query
 def get_int32() -&gt; int32:
     return 2_147_483_647
+
 
 @query
 def print_int32(int32: int32) -&gt; int32:
@@ -498,7 +510,7 @@ def print_int32(int32: int32) -&gt; int32:
     return int32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int32&quot;: () -&gt; (int32) query;
     &quot;print_int32&quot;: (int32) -&gt; (int32) query;
 }
@@ -508,9 +520,11 @@ def print_int32(int32: int32) -&gt; int32:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int16, query
 
+
 @query
 def get_int16() -&gt; int16:
     return 32_767
+
 
 @query
 def print_int16(int16: int16) -&gt; int16:
@@ -518,7 +532,7 @@ def print_int16(int16: int16) -&gt; int16:
     return int16
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int16&quot;: () -&gt; (int16) query;
     &quot;print_int16&quot;: (int16) -&gt; (int16) query;
 }
@@ -528,9 +542,11 @@ def print_int16(int16: int16) -&gt; int16:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int8, query
 
+
 @query
 def get_int8() -&gt; int8:
     return 127
+
 
 @query
 def print_int8(int8: int8) -&gt; int8:
@@ -538,7 +554,7 @@ def print_int8(int8: int8) -&gt; int8:
     return int8
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int8&quot;: () -&gt; (int8) query;
     &quot;print_int8&quot;: (int8) -&gt; (int8) query;
 }
@@ -555,13 +571,14 @@ from kybra import float64, ic, query
 def get_float64() -&gt; float64:
     return math.e
 
+
 @query
 def print_float64(float64: float64) -&gt; float64:
     ic.print(type(float64))
     return float64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_float64&quot;: () -&gt; (float64) query;
     &quot;print_float64&quot;: (float64) -&gt; (float64) query;
 }
@@ -585,7 +602,7 @@ def print_float32(float32: float32) -&gt; float32:
     return float32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_float32&quot;: () -&gt; (float32) query;
     &quot;print_float32&quot;: (float32) -&gt; (float32) query;
 }
@@ -595,9 +612,11 @@ def print_float32(float32: float32) -&gt; float32:
 <p>Python:</p>
 <pre><code class="language-Python">from kybra import ic, query
 
+
 @query
 def get_bool() -&gt; bool:
     return True
+
 
 @query
 def print_bool(bool: bool) -&gt; bool:
@@ -605,7 +624,7 @@ def print_bool(bool: bool) -&gt; bool:
     return bool
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_bool&quot;: () -&gt; (bool) query;
     &quot;print_bool&quot;: (bool) -&gt; (bool) query;
 }
@@ -615,9 +634,11 @@ def print_bool(bool: bool) -&gt; bool:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query
 
+
 @query
 def get_null() -&gt; None:
     return None
+
 
 @query
 def print_null(none: None) -&gt; None:
@@ -625,7 +646,7 @@ def print_null(none: None) -&gt; None:
     return none
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_null&quot;: () -&gt; (null) query;
     &quot;print_null&quot;: (null) -&gt; (null) query;
 }
@@ -635,12 +656,13 @@ def print_null(none: None) -&gt; None:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import int32, query
 
+
 @query
 def get_numbers() -&gt; list[int32]:
     return [0, 1, 2, 3]
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_numbers&quot;: () -&gt; (vec int32) query;
 }
 </code></pre>
@@ -649,16 +671,18 @@ def get_numbers() -&gt; list[int32]:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import opt, query
 
+
 @query
 def get_opt_some() -&gt; opt[bool]:
     return True
+
 
 @query
 def get_opt_none() -&gt; opt[bool]:
     return None
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_opt_some&quot;: () -&gt; (opt bool) query;
     &quot;get_opt_none&quot;: () -&gt; (opt bool) query;
 }
@@ -690,7 +714,7 @@ class User(Record):
     username: str
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">type Post = record {
+<pre><code>type Post = record {
     &quot;id&quot;: text;
     &quot;author&quot;: User;
     &quot;text&quot;: text;
@@ -735,7 +759,7 @@ class Firework(Variant, total=False):
     NumStreaks: nat32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">type ReactionType = variant {
+<pre><code>type ReactionType = variant {
     &quot;Fire&quot;: null;
     &quot;ThumbsUp&quot;: null;
     &quot;ThumbsDown&quot;: null;
@@ -786,7 +810,7 @@ def get_complex_func() -&gt; ComplexFunc:
     return (Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;), &quot;complex_function_name&quot;)
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">type User = record {
+<pre><code>type User = record {
     &quot;id&quot;: text;
     &quot;basic_func&quot;: BasicFunc;
     &quot;complex_func&quot;: ComplexFunc;
@@ -809,9 +833,11 @@ service: () -&gt; {
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, Principal, query
 
+
 @query
 def get_principal() -&gt; Principal:
-    return Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai')
+    return Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;)
+
 
 @query
 def print_principal(principal: Principal) -&gt; Principal:
@@ -819,7 +845,7 @@ def print_principal(principal: Principal) -&gt; Principal:
     return principal
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_principal&quot;: () -&gt; (principal) query;
     &quot;print_principal&quot;: (principal) -&gt; (principal) query;
 }
@@ -829,9 +855,11 @@ def print_principal(principal: Principal) -&gt; Principal:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query, reserved
 
+
 @query
 def get_reserved() -&gt; reserved:
-    return 'anything'
+    return &quot;anything&quot;
+
 
 @query
 def print_reserved(reserved: reserved) -&gt; reserved:
@@ -839,7 +867,7 @@ def print_reserved(reserved: reserved) -&gt; reserved:
     return reserved
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_reserved&quot;: () -&gt; (reserved) query;
     &quot;print_reserved&quot;: (reserved) -&gt; (reserved) query;
 }
@@ -849,18 +877,20 @@ def print_reserved(reserved: reserved) -&gt; reserved:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import empty, ic, query
 
+
 def get_empty() -&gt; empty:
-    raise Exception('Anything you want')
+    raise Exception(&quot;Anything you want&quot;)
+
 
 # Note: It is impossible to call this function because it requires an argument
 # but there is no way to pass an &quot;empty&quot; value as an argument.
 @query
 def print_empty(empty: empty) -&gt; empty:
     ic.print(type(empty))
-    raise Exception('Anything you want')
+    raise Exception(&quot;Anything you want&quot;)
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_empty&quot;: () -&gt; (empty) query;
     &quot;print_empty&quot;: (empty) -&gt; (empty) query;
 }

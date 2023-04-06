@@ -162,7 +162,7 @@ def print_int(int: int) -&gt; int:
     return int
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int&quot;: () -&gt; (int) query;
     &quot;print_int&quot;: (int) -&gt; (int) query;
 }

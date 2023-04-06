@@ -150,17 +150,20 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query
 
+
 @query
 def get_string() -&gt; str:
-    return 'Hello world!'
+    return &quot;Hello world!&quot;
+
 
 @query
 def print_string(string: str) -&gt; str:
     ic.print(type(string))
     return string
+
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_string&quot;: () -&gt; (text) query;
     &quot;print_string&quot;: (text) -&gt; (text) query;
 }

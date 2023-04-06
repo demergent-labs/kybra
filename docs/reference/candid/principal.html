@@ -150,9 +150,11 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, Principal, query
 
+
 @query
 def get_principal() -&gt; Principal:
-    return Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai')
+    return Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;)
+
 
 @query
 def print_principal(principal: Principal) -&gt; Principal:
@@ -160,7 +162,7 @@ def print_principal(principal: Principal) -&gt; Principal:
     return principal
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_principal&quot;: () -&gt; (principal) query;
     &quot;print_principal&quot;: (principal) -&gt; (principal) query;
 }

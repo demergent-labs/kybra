@@ -150,9 +150,11 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int32, query
 
+
 @query
 def get_int32() -&gt; int32:
     return 2_147_483_647
+
 
 @query
 def print_int32(int32: int32) -&gt; int32:
@@ -160,7 +162,7 @@ def print_int32(int32: int32) -&gt; int32:
     return int32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int32&quot;: () -&gt; (int32) query;
     &quot;print_int32&quot;: (int32) -&gt; (int32) query;
 }

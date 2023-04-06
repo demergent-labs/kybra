@@ -146,19 +146,22 @@
                     <main>
                         <h1 id="canister-lifecycle"><a class="header" href="#canister-lifecycle">Canister Lifecycle</a></h1>
 <p>This chapter is a work in progress.</p>
-<pre><code class="language-python">from kybra import init, post_upgrade, pre_upgrade
+<pre><code class="language-python">from kybra import init, post_upgrade, pre_upgrade, void
+
 
 @init
 def init_() -&gt; void:
-    print('runs on first canister install')
+    print(&quot;runs on first canister install&quot;)
+
 
 @pre_upgrade
 def pre_upgrade_() -&gt; void:
-    print('runs before canister upgrade')
+    print(&quot;runs before canister upgrade&quot;)
+
 
 @post_upgrade
 def post_upgrade_() -&gt; void:
-    print('runs after canister upgrade')
+    print(&quot;runs after canister upgrade&quot;)
 </code></pre>
 
                     </main>

@@ -148,11 +148,13 @@
 <p>This section is a work in progress.</p>
 <p>The Python type <code>bool</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-bool">Candid type bool</a> and will become a <a href="https://docs.python.org/3/library/stdtypes.html#boolean-values">Python Boolean Value</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-Python">from kybra import ic, query
+<pre><code class="language-python">from kybra import ic, query
+
 
 @query
 def get_bool() -&gt; bool:
     return True
+
 
 @query
 def print_bool(bool: bool) -&gt; bool:
@@ -160,7 +162,7 @@ def print_bool(bool: bool) -&gt; bool:
     return bool
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_bool&quot;: () -&gt; (bool) query;
     &quot;print_bool&quot;: (bool) -&gt; (bool) query;
 }

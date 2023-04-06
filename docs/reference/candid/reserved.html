@@ -150,9 +150,11 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query, reserved
 
+
 @query
 def get_reserved() -&gt; reserved:
-    return 'anything'
+    return &quot;anything&quot;
+
 
 @query
 def print_reserved(reserved: reserved) -&gt; reserved:
@@ -160,7 +162,7 @@ def print_reserved(reserved: reserved) -&gt; reserved:
     return reserved
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_reserved&quot;: () -&gt; (reserved) query;
     &quot;print_reserved&quot;: (reserved) -&gt; (reserved) query;
 }

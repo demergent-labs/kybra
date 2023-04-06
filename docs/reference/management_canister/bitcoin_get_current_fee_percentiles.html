@@ -150,15 +150,15 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, match, update, Variant
 from kybra.canisters.management import management_canister, MillisatoshiPerByte
 
 BITCOIN_API_CYCLE_COST = 100_000_000
 
 
 class GetCurrentFeePercentilesResult(Variant, total=False):
-    ok: list[MillisatoshiPerByte]
-    err: str
+    Ok: list[MillisatoshiPerByte]
+    Err: str
 
 
 @update
@@ -171,10 +171,9 @@ def get_current_fee_percentiles() -&gt; Async[GetCurrentFeePercentilesResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: call_result.ok}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 
                     </main>

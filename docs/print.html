@@ -623,9 +623,10 @@ URLs:
 <p>The most basic way to expose your canister's functionality publicly is through a query method. Here's an example of a simple query method:</p>
 <pre><code class="language-python">from kybra import query
 
+
 @query
 def get_string() -&gt; str:
-    return 'This is a query method!'
+    return &quot;This is a query method!&quot;
 </code></pre>
 <p><code>get_string</code> can be called from the outside world through the IC's HTTP API. You'll usually invoke this API from the <a href="./deployment.html#interacting-with-your-canister"><code>dfx command line</code>, <code>dfx web UI</code>, or an agent</a>.</p>
 <p>From the <code>dfx command line</code> you can call it like this:</p>
@@ -636,6 +637,7 @@ def get_string() -&gt; str:
 
 db = {}
 
+
 @query
 def set(key: str, value: str) -&gt; void:
     db[key] = value
@@ -645,13 +647,17 @@ def set(key: str, value: str) -&gt; void:
 <p>There is a limit to how much computation can be done in a single call to a query method. The current query call limit is <a href="https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits">5 billion Wasm instructions</a>. Here's an example of a query method that runs the risk of reaching the limit:</p>
 <pre><code class="language-python">from kybra import nat32, query
 
+
 @query
 def pyramid(levels: nat32) -&gt; str:
     levels_array = [0 for _ in range(levels)]
-    asterisk_array = [ ['*' for _ in range(i + 1)] + ['\n'] for i in range(len(levels_array)) ]
+    asterisk_array = [
+        [&quot;*&quot; for _ in range(i + 1)] + [&quot;\n&quot;] for i in range(len(levels_array))
+    ]
     flattened_array = [element for subarray in asterisk_array for element in subarray]
 
-    return ''.join(flattened_array)
+    return &quot;&quot;.join(flattened_array)
+
 </code></pre>
 <p>From the <code>dfx command line</code> you can call <code>pyramid</code> like this:</p>
 <pre><code class="language-bash">dfx canister call my_canister pyramid '(600)'
@@ -677,6 +683,7 @@ def pyramid(levels: nat32) -&gt; str:
 
 counter = 0
 
+
 @update
 def increment() -&gt; nat64:
     global counter
@@ -688,11 +695,13 @@ def increment() -&gt; nat64:
 <p>Due to the latency and other expenses involved with update methods, it is best to use them only when necessary. Look at the following example:</p>
 <pre><code class="language-python">from kybra import query, update, void
 
-message = ''
+message = &quot;&quot;
+
 
 @query
 def get_message() -&gt; str:
     return message
+
 
 @update
 def set_message(new_message: str) -&gt; void:
@@ -705,22 +714,27 @@ def set_message(new_message: str) -&gt; void:
 
 db: dict[str, str] = {}
 
+
 @query
 def get(key: str) -&gt; opt[str]:
     return db.get(key)
 
+
 @update
 def set(key: str, value: str) -&gt; void:
     db[key] = value
+
 </code></pre>
 <p>If you need more than 4 GiB of storage, consider taking advantage of the 48 GiB of stable memory. Stable structures like <code>StableBTreeMap</code> give you a nice API for interacting with stable memory. These data structures will be <a href="./stable_structures.html">covered in more detail later</a>. Here's a simple example:</p>
 <pre><code class="language-python">from kybra import opt, query, StableBTreeMap, update, void
 
 db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
 
+
 @query
 def get(key: str) -&gt; opt[str]:
     return db.get(key)
+
 
 @update
 def set(key: str, value: str) -&gt; void:
@@ -731,53 +745,63 @@ def set(key: str, value: str) -&gt; void:
 <p>Here's an example of how to trap and ensure atomic changes to your database:</p>
 <pre><code class="language-python">from kybra import ic, opt, query, Record, StableBTreeMap, update, void
 
+
 class Entry(Record):
     key: str
     value: str
 
+
 db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
+
 
 @query
 def get(key: str) -&gt; opt[str]:
     return db.get(key)
 
+
 @update
 def set(key: str, value: str) -&gt; void:
     db.insert(key, value)
 
+
 @update
 def set_many(entries: list[Entry]) -&gt; void:
     for entry in entries:
-        result = db.insert(entry['key'], entry['value'])
+        result = db.insert(entry[&quot;key&quot;], entry[&quot;value&quot;])
 
-        if result.err is not None:
-            ic.trap(str(result.err))
+        if result.Err is not None:
+            ic.trap(str(result.Err))
 </code></pre>
 <p>In addition to <code>ic.trap</code>, an explicit Python <code>raise</code> or any unhandled exception will also trap.</p>
 <p>There is a limit to how much computation can be done in a single call to an update method. The current update call limit is <a href="https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits">20 billion Wasm instructions</a>. If we modify our database example, we can introduce an update method that runs the risk reaching the limit:</p>
 <pre><code class="language-python">from kybra import ic, nat64, opt, query, Record, StableBTreeMap, update, void
 
+
 class Entry(Record):
     key: str
     value: str
 
+
 db = StableBTreeMap[str, str](memory_id=0, max_key_size=1_000, max_value_size=1_000)
+
 
 @query
 def get(key: str) -&gt; opt[str]:
     return db.get(key)
 
+
 @update
 def set(key: str, value: str) -&gt; void:
     db.insert(key, value)
+
 
 @update
 def set_many(num_entries: nat64) -&gt; void:
     for i in range(num_entries):
         result = db.insert(str(i), str(i))
 
-        if result.err is not None:
-            ic.trap(str(result.err))
+        if result.Err is not None:
+            ic.trap(str(result.Err))
 </code></pre>
 <p>From the <code>dfx command line</code> you can call <code>set_many</code> like this:</p>
 <pre><code class="language-bash">dfx canister call my_canister set_many '(100_000)'
@@ -820,26 +844,27 @@ def set_many(num_entries: nat64) -&gt; void:
 <p>The following is a simple example showing how to import and use most of the Candid types available in Kybra:</p>
 <pre><code class="language-python">from kybra import (
     blob,
-    nat,
-    nat64,
-    nat32,
-    nat16,
-    nat8,
-    int64,
-    int32,
-    int16,
-    int8,
     float64,
     float32,
+    Func,
+    int8,
+    int16,
+    int32,
+    int64,
+    nat,
+    nat8,
+    nat16,
+    nat32,
+    nat64,
     null,
     opt,
     Principal,
-    Variant,
-    Func,
     query,
     Query,
-    Record
+    Record,
+    Variant,
 )
+
 
 class Candid(Record):
     text: str
@@ -857,56 +882,51 @@ class Candid(Record):
     float64: float64
     float32: float32
     bool: bool
-    opt: opt['nat']
-    record: 'CandidRecord'
-    variant: 'CandidVariant'
-    func: 'CandidFunc'
+    opt: opt[&quot;nat&quot;]
+    record: &quot;CandidRecord&quot;
+    variant: &quot;CandidVariant&quot;
+    func: &quot;CandidFunc&quot;
     principal: Principal
+
 
 class CandidRecord(Record):
     first_name: str
     last_name: str
     age: nat8
 
+
 class CandidVariant(Variant, total=False):
     Tag1: null
     Tag2: null
     Tag3: int
 
+
 CandidFunc = Func(Query[[], Candid])
+
 
 @query
 def candid_types() -&gt; Candid:
     return {
-        'text': 'text',
-        'blob': bytes(),
-        'nat': 340_282_366_920_938_463_463_374_607_431_768_211_455,
-        'nat64': 18_446_744_073_709_551_615,
-        'nat32': 4_294_967_295,
-        'nat16': 65_535,
-        'nat8': 255,
-        'int': 170_141_183_460_469_231_731_687_303_715_884_105_727,
-        'int64': 9_223_372_036_854_775_807,
-        'int32': 2_147_483_647,
-        'int16': 32_767,
-        'int8': 127,
-        'float64': 0.0,
-        'float32': 0.0,
-        'bool': True,
-        'opt': None,
-        'record': {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'age': 35
-        },
-        'variant': {
-            'Tag1': None
-        },
-        'func': (
-            Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'),
-            'candid_types'
-        ),
-        'principal': Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai')
+        &quot;text&quot;: &quot;text&quot;,
+        &quot;blob&quot;: bytes(),
+        &quot;nat&quot;: 340_282_366_920_938_463_463_374_607_431_768_211_455,
+        &quot;nat64&quot;: 18_446_744_073_709_551_615,
+        &quot;nat32&quot;: 4_294_967_295,
+        &quot;nat16&quot;: 65_535,
+        &quot;nat8&quot;: 255,
+        &quot;int&quot;: 170_141_183_460_469_231_731_687_303_715_884_105_727,
+        &quot;int64&quot;: 9_223_372_036_854_775_807,
+        &quot;int32&quot;: 2_147_483_647,
+        &quot;int16&quot;: 32_767,
+        &quot;int8&quot;: 127,
+        &quot;float64&quot;: 0.0,
+        &quot;float32&quot;: 0.0,
+        &quot;bool&quot;: True,
+        &quot;opt&quot;: None,
+        &quot;record&quot;: {&quot;first_name&quot;: &quot;John&quot;, &quot;last_name&quot;: &quot;Doe&quot;, &quot;age&quot;: 35},
+        &quot;variant&quot;: {&quot;Tag1&quot;: None},
+        &quot;func&quot;: (Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;), &quot;candid_types&quot;),
+        &quot;principal&quot;: Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;),
     }
 </code></pre>
 <p>Calling <code>candid_types</code> with <code>dfx</code> will return:</p>
@@ -944,9 +964,11 @@ def candid_types() -&gt; Candid:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query
 
+
 @query
 def get_string() -&gt; str:
-    return 'Hello world!'
+    return &quot;Hello world!&quot;
+
 
 @query
 def print_string(string: str) -&gt; str:
@@ -964,9 +986,11 @@ def print_string(string: str) -&gt; str:
 <p>Python:</p>
 <pre><code class="language-Python">from kybra import blob, ic, query
 
+
 @query
 def get_blob() -&gt; blob:
     return bytes([68, 73, 68, 76, 0, 0])
+
 
 @query
 def print_blob(blob: blob) -&gt; blob:
@@ -974,7 +998,7 @@ def print_blob(blob: blob) -&gt; blob:
     return blob
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_blob&quot;: () -&gt; (blob) query;
     &quot;print_blob&quot;: (blob) -&gt; (blob) query;
 }
@@ -984,9 +1008,11 @@ def print_blob(blob: blob) -&gt; blob:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat, query
 
+
 @query
 def get_nat() -&gt; nat:
     return 340_282_366_920_938_463_463_374_607_431_768_211_455
+
 
 @query
 def print_nat(nat: nat) -&gt; nat:
@@ -994,7 +1020,7 @@ def print_nat(nat: nat) -&gt; nat:
     return nat
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat&quot;: () -&gt; (nat) query;
     &quot;print_nat&quot;: (nat) -&gt; (nat) query;
 }
@@ -1004,9 +1030,11 @@ def print_nat(nat: nat) -&gt; nat:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat64, query
 
+
 @query
 def get_nat64() -&gt; nat64:
     return 18_446_744_073_709_551_615
+
 
 @query
 def print_nat64(nat64: nat64) -&gt; nat64:
@@ -1014,7 +1042,7 @@ def print_nat64(nat64: nat64) -&gt; nat64:
     return nat64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat64&quot;: () -&gt; (nat64) query;
     &quot;print_nat64&quot;: (nat64) -&gt; (nat64) query;
 }
@@ -1024,9 +1052,11 @@ def print_nat64(nat64: nat64) -&gt; nat64:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat32, query
 
+
 @query
 def get_nat32() -&gt; nat32:
     return 4_294_967_295
+
 
 @query
 def print_nat32(nat32: nat32) -&gt; nat32:
@@ -1034,7 +1064,7 @@ def print_nat32(nat32: nat32) -&gt; nat32:
     return nat32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat32&quot;: () -&gt; (nat32) query;
     &quot;print_nat32&quot;: (nat32) -&gt; (nat32) query;
 }
@@ -1044,9 +1074,11 @@ def print_nat32(nat32: nat32) -&gt; nat32:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat16, query
 
+
 @query
 def get_nat16() -&gt; nat16:
     return 65_535
+
 
 @query
 def print_nat16(nat16: nat16) -&gt; nat16:
@@ -1054,7 +1086,7 @@ def print_nat16(nat16: nat16) -&gt; nat16:
     return nat16
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat16&quot;: () -&gt; (nat16) query;
     &quot;print_nat16&quot;: (nat16) -&gt; (nat16) query;
 }
@@ -1064,9 +1096,11 @@ def print_nat16(nat16: nat16) -&gt; nat16:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat8, query
 
+
 @query
 def get_nat8() -&gt; nat8:
     return 255
+
 
 @query
 def print_nat8(nat8: nat8) -&gt; nat8:
@@ -1074,7 +1108,7 @@ def print_nat8(nat8: nat8) -&gt; nat8:
     return nat8
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat8&quot;: () -&gt; (nat8) query;
     &quot;print_nat8&quot;: (nat8) -&gt; (nat8) query;
 }
@@ -1096,7 +1130,7 @@ def print_int(int: int) -&gt; int:
     return int
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int&quot;: () -&gt; (int) query;
     &quot;print_int&quot;: (int) -&gt; (int) query;
 }
@@ -1118,7 +1152,7 @@ def print_int64(int64: int64) -&gt; int64:
     return int64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int64&quot;: () -&gt; (int64) query;
     &quot;print_int64&quot;: (int64) -&gt; (int64) query;
 }
@@ -1128,9 +1162,11 @@ def print_int64(int64: int64) -&gt; int64:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int32, query
 
+
 @query
 def get_int32() -&gt; int32:
     return 2_147_483_647
+
 
 @query
 def print_int32(int32: int32) -&gt; int32:
@@ -1138,7 +1174,7 @@ def print_int32(int32: int32) -&gt; int32:
     return int32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int32&quot;: () -&gt; (int32) query;
     &quot;print_int32&quot;: (int32) -&gt; (int32) query;
 }
@@ -1148,9 +1184,11 @@ def print_int32(int32: int32) -&gt; int32:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int16, query
 
+
 @query
 def get_int16() -&gt; int16:
     return 32_767
+
 
 @query
 def print_int16(int16: int16) -&gt; int16:
@@ -1158,7 +1196,7 @@ def print_int16(int16: int16) -&gt; int16:
     return int16
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int16&quot;: () -&gt; (int16) query;
     &quot;print_int16&quot;: (int16) -&gt; (int16) query;
 }
@@ -1168,9 +1206,11 @@ def print_int16(int16: int16) -&gt; int16:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int8, query
 
+
 @query
 def get_int8() -&gt; int8:
     return 127
+
 
 @query
 def print_int8(int8: int8) -&gt; int8:
@@ -1178,7 +1218,7 @@ def print_int8(int8: int8) -&gt; int8:
     return int8
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int8&quot;: () -&gt; (int8) query;
     &quot;print_int8&quot;: (int8) -&gt; (int8) query;
 }
@@ -1195,13 +1235,14 @@ from kybra import float64, ic, query
 def get_float64() -&gt; float64:
     return math.e
 
+
 @query
 def print_float64(float64: float64) -&gt; float64:
     ic.print(type(float64))
     return float64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_float64&quot;: () -&gt; (float64) query;
     &quot;print_float64&quot;: (float64) -&gt; (float64) query;
 }
@@ -1225,7 +1266,7 @@ def print_float32(float32: float32) -&gt; float32:
     return float32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_float32&quot;: () -&gt; (float32) query;
     &quot;print_float32&quot;: (float32) -&gt; (float32) query;
 }
@@ -1235,9 +1276,11 @@ def print_float32(float32: float32) -&gt; float32:
 <p>Python:</p>
 <pre><code class="language-Python">from kybra import ic, query
 
+
 @query
 def get_bool() -&gt; bool:
     return True
+
 
 @query
 def print_bool(bool: bool) -&gt; bool:
@@ -1245,7 +1288,7 @@ def print_bool(bool: bool) -&gt; bool:
     return bool
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_bool&quot;: () -&gt; (bool) query;
     &quot;print_bool&quot;: (bool) -&gt; (bool) query;
 }
@@ -1255,9 +1298,11 @@ def print_bool(bool: bool) -&gt; bool:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query
 
+
 @query
 def get_null() -&gt; None:
     return None
+
 
 @query
 def print_null(none: None) -&gt; None:
@@ -1265,7 +1310,7 @@ def print_null(none: None) -&gt; None:
     return none
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_null&quot;: () -&gt; (null) query;
     &quot;print_null&quot;: (null) -&gt; (null) query;
 }
@@ -1275,12 +1320,13 @@ def print_null(none: None) -&gt; None:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import int32, query
 
+
 @query
 def get_numbers() -&gt; list[int32]:
     return [0, 1, 2, 3]
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_numbers&quot;: () -&gt; (vec int32) query;
 }
 </code></pre>
@@ -1289,16 +1335,18 @@ def get_numbers() -&gt; list[int32]:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import opt, query
 
+
 @query
 def get_opt_some() -&gt; opt[bool]:
     return True
+
 
 @query
 def get_opt_none() -&gt; opt[bool]:
     return None
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_opt_some&quot;: () -&gt; (opt bool) query;
     &quot;get_opt_none&quot;: () -&gt; (opt bool) query;
 }
@@ -1330,7 +1378,7 @@ class User(Record):
     username: str
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">type Post = record {
+<pre><code>type Post = record {
     &quot;id&quot;: text;
     &quot;author&quot;: User;
     &quot;text&quot;: text;
@@ -1375,7 +1423,7 @@ class Firework(Variant, total=False):
     NumStreaks: nat32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">type ReactionType = variant {
+<pre><code>type ReactionType = variant {
     &quot;Fire&quot;: null;
     &quot;ThumbsUp&quot;: null;
     &quot;ThumbsDown&quot;: null;
@@ -1426,7 +1474,7 @@ def get_complex_func() -&gt; ComplexFunc:
     return (Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;), &quot;complex_function_name&quot;)
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">type User = record {
+<pre><code>type User = record {
     &quot;id&quot;: text;
     &quot;basic_func&quot;: BasicFunc;
     &quot;complex_func&quot;: ComplexFunc;
@@ -1449,9 +1497,11 @@ service: () -&gt; {
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, Principal, query
 
+
 @query
 def get_principal() -&gt; Principal:
-    return Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai')
+    return Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;)
+
 
 @query
 def print_principal(principal: Principal) -&gt; Principal:
@@ -1459,7 +1509,7 @@ def print_principal(principal: Principal) -&gt; Principal:
     return principal
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_principal&quot;: () -&gt; (principal) query;
     &quot;print_principal&quot;: (principal) -&gt; (principal) query;
 }
@@ -1469,9 +1519,11 @@ def print_principal(principal: Principal) -&gt; Principal:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query, reserved
 
+
 @query
 def get_reserved() -&gt; reserved:
-    return 'anything'
+    return &quot;anything&quot;
+
 
 @query
 def print_reserved(reserved: reserved) -&gt; reserved:
@@ -1479,7 +1531,7 @@ def print_reserved(reserved: reserved) -&gt; reserved:
     return reserved
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_reserved&quot;: () -&gt; (reserved) query;
     &quot;print_reserved&quot;: (reserved) -&gt; (reserved) query;
 }
@@ -1489,18 +1541,20 @@ def print_reserved(reserved: reserved) -&gt; reserved:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import empty, ic, query
 
+
 def get_empty() -&gt; empty:
-    raise Exception('Anything you want')
+    raise Exception(&quot;Anything you want&quot;)
+
 
 # Note: It is impossible to call this function because it requires an argument
 # but there is no way to pass an &quot;empty&quot; value as an argument.
 @query
 def print_empty(empty: empty) -&gt; empty:
     ic.print(type(empty))
-    raise Exception('Anything you want')
+    raise Exception(&quot;Anything you want&quot;)
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_empty&quot;: () -&gt; (empty) query;
     &quot;print_empty&quot;: (empty) -&gt; (empty) query;
 }
@@ -1531,68 +1585,74 @@ map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_
 <p>Here's an example showing all of the basic <code>StableBTreeMap</code> operations:</p>
 <pre><code class="language-python">from kybra import (
     InsertError,
+    match,
     nat64,
     nat8,
     opt,
     query,
     StableBTreeMap,
     update,
-    Variant
+    Variant,
 )
 
 Key = nat8
 Value = str
 
+
 class InsertResult(Variant, total=False):
-    ok: opt[Value]
-    err: InsertError
+    Ok: opt[Value]
+    Err: InsertError
+
 
 map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
+
 
 @query
 def contains_key(key: Key) -&gt; bool:
     return map.contains_key(key)
 
+
 @query
 def get(key: Key) -&gt; opt[Value]:
     return map.get(key)
+
 
 @update
 def insert(key: Key, value: Value) -&gt; InsertResult:
     result = map.insert(key, value)
 
-    if result.err is not None:
-        return {
-            'err': result.err
-        }
+    return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
 
-    return {
-        'ok': result.ok
-    }
 
 @query
 def is_empty() -&gt; bool:
     return map.is_empty()
 
+
 @query
 def items() -&gt; list[tuple[Key, Value]]:
     return map.items()
+
 
 @query
 def keys() -&gt; list[Key]:
     return map.keys()
 
+
 @query
 def len() -&gt; nat64:
     return map.len()
+
 
 @update
 def remove(key: Key) -&gt; opt[Value]:
     return map.remove(key)
 
+
 @query
 def values() -&gt; list[Value]:
     return map.values()
+
 </code></pre>
 <p>With these basic operations you can build more complex CRUD database applications:</p>
 <pre><code class="language-python">import math
@@ -1602,6 +1662,7 @@ from kybra import (
     blob,
     ic,
     InsertError,
+    match,
     nat64,
     opt,
     Principal,
@@ -1637,8 +1698,8 @@ recordings = StableBTreeMap[Principal, Recording](
 
 
 class CreateUserResult(Variant, total=False):
-    ok: User
-    err: InsertError
+    Ok: User
+    Err: InsertError
 
 
 @update
@@ -1653,10 +1714,9 @@ def create_user(username: str) -&gt; CreateUserResult:
 
     result = users.insert(user[&quot;id&quot;], user)
 
-    if result.err is not None:
-        return {&quot;err&quot;: result.err}
-
-    return {&quot;ok&quot;: user}
+    return match(
+        result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: user}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 
 
 @query
@@ -1670,8 +1730,8 @@ def read_user_by_id(id: Principal) -&gt; opt[User]:
 
 
 class DeleteUserResult(Variant, total=False):
-    ok: User
-    err: &quot;DeleteUserErr&quot;
+    Ok: User
+    Err: &quot;DeleteUserErr&quot;
 
 
 class DeleteUserErr(Variant, total=False):
@@ -1683,19 +1743,19 @@ def delete_user(id: Principal) -&gt; DeleteUserResult:
     user = users.get(id)
 
     if user is None:
-        return {&quot;err&quot;: {&quot;UserDoesNotExist&quot;: id}}
+        return {&quot;Err&quot;: {&quot;UserDoesNotExist&quot;: id}}
 
     for recording_id in user[&quot;recording_ids&quot;]:
         recordings.remove(recording_id)
 
     users.remove(user[&quot;id&quot;])
 
-    return {&quot;ok&quot;: user}
+    return {&quot;Ok&quot;: user}
 
 
 class CreateRecordingResult(Variant, total=False):
-    ok: Recording
-    err: &quot;CreateRecordingErr&quot;
+    Ok: Recording
+    Err: &quot;CreateRecordingErr&quot;
 
 
 class CreateRecordingErr(Variant, total=False):
@@ -1710,7 +1770,7 @@ def create_recording(
     user = users.get(user_id)
 
     if user is None:
-        return {&quot;err&quot;: {&quot;UserDoesNotExist&quot;: user_id}}
+        return {&quot;Err&quot;: {&quot;UserDoesNotExist&quot;: user_id}}
 
     id = generate_id()
     recording: Recording = {
@@ -1723,20 +1783,29 @@ def create_recording(
 
     create_recording_result = recordings.insert(recording[&quot;id&quot;], recording)
 
-    if create_recording_result.err is not None:
-        return {&quot;err&quot;: {&quot;InsertError&quot;: create_recording_result.err}}
+    def handle_create_record_result_ok(_) -&gt; CreateRecordingResult:
+        updated_user: User = {
+            **user,
+            &quot;recording_ids&quot;: [*user[&quot;recording_ids&quot;], recording[&quot;id&quot;]],
+        }
 
-    updated_user: User = {
-        **user,
-        &quot;recording_ids&quot;: [*user[&quot;recording_ids&quot;], recording[&quot;id&quot;]],
-    }
+        update_user_result = users.insert(updated_user[&quot;id&quot;], updated_user)
 
-    update_user_result = users.insert(updated_user[&quot;id&quot;], updated_user)
+        return match(
+            update_user_result,
+            {
+                &quot;Ok&quot;: lambda _: {&quot;Ok&quot;: recording},
+                &quot;Err&quot;: lambda err: {&quot;Err&quot;: {&quot;InsertError&quot;: err}},
+            },
+        )
 
-    if update_user_result.err is not None:
-        return {&quot;err&quot;: {&quot;InsertError&quot;: update_user_result.err}}
-
-    return {&quot;ok&quot;: recording}
+    return match(
+        create_recording_result,
+        {
+            &quot;Ok&quot;: handle_create_record_result_ok,
+            &quot;Err&quot;: lambda err: {&quot;Err&quot;: {&quot;InsertError&quot;: err}},
+        },
+    )
 
 
 @query
@@ -1750,8 +1819,8 @@ def read_recording_by_id(id: Principal) -&gt; opt[Recording]:
 
 
 class DeleteRecordingResult(Variant, total=False):
-    ok: Recording
-    err: &quot;DeleteRecordingError&quot;
+    Ok: Recording
+    Err: &quot;DeleteRecordingError&quot;
 
 
 class DeleteRecordingError(Variant, total=False):
@@ -1765,12 +1834,12 @@ def delete_recording(id: Principal) -&gt; DeleteRecordingResult:
     recording = recordings.get(id)
 
     if recording is None:
-        return {&quot;err&quot;: {&quot;RecordingDoesNotExist&quot;: id}}
+        return {&quot;Err&quot;: {&quot;RecordingDoesNotExist&quot;: id}}
 
     user = users.get(recording[&quot;user_id&quot;])
 
     if user is None:
-        return {&quot;err&quot;: {&quot;UserDoesNotExist&quot;: recording[&quot;user_id&quot;]}}
+        return {&quot;Err&quot;: {&quot;UserDoesNotExist&quot;: recording[&quot;user_id&quot;]}}
 
     updated_user: User = {
         **user,
@@ -1784,12 +1853,17 @@ def delete_recording(id: Principal) -&gt; DeleteRecordingResult:
 
     update_user_result = users.insert(updated_user[&quot;id&quot;], updated_user)
 
-    if update_user_result.err is not None:
-        return {&quot;err&quot;: {&quot;InsertError&quot;: update_user_result.err}}
+    def handle_update_user_result_ok(_) -&gt; DeleteRecordingResult:
+        recordings.remove(id)
+        return {&quot;Ok&quot;: recording}
 
-    recordings.remove(id)
-
-    return {&quot;ok&quot;: recording}
+    return match(
+        update_user_result,
+        {
+            &quot;Ok&quot;: handle_update_user_result_ok,
+            &quot;Err&quot;: lambda err: {&quot;Err&quot;: {&quot;InsertError&quot;: err}},
+        },
+    )
 
 
 def generate_id() -&gt; Principal:
@@ -1801,22 +1875,7 @@ def generate_id() -&gt; Principal:
 </code></pre>
 <p>The example above shows a very basic audio recording backend application. There are two types of entities that need to be stored, <code>User</code> and <code>Recording</code>. These are represented as <code>Candid</code> records.</p>
 <p>Each entity gets its own <code>StableBTreeMap</code>:</p>
-<pre><code class="language-python">import math
-import _random
-
-from kybra import (
-    blob,
-    ic,
-    InsertError,
-    nat64,
-    opt,
-    Principal,
-    query,
-    Record,
-    StableBTreeMap,
-    update,
-    Variant,
-)
+<pre><code class="language-python">from kybra import blob, nat64, Principal, Record, StableBTreeMap
 
 
 class User(Record):
@@ -1843,7 +1902,12 @@ recordings = StableBTreeMap[Principal, Recording](
 </code></pre>
 <p>Notice that each <code>StableBTreeMap</code> has a unique <code>memory id</code>. The maximum key and value sizes are also set according to the expected application usage.</p>
 <p>You can figure out the appropriate maximum key and value sizes by reasoning about your application and engaging in some trial and error using the <code>insert</code> method. Calling <code>insert</code> on a <code>StableBTreeMap</code> returns an <code>InsertResult</code> object that looks like this:</p>
-<pre><code class="language-python">K = TypeVar(&quot;K&quot;)
+<pre><code class="language-python">from typing import Generic, Optional, TypeVar
+
+from kybra import nat32, Record, Variant
+
+
+K = TypeVar(&quot;K&quot;)
 V = TypeVar(&quot;V&quot;)
 
 
@@ -1863,12 +1927,12 @@ class InsertError(Variant, total=False):
 
 
 class InsertResult(Generic[V]):
-    ok: V
-    err: Optional[InsertError]
+    Ok: V
+    Err: Optional[InsertError]
 
     def __init__(self, ok: V, err: InsertError):
-        self.ok = ok
-        self.err = err
+        self.Ok = ok
+        self.Err = err
 </code></pre>
 <p>The <code>InsertError</code> variant will in some cases have the information that you need to determine the maximum key or value size. If you attempt to insert a key or value that is too large, the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> records will show you the size of the value that you attempted to insert. You can increase the maximum key or value size based on the information you receive from the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> records and try inserting again.</p>
 <p>Thus through some trial and error you can whittle your way to a correct solution. In some cases all of your values will have an obvious static maximum size. In the audio recording example, trial and error revealed that <code>Principal</code> is most likely always 38 bytes, thus the maximum key size is set to 38.</p>
@@ -1898,7 +1962,10 @@ class InsertResult(Generic[V]):
 <p>Imagine a simple service called <code>token_canister</code>:</p>
 <pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update
 
-accounts = StableBTreeMap[Principal, nat64](memory_id=0, max_key_size=38, max_value_size=15)
+accounts = StableBTreeMap[Principal, nat64](
+    memory_id=0, max_key_size=38, max_value_size=15
+)
+
 
 @update
 def transfer(to: Principal, amount: nat64) -&gt; nat64:
@@ -1913,11 +1980,13 @@ def transfer(to: Principal, amount: nat64) -&gt; nat64:
     return amount
 </code></pre>
 <p>Here's how you would create its service definition:</p>
-<pre><code class="language-python">from kybra import nat64, Principal, Service, service_update, update
+<pre><code class="language-python">from kybra import nat64, Principal, Service, service_update
+
 
 class TokenCanister(Service):
     @service_update
-    def transfer(self, to: Principal, amount: nat64) -&gt; nat64: ...
+    def transfer(self, to: Principal, amount: nat64) -&gt; nat64:
+        ...
 </code></pre>
 <p>Once you have a service definition you can instantiate it with the service's <code>Principal</code> and then invoke its methods.</p>
 <p>Here's how to instantiate <code>TokenCanister</code>:</p>
@@ -1926,35 +1995,38 @@ class TokenCanister(Service):
 )
 </code></pre>
 <p>And here's a more complete example of a service called <code>payout_canister</code> that performs a cross-canister call to <code>token_canister</code>:</p>
-<pre><code class="language-python">from kybra import Async, CallResult, nat64, Principal, Service, service_update, update, Variant
+<pre><code class="language-python">from kybra import (
+    Async,
+    CallResult,
+    match,
+    nat64,
+    Principal,
+    Service,
+    service_update,
+    update,
+    Variant,
+)
+
 
 class TokenCanister(Service):
     @service_update
-    def transfer(self, to: Principal, amount: nat64) -&gt; nat64: ...
+    def transfer(self, to: Principal, amount: nat64) -&gt; nat64:
+        ...
 
-token_canister = TokenCanister(
-    Principal.from_str('r7inp-6aaaa-aaaaa-aaabq-cai')
-)
+
+token_canister = TokenCanister(Principal.from_str(&quot;r7inp-6aaaa-aaaaa-aaabq-cai&quot;))
+
 
 class PayoutResult(Variant, total=False):
-    ok: nat64
-    err: str
+    Ok: nat64
+    Err: str
+
 
 @update
-def payout(
-    to: Principal,
-    amount: nat64
-) -&gt; Async[PayoutResult]:
+def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
     result: CallResult[nat64] = yield token_canister.transfer(to, amount)
 
-    if result.err is not None:
-        return {
-            'err': result.err
-        }
-
-    return {
-        'ok': result.ok
-    }
+    return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
 </code></pre>
 <p>Notice that the <code>token_canister.transfer</code> method, because it is a cross-canister method, returns a <code>CallResult</code>. All cross-canister calls return <code>CallResult</code>, which has an <code>ok</code> or <code>err</code> property depending on if the cross-canister call was successful or not.</p>
 <p>The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a <code>CallResult</code>. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a <code>try...except</code> most likely won't do anything useful.</p>
@@ -1962,14 +2034,19 @@ def payout(
 <p><code>token_canister</code>:</p>
 <pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update, Variant
 
-accounts = StableBTreeMap[Principal, nat64](memory_id=0, max_key_size=38, max_value_size=15)
+accounts = StableBTreeMap[Principal, nat64](
+    memory_id=0, max_key_size=38, max_value_size=15
+)
+
 
 class TransferResult(Variant, total=False):
-    ok: nat64
-    err: 'TransferError'
+    Ok: nat64
+    Err: &quot;TransferError&quot;
+
 
 class TransferError(Variant, total=False):
     InsufficientBalance: nat64
+
 
 @update
 def transfer(to: Principal, amount: nat64) -&gt; TransferResult:
@@ -1978,134 +2055,172 @@ def transfer(to: Principal, amount: nat64) -&gt; TransferResult:
     from_balance = accounts.get(from_) or 0
 
     if from_balance &lt; amount:
-        return {
-            'err': {
-                'InsufficientBalance': from_balance
-            }
-        }
+        return {&quot;Err&quot;: {&quot;InsufficientBalance&quot;: from_balance}}
 
     to_balance = accounts.get(to) or 0
 
     accounts.insert(from_, from_balance - amount)
     accounts.insert(to, to_balance + amount)
 
-    return {
-        'ok': amount
-    }
+    return {&quot;Ok&quot;: amount}
 </code></pre>
 <p><code>payout_canister</code>:</p>
-<pre><code class="language-python">from kybra import Async, CallResult, nat64, Principal, Service, service_update, update, Variant
+<pre><code class="language-python">from kybra import (
+    Async,
+    CallResult,
+    match,
+    nat64,
+    Principal,
+    Service,
+    service_update,
+    update,
+    Variant,
+)
+
 
 class TokenCanister(Service):
     @service_update
-    def transfer(self, to: Principal, amount: nat64) -&gt; 'TransferResult': ...
+    def transfer(self, to: Principal, amount: nat64) -&gt; &quot;TransferResult&quot;:
+        ...
+
 
 class TransferResult(Variant, total=False):
-    ok: nat64
-    err: 'TransferError'
+    Ok: nat64
+    Err: &quot;TransferError&quot;
+
 
 class TransferError(Variant, total=False):
     InsufficientBalance: nat64
 
-token_canister = TokenCanister(
-    Principal.from_str('r7inp-6aaaa-aaaaa-aaabq-cai')
-)
+
+token_canister = TokenCanister(Principal.from_str(&quot;r7inp-6aaaa-aaaaa-aaabq-cai&quot;))
+
 
 class PayoutResult(Variant, total=False):
-    ok: nat64
-    err: str
+    Ok: nat64
+    Err: str
+
 
 @update
-def payout(
-    to: Principal,
-    amount: nat64
-) -&gt; Async[PayoutResult]:
+def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
     call_result: CallResult[TransferResult] = yield token_canister.transfer(to, amount)
 
-    if call_result.err is not None:
-        return {
-            'err': call_result.err
-        }
+    def handle_transfer_result_ok(transfer_result: TransferResult) -&gt; PayoutResult:
+        return match(
+            transfer_result,
+            {
+                &quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok},
+                &quot;Err&quot;: lambda err: {&quot;Err&quot;: str(err)},
+                &quot;_&quot;: lambda _: {
+                    &quot;Err&quot;: f&quot;Ok and Err both do not exist in {str(transfer_result)}&quot;
+                },
+            },
+        )
 
-    transfer_result = call_result.ok
+    return match(
+        call_result,
+        {
+            &quot;Ok&quot;: lambda ok: handle_transfer_result_ok(ok),
+            &quot;Err&quot;: lambda err: {&quot;Err&quot;: err},
+        },
+    )
 
-    if 'err' in transfer_result:
-        return {
-            'err': str(transfer_result['err'])
-        }
-    elif 'ok' not in transfer_result:
-        return {
-            'err': f'ok and err both do not exist in {str(transfer_result)}'
-        }
-
-    return {
-        'ok': transfer_result['ok']
-    }
 </code></pre>
 <p>So far we have only shown a cross-canister call from an update method. Update methods can call other update methods or query methods (but not composite query methods as discussed below). If an update method calls a query method, that query method will be called in replicated mode. Replicated mode engages the consensus process, but for queries the state will still be discarded.</p>
 <p>Cross-canister calls can also be initiated from query methods (not yet live on IC mainnet but this works locally). These are known as composite queries, and in Kybra they are simply query methods that return a generator using the <code>Async</code> type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.</p>
 <p>Here's an example of a composite query method:</p>
-<pre><code class="language-python">from kybra import Async, CallResult, Principal, query, Service, service_query, Variant
+<pre><code class="language-python">from kybra import (
+    Async,
+    CallResult,
+    match,
+    Principal,
+    query,
+    Service,
+    service_query,
+    Variant,
+)
+
 
 class SomeCanister(Service):
     @service_query
-    def query_for_boolean(self) -&gt; bool: ...
+    def query_for_boolean(self) -&gt; bool:
+        ...
 
-some_canister = SomeCanister(
-    Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai')
-)
+
+some_canister = SomeCanister(Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;))
+
 
 class QuerySomeCanisterResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
+
 
 @query
 def query_some_canister() -&gt; Async[QuerySomeCanisterResult]:
     call_result: CallResult[bool] = yield some_canister.query_for_boolean()
 
-    if call_result.err is not None:
-        return {
-            'err': call_result.err
-        }
-
-    return {
-        'ok': call_result.ok
-    }
+    return match(
+        call_result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <p>You can expect cross-canister calls within the same subnet to take up to a few seconds to complete, and cross-canister calls across subnets <a href="https://forum.dfinity.org/t/can-i-run-multiple-inter-canister-update-calls-in-parallel/13115/6">take about double that time</a>.</p>
 <p>If you don't need to wait for your cross-canister call to return, you can use <code>notify</code>:</p>
-<pre><code class="language-python">from kybra import null, Principal, query, RejectionCode, Service, service_update, update, Variant, void
+<pre><code class="language-python">from kybra import (
+    null,
+    Principal,
+    query,
+    RejectionCode,
+    Service,
+    service_update,
+    Variant,
+    void,
+)
+
 
 class SomeCanister(Service):
     @service_update
-    def receive_notification(self) -&gt; void: ...
+    def receive_notification(self) -&gt; void:
+        ...
 
-some_canister = SomeCanister(
-    Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai')
-)
+
+some_canister = SomeCanister(Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;))
+
 
 class ReceiveNotificationResult(Variant, total=False):
-    ok: null
-    err: RejectionCode
+    Ok: null
+    Err: RejectionCode
+
 
 @query
 def send_notification() -&gt; ReceiveNotificationResult:
     return some_canister.receive_notification().notify()
 </code></pre>
 <p>If you need to send cycles with your cross-canister call, you can call <code>with_cycles</code> before calling <code>call</code> or <code>notify</code>:</p>
-<pre><code class="language-python">from kybra import null, Principal, query, RejectionCode, Service, service_update, update, Variant, void
+<pre><code class="language-python">from kybra import (
+    null,
+    Principal,
+    query,
+    RejectionCode,
+    Service,
+    service_update,
+    Variant,
+    void,
+)
+
 
 class SomeCanister(Service):
     @service_update
-    def receive_notification(self) -&gt; void: ...
+    def receive_notification(self) -&gt; void:
+        ...
 
-some_canister = SomeCanister(
-    Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai')
-)
+
+some_canister = SomeCanister(Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;))
+
 
 class ReceiveNotificationResult(Variant, total=False):
-    ok: null
-    err: RejectionCode
+    Ok: null
+    Err: RejectionCode
+
 
 @query
 def send_notification() -&gt; ReceiveNotificationResult:
@@ -2176,18 +2291,35 @@ def http_request(req: HttpRequest) -&gt; HttpResponse:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, ic, init, nat32, query, StableBTreeMap, update
-from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
+<pre><code class="language-python">from kybra import (
+    Async,
+    CallResult,
+    ic,
+    init,
+    match,
+    nat32,
+    query,
+    StableBTreeMap,
+    update,
+    void,
+)
+from kybra.canisters.management import (
+    HttpResponse,
+    HttpTransformArgs,
+    management_canister,
+)
 
 JSON = str
 
 
-stable_storage = StableBTreeMap[str, str](memory_id=0, max_key_size=20, max_value_size=1_000)
+stable_storage = StableBTreeMap[str, str](
+    memory_id=0, max_key_size=20, max_value_size=1_000
+)
 
 
 @init
 def init_(ethereum_url: str) -&gt; void:
-    stable_storage.insert('ethereum_url', ethereum_url)
+    stable_storage.insert(&quot;ethereum_url&quot;, ethereum_url)
 
 
 @update
@@ -2199,24 +2331,28 @@ def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CallResult[HttpResponse] = yield management_canister.http_request({
-        'url': stable_storage.get('ethereum_url') or '',
-        'max_response_bytes': max_response_bytes,
-        'method': {'post': None},
-        'headers': [],
-        'body': f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBalance&quot;,&quot;params&quot;:[&quot;{ethereum_address}&quot;,&quot;earliest&quot;],&quot;id&quot;:1}}'.encode('utf-8'),
-        'transform': {
-            'function': (ic.id(), 'eth_transform'),
-            'context': bytes()
-        },
-    }).with_cycles(cycle_cost_total)
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request(
+        {
+            &quot;url&quot;: stable_storage.get(&quot;ethereum_url&quot;) or &quot;&quot;,
+            &quot;max_response_bytes&quot;: max_response_bytes,
+            &quot;method&quot;: {&quot;post&quot;: None},
+            &quot;headers&quot;: [],
+            &quot;body&quot;: f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBalance&quot;,&quot;params&quot;:[&quot;{ethereum_address}&quot;,&quot;earliest&quot;],&quot;id&quot;:1}}'.encode(
+                &quot;utf-8&quot;
+            ),
+            &quot;transform&quot;: {&quot;function&quot;: (ic.id(), &quot;eth_transform&quot;), &quot;context&quot;: bytes()},
+        }
+    ).with_cycles(cycle_cost_total)
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
-        ic.trap('http_result had an error')
+    def handle_http_result_err(err: str):
+        if err:
+            ic.trap(err)
+        ic.trap(&quot;http_result had an error&quot;)
 
-    return http_result.ok['body'].decode('utf-8')
+    return match(
+        http_result,
+        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: handle_http_result_err},
+    )
 
 
 @update
@@ -2228,72 +2364,73 @@ def eth_get_block_by_number(number: nat32) -&gt; Async[JSON]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CallResult[HttpResponse] = yield management_canister.http_request({
-        'url': stable_storage.get('ethereum_url') or '',
-        'max_response_bytes': max_response_bytes,
-        'method': {'post': None},
-        'headers': [],
-        'body': f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBlockByNumber&quot;,&quot;params&quot;:[&quot;{hex(number)}&quot;, false],&quot;id&quot;:1}}'.encode('utf-8'),
-        'transform': {
-            'function': (ic.id(), 'eth_transform'),
-            'context': bytes()
-        },
-    }).with_cycles(cycle_cost_total)
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request(
+        {
+            &quot;url&quot;: stable_storage.get(&quot;ethereum_url&quot;) or &quot;&quot;,
+            &quot;max_response_bytes&quot;: max_response_bytes,
+            &quot;method&quot;: {&quot;post&quot;: None},
+            &quot;headers&quot;: [],
+            &quot;body&quot;: f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBlockByNumber&quot;,&quot;params&quot;:[&quot;{hex(number)}&quot;, false],&quot;id&quot;:1}}'.encode(
+                &quot;utf-8&quot;
+            ),
+            &quot;transform&quot;: {&quot;function&quot;: (ic.id(), &quot;eth_transform&quot;), &quot;context&quot;: bytes()},
+        }
+    ).with_cycles(cycle_cost_total)
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
-        ic.trap('http_result had an error')
+    def handle_http_result_err(err: str):
+        if err:
+            ic.trap(err)
+        ic.trap(&quot;http_result had an error&quot;)
 
-    return http_result.ok['body'].decode('utf-8')
+    return match(
+        http_result,
+        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: handle_http_result_err},
+    )
 
 
 @query
 def eth_transform(args: HttpTransformArgs) -&gt; HttpResponse:
-    return {
-        **args['response'],
-        'headers': []
-    }
+    return {**args[&quot;response&quot;], &quot;headers&quot;: []}
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="management-canister"><a class="header" href="#management-canister">Management Canister</a></h1>
 <p>This chapter is a work in progress.</p>
 <p>You can access the management canister like this:</p>
-<pre><code class="language-python">from kybra import Async, blob, CallResult, update, Variant
+<pre><code class="language-python">from kybra import Async, blob, CallResult, match, update, Variant
 from kybra.canisters.management import management_canister
 
+
 class RandomBytesResult(Variant, total=False):
-    ok: blob
-    err: str
+    Ok: blob
+    Err: str
+
 
 @update
 def random_bytes() -&gt; Async[RandomBytesResult]:
     call_result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if call_result.err is not None:
-        return {
-            'err': call_result.err
-        }
-
-    return {
-        'ok': call_result.ok
-    }
+    return match(
+        call_result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <p>See the <a href="https://github.com/demergent-labs/kybra/blob/main/kybra/canisters/management/__init__.py">management canister types</a> for all methods and their parameter and return types.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="canister-lifecycle"><a class="header" href="#canister-lifecycle">Canister Lifecycle</a></h1>
 <p>This chapter is a work in progress.</p>
-<pre><code class="language-python">from kybra import init, post_upgrade, pre_upgrade
+<pre><code class="language-python">from kybra import init, post_upgrade, pre_upgrade, void
+
 
 @init
 def init_() -&gt; void:
-    print('runs on first canister install')
+    print(&quot;runs on first canister install&quot;)
+
 
 @pre_upgrade
 def pre_upgrade_() -&gt; void:
-    print('runs before canister upgrade')
+    print(&quot;runs before canister upgrade&quot;)
+
 
 @post_upgrade
 def post_upgrade_() -&gt; void:
-    print('runs after canister upgrade')
+    print(&quot;runs after canister upgrade&quot;)
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="timers"><a class="header" href="#timers">Timers</a></h1>
 <p>This chapter is a work in progress.</p>
@@ -2303,6 +2440,7 @@ def post_upgrade_() -&gt; void:
     CallResult,
     Duration,
     ic,
+    match,
     nat8,
     query,
     Record,
@@ -2415,12 +2553,12 @@ def single_cross_canister_timer_callback() -&gt; Async[blob]:
 
     result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if result.err is not None:
-        return bytes()
+    def handle_result_ok(ok: blob) -&gt; blob:
+        status[&quot;single_cross_canister&quot;] = ok
 
-    status[&quot;single_cross_canister&quot;] = result.ok
+        return ok
 
-    return result.ok
+    return match(result, {&quot;Ok&quot;: handle_result_ok, &quot;Err&quot;: lambda _: bytes()})
 
 
 # TODO It would probably be better for this to have a return type of Async[void] once we have void types working
@@ -2429,12 +2567,11 @@ def repeat_cross_canister_timer_callback() -&gt; Async[blob]:
 
     result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if result.err is not None:
-        return bytes()
+    def handle_result_ok(ok: blob) -&gt; blob:
+        status[&quot;repeat_cross_canister&quot;] += ok
+        return ok
 
-    status[&quot;repeat_cross_canister&quot;] += result.ok
-
-    return result.ok
+    return match(result, {&quot;Ok&quot;: handle_result_ok, &quot;Err&quot;: lambda _: bytes()})
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="cycles"><a class="header" href="#cycles">Cycles</a></h1>
 <p>This chapter is a work in progress.</p>
@@ -2526,7 +2663,7 @@ def repeat_cross_canister_timer_callback() -&gt; Async[blob]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/blob/main/examples/inspect_message/src/main.py">inspect_message</a></li>
 </ul>
-<pre><code class="language-python">from kybra import ic, inspect_message
+<pre><code class="language-python">from kybra import ic, inspect_message, void
 
 
 @inspect_message
@@ -2582,6 +2719,7 @@ def arg_data_raw_size(arg1: blob, arg2: int8, arg3: bool, arg4: str) -&gt; nat32
 <pre><code class="language-python">from kybra import (
     Async,
     CallResult,
+    match,
     nat64,
     Principal,
     Service,
@@ -2601,18 +2739,15 @@ token_canister = TokenCanister(Principal.from_str(&quot;r7inp-6aaaa-aaaaa-aaabq-
 
 
 class PayoutResult(Variant, total=False):
-    ok: nat64
-    err: str
+    Ok: nat64
+    Err: str
 
 
 @update
 def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
     result: CallResult[nat64] = yield token_canister.transfer(to, amount)
 
-    if result.err is not None:
-        return {&quot;err&quot;: result.err}
-
-    return {&quot;ok&quot;: result.ok}
+    return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="call-raw"><a class="header" href="#call-raw">call raw</a></h1>
 <p>This section is a work in progress.</p>
@@ -2626,6 +2761,7 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
     blob,
     CallResult,
     ic,
+    match,
     nat64,
     Principal,
     update,
@@ -2634,8 +2770,8 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
 
 
 class ExecuteCallRawResult(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
 
 
 @update
@@ -2646,10 +2782,13 @@ def execute_call_raw(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: ic.candid_decode(call_result.ok)}
+    return match(
+        call_result,
+        {
+            &quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ic.candid_decode(ok)},
+            &quot;Err&quot;: lambda err: {&quot;Err&quot;: err},
+        },
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="call-raw-128"><a class="header" href="#call-raw-128">call raw 128</a></h1>
 <p>This section is a work in progress.</p>
@@ -2662,30 +2801,34 @@ def execute_call_raw(
     blob,
     CallResult,
     ic,
+    match,
     nat,
     Principal,
     update,
     Variant,
 )
 
+
 class ExecuteCallRaw128Result(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
 
 
 @update
 def execute_call_raw128(
     canister_id: Principal, method: str, candid_args: str, payment: nat
 ) -&gt; Async[ExecuteCallRaw128Result]:
-    canister_result: CallResult[blob] = yield ic.call_raw128(
+    call_result: CallResult[blob] = yield ic.call_raw128(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
-
-    return {&quot;ok&quot;: ic.candid_decode(canister_result.ok)}
-
+    return match(
+        call_result,
+        {
+            &quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ic.candid_decode(ok)},
+            &quot;Err&quot;: lambda err: {&quot;Err&quot;: err},
+        },
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="call-with-payment"><a class="header" href="#call-with-payment">call with payment</a></h1>
 <p>This section is a work in progress.</p>
@@ -2698,9 +2841,13 @@ def execute_call_raw128(
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/threshold_ecdsa">threshold_ecdsa</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CallResult, Principal, update, void
+<pre><code class="language-python">from kybra import Async, blob, CallResult, match, Principal, update, Variant, void
 from kybra.canisters.management import management_canister
-from src.types import DefaultResult
+
+
+class DefaultResult(Variant, total=False):
+    Ok: bool
+    Err: str
 
 
 @update
@@ -2716,10 +2863,9 @@ def execute_install_code(
         }
     ).with_cycles(100_000_000_000)
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="call-with-payment-128"><a class="header" href="#call-with-payment-128">call with payment 128</a></h1>
 <p>This section is a work in progress.</p>
@@ -2727,9 +2873,13 @@ def execute_install_code(
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CallResult, Principal, update, void
+<pre><code class="language-python">from kybra import Async, blob, CallResult, match, Principal, update, Variant, void
 from kybra.canisters.management import management_canister
-from src.types import DefaultResult
+
+
+class DefaultResult(Variant, total=False):
+    Ok: bool
+    Err: str
 
 
 @update
@@ -2745,10 +2895,9 @@ def execute_install_code(
         }
     ).with_cycles128(100_000_000_000)
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="caller"><a class="header" href="#caller">caller</a></h1>
 <p>This section is a work in progress.</p>
@@ -2764,7 +2913,6 @@ def execute_install_code(
 @query
 def caller() -&gt; Principal:
     return ic.caller()
-
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="method-name"><a class="header" href="#method-name">method name</a></h1>
 <p>This section is a work in progress.</p>
@@ -2772,7 +2920,7 @@ def caller() -&gt; Principal:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/inspect_message">inspect_message</a></li>
 </ul>
-<pre><code class="language-python">from kybra import ic, inspect_message, update
+<pre><code class="language-python">from kybra import ic, inspect_message, update, void
 
 
 @inspect_message
@@ -2865,27 +3013,41 @@ def receive_cycles128() -&gt; nat:
     Async,
     CallResult,
     ic,
+    match,
     nat64,
+    Principal,
+    Service,
+    service_update,
     update,
     Variant,
 )
-from src.cycles.types import cycles
 
 
 class SendCyclesResult(Variant, total=False):
-    ok: nat64
-    err: str
+    Ok: nat64
+    Err: str
+
+
+class Cycles(Service):
+    @service_update
+    def receive_cycles(self) -&gt; nat64:
+        ...
+
+
+cycles = Cycles(Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;))
 
 
 # Reports the number of cycles returned from the Cycles canister
 @update
 def send_cycles() -&gt; Async[SendCyclesResult]:
     result: CallResult[nat64] = yield cycles.receive_cycles().with_cycles(1_000_000)
-
-    if result.err is not None:
-        return {&quot;err&quot;: result.err}
-
-    return {&quot;ok&quot;: ic.msg_cycles_refunded()}
+    return match(
+        result,
+        {
+            &quot;Ok&quot;: lambda _: {&quot;Ok&quot;: ic.msg_cycles_refunded()},
+            &quot;Err&quot;: lambda err: {&quot;Err&quot;: err},
+        },
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="msg-cycles-refunded-128"><a class="header" href="#msg-cycles-refunded-128">msg cycles refunded 128</a></h1>
 <p>This section is a work in progress.</p>
@@ -2897,29 +3059,42 @@ def send_cycles() -&gt; Async[SendCyclesResult]:
     Async,
     CallResult,
     ic,
+    match,
     nat,
+    Principal,
+    Service,
+    service_update,
     update,
     Variant,
 )
-from src.cycles.types import cycles
 
 
 class SendCyclesResult128(Variant, total=False):
-    ok: nat
-    err: str
+    Ok: nat
+    Err: str
+
+
+class Cycles(Service):
+    @service_update
+    def receive_cycles128(self) -&gt; nat:
+        ...
+
+
+cycles = Cycles(Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;))
 
 
 # Reports the number of cycles returned from the Cycles canister
 @update
 def send_cycles128() -&gt; Async[SendCyclesResult128]:
-    result: CallResult[nat] = yield cycles.receive_cycles128().with_cycles128(
-        1_000_000
+    result: CallResult[nat] = yield cycles.receive_cycles128().with_cycles128(1_000_000)
+
+    return match(
+        result,
+        {
+            &quot;Ok&quot;: lambda _: {&quot;Ok&quot;: ic.msg_cycles_refunded128()},
+            &quot;Err&quot;: lambda err: {&quot;Err&quot;: err},
+        },
     )
-
-    if result.err is not None:
-        return {&quot;err&quot;: result.err}
-
-    return {&quot;ok&quot;: ic.msg_cycles_refunded128()}
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="notify"><a class="header" href="#notify">notify</a></h1>
 <p>This section is a work in progress.</p>
@@ -2928,8 +3103,14 @@ def send_cycles128() -&gt; Async[SendCyclesResult128]:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cross_canister_calls">cross_canister_calls</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
 </ul>
-<pre><code class="language-python">from kybra import NotifyResult, Principal, update
-from src.canister2.types import Canister2
+<pre><code class="language-python">from kybra import NotifyResult, Principal, Service, service_update, update, void
+
+
+class Canister2(Service):
+    @service_update
+    def receive_notification(self, message: str) -&gt; void:
+        ...
+
 
 canister2 = Canister2(Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;))
 
@@ -2944,12 +3125,12 @@ def send_notification() -&gt; NotifyResult:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/notify_raw">notify_raw</a></li>
 </ul>
-<pre><code class="language-python">from kybra import ic, Principal, RejectionCode, update, Variant
+<pre><code class="language-python">from kybra import ic, match, Principal, RejectionCode, update, Variant
 
 
 class SendNotificationResult(Variant, total=False):
-    ok: bool
-    err: RejectionCode
+    Ok: bool
+    Err: RejectionCode
 
 
 @update
@@ -2961,10 +3142,9 @@ def send_notification() -&gt; SendNotificationResult:
         0,
     )
 
-    if &quot;err&quot; in result:
-        return {&quot;err&quot;: result[&quot;err&quot;]}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="notify-with-payment-128"><a class="header" href="#notify-with-payment-128">notify with payment 128</a></h1>
 <p>This section is a work in progress.</p>
@@ -2972,8 +3152,14 @@ def send_notification() -&gt; SendNotificationResult:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
 </ul>
-<pre><code class="language-python">from kybra import NotifyResult, Principal, update
-from src.cycles.types import Cycles
+<pre><code class="language-python">from kybra import nat, NotifyResult, Principal, Service, service_update, update
+
+
+class Cycles(Service):
+    @service_update
+    @service_update
+    def receive_cycles128(self) -&gt; nat:
+        ...
 
 
 cycles = Cycles(Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;))
@@ -3017,7 +3203,16 @@ def reject(message: str) -&gt; manual[empty]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/rejections">rejections</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, ic, Principal, RejectionCode, Service, service_update, update, void
+<pre><code class="language-python">from kybra import (
+    Async,
+    ic,
+    Principal,
+    RejectionCode,
+    Service,
+    service_update,
+    update,
+    void,
+)
 
 
 class Nonexistent(Service):
@@ -3127,11 +3322,13 @@ def reply_raw() -&gt; manual[RawReply]:
 <p>This section is a work in progress.</p>
 <p>The Kybra type <code>blob</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-blob">Candid type blob</a> and will become a <a href="https://docs.python.org/3/library/stdtypes.html#bytes">Python bytes</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-Python">from kybra import blob, ic, query
+<pre><code class="language-python">from kybra import blob, ic, query
+
 
 @query
 def get_blob() -&gt; blob:
     return bytes([68, 73, 68, 76, 0, 0])
+
 
 @query
 def print_blob(blob: blob) -&gt; blob:
@@ -3139,7 +3336,7 @@ def print_blob(blob: blob) -&gt; blob:
     return blob
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_blob&quot;: () -&gt; (blob) query;
     &quot;print_blob&quot;: (blob) -&gt; (blob) query;
 }
@@ -3148,11 +3345,13 @@ def print_blob(blob: blob) -&gt; blob:
 <p>This section is a work in progress.</p>
 <p>The Python type <code>bool</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-bool">Candid type bool</a> and will become a <a href="https://docs.python.org/3/library/stdtypes.html#boolean-values">Python Boolean Value</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-Python">from kybra import ic, query
+<pre><code class="language-python">from kybra import ic, query
+
 
 @query
 def get_bool() -&gt; bool:
     return True
+
 
 @query
 def print_bool(bool: bool) -&gt; bool:
@@ -3160,7 +3359,7 @@ def print_bool(bool: bool) -&gt; bool:
     return bool
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_bool&quot;: () -&gt; (bool) query;
     &quot;print_bool&quot;: (bool) -&gt; (bool) query;
 }
@@ -3171,18 +3370,20 @@ def print_bool(bool: bool) -&gt; bool:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import empty, ic, query
 
+
 def get_empty() -&gt; empty:
-    raise Exception('Anything you want')
+    raise Exception(&quot;Anything you want&quot;)
+
 
 # Note: It is impossible to call this function because it requires an argument
 # but there is no way to pass an &quot;empty&quot; value as an argument.
 @query
 def print_empty(empty: empty) -&gt; empty:
     ic.print(type(empty))
-    raise Exception('Anything you want')
+    raise Exception(&quot;Anything you want&quot;)
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_empty&quot;: () -&gt; (empty) query;
     &quot;print_empty&quot;: (empty) -&gt; (empty) query;
 }
@@ -3207,7 +3408,7 @@ def print_float32(float32: float32) -&gt; float32:
     return float32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_float32&quot;: () -&gt; (float32) query;
     &quot;print_float32&quot;: (float32) -&gt; (float32) query;
 }
@@ -3225,13 +3426,14 @@ from kybra import float64, ic, query
 def get_float64() -&gt; float64:
     return math.e
 
+
 @query
 def print_float64(float64: float64) -&gt; float64:
     ic.print(type(float64))
     return float64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_float64&quot;: () -&gt; (float64) query;
     &quot;print_float64&quot;: (float64) -&gt; (float64) query;
 }
@@ -3272,7 +3474,7 @@ def get_complex_func() -&gt; ComplexFunc:
     return (Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;), &quot;complex_function_name&quot;)
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">type User = record {
+<pre><code>type User = record {
     &quot;id&quot;: text;
     &quot;basic_func&quot;: BasicFunc;
     &quot;complex_func&quot;: ComplexFunc;
@@ -3305,7 +3507,7 @@ def print_int(int: int) -&gt; int:
     return int
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int&quot;: () -&gt; (int) query;
     &quot;print_int&quot;: (int) -&gt; (int) query;
 }
@@ -3316,9 +3518,11 @@ def print_int(int: int) -&gt; int:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int8, query
 
+
 @query
 def get_int8() -&gt; int8:
     return 127
+
 
 @query
 def print_int8(int8: int8) -&gt; int8:
@@ -3326,7 +3530,7 @@ def print_int8(int8: int8) -&gt; int8:
     return int8
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int8&quot;: () -&gt; (int8) query;
     &quot;print_int8&quot;: (int8) -&gt; (int8) query;
 }
@@ -3337,9 +3541,11 @@ def print_int8(int8: int8) -&gt; int8:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int16, query
 
+
 @query
 def get_int16() -&gt; int16:
     return 32_767
+
 
 @query
 def print_int16(int16: int16) -&gt; int16:
@@ -3347,7 +3553,7 @@ def print_int16(int16: int16) -&gt; int16:
     return int16
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int16&quot;: () -&gt; (int16) query;
     &quot;print_int16&quot;: (int16) -&gt; (int16) query;
 }
@@ -3358,9 +3564,11 @@ def print_int16(int16: int16) -&gt; int16:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int32, query
 
+
 @query
 def get_int32() -&gt; int32:
     return 2_147_483_647
+
 
 @query
 def print_int32(int32: int32) -&gt; int32:
@@ -3368,7 +3576,7 @@ def print_int32(int32: int32) -&gt; int32:
     return int32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int32&quot;: () -&gt; (int32) query;
     &quot;print_int32&quot;: (int32) -&gt; (int32) query;
 }
@@ -3391,7 +3599,7 @@ def print_int64(int64: int64) -&gt; int64:
     return int64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int64&quot;: () -&gt; (int64) query;
     &quot;print_int64&quot;: (int64) -&gt; (int64) query;
 }
@@ -3402,9 +3610,11 @@ def print_int64(int64: int64) -&gt; int64:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat, query
 
+
 @query
 def get_nat() -&gt; nat:
     return 340_282_366_920_938_463_463_374_607_431_768_211_455
+
 
 @query
 def print_nat(nat: nat) -&gt; nat:
@@ -3412,7 +3622,7 @@ def print_nat(nat: nat) -&gt; nat:
     return nat
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat&quot;: () -&gt; (nat) query;
     &quot;print_nat&quot;: (nat) -&gt; (nat) query;
 }
@@ -3423,9 +3633,11 @@ def print_nat(nat: nat) -&gt; nat:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat8, query
 
+
 @query
 def get_nat8() -&gt; nat8:
     return 255
+
 
 @query
 def print_nat8(nat8: nat8) -&gt; nat8:
@@ -3433,7 +3645,7 @@ def print_nat8(nat8: nat8) -&gt; nat8:
     return nat8
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat8&quot;: () -&gt; (nat8) query;
     &quot;print_nat8&quot;: (nat8) -&gt; (nat8) query;
 }
@@ -3444,9 +3656,11 @@ def print_nat8(nat8: nat8) -&gt; nat8:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat16, query
 
+
 @query
 def get_nat16() -&gt; nat16:
     return 65_535
+
 
 @query
 def print_nat16(nat16: nat16) -&gt; nat16:
@@ -3454,7 +3668,7 @@ def print_nat16(nat16: nat16) -&gt; nat16:
     return nat16
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat16&quot;: () -&gt; (nat16) query;
     &quot;print_nat16&quot;: (nat16) -&gt; (nat16) query;
 }
@@ -3465,9 +3679,11 @@ def print_nat16(nat16: nat16) -&gt; nat16:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat32, query
 
+
 @query
 def get_nat32() -&gt; nat32:
     return 4_294_967_295
+
 
 @query
 def print_nat32(nat32: nat32) -&gt; nat32:
@@ -3475,7 +3691,7 @@ def print_nat32(nat32: nat32) -&gt; nat32:
     return nat32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat32&quot;: () -&gt; (nat32) query;
     &quot;print_nat32&quot;: (nat32) -&gt; (nat32) query;
 }
@@ -3486,9 +3702,11 @@ def print_nat32(nat32: nat32) -&gt; nat32:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat64, query
 
+
 @query
 def get_nat64() -&gt; nat64:
     return 18_446_744_073_709_551_615
+
 
 @query
 def print_nat64(nat64: nat64) -&gt; nat64:
@@ -3496,7 +3714,7 @@ def print_nat64(nat64: nat64) -&gt; nat64:
     return nat64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat64&quot;: () -&gt; (nat64) query;
     &quot;print_nat64&quot;: (nat64) -&gt; (nat64) query;
 }
@@ -3507,9 +3725,11 @@ def print_nat64(nat64: nat64) -&gt; nat64:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query
 
+
 @query
 def get_null() -&gt; None:
     return None
+
 
 @query
 def print_null(none: None) -&gt; None:
@@ -3517,7 +3737,7 @@ def print_null(none: None) -&gt; None:
     return none
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_null&quot;: () -&gt; (null) query;
     &quot;print_null&quot;: (null) -&gt; (null) query;
 }
@@ -3528,16 +3748,18 @@ def print_null(none: None) -&gt; None:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import opt, query
 
+
 @query
 def get_opt_some() -&gt; opt[bool]:
     return True
+
 
 @query
 def get_opt_none() -&gt; opt[bool]:
     return None
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_opt_some&quot;: () -&gt; (opt bool) query;
     &quot;get_opt_none&quot;: () -&gt; (opt bool) query;
 }
@@ -3548,9 +3770,11 @@ def get_opt_none() -&gt; opt[bool]:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, Principal, query
 
+
 @query
 def get_principal() -&gt; Principal:
-    return Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai')
+    return Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;)
+
 
 @query
 def print_principal(principal: Principal) -&gt; Principal:
@@ -3558,7 +3782,7 @@ def print_principal(principal: Principal) -&gt; Principal:
     return principal
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_principal&quot;: () -&gt; (principal) query;
     &quot;print_principal&quot;: (principal) -&gt; (principal) query;
 }
@@ -3591,7 +3815,7 @@ class User(Record):
     username: str
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">type Post = record {
+<pre><code>type Post = record {
     &quot;id&quot;: text;
     &quot;author&quot;: User;
     &quot;text&quot;: text;
@@ -3618,9 +3842,11 @@ type User = record {
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query, reserved
 
+
 @query
 def get_reserved() -&gt; reserved:
-    return 'anything'
+    return &quot;anything&quot;
+
 
 @query
 def print_reserved(reserved: reserved) -&gt; reserved:
@@ -3628,7 +3854,7 @@ def print_reserved(reserved: reserved) -&gt; reserved:
     return reserved
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_reserved&quot;: () -&gt; (reserved) query;
     &quot;print_reserved&quot;: (reserved) -&gt; (reserved) query;
 }
@@ -3642,17 +3868,20 @@ def print_reserved(reserved: reserved) -&gt; reserved:
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query
 
+
 @query
 def get_string() -&gt; str:
-    return 'Hello world!'
+    return &quot;Hello world!&quot;
+
 
 @query
 def print_string(string: str) -&gt; str:
     ic.print(type(string))
     return string
+
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_string&quot;: () -&gt; (text) query;
     &quot;print_string&quot;: (text) -&gt; (text) query;
 }
@@ -3682,7 +3911,7 @@ class Firework(Variant, total=False):
     NumStreaks: nat32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">type ReactionType = variant {
+<pre><code>type ReactionType = variant {
     &quot;Fire&quot;: null;
     &quot;ThumbsUp&quot;: null;
     &quot;ThumbsDown&quot;: null;
@@ -3706,12 +3935,13 @@ type Firework = record {
 <p>Python:</p>
 <pre><code class="language-python">from kybra import int32, query
 
+
 @query
 def get_numbers() -&gt; list[int32]:
     return [0, 1, 2, 3]
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_numbers&quot;: () -&gt; (vec int32) query;
 }
 </code></pre>
@@ -4054,7 +4284,7 @@ def init_() -&gt; void:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/inspect_message">inspect_message</a></li>
 </ul>
-<pre><code class="language-python">from kybra import ic, inspect_message, update
+<pre><code class="language-python">from kybra import ic, inspect_message, update, void
 
 
 @inspect_message
@@ -4098,7 +4328,6 @@ def also_inaccessible() -&gt; bool:
 @post_upgrade
 def post_upgrade_() -&gt; void:
     ic.print(&quot;This runs after every canister upgrade&quot;)
-
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="pre-upgrade"><a class="header" href="#pre-upgrade">pre upgrade</a></h1>
 <p>This section is a work in progress.</p>
@@ -4167,31 +4396,26 @@ def set_message(new_message: str) -&gt; void:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, match, update, Variant
 from kybra.canisters.management import management_canister, Satoshi
 
 BITCOIN_API_CYCLE_COST = 100_000_000
 
 
 class ExecuteGetBalanceResult(Variant, total=False):
-    ok: Satoshi
-    err: str
+    Ok: Satoshi
+    Err: str
 
 
 @update
 def get_balance(address: str) -&gt; Async[ExecuteGetBalanceResult]:
-    call_result: CallResult[
-        Satoshi
-    ] = yield management_canister.bitcoin_get_balance(
+    call_result: CallResult[Satoshi] = yield management_canister.bitcoin_get_balance(
         {&quot;address&quot;: address, &quot;min_confirmations&quot;: None, &quot;network&quot;: {&quot;Regtest&quot;: None}}
-    ).with_cycles(
-        BITCOIN_API_CYCLE_COST
+    ).with_cycles(BITCOIN_API_CYCLE_COST)
+
+    return match(
+        call_result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
     )
-
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: call_result.ok}
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="bitcoin_get_current_fee_percentiles"><a class="header" href="#bitcoin_get_current_fee_percentiles">bitcoin_get_current_fee_percentiles</a></h1>
 <p>This section is a work in progress.</p>
@@ -4199,15 +4423,15 @@ def get_balance(address: str) -&gt; Async[ExecuteGetBalanceResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, match, update, Variant
 from kybra.canisters.management import management_canister, MillisatoshiPerByte
 
 BITCOIN_API_CYCLE_COST = 100_000_000
 
 
 class GetCurrentFeePercentilesResult(Variant, total=False):
-    ok: list[MillisatoshiPerByte]
-    err: str
+    Ok: list[MillisatoshiPerByte]
+    Err: str
 
 
 @update
@@ -4220,10 +4444,9 @@ def get_current_fee_percentiles() -&gt; Async[GetCurrentFeePercentilesResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: call_result.ok}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="bitcoin_get_utxos"><a class="header" href="#bitcoin_get_utxos">bitcoin_get_utxos</a></h1>
 <p>This section is a work in progress.</p>
@@ -4231,15 +4454,15 @@ def get_current_fee_percentiles() -&gt; Async[GetCurrentFeePercentilesResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, match, update, Variant
 from kybra.canisters.management import GetUtxosResult, management_canister
 
 BITCOIN_API_CYCLE_COST = 100_000_000
 
 
 class ExecuteGetUtxosResult(Variant, total=False):
-    ok: GetUtxosResult
-    err: str
+    Ok: GetUtxosResult
+    Err: str
 
 
 @update
@@ -4252,10 +4475,9 @@ def get_utxos(address: str) -&gt; Async[ExecuteGetUtxosResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: call_result.ok}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="bitcoin_send_transaction"><a class="header" href="#bitcoin_send_transaction">bitcoin_send_transaction</a></h1>
 <p>This section is a work in progress.</p>
@@ -4263,7 +4485,7 @@ def get_utxos(address: str) -&gt; Async[ExecuteGetUtxosResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CallResult, null, update, Variant, void
+<pre><code class="language-python">from kybra import Async, blob, CallResult, match, null, update, Variant, void
 from kybra.canisters.management import management_canister
 
 BITCOIN_BASE_TRANSACTION_COST = 5_000_000_000
@@ -4271,8 +4493,8 @@ BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE = 20_000_000
 
 
 class SendTransactionResult(Variant, total=False):
-    ok: null
-    err: str
+    Ok: null
+    Err: str
 
 
 @update
@@ -4282,18 +4504,13 @@ def send_transaction(transaction: blob) -&gt; Async[SendTransactionResult]:
         + len(transaction) * BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE
     )
 
-    call_result: CallResult[
-        void
-    ] = yield management_canister.bitcoin_send_transaction(
+    call_result: CallResult[void] = yield management_canister.bitcoin_send_transaction(
         {&quot;transaction&quot;: transaction, &quot;network&quot;: {&quot;Regtest&quot;: None}}
-    ).with_cycles(
-        transaction_fee
+    ).with_cycles(transaction_fee)
+
+    return match(
+        call_result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
     )
-
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: call_result.ok}
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="canister_status"><a class="header" href="#canister_status">canister_status</a></h1>
 <p>This section is a work in progress.</p>
@@ -4301,7 +4518,7 @@ def send_transaction(transaction: blob) -&gt; Async[SendTransactionResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, match, update, Variant
 from kybra.canisters.management import (
     CanisterStatusArgs,
     CanisterStatusResult,
@@ -4310,8 +4527,8 @@ from kybra.canisters.management import (
 
 
 class GetCanisterStatusResult(Variant, total=False):
-    ok: CanisterStatusResult
-    err: str
+    Ok: CanisterStatusResult
+    Err: str
 
 
 @update
@@ -4320,12 +4537,10 @@ def get_canister_status(args: CanisterStatusArgs) -&gt; Async[GetCanisterStatusR
         CanisterStatusResult
     ] = yield management_canister.canister_status({&quot;canister_id&quot;: args[&quot;canister_id&quot;]})
 
-    if canister_status_result_call_result.err is not None:
-        return {&quot;err&quot;: canister_status_result_call_result.err}
-
-    canister_status_result = canister_status_result_call_result.ok
-
-    return {&quot;ok&quot;: canister_status_result}
+    return match(
+        canister_status_result_call_result,
+        {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}},
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="create_canister"><a class="header" href="#create_canister">create_canister</a></h1>
 <p>This section is a work in progress.</p>
@@ -4333,13 +4548,13 @@ def get_canister_status(args: CanisterStatusArgs) -&gt; Async[GetCanisterStatusR
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, match, update, Variant
 from kybra.canisters.management import CreateCanisterResult, management_canister
 
 
 class ExecuteCreateCanisterResult(Variant, total=False):
-    ok: CreateCanisterResult
-    err: str
+    Ok: CreateCanisterResult
+    Err: str
 
 
 @update
@@ -4350,12 +4565,10 @@ def execute_create_canister() -&gt; Async[ExecuteCreateCanisterResult]:
         50_000_000_000_000
     )
 
-    if create_canister_result_call_result.err is not None:
-        return {&quot;err&quot;: create_canister_result_call_result.err}
-
-    create_canister_result = create_canister_result_call_result.ok
-
-    return {&quot;ok&quot;: create_canister_result}
+    return match(
+        create_canister_result_call_result,
+        {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}},
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="delete_canister"><a class="header" href="#delete_canister">delete_canister</a></h1>
 <p>This section is a work in progress.</p>
@@ -4366,6 +4579,7 @@ def execute_create_canister() -&gt; Async[ExecuteCreateCanisterResult]:
 <pre><code class="language-python">from kybra import (
     Async,
     CallResult,
+    match,
     Principal,
     update,
     Variant,
@@ -4375,8 +4589,8 @@ from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -4385,10 +4599,9 @@ def execute_delete_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
         {&quot;canister_id&quot;: canister_id}
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="deposit_cycles"><a class="header" href="#deposit_cycles">deposit_cycles</a></h1>
 <p>This section is a work in progress.</p>
@@ -4396,16 +4609,24 @@ def execute_delete_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">@update
+<pre><code class="language-python">from kybra import Async, CallResult, match, Principal, update, Variant, void
+from kybra.canisters.management import management_canister
+
+
+class DefaultResult(Variant, total=False):
+    Ok: bool
+    Err: str
+
+
+@update
 def execute_deposit_cycles(canister_id: Principal) -&gt; Async[DefaultResult]:
     call_result: CallResult[void] = yield management_canister.deposit_cycles(
         {&quot;canister_id&quot;: canister_id}
     ).with_cycles(1_000_000)
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ecdsa_public_key"><a class="header" href="#ecdsa_public_key">ecdsa_public_key</a></h1>
 <p>Not yet implemented. You can technically do this yourself by implementing the appropriate types. We'll have this functionality implemented shortly.</p>
@@ -4416,8 +4637,12 @@ def execute_deposit_cycles(canister_id: Principal) -&gt; Async[DefaultResult]:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, ic, query, update
-from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
+<pre><code class="language-python">from kybra import Async, CallResult, match, ic, query, update
+from kybra.canisters.management import (
+    HttpResponse,
+    HttpTransformArgs,
+    management_canister,
+)
 
 
 @update
@@ -4440,12 +4665,12 @@ def xkcd() -&gt; Async[HttpResponse]:
         }
     ).with_cycles(cycle_cost_total)
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
-        ic.trap(&quot;http_result had an error&quot;)
+    def handle_http_result_err(err: str):
+        if err:
+            ic.trap(err)
+        ic.trap(err)
 
-    return http_result.ok
+    return match(http_result, {&quot;Ok&quot;: lambda ok: ok, &quot;Err&quot;: handle_http_result_err})
 
 
 @query
@@ -4462,6 +4687,7 @@ def xkcd_transform(args: HttpTransformArgs) -&gt; HttpResponse:
     Async,
     blob,
     CallResult,
+    match,
     Principal,
     update,
     Variant,
@@ -4471,8 +4697,8 @@ from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -4488,10 +4714,9 @@ def execute_install_code(
         }
     ).with_cycles(100_000_000_000)
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="provisional_create_canister_with_cycles"><a class="header" href="#provisional_create_canister_with_cycles">provisional_create_canister_with_cycles</a></h1>
 <p>This section is a work in progress.</p>
@@ -4499,7 +4724,7 @@ def execute_install_code(
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, match, update, Variant
 from kybra.canisters.management import (
     CreateCanisterResult,
     management_canister,
@@ -4508,8 +4733,8 @@ from kybra.canisters.management import (
 
 
 class ExecuteProvisionalCreateCanisterWithCyclesResult(Variant, total=False):
-    ok: CreateCanisterResult
-    err: str
+    Ok: CreateCanisterResult
+    Err: str
 
 
 @update
@@ -4522,12 +4747,9 @@ def provisional_create_canister_with_cycles() -&gt; (
         {&quot;amount&quot;: None, &quot;settings&quot;: None}
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    provisional_create_canister_with_cycles_result = call_result.ok
-
-    return {&quot;ok&quot;: provisional_create_canister_with_cycles_result}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="provisional_top_up_canister"><a class="header" href="#provisional_top_up_canister">provisional_top_up_canister</a></h1>
 <p>This section is a work in progress.</p>
@@ -4538,6 +4760,7 @@ def provisional_create_canister_with_cycles() -&gt; (
 <pre><code class="language-python">from kybra import (
     Async,
     CallResult,
+    match,
     nat,
     Principal,
     update,
@@ -4548,8 +4771,8 @@ from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -4562,10 +4785,9 @@ def provisional_top_up_canister(
         {&quot;canister_id&quot;: canister_id, &quot;amount&quot;: amount}
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="raw_rand"><a class="header" href="#raw_rand">raw_rand</a></h1>
 <p>This section is a work in progress.</p>
@@ -4576,7 +4798,7 @@ def provisional_top_up_canister(
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/timers">timers</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CallResult, update
+<pre><code class="language-python">from kybra import Async, blob, CallResult, match, update
 from kybra.canisters.management import management_canister
 
 
@@ -4584,10 +4806,7 @@ from kybra.canisters.management import management_canister
 def get_randomness_directly() -&gt; Async[blob]:
     randomness_result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if randomness_result.err is not None:
-        return bytes()
-
-    return randomness_result.ok
+    return match(randomness_result, {&quot;Ok&quot;: lambda ok: ok, &quot;Err&quot;: lambda err: err})
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="sign_with_ecdsa"><a class="header" href="#sign_with_ecdsa">sign_with_ecdsa</a></h1>
 <p>Not yet implemented. You can technically do this yourself by implementing the appropriate types. We'll have this functionality implemented shortly.</p>
@@ -4600,6 +4819,7 @@ def get_randomness_directly() -&gt; Async[blob]:
 <pre><code class="language-python">from kybra import (
     Async,
     CallResult,
+    match,
     Principal,
     update,
     Variant,
@@ -4609,8 +4829,8 @@ from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -4619,10 +4839,9 @@ def execute_start_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
         {&quot;canister_id&quot;: canister_id}
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="stop_canister"><a class="header" href="#stop_canister">stop_canister</a></h1>
 <p>This section is a work in progress.</p>
@@ -4633,6 +4852,7 @@ def execute_start_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
 <pre><code class="language-python">from kybra import (
     Async,
     CallResult,
+    match,
     Principal,
     update,
     Variant,
@@ -4642,8 +4862,8 @@ from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -4652,10 +4872,9 @@ def execute_stop_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
         {&quot;canister_id&quot;: canister_id}
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="uninstall_code"><a class="header" href="#uninstall_code">uninstall_code</a></h1>
 <p>This section is a work in progress.</p>
@@ -4663,13 +4882,13 @@ def execute_stop_canister(canister_id: Principal) -&gt; Async[DefaultResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, Principal, update, Variant, void
+<pre><code class="language-python">from kybra import Async, CallResult, match, Principal, update, Variant, void
 from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -4678,10 +4897,9 @@ def execute_uninstall_code(canister_id: Principal) -&gt; Async[DefaultResult]:
         {&quot;canister_id&quot;: canister_id}
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="update_settings"><a class="header" href="#update_settings">update_settings</a></h1>
 <p>This section is a work in progress.</p>
@@ -4689,13 +4907,13 @@ def execute_uninstall_code(canister_id: Principal) -&gt; Async[DefaultResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, Principal, update, Variant, void
+<pre><code class="language-python">from kybra import Async, CallResult, match, Principal, update, Variant, void
 from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -4712,10 +4930,9 @@ def execute_update_settings(canister_id: Principal) -&gt; Async[DefaultResult]:
         }
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="stable-memory"><a class="header" href="#stable-memory">Stable Memory</a></h1>
 <ul>
@@ -4744,64 +4961,69 @@ def execute_update_settings(canister_id: Principal) -&gt; Async[DefaultResult]:
 </ul>
 <pre><code class="language-python">from kybra import (
     InsertError,
+    match,
     nat64,
     nat8,
     opt,
     query,
     StableBTreeMap,
     update,
-    Variant
+    Variant,
 )
 
 Key = nat8
 Value = str
 
+
 class InsertResult(Variant, total=False):
-    ok: opt[Value]
-    err: InsertError
+    Ok: opt[Value]
+    Err: InsertError
+
 
 map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
+
 
 @query
 def contains_key(key: Key) -&gt; bool:
     return map.contains_key(key)
 
+
 @query
 def get(key: Key) -&gt; opt[Value]:
     return map.get(key)
+
 
 @update
 def insert(key: Key, value: Value) -&gt; InsertResult:
     result = map.insert(key, value)
 
-    if result.err is not None:
-        return {
-            'err': result.err
-        }
+    return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
 
-    return {
-        'ok': result.ok
-    }
 
 @query
 def is_empty() -&gt; bool:
     return map.is_empty()
 
+
 @query
 def items() -&gt; list[tuple[Key, Value]]:
     return map.items()
+
 
 @query
 def keys() -&gt; list[Key]:
     return map.keys()
 
+
 @query
 def len() -&gt; nat64:
     return map.len()
 
+
 @update
 def remove(key: Key) -&gt; opt[Value]:
     return map.remove(key)
+
 
 @query
 def values() -&gt; list[Value]:
@@ -4965,7 +5187,6 @@ def set_timer(delay: Duration) -&gt; TimerId:
 
 def timer_callback():
     ic.print(&quot;timer_callback&quot;)
-
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="set-timer-interval"><a class="header" href="#set-timer-interval">set timer interval</a></h1>
 <p>This section is a work in progress.</p>

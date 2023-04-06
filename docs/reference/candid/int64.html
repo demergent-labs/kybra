@@ -162,7 +162,7 @@ def print_int64(int64: int64) -&gt; int64:
     return int64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int64&quot;: () -&gt; (int64) query;
     &quot;print_int64&quot;: (int64) -&gt; (int64) query;
 }

@@ -150,16 +150,18 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import opt, query
 
+
 @query
 def get_opt_some() -&gt; opt[bool]:
     return True
+
 
 @query
 def get_opt_none() -&gt; opt[bool]:
     return None
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_opt_some&quot;: () -&gt; (opt bool) query;
     &quot;get_opt_none&quot;: () -&gt; (opt bool) query;
 }

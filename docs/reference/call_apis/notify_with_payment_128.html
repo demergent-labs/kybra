@@ -150,8 +150,14 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
 </ul>
-<pre><code class="language-python">from kybra import NotifyResult, Principal, update
-from src.cycles.types import Cycles
+<pre><code class="language-python">from kybra import nat, NotifyResult, Principal, Service, service_update, update
+
+
+class Cycles(Service):
+    @service_update
+    @service_update
+    def receive_cycles128(self) -&gt; nat:
+        ...
 
 
 cycles = Cycles(Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;))

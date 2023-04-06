@@ -150,13 +150,13 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, Principal, update, Variant, void
+<pre><code class="language-python">from kybra import Async, CallResult, match, Principal, update, Variant, void
 from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -165,10 +165,9 @@ def execute_uninstall_code(canister_id: Principal) -&gt; Async[DefaultResult]:
         {&quot;canister_id&quot;: canister_id}
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 
                     </main>

@@ -150,9 +150,13 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CallResult, Principal, update, void
+<pre><code class="language-python">from kybra import Async, blob, CallResult, match, Principal, update, Variant, void
 from kybra.canisters.management import management_canister
-from src.types import DefaultResult
+
+
+class DefaultResult(Variant, total=False):
+    Ok: bool
+    Err: str
 
 
 @update
@@ -168,10 +172,9 @@ def execute_install_code(
         }
     ).with_cycles128(100_000_000_000)
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 
                     </main>

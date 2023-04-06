@@ -150,9 +150,11 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, query
 
+
 @query
 def get_null() -&gt; None:
     return None
+
 
 @query
 def print_null(none: None) -&gt; None:
@@ -160,7 +162,7 @@ def print_null(none: None) -&gt; None:
     return none
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_null&quot;: () -&gt; (null) query;
     &quot;print_null&quot;: (null) -&gt; (null) query;
 }
