@@ -22,5 +22,4 @@ def set_timer(delay: Duration) -> TimerId:
 
 def timer_callback():
     ic.print("timer_callback")
-
 ```

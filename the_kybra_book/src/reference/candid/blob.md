@@ -6,12 +6,14 @@ The Kybra type `blob` corresponds to the [Candid type blob](https://internetcomp
 
 Python:
 
-```Python
+```python
 from kybra import blob, ic, query
+
 
 @query
 def get_blob() -> blob:
     return bytes([68, 73, 68, 76, 0, 0])
+
 
 @query
 def print_blob(blob: blob) -> blob:
@@ -21,7 +23,7 @@ def print_blob(blob: blob) -> blob:
 
 Candid:
 
-```python
+```
 service: {
     "get_blob": () -> (blob) query;
     "print_blob": (blob) -> (blob) query;

@@ -16,6 +16,7 @@ from kybra import float64, ic, query
 def get_float64() -> float64:
     return math.e
 
+
 @query
 def print_float64(float64: float64) -> float64:
     ic.print(type(float64))
@@ -24,7 +25,7 @@ def print_float64(float64: float64) -> float64:
 
 Candid:
 
-```python
+```
 service: {
     "get_float64": () -> (float64) query;
     "print_float64": (float64) -> (float64) query;

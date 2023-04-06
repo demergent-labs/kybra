@@ -7,7 +7,7 @@ Examples:
 -   [management_canister](https://github.com/demergent-labs/kybra/tree/main/examples/management_canister)
 
 ```python
-from kybra import Async, CallResult, Principal, update, Variant, void
+from kybra import Async, CallResult, match, Principal, update, Variant, void
 from kybra.canisters.management import management_canister
 
 

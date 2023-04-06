@@ -23,7 +23,7 @@ def print_int(int: int) -> int:
 
 Candid:
 
-```python
+```
 service: {
     "get_int": () -> (int) query;
     "print_int": (int) -> (int) query;

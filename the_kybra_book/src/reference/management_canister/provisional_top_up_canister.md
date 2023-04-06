@@ -10,6 +10,7 @@ Examples:
 from kybra import (
     Async,
     CallResult,
+    match,
     nat,
     Principal,
     update,

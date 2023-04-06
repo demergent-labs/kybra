@@ -9,9 +9,11 @@ Python:
 ```python
 from kybra import ic, int32, query
 
+
 @query
 def get_int32() -> int32:
     return 2_147_483_647
+
 
 @query
 def print_int32(int32: int32) -> int32:
@@ -21,7 +23,7 @@ def print_int32(int32: int32) -> int32:
 
 Candid:
 
-```python
+```
 service: {
     "get_int32": () -> (int32) query;
     "print_int32": (int32) -> (int32) query;

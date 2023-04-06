@@ -9,6 +9,7 @@ Python:
 ```python
 from kybra import int32, query
 
+
 @query
 def get_numbers() -> list[int32]:
     return [0, 1, 2, 3]
@@ -16,7 +17,7 @@ def get_numbers() -> list[int32]:
 
 Candid:
 
-```python
+```
 service: {
     "get_numbers": () -> (vec int32) query;
 }

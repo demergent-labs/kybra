@@ -35,6 +35,10 @@ def execute_call_raw(
     )
 
     return match(
-        call_result, {"Ok": lambda ok: {"Ok": ic.candid_decode(ok)}, "Err": lambda err: {"Err": err}}
+        call_result,
+        {
+            "Ok": lambda ok: {"Ok": ic.candid_decode(ok)},
+            "Err": lambda err: {"Err": err},
+        },
     )
 ```

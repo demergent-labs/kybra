@@ -43,7 +43,7 @@ def get_complex_func() -> ComplexFunc:
 
 Candid:
 
-```python
+```
 type User = record {
     "id": text;
     "basic_func": BasicFunc;

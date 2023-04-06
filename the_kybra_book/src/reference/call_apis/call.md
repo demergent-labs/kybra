@@ -50,7 +50,5 @@ class PayoutResult(Variant, total=False):
 def payout(to: Principal, amount: nat64) -> Async[PayoutResult]:
     result: CallResult[nat64] = yield token_canister.transfer(to, amount)
 
-    return match(
-        result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
-    )
+    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 ```

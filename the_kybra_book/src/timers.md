@@ -9,6 +9,7 @@ from kybra import (
     CallResult,
     Duration,
     ic,
+    match,
     nat8,
     query,
     Record,
@@ -121,12 +122,12 @@ def single_cross_canister_timer_callback() -> Async[blob]:
 
     result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if result.err is not None:
-        return bytes()
+    def handle_result_ok(ok: blob) -> blob:
+        status["single_cross_canister"] = ok
 
-    status["single_cross_canister"] = result.ok
+        return ok
 
-    return result.ok
+    return match(result, {"Ok": handle_result_ok, "Err": lambda _: bytes()})
 
 
 # TODO It would probably be better for this to have a return type of Async[void] once we have void types working
@@ -135,10 +136,9 @@ def repeat_cross_canister_timer_callback() -> Async[blob]:
 
     result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if result.err is not None:
-        return bytes()
+    def handle_result_ok(ok: blob) -> blob:
+        status["repeat_cross_canister"] += ok
+        return ok
 
-    status["repeat_cross_canister"] += result.ok
-
-    return result.ok
+    return match(result, {"Ok": handle_result_ok, "Err": lambda _: bytes()})
 ```

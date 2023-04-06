@@ -7,7 +7,7 @@ Examples:
 -   [management_canister](https://github.com/demergent-labs/kybra/tree/main/examples/management_canister)
 
 ```python
-from kybra import Async, CallResult, update, Variant
+from kybra import Async, CallResult, match, update, Variant
 from kybra.canisters.management import CreateCanisterResult, management_canister
 
 
@@ -25,6 +25,7 @@ def execute_create_canister() -> Async[ExecuteCreateCanisterResult]:
     )
 
     return match(
-        create_canister_result_call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+        create_canister_result_call_result,
+        {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}},
     )
 ```

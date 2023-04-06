@@ -7,7 +7,7 @@ Examples:
 -   [notify_raw](https://github.com/demergent-labs/kybra/tree/main/examples/notify_raw)
 
 ```python
-from kybra import ic, Principal, RejectionCode, update, Variant
+from kybra import ic, match, Principal, RejectionCode, update, Variant
 
 
 class SendNotificationResult(Variant, total=False):

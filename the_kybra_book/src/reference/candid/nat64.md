@@ -9,9 +9,11 @@ Python:
 ```python
 from kybra import ic, nat64, query
 
+
 @query
 def get_nat64() -> nat64:
     return 18_446_744_073_709_551_615
+
 
 @query
 def print_nat64(nat64: nat64) -> nat64:
@@ -21,7 +23,7 @@ def print_nat64(nat64: nat64) -> nat64:
 
 Candid:
 
-```python
+```
 service: {
     "get_nat64": () -> (nat64) query;
     "print_nat64": (nat64) -> (nat64) query;

@@ -19,6 +19,7 @@ from kybra import (
     Variant,
 )
 
+
 class ExecuteCallRaw128Result(Variant, total=False):
     Ok: str
     Err: str
@@ -33,6 +34,10 @@ def execute_call_raw128(
     )
 
     return match(
-        call_result, {"Ok": lambda ok: {"Ok": ic.candid_decode(ok)}, "Err": lambda err: {"Err": err}}
+        call_result,
+        {
+            "Ok": lambda ok: {"Ok": ic.candid_decode(ok)},
+            "Err": lambda err: {"Err": err},
+        },
     )
 ```

@@ -28,10 +28,11 @@ class SendCyclesResult(Variant, total=False):
 
 class Cycles(Service):
     @service_update
-    def receive_cycles(self) -> nat64: ...
+    def receive_cycles(self) -> nat64:
+        ...
 
 
-cycles = Cycles(Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'))
+cycles = Cycles(Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"))
 
 
 # Reports the number of cycles returned from the Cycles canister
@@ -39,6 +40,10 @@ cycles = Cycles(Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'))
 def send_cycles() -> Async[SendCyclesResult]:
     result: CallResult[nat64] = yield cycles.receive_cycles().with_cycles(1_000_000)
     return match(
-        result, {"Ok": lambda _: {"Ok": ic.msg_cycles_refunded()}, "Err": lambda err: {"Err": err}}
+        result,
+        {
+            "Ok": lambda _: {"Ok": ic.msg_cycles_refunded()},
+            "Err": lambda err: {"Err": err},
+        },
     )
 ```

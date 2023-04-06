@@ -8,8 +8,14 @@ Examples:
 -   [cycles](https://github.com/demergent-labs/kybra/tree/main/examples/cycles)
 
 ```python
-from kybra import NotifyResult, Principal, update
-from src.canister2.types import Canister2
+from kybra import NotifyResult, Principal, Service, service_update, update, void
+
+
+class Canister2(Service):
+    @service_update
+    def receive_notification(self, message: str) -> void:
+        ...
+
 
 canister2 = Canister2(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
 

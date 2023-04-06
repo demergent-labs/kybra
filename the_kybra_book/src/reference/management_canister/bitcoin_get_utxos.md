@@ -7,7 +7,7 @@ Examples:
 -   [bitcoin](https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin)
 
 ```python
-from kybra import Async, CallResult, update, Variant
+from kybra import Async, CallResult, match, update, Variant
 from kybra.canisters.management import GetUtxosResult, management_canister
 
 BITCOIN_API_CYCLE_COST = 100_000_000
