@@ -102,7 +102,7 @@ def payout(to: Principal, amount: nat64) -> Async[PayoutResult]:
     return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 ```
 
-Notice that the `token_canister.transfer` method, because it is a cross-canister method, returns a `CallResult`. All cross-canister calls return `CallResult`, which has an `ok` or `err` property depending on if the cross-canister call was successful or not.
+Notice that the `token_canister.transfer` method, because it is a cross-canister method, returns a `CallResult`. All cross-canister calls return `CallResult`, which has an `Ok` or `Err` property depending on if the cross-canister call was successful or not.
 
 The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a `CallResult`. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a `try...except` most likely won't do anything useful.
 

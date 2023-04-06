@@ -2028,7 +2028,7 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
 
     return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
 </code></pre>
-<p>Notice that the <code>token_canister.transfer</code> method, because it is a cross-canister method, returns a <code>CallResult</code>. All cross-canister calls return <code>CallResult</code>, which has an <code>ok</code> or <code>err</code> property depending on if the cross-canister call was successful or not.</p>
+<p>Notice that the <code>token_canister.transfer</code> method, because it is a cross-canister method, returns a <code>CallResult</code>. All cross-canister calls return <code>CallResult</code>, which has an <code>Ok</code> or <code>Err</code> property depending on if the cross-canister call was successful or not.</p>
 <p>The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a <code>CallResult</code>. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a <code>try...except</code> most likely won't do anything useful.</p>
 <p>Let's add to our example code and explore adding some practical result-based error-handling to stop people from stealing tokens.</p>
 <p><code>token_canister</code>:</p>
@@ -3861,7 +3861,23 @@ def print_reserved(reserved: reserved) -&gt; reserved:
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="service-1"><a class="header" href="#service-1">service</a></h1>
 <p>This section is a work in progress.</p>
-<p><a href="https://github.com/demergent-labs/kybra/issues/303">Not yet implemented.</a></p>
+<p>Python classes that inherit from the Kybra type <code>Service</code> correspond to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-service-">Candid service type</a>.</p>
+<p>Python:</p>
+<pre><code class="language-python">class SomeService(Service):
+    @service_query
+    def query1(self) -&gt; bool:
+        ...
+
+    @service_update
+    def update1(self) -&gt; str:
+        ...
+
+
+some_service = SomeService(Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;))
+</code></pre>
+<p>Candid:</p>
+<pre><code>service { query1 : () -&gt; (bool) query; update1 : () -&gt; (text) }
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="text-1"><a class="header" href="#text-1">text</a></h1>
 <p>This section is a work in progress.</p>
 <p>The Python type <code>str</code> and the Kybra type <code>text</code> both correspond to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-text">Candid type text</a> and will become a <a href="https://docs.python.org/3/library/stdtypes.html#textseq">Python str</a> at runtime.</p>
