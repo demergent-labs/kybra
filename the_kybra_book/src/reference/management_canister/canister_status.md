@@ -16,8 +16,8 @@ from kybra.canisters.management import (
 
 
 class GetCanisterStatusResult(Variant, total=False):
-    ok: CanisterStatusResult
-    err: str
+    Ok: CanisterStatusResult
+    Err: str
 
 
 @update
@@ -26,10 +26,7 @@ def get_canister_status(args: CanisterStatusArgs) -> Async[GetCanisterStatusResu
         CanisterStatusResult
     ] = yield management_canister.canister_status({"canister_id": args["canister_id"]})
 
-    if canister_status_result_call_result.err is not None:
-        return {"err": canister_status_result_call_result.err}
-
-    canister_status_result = canister_status_result_call_result.ok
-
-    return {"ok": canister_status_result}
+    return match(
+        canister_status_result_call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+    )
 ```

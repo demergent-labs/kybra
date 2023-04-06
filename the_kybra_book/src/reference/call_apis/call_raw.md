@@ -13,6 +13,7 @@ from kybra import (
     blob,
     CallResult,
     ic,
+    match,
     nat64,
     Principal,
     update,
@@ -21,8 +22,8 @@ from kybra import (
 
 
 class ExecuteCallRawResult(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
 
 
 @update
@@ -33,8 +34,7 @@ def execute_call_raw(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
-    if call_result.err is not None:
-        return {"err": call_result.err}
-
-    return {"ok": ic.candid_decode(call_result.ok)}
+    return match(
+        call_result, {"Ok": lambda ok: {"Ok": ic.candid_decode(ok)}, "Err": lambda err: {"Err": err}}
+    )
 ```

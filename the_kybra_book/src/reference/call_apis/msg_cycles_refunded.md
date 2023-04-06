@@ -11,25 +11,34 @@ from kybra import (
     Async,
     CallResult,
     ic,
+    match,
     nat64,
+    Principal,
+    Service,
+    service_update,
     update,
     Variant,
 )
-from src.cycles.types import cycles
 
 
 class SendCyclesResult(Variant, total=False):
-    ok: nat64
-    err: str
+    Ok: nat64
+    Err: str
+
+
+class Cycles(Service):
+    @service_update
+    def receive_cycles(self) -> nat64: ...
+
+
+cycles = Cycles(Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'))
 
 
 # Reports the number of cycles returned from the Cycles canister
 @update
 def send_cycles() -> Async[SendCyclesResult]:
     result: CallResult[nat64] = yield cycles.receive_cycles().with_cycles(1_000_000)
-
-    if result.err is not None:
-        return {"err": result.err}
-
-    return {"ok": ic.msg_cycles_refunded()}
+    return match(
+        result, {"Ok": lambda _: {"Ok": ic.msg_cycles_refunded()}, "Err": lambda err: {"Err": err}}
+    )
 ```

@@ -28,8 +28,8 @@ Key = nat8
 Value = str
 
 class InsertResult(Variant, total=False):
-    ok: opt[Value]
-    err: InsertError
+    Ok: opt[Value]
+    Err: InsertError
 
 map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
 
@@ -45,14 +45,9 @@ def get(key: Key) -> opt[Value]:
 def insert(key: Key, value: Value) -> InsertResult:
     result = map.insert(key, value)
 
-    if result.err is not None:
-        return {
-            'err': result.err
-        }
-
-    return {
-        'ok': result.ok
-    }
+    return match(
+        call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+    )
 
 @query
 def is_empty() -> bool:

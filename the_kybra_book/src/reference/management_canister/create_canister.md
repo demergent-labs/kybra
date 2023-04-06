@@ -12,8 +12,8 @@ from kybra.canisters.management import CreateCanisterResult, management_canister
 
 
 class ExecuteCreateCanisterResult(Variant, total=False):
-    ok: CreateCanisterResult
-    err: str
+    Ok: CreateCanisterResult
+    Err: str
 
 
 @update
@@ -24,10 +24,7 @@ def execute_create_canister() -> Async[ExecuteCreateCanisterResult]:
         50_000_000_000_000
     )
 
-    if create_canister_result_call_result.err is not None:
-        return {"err": create_canister_result_call_result.err}
-
-    create_canister_result = create_canister_result_call_result.ok
-
-    return {"ok": create_canister_result}
+    return match(
+        create_canister_result_call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+    )
 ```

@@ -16,8 +16,8 @@ from kybra.canisters.management import (
 
 
 class ExecuteProvisionalCreateCanisterWithCyclesResult(Variant, total=False):
-    ok: CreateCanisterResult
-    err: str
+    Ok: CreateCanisterResult
+    Err: str
 
 
 @update
@@ -30,10 +30,7 @@ def provisional_create_canister_with_cycles() -> (
         {"amount": None, "settings": None}
     )
 
-    if call_result.err is not None:
-        return {"err": call_result.err}
-
-    provisional_create_canister_with_cycles_result = call_result.ok
-
-    return {"ok": provisional_create_canister_with_cycles_result}
+    return match(
+        call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+    )
 ```

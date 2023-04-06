@@ -15,8 +15,8 @@ BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE = 20_000_000
 
 
 class SendTransactionResult(Variant, total=False):
-    ok: null
-    err: str
+    Ok: null
+    Err: str
 
 
 @update
@@ -34,8 +34,7 @@ def send_transaction(transaction: blob) -> Async[SendTransactionResult]:
         transaction_fee
     )
 
-    if call_result.err is not None:
-        return {"err": call_result.err}
-
-    return {"ok": call_result.ok}
+    return match(
+        call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+    )
 ```

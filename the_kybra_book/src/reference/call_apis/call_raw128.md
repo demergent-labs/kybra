@@ -12,6 +12,7 @@ from kybra import (
     blob,
     CallResult,
     ic,
+    match,
     nat,
     Principal,
     update,
@@ -19,21 +20,19 @@ from kybra import (
 )
 
 class ExecuteCallRaw128Result(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
 
 
 @update
 def execute_call_raw128(
     canister_id: Principal, method: str, candid_args: str, payment: nat
 ) -> Async[ExecuteCallRaw128Result]:
-    canister_result: CallResult[blob] = yield ic.call_raw128(
+    call_result: CallResult[blob] = yield ic.call_raw128(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
-    if canister_result.err is not None:
-        return {"err": canister_result.err}
-
-    return {"ok": ic.candid_decode(canister_result.ok)}
-
+    return match(
+        call_result, {"Ok": lambda ok: {"Ok": ic.candid_decode(ok)}, "Err": lambda err: {"Err": err}}
+    )
 ```

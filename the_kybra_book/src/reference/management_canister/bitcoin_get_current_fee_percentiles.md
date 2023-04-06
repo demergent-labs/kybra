@@ -14,8 +14,8 @@ BITCOIN_API_CYCLE_COST = 100_000_000
 
 
 class GetCurrentFeePercentilesResult(Variant, total=False):
-    ok: list[MillisatoshiPerByte]
-    err: str
+    Ok: list[MillisatoshiPerByte]
+    Err: str
 
 
 @update
@@ -28,8 +28,7 @@ def get_current_fee_percentiles() -> Async[GetCurrentFeePercentilesResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if call_result.err is not None:
-        return {"err": call_result.err}
-
-    return {"ok": call_result.ok}
+    return match(
+        call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+    )
 ```

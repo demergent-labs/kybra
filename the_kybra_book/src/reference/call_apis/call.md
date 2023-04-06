@@ -22,6 +22,7 @@ Examples:
 from kybra import (
     Async,
     CallResult,
+    match,
     nat64,
     Principal,
     Service,
@@ -41,16 +42,15 @@ token_canister = TokenCanister(Principal.from_str("r7inp-6aaaa-aaaaa-aaabq-cai")
 
 
 class PayoutResult(Variant, total=False):
-    ok: nat64
-    err: str
+    Ok: nat64
+    Err: str
 
 
 @update
 def payout(to: Principal, amount: nat64) -> Async[PayoutResult]:
     result: CallResult[nat64] = yield token_canister.transfer(to, amount)
 
-    if result.err is not None:
-        return {"err": result.err}
-
-    return {"ok": result.ok}
+    return match(
+        result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+    )
 ```
