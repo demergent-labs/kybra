@@ -12,6 +12,7 @@ from kybra import (
     StableBTreeMap,
     update,
     Variant,
+    Vec,
 )
 
 
@@ -41,7 +42,7 @@ HeaderField = alias[tuple[str, str]]
 
 class HttpResponse(Record):
     status_code: nat16
-    headers: list[HeaderField]
+    headers: Vec[HeaderField]
     body: blob
     streaming_strategy: opt[StreamingStrategy]
     upgrade: opt[bool]
@@ -50,7 +51,7 @@ class HttpResponse(Record):
 class HttpRequest(Record):
     method: str
     url: str
-    headers: list[HeaderField]
+    headers: Vec[HeaderField]
     body: blob
 
 

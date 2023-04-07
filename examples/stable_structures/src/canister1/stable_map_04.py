@@ -3,10 +3,11 @@ from kybra import (
     match,
     opt,
     query,
+    Record,
     StableBTreeMap,
     update,
     Variant,
-    Record,
+    Vec,
 )
 from kybra import nat64
 from kybra import float32
@@ -18,7 +19,7 @@ class BlogPost(Record):
 
 class User(Record):
     username: str
-    posts: list["BlogPost"]
+    posts: Vec["BlogPost"]
 
 
 class StableMap4InsertResult(Variant, total=False):
@@ -59,17 +60,17 @@ def stable_map4_is_empty() -> bool:
 
 
 @query
-def stable_map4_keys() -> list[User]:
+def stable_map4_keys() -> Vec[User]:
     return stable_map4.keys()
 
 
 @query
-def stable_map4_values() -> list[float32]:
+def stable_map4_values() -> Vec[float32]:
     return stable_map4.values()
 
 
 @query
-def stable_map4_items() -> list[tuple[User, float32]]:
+def stable_map4_items() -> Vec[tuple[User, float32]]:
     return stable_map4.items()
 
 

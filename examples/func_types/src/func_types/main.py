@@ -15,6 +15,7 @@ from kybra import (
     Update,
     update,
     Variant,
+    Vec,
     void,
 )
 
@@ -43,7 +44,7 @@ BasicFunc = Func(Query[[str], str])
 ComplexFunc = Func(Update[[User, Reaction], nat64])
 StableFunc = Func(Query[[nat64, str], void])
 NullFunc = Func(
-    Query[[opt[null], list[null], null, list[list[null]], list[opt[null]]], null]
+    Query[[opt[null], Vec[null], null, Vec[Vec[null]], Vec[opt[null]]], null]
 )
 
 
@@ -78,7 +79,7 @@ def basic_func_param(basic_func: BasicFunc) -> BasicFunc:
 
 
 @query
-def basic_func_param_array(basic_funcs: list[BasicFunc]) -> list[BasicFunc]:
+def basic_func_param_array(basic_funcs: Vec[BasicFunc]) -> Vec[BasicFunc]:
     return basic_funcs
 
 
@@ -88,7 +89,7 @@ def basic_func_return_type() -> BasicFunc:
 
 
 @query
-def basic_func_return_type_array() -> list[BasicFunc]:
+def basic_func_return_type_array() -> Vec[BasicFunc]:
     return [
         (Principal.from_str("aaaaa-aa"), "create_canister"),
         (Principal.from_str("aaaaa-aa"), "update_settings"),

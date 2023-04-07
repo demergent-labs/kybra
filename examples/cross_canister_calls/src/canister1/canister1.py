@@ -8,6 +8,7 @@ from kybra import (
     Principal,
     update,
     Variant,
+    Vec,
 )
 from src.canister2.types import Account, AccountArgs, Canister2
 
@@ -28,7 +29,7 @@ class AccountResult(Variant, total=False):
 
 
 class AccountsResult(Variant, total=False):
-    Ok: list[Account]
+    Ok: Vec[Account]
     Err: str
 
 

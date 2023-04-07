@@ -43,6 +43,8 @@ opt = Optional[T]
 manual = Optional[T]
 alias = Annotated[T, None]
 
+Tuple = tuple
+Vec = list
 
 Record = TypedDict
 Variant = TypedDict

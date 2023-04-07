@@ -1,35 +1,32 @@
-from kybra import opt, query, Record
+from kybra import opt, query, Record, Vec
+
 
 class Element(Record):
     id: str
 
+
 class Head(Record):
-    elements: list[Element]
+    elements: Vec[Element]
+
 
 class Html(Record):
     head: opt[Head]
 
+
 @query
 def get_html() -> Html:
-    return {
-        'head': None
-    }
+    return {"head": None}
+
 
 @query
 def get_head() -> opt[Head]:
-    return {
-        'elements': []
-    }
+    return {"elements": []}
+
 
 @query
 def get_head_with_elements() -> opt[Head]:
-    return {
-        'elements': [
-            {
-                'id': '0'
-            }
-        ]
-    }
+    return {"elements": [{"id": "0"}]}
+
 
 @query
 def get_element(element: opt[opt[Element]]) -> opt[opt[Element]]:

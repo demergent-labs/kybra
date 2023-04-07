@@ -1,4 +1,4 @@
-from kybra import nat64, opt, Record, Service, service_query, service_update, void
+from kybra import nat64, opt, Record, Service, service_query, service_update, Vec, void
 from typing import TypedDict
 
 
@@ -13,22 +13,28 @@ class AccountArgs(Record):
 
 class Canister2(Service):
     @service_update
-    def transfer(self, from_: str, to: str, amount: nat64) -> nat64: ...
+    def transfer(self, from_: str, to: str, amount: nat64) -> nat64:
+        ...
 
     @service_query
-    def balance(self, id: str) -> nat64: ...
+    def balance(self, id: str) -> nat64:
+        ...
 
     @service_query
-    def account(self, account_args: AccountArgs) -> opt[Account]: ...
+    def account(self, account_args: AccountArgs) -> opt[Account]:
+        ...
 
     @service_query
-    def accounts(self) -> list[Account]: ...
+    def accounts(self) -> Vec[Account]:
+        ...
 
     @service_query
-    def trap(self) -> str: ...
+    def trap(self) -> str:
+        ...
 
     @service_update
-    def receive_notification(self, message: str) -> void: ...
+    def receive_notification(self, message: str) -> void:
+        ...
 
 
 class State(TypedDict):

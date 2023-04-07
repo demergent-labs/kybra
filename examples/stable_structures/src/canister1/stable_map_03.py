@@ -8,6 +8,7 @@ from kybra import (
     StableBTreeMap,
     update,
     Variant,
+    Vec,
 )
 
 
@@ -54,17 +55,17 @@ def stable_map3_is_empty() -> bool:
 
 
 @query
-def stable_map3_keys() -> list[Reaction]:
+def stable_map3_keys() -> Vec[Reaction]:
     return stable_map3.keys()
 
 
 @query
-def stable_map3_values() -> list[int]:
+def stable_map3_values() -> Vec[int]:
     return stable_map3.values()
 
 
 @query
-def stable_map3_items() -> list[tuple[Reaction, int]]:
+def stable_map3_items() -> Vec[tuple[Reaction, int]]:
     return stable_map3.items()
 
 

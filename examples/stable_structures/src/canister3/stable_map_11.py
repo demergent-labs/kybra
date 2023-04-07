@@ -6,6 +6,7 @@ from kybra import (
     Record,
     StableBTreeMap,
     update,
+    Vec,
     Variant,
 )
 from kybra import nat, nat64
@@ -17,7 +18,7 @@ class BlogPost(Record):
 
 class User(Record):
     username: str
-    posts: list[BlogPost]
+    posts: Vec[BlogPost]
 
 
 class StableMap11InsertResult(Variant, total=False):
@@ -58,17 +59,17 @@ def stable_map11_is_empty() -> bool:
 
 
 @query
-def stable_map11_keys() -> list[nat]:
+def stable_map11_keys() -> Vec[nat]:
     return stable_map11.keys()
 
 
 @query
-def stable_map11_values() -> list[User]:
+def stable_map11_values() -> Vec[User]:
     return stable_map11.values()
 
 
 @query
-def stable_map11_items() -> list[tuple[nat, User]]:
+def stable_map11_items() -> Vec[tuple[nat, User]]:
     return stable_map11.items()
 
 

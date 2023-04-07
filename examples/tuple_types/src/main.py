@@ -1,6 +1,6 @@
 # TODO Add in Canister types like in the Azle tuple_types example
 
-from kybra import nat8, nat64, null, Principal, query, Record, Variant
+from kybra import nat8, nat64, null, Principal, query, Record, Vec, Variant
 
 
 class User(Record):
@@ -25,17 +25,17 @@ Header = tuple[str, str]
 
 
 class HttpResponse(Record):
-    headers: list[Header]
+    headers: Vec[Header]
 
 
 class StreamingCallbackType(Variant, total=False):
-    WithHeaders: list[Header]
+    WithHeaders: Vec[Header]
     WithoutHeaders: null
 
 
 @query
 def primitive_one_tuple_return_type() -> PrimitiveOneTuple:
-    return ('Hello',)
+    return ("Hello",)
 
 
 @query
@@ -45,7 +45,7 @@ def primitive_one_tuple_param(param: PrimitiveOneTuple) -> PrimitiveOneTuple:
 
 @query
 def primitive_one_tuple_inline_return_type() -> tuple[str]:
-    return ('Greenland',)
+    return ("Greenland",)
 
 
 @query
@@ -55,7 +55,7 @@ def primitive_one_tuple_inline_param(param: tuple[str]) -> tuple[str]:
 
 @query
 def primitive_two_tuple_return_type() -> PrimitiveTwoTuple:
-    return ('Content-Type', 64)
+    return ("Content-Type", 64)
 
 
 @query
@@ -65,7 +65,7 @@ def primitive_two_tuple_param(param: PrimitiveTwoTuple) -> PrimitiveTwoTuple:
 
 @query
 def primitive_two_tuple_inline_return_type() -> tuple[str, str]:
-    return ('Fun', 'Times')
+    return ("Fun", "Times")
 
 
 @query
@@ -75,7 +75,7 @@ def primitive_two_tuple_inline_param(param: tuple[str, str]) -> tuple[str, str]:
 
 @query
 def primitive_three_tuple_return_type() -> PrimitiveThreeTuple:
-    return ('Good', 454, Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'))
+    return ("Good", 454, Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"))
 
 
 @query
@@ -85,17 +85,19 @@ def primitive_three_tuple_param(param: PrimitiveThreeTuple) -> PrimitiveThreeTup
 
 @query
 def primitive_three_tuple_inline_return_type() -> tuple[str, nat64, Principal]:
-    return ('Fun', 101, Principal.from_str('aaaaa-aa'))
+    return ("Fun", 101, Principal.from_str("aaaaa-aa"))
 
 
 @query
-def primitive_three_tuple_inline_param(param: tuple[str, nat64, Principal]) -> tuple[str, nat64, Principal]:
+def primitive_three_tuple_inline_param(
+    param: tuple[str, nat64, Principal]
+) -> tuple[str, nat64, Principal]:
     return param
 
 
 @query
 def complex_one_tuple_return_type() -> ComplexOneTuple:
-    return (('Hello', 0),)
+    return (("Hello", 0),)
 
 
 @query
@@ -105,22 +107,21 @@ def complex_one_tuple_param(param: ComplexOneTuple) -> ComplexOneTuple:
 
 @query
 def complex_one_tuple_inline_return_type() -> tuple[PrimitiveTwoTuple]:
-    return (('Candy', 56),)
+    return (("Candy", 56),)
 
 
 @query
-def complex_one_tuple_inline_param(param: tuple[PrimitiveTwoTuple]) -> tuple[PrimitiveTwoTuple]:
+def complex_one_tuple_inline_param(
+    param: tuple[PrimitiveTwoTuple],
+) -> tuple[PrimitiveTwoTuple]:
     return param
 
 
 @query
 def complex_two_tuple_return_type() -> ComplexTwoTuple:
     return (
-        ('Content-Type', 64),
-        {
-            'id': '0',
-            'primitive_two_tuple': ('Content-Type', 64)
-        }
+        ("Content-Type", 64),
+        {"id": "0", "primitive_two_tuple": ("Content-Type", 64)},
     )
 
 
@@ -132,39 +133,30 @@ def complex_two_tuple_param(param: ComplexTwoTuple) -> ComplexTwoTuple:
 @query
 def complex_two_tuple_inline_return_type() -> tuple[PrimitiveTwoTuple, User]:
     return (
-        ('Content-Type', 644),
-        {
-            'id': '444',
-            'primitive_two_tuple': ('Content-Type', 6_422)
-        }
+        ("Content-Type", 644),
+        {"id": "444", "primitive_two_tuple": ("Content-Type", 6_422)},
     )
 
 
 @query
-def complex_two_tuple_inline_param(param: tuple[PrimitiveTwoTuple, User]) -> tuple[PrimitiveTwoTuple, User]:
+def complex_two_tuple_inline_param(
+    param: tuple[PrimitiveTwoTuple, User]
+) -> tuple[PrimitiveTwoTuple, User]:
     return param
 
 
 @query
 def complex_three_tuple_return_type() -> ComplexThreeTuple:
     return (
-        ('Content-Type', 64),
+        ("Content-Type", 64),
+        {"id": "0", "primitive_two_tuple": ("Content-Type", 64)},
         {
-            'id': '0',
-            'primitive_two_tuple': ('Content-Type', 64)
-        },
-        {
-            'Bad': (
-                ('Content-Type', 64),
-                {
-                    'id': '1',
-                    'primitive_two_tuple': ('Content-Type', 64)
-                },
-                {
-                    'Good': None
-                }
+            "Bad": (
+                ("Content-Type", 64),
+                {"id": "1", "primitive_two_tuple": ("Content-Type", 64)},
+                {"Good": None},
             )
-        }
+        },
     )
 
 
@@ -174,58 +166,53 @@ def complex_three_tuple_param(param: ComplexThreeTuple) -> ComplexThreeTuple:
 
 
 @query
-def complex_three_tuple_inline_return_type() -> tuple[PrimitiveTwoTuple, User, Reaction]:
+def complex_three_tuple_inline_return_type() -> (
+    tuple[PrimitiveTwoTuple, User, Reaction]
+):
     return (
-        ('Content-Type', 64),
+        ("Content-Type", 64),
+        {"id": "0", "primitive_two_tuple": ("Content-Type", 64)},
         {
-            'id': '0',
-            'primitive_two_tuple': ('Content-Type', 64)
-        },
-        {
-            'Bad': (
-                ('Content-Type', 64),
-                {
-                    'id': '1',
-                    'primitive_two_tuple': ('Content-Type', 64)
-                },
-                {
-                    'Good': None
-                }
+            "Bad": (
+                ("Content-Type", 64),
+                {"id": "1", "primitive_two_tuple": ("Content-Type", 64)},
+                {"Good": None},
             )
-        }
+        },
     )
 
 
 @query
-def complex_three_tuple_inline_param(param: tuple[PrimitiveTwoTuple, User, Reaction]) -> tuple[PrimitiveTwoTuple, User, Reaction]:
+def complex_three_tuple_inline_param(
+    param: tuple[PrimitiveTwoTuple, User, Reaction]
+) -> tuple[PrimitiveTwoTuple, User, Reaction]:
     return param
 
 
 @query
-def tuple_array_params_and_return_type(headers: list[Header]) -> list[Header]:
+def tuple_array_params_and_return_type(headers: Vec[Header]) -> Vec[Header]:
     return headers
 
 
 @query
 def tuple_array_record_field() -> HttpResponse:
     return {
-        'headers': [
-            ('Content-Type', 'application/json'),
-            ('Accept-Ranges', 'bytes')
-        ]
+        "headers": [("Content-Type", "application/json"), ("Accept-Ranges", "bytes")]
     }
 
 
 @query
 def tuple_array_variant_field() -> StreamingCallbackType:
     return {
-        'WithHeaders': [
-            ('Content-Type', 'application/json'),
-            ('Accept-Ranges', 'bytes')
+        "WithHeaders": [
+            ("Content-Type", "application/json"),
+            ("Accept-Ranges", "bytes"),
         ]
     }
 
 
 @query
-def nested_tuple_query(param: tuple[tuple[str, tuple[nat8, nat8]], int]) -> tuple[tuple[str, tuple[nat8, nat8]], int]:
+def nested_tuple_query(
+    param: tuple[tuple[str, tuple[nat8, nat8]], int]
+) -> tuple[tuple[str, tuple[nat8, nat8]], int]:
     return param

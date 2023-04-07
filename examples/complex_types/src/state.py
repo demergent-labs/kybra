@@ -1,12 +1,9 @@
+from kybra import Vec
 from src.candid_types import ReactionType
 from typing import TypedDict
 
-state: "State" = {
-    'posts': {},
-    'reactions': {},
-    'threads': {},
-    'users': {}
-}
+state: "State" = {"posts": {}, "reactions": {}, "threads": {}, "users": {}}
+
 
 class State(TypedDict):
     posts: dict[str, "StatePost"]
@@ -14,12 +11,14 @@ class State(TypedDict):
     threads: dict[str, "StateThread"]
     users: dict[str, "StateUser"]
 
+
 class StatePost(TypedDict):
     id: str
     author_id: str
-    reaction_ids: list[str]
+    reaction_ids: Vec[str]
     text: str
     thread_id: str
+
 
 class StateReaction(TypedDict):
     id: str
@@ -27,15 +26,17 @@ class StateReaction(TypedDict):
     post_id: str
     reaction_type: ReactionType
 
+
 class StateThread(TypedDict):
     id: str
     author_id: str
-    post_ids: list[str]
+    post_ids: Vec[str]
     title: str
+
 
 class StateUser(TypedDict):
     id: str
-    post_ids: list[str]
-    reaction_ids: list[str]
-    thread_ids: list[str]
+    post_ids: Vec[str]
+    reaction_ids: Vec[str]
+    thread_ids: Vec[str]
     username: str
