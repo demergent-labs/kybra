@@ -8,6 +8,7 @@ from kybra import (
     service_update,
     update,
     Variant,
+    Vec,
 )
 
 
@@ -40,7 +41,7 @@ def service_return_type() -> SomeService:
 
 
 @update
-def service_list(some_services: list[SomeService]) -> list[SomeService]:
+def service_list(some_services: Vec[SomeService]) -> Vec[SomeService]:
     return some_services
 
 
