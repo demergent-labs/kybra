@@ -149,14 +149,20 @@ Update = Callable
 Oneway = Callable
 
 
-class CallResult(Generic[T]):
-    Ok: T
-    Err: Optional[str]
+O = TypeVar("O")
+E = TypeVar("E")
 
-    def __init__(self, Ok: T, Err: str):
-        self.Ok = Ok
-        self.Err = Err
 
+class Result(Generic[O, E]):
+    Ok: O
+    Err: Optional[E]
+
+    def __init__(self, ok: O, err: E):
+        self.Ok = ok
+        self.Err = err
+
+
+class CallResult(Result[T, str]):
     def notify(self) -> "NotifyResult":
         ...
 

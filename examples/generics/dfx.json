@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "generics": {
+            "type": "custom",
+            "build": "python -m kybra generics src/main.py src/main.did",
+            "candid": "src/main.did",
+            "wasm": ".kybra/generics/generics.wasm.gz",
+            "declarations": {
+                "output": "test/dfx_generated/generics",
+                "node_compatibility": true
+            }
+        }
+    }
+}
