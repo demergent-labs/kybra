@@ -5,6 +5,7 @@ from kybra import (
     Principal,
     query,
     StableBTreeMap,
+    Tuple,
     update,
     Variant,
     Vec,
@@ -60,7 +61,7 @@ def stable_map13_values() -> Vec[Principal]:
 
 
 @query
-def stable_map13_items() -> Vec[tuple[str, Principal]]:
+def stable_map13_items() -> Vec[Tuple[str, Principal]]:
     return stable_map13.items()
 
 

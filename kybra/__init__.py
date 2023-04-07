@@ -554,7 +554,7 @@ class StableBTreeMap(Generic[K, V]):
         """
         return _kybra_ic._kybra_stable_b_tree_map_is_empty(self.memory_id)  # type: ignore
 
-    def items(self) -> list[tuple[K, V]]:
+    def items(self) -> Vec[Tuple[K, V]]:
         """
         Get a list of all key-value pairs in the map.
 
@@ -562,7 +562,7 @@ class StableBTreeMap(Generic[K, V]):
         """
         return _kybra_ic._kybra_stable_b_tree_map_items(self.memory_id)  # type: ignore
 
-    def keys(self) -> list[K]:
+    def keys(self) -> Vec[K]:
         """
         Get a list of all keys in the map.
 
@@ -587,7 +587,7 @@ class StableBTreeMap(Generic[K, V]):
         """
         return _kybra_ic._kybra_stable_b_tree_map_remove(self.memory_id, key)  # type: ignore
 
-    def values(self) -> list[V]:
+    def values(self) -> Vec[V]:
         """
         Get a list of all values in the map.
 

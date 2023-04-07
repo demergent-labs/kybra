@@ -20,6 +20,7 @@ from kybra import (
     Record,
     reserved,
     text,
+    Tuple,
     Variant,
     Vec,
 )
@@ -55,7 +56,7 @@ class KeywordRecord(Record):
     raise_: blob
     with_: Principal
     # # The below python keywords are also
-    None_: tuple[bool, bool]
+    None_: Tuple[bool, bool]
     as_: null
     async_: reserved
     await_: Vec[nat]

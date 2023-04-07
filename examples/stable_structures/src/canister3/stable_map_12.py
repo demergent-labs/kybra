@@ -6,6 +6,7 @@ from kybra import (
     opt,
     query,
     StableBTreeMap,
+    Tuple,
     update,
     Vec,
     Variant,
@@ -66,7 +67,7 @@ def stable_map12_values() -> Vec[Reaction]:
 
 
 @query
-def stable_map12_items() -> Vec[tuple[blob, Reaction]]:
+def stable_map12_items() -> Vec[Tuple[blob, Reaction]]:
     return stable_map12.items()
 
 

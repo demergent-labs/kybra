@@ -1,6 +1,6 @@
 # TODO Add in Canister types like in the Azle tuple_types example
 
-from kybra import nat8, nat64, null, Principal, query, Record, Vec, Variant
+from kybra import nat8, nat64, null, Principal, query, Record, Tuple, Vec, Variant
 
 
 class User(Record):
@@ -13,15 +13,15 @@ class Reaction(Variant, total=False):
     Bad: "ComplexThreeTuple"
 
 
-PrimitiveOneTuple = tuple[str]
-PrimitiveTwoTuple = tuple[str, nat64]
-PrimitiveThreeTuple = tuple[str, nat64, Principal]
+PrimitiveOneTuple = Tuple[str]
+PrimitiveTwoTuple = Tuple[str, nat64]
+PrimitiveThreeTuple = Tuple[str, nat64, Principal]
 
-ComplexOneTuple = tuple[PrimitiveTwoTuple]
-ComplexTwoTuple = tuple[PrimitiveTwoTuple, User]
-ComplexThreeTuple = tuple[PrimitiveTwoTuple, User, Reaction]
+ComplexOneTuple = Tuple[PrimitiveTwoTuple]
+ComplexTwoTuple = Tuple[PrimitiveTwoTuple, User]
+ComplexThreeTuple = Tuple[PrimitiveTwoTuple, User, Reaction]
 
-Header = tuple[str, str]
+Header = Tuple[str, str]
 
 
 class HttpResponse(Record):
@@ -44,12 +44,12 @@ def primitive_one_tuple_param(param: PrimitiveOneTuple) -> PrimitiveOneTuple:
 
 
 @query
-def primitive_one_tuple_inline_return_type() -> tuple[str]:
+def primitive_one_tuple_inline_return_type() -> Tuple[str]:
     return ("Greenland",)
 
 
 @query
-def primitive_one_tuple_inline_param(param: tuple[str]) -> tuple[str]:
+def primitive_one_tuple_inline_param(param: Tuple[str]) -> Tuple[str]:
     return param
 
 
@@ -64,12 +64,12 @@ def primitive_two_tuple_param(param: PrimitiveTwoTuple) -> PrimitiveTwoTuple:
 
 
 @query
-def primitive_two_tuple_inline_return_type() -> tuple[str, str]:
+def primitive_two_tuple_inline_return_type() -> Tuple[str, str]:
     return ("Fun", "Times")
 
 
 @query
-def primitive_two_tuple_inline_param(param: tuple[str, str]) -> tuple[str, str]:
+def primitive_two_tuple_inline_param(param: Tuple[str, str]) -> Tuple[str, str]:
     return param
 
 
@@ -84,14 +84,14 @@ def primitive_three_tuple_param(param: PrimitiveThreeTuple) -> PrimitiveThreeTup
 
 
 @query
-def primitive_three_tuple_inline_return_type() -> tuple[str, nat64, Principal]:
+def primitive_three_tuple_inline_return_type() -> Tuple[str, nat64, Principal]:
     return ("Fun", 101, Principal.from_str("aaaaa-aa"))
 
 
 @query
 def primitive_three_tuple_inline_param(
-    param: tuple[str, nat64, Principal]
-) -> tuple[str, nat64, Principal]:
+    param: Tuple[str, nat64, Principal]
+) -> Tuple[str, nat64, Principal]:
     return param
 
 
@@ -106,14 +106,14 @@ def complex_one_tuple_param(param: ComplexOneTuple) -> ComplexOneTuple:
 
 
 @query
-def complex_one_tuple_inline_return_type() -> tuple[PrimitiveTwoTuple]:
+def complex_one_tuple_inline_return_type() -> Tuple[PrimitiveTwoTuple]:
     return (("Candy", 56),)
 
 
 @query
 def complex_one_tuple_inline_param(
-    param: tuple[PrimitiveTwoTuple],
-) -> tuple[PrimitiveTwoTuple]:
+    param: Tuple[PrimitiveTwoTuple],
+) -> Tuple[PrimitiveTwoTuple]:
     return param
 
 
@@ -131,7 +131,7 @@ def complex_two_tuple_param(param: ComplexTwoTuple) -> ComplexTwoTuple:
 
 
 @query
-def complex_two_tuple_inline_return_type() -> tuple[PrimitiveTwoTuple, User]:
+def complex_two_tuple_inline_return_type() -> Tuple[PrimitiveTwoTuple, User]:
     return (
         ("Content-Type", 644),
         {"id": "444", "primitive_two_tuple": ("Content-Type", 6_422)},
@@ -140,8 +140,8 @@ def complex_two_tuple_inline_return_type() -> tuple[PrimitiveTwoTuple, User]:
 
 @query
 def complex_two_tuple_inline_param(
-    param: tuple[PrimitiveTwoTuple, User]
-) -> tuple[PrimitiveTwoTuple, User]:
+    param: Tuple[PrimitiveTwoTuple, User]
+) -> Tuple[PrimitiveTwoTuple, User]:
     return param
 
 
@@ -167,7 +167,7 @@ def complex_three_tuple_param(param: ComplexThreeTuple) -> ComplexThreeTuple:
 
 @query
 def complex_three_tuple_inline_return_type() -> (
-    tuple[PrimitiveTwoTuple, User, Reaction]
+    Tuple[PrimitiveTwoTuple, User, Reaction]
 ):
     return (
         ("Content-Type", 64),
@@ -184,8 +184,8 @@ def complex_three_tuple_inline_return_type() -> (
 
 @query
 def complex_three_tuple_inline_param(
-    param: tuple[PrimitiveTwoTuple, User, Reaction]
-) -> tuple[PrimitiveTwoTuple, User, Reaction]:
+    param: Tuple[PrimitiveTwoTuple, User, Reaction]
+) -> Tuple[PrimitiveTwoTuple, User, Reaction]:
     return param
 
 
@@ -213,6 +213,6 @@ def tuple_array_variant_field() -> StreamingCallbackType:
 
 @query
 def nested_tuple_query(
-    param: tuple[tuple[str, tuple[nat8, nat8]], int]
-) -> tuple[tuple[str, tuple[nat8, nat8]], int]:
+    param: Tuple[Tuple[str, Tuple[nat8, nat8]], int]
+) -> Tuple[Tuple[str, Tuple[nat8, nat8]], int]:
     return param

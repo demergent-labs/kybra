@@ -1,8 +1,8 @@
-from kybra import alias, nat32, opt, query, Record, update
+from kybra import alias, nat32, opt, query, Record, Tuple, update
 
 SuperheroId = alias[nat32]
 
-List = tuple[str, opt['List']]
+List = Tuple[str, opt["List"]]
 
 
 # type of a superhero.

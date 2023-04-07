@@ -10,6 +10,7 @@ from kybra import (
     Record,
     query,
     reserved,
+    Tuple,
     update,
     Variant,
     Vec,
@@ -80,7 +81,7 @@ def update_float32() -> manual[float32]:
 
 
 @update
-def update_inline_type() -> manual[tuple[str, str]]:
+def update_inline_type() -> manual[Tuple[str, str]]:
     ic.reply(("Hello", "World"))
 
 

@@ -10,6 +10,7 @@ from kybra import (
     query,
     Record,
     StableBTreeMap,
+    Tuple,
     update,
     Variant,
     Vec,
@@ -37,7 +38,7 @@ class StreamingStrategy(Variant, total=False):
     Callback: CallbackStrategy
 
 
-HeaderField = alias[tuple[str, str]]
+HeaderField = alias[Tuple[str, str]]
 
 
 class HttpResponse(Record):

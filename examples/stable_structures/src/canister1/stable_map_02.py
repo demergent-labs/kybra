@@ -1,4 +1,14 @@
-from kybra import InsertError, match, opt, query, StableBTreeMap, update, Vec, Variant
+from kybra import (
+    InsertError,
+    match,
+    opt,
+    query,
+    StableBTreeMap,
+    Tuple,
+    update,
+    Vec,
+    Variant,
+)
 from kybra import nat, nat64, nat32
 
 
@@ -50,7 +60,7 @@ def stable_map2_values() -> Vec[nat]:
 
 
 @query
-def stable_map2_items() -> Vec[tuple[nat32, nat]]:
+def stable_map2_items() -> Vec[Tuple[nat32, nat]]:
     return stable_map2.items()
 
 
