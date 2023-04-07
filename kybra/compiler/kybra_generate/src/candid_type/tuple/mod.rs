@@ -24,7 +24,7 @@ impl SourceMapped<&Located<ExprKind>> {
     pub fn is_tuple(&self) -> bool {
         match &self.node {
             ExprKind::Subscript { value, .. } => match &value.node {
-                ExprKind::Name { id, .. } => id == "tuple",
+                ExprKind::Name { id, .. } => id == "Tuple",
                 _ => false,
             },
             _ => false,
@@ -36,7 +36,7 @@ impl SourceMapped<&Located<ExprKind>> {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
                     ExprKind::Name { id, .. } => {
-                        if id != "tuple" {
+                        if id != "Tuple" {
                             return Err(self.not_tuple_error());
                         }
                     }

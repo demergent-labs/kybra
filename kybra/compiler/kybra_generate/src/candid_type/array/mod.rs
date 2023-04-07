@@ -9,7 +9,7 @@ impl SourceMapped<&Located<ExprKind>> {
     pub fn is_array(&self) -> bool {
         match &self.node {
             ExprKind::Subscript { value, .. } => match &value.node {
-                ExprKind::Name { id, .. } => id == "list",
+                ExprKind::Name { id, .. } => id == "Vec",
                 _ => false,
             },
             _ => false,
@@ -24,7 +24,7 @@ impl SourceMapped<&Located<ExprKind>> {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
                     ExprKind::Name { id, .. } => {
-                        if id != "list" {
+                        if id != "Vec" {
                             return Err(crate::errors::unreachable());
                         }
                     }
