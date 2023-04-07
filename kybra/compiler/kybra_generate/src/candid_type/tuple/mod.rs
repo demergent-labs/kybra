@@ -60,6 +60,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 Ok(Tuple {
                     name: tuple_name,
                     elems,
+                    type_params: vec![].into(),
                 })
             }
             _ => Err(self.not_tuple_error()),

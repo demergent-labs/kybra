@@ -24,10 +24,12 @@ impl SourceMapped<&Located<ExprKind>> {
         match &self.node {
             ExprKind::Name { id, .. } => Ok(TypeRef {
                 name: id.to_string(),
+                type_arguments: vec![].into(),
             }),
             ExprKind::Constant { value, .. } => match value {
                 Constant::Str(string) => Ok(TypeRef {
                     name: string.clone(),
+                    type_arguments: vec![],
                 }),
                 _ => Err(crate::errors::unreachable()),
             },

@@ -76,6 +76,7 @@ impl SourceMapped<&Located<StmtKind>> {
         Ok(Some(TypeAlias {
             name: alias_name,
             aliased_type: Box::new(enclosed_type),
+            type_params: vec![].into(),
         }))
     }
 }
