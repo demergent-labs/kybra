@@ -1,4 +1,4 @@
-from kybra import alias, blob, nat32, nat64, null, opt, Record, Variant
+from kybra import alias, blob, nat32, nat64, null, opt, Record, Variant, Vec
 
 BitcoinAddress = alias[str]
 BlockHash = alias[blob]
@@ -52,7 +52,7 @@ class GetUtxosResult(Record):
     next_page: opt[Page]
     tip_block_hash: BlockHash
     tip_height: nat32
-    utxos: list[Utxo]
+    utxos: Vec[Utxo]
 
 
 MillisatoshiPerByte = alias[nat64]
