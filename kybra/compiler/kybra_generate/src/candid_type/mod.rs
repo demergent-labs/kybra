@@ -32,7 +32,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     ExprKind::Name { id, .. } => match &id[..] {
                         "Async" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
                             .is_candid_type(),
-                        "manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
+                        "Manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
                             .is_candid_type(),
                         _ => false,
                     },
@@ -67,7 +67,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     ExprKind::Name { id, .. } => match &id[..] {
                         "Async" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
                             .to_candid_type(),
-                        "manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
+                        "Manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
                             .to_candid_type(),
                         _ => Err(self.invalid_subscript_value_error()),
                     },

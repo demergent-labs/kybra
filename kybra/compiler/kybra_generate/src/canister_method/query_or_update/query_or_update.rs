@@ -46,7 +46,7 @@ impl SourceMapped<&Located<ExprKind>> {
         match &self.node {
             ExprKind::Subscript { value, slice, .. } => match &value.node {
                 ExprKind::Name { id, .. } => {
-                    if id == "manual" {
+                    if id == "Manual" {
                         return true;
                     } else {
                         return SourceMapped::new(slice.as_ref(), self.source_map.clone())
