@@ -743,7 +743,7 @@ def set(key: str, value: str) -&gt; void:
 <p>So far we have only seen how state changes can be persisted. State changes can also be discarded by implicit or explicit traps. A trap is an immediate stop to execution with the ability to provide a message to the execution environment.</p>
 <p>Traps can be useful for ensuring that multiple operations are either all completed or all disregarded, or in other words atomic. Keep in mind that these guarantees do not hold once cross-canister calls are introduced, but that's a more advanced topic <a href="./cross_canister.html">covered later</a>.</p>
 <p>Here's an example of how to trap and ensure atomic changes to your database:</p>
-<pre><code class="language-python">from kybra import ic, opt, query, Record, StableBTreeMap, update, void
+<pre><code class="language-python">from kybra import ic, match, opt, query, Record, StableBTreeMap, update, Vec, void
 
 
 class Entry(Record):
@@ -765,16 +765,20 @@ def set(key: str, value: str) -&gt; void:
 
 
 @update
-def set_many(entries: list[Entry]) -&gt; void:
+def set_many(entries: Vec[Entry]) -&gt; void:
     for entry in entries:
         result = db.insert(entry[&quot;key&quot;], entry[&quot;value&quot;])
-
-        if result.Err is not None:
-            ic.trap(str(result.Err))
+        match(
+            result,
+            {
+                &quot;Ok&quot;: lambda _: ...,
+                &quot;Err&quot;: lambda err: ic.trap(err),
+            },
+        )
 </code></pre>
 <p>In addition to <code>ic.trap</code>, an explicit Python <code>raise</code> or any unhandled exception will also trap.</p>
 <p>There is a limit to how much computation can be done in a single call to an update method. The current update call limit is <a href="https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits">20 billion Wasm instructions</a>. If we modify our database example, we can introduce an update method that runs the risk reaching the limit:</p>
-<pre><code class="language-python">from kybra import ic, nat64, opt, query, Record, StableBTreeMap, update, void
+<pre><code class="language-python">from kybra import ic, match, nat64, opt, query, Record, StableBTreeMap, update, void
 
 
 class Entry(Record):
@@ -800,8 +804,13 @@ def set_many(num_entries: nat64) -&gt; void:
     for i in range(num_entries):
         result = db.insert(str(i), str(i))
 
-        if result.Err is not None:
-            ic.trap(str(result.Err))
+        match(
+            result,
+            {
+                &quot;Ok&quot;: lambda _: ...,
+                &quot;Err&quot;: lambda err: ic.trap(err),
+            },
+        )
 </code></pre>
 <p>From the <code>dfx command line</code> you can call <code>set_many</code> like this:</p>
 <pre><code class="language-bash">dfx canister call my_canister set_many '(100_000)'
@@ -1316,13 +1325,13 @@ def print_null(none: None) -&gt; None:
 }
 </code></pre>
 <h4 id="vec"><a class="header" href="#vec">vec</a></h4>
-<p>The Python type <code>list</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t">Candid type vec</a> and will become an array of the specified type at runtime.</p>
+<p>The Kybra type <code>Vec</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t">Candid type vec</a> and will become an array of the specified type at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import int32, query
+<pre><code class="language-python">from kybra import int32, query, Vec
 
 
 @query
-def get_numbers() -&gt; list[int32]:
+def get_numbers() -&gt; Vec[int32]:
     return [0, 1, 2, 3]
 </code></pre>
 <p>Candid:</p>
@@ -1354,7 +1363,7 @@ def get_opt_none() -&gt; opt[bool]:
 <h4 id="record"><a class="header" href="#record">record</a></h4>
 <p>Python classes that inherit from the Kybra type <code>Record</code> correspond to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-record--n--t--">Candid record type</a> and will become <a href="https://docs.python.org/3/library/typing.html#typing.TypedDict">Python TypedDicts</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import Record
+<pre><code class="language-python">from kybra import Record, Vec
 
 
 class Post(Record):
@@ -1367,14 +1376,14 @@ class Post(Record):
 class Thread(Record):
     id: str
     author: &quot;User&quot;
-    posts: list[Post]
+    posts: Vec[Post]
     title: str
 
 
 class User(Record):
     id: str
-    posts: list[Post]
-    thread: list[Thread]
+    posts: Vec[Post]
+    thread: Vec[Thread]
     username: str
 </code></pre>
 <p>Candid:</p>
@@ -1591,8 +1600,10 @@ map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_
     opt,
     query,
     StableBTreeMap,
+    Tuple,
     update,
     Variant,
+    Vec,
 )
 
 Key = nat8
@@ -1630,12 +1641,12 @@ def is_empty() -&gt; bool:
 
 
 @query
-def items() -&gt; list[tuple[Key, Value]]:
+def items() -&gt; Vec[Tuple[Key, Value]]:
     return map.items()
 
 
 @query
-def keys() -&gt; list[Key]:
+def keys() -&gt; Vec[Key]:
     return map.keys()
 
 
@@ -1650,7 +1661,7 @@ def remove(key: Key) -&gt; opt[Value]:
 
 
 @query
-def values() -&gt; list[Value]:
+def values() -&gt; Vec[Value]:
     return map.values()
 
 </code></pre>
@@ -1671,13 +1682,14 @@ from kybra import (
     StableBTreeMap,
     update,
     Variant,
+    Vec,
 )
 
 
 class User(Record):
     id: Principal
     created_at: nat64
-    recording_ids: list[Principal]
+    recording_ids: Vec[Principal]
     username: str
 
 
@@ -1720,7 +1732,7 @@ def create_user(username: str) -&gt; CreateUserResult:
 
 
 @query
-def read_users() -&gt; list[User]:
+def read_users() -&gt; Vec[User]:
     return users.values()
 
 
@@ -1809,7 +1821,7 @@ def create_recording(
 
 
 @query
-def read_recordings() -&gt; list[Recording]:
+def read_recordings() -&gt; Vec[Recording]:
     return recordings.values()
 
 
@@ -1875,13 +1887,13 @@ def generate_id() -&gt; Principal:
 </code></pre>
 <p>The example above shows a very basic audio recording backend application. There are two types of entities that need to be stored, <code>User</code> and <code>Recording</code>. These are represented as <code>Candid</code> records.</p>
 <p>Each entity gets its own <code>StableBTreeMap</code>:</p>
-<pre><code class="language-python">from kybra import blob, nat64, Principal, Record, StableBTreeMap
+<pre><code class="language-python">from kybra import blob, nat64, Principal, Record, StableBTreeMap, Vec
 
 
 class User(Record):
     id: Principal
     created_at: nat64
-    recording_ids: list[Principal]
+    recording_ids: Vec[Principal]
     username: str
 
 
@@ -2111,20 +2123,16 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
             {
                 &quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok},
                 &quot;Err&quot;: lambda err: {&quot;Err&quot;: str(err)},
-                &quot;_&quot;: lambda _: {
-                    &quot;Err&quot;: f&quot;Ok and Err both do not exist in {str(transfer_result)}&quot;
-                },
             },
         )
 
     return match(
         call_result,
         {
-            &quot;Ok&quot;: lambda ok: handle_transfer_result_ok(ok),
+            &quot;Ok&quot;: handle_transfer_result_ok,
             &quot;Err&quot;: lambda err: {&quot;Err&quot;: err},
         },
     )
-
 </code></pre>
 <p>So far we have only shown a cross-canister call from an update method. Update methods can call other update methods or query methods (but not composite query methods as discussed below). If an update method calls a query method, that query method will be called in replicated mode. Replicated mode engages the consensus process, but for queries the state will still be discarded.</p>
 <p>Cross-canister calls can also be initiated from query methods (not yet live on IC mainnet but this works locally). These are known as composite queries, and in Kybra they are simply query methods that return a generator using the <code>Async</code> type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.</p>
@@ -2233,25 +2241,25 @@ def send_notification() -&gt; ReceiveNotificationResult:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
+<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Tuple, Variant, Vec
 
 
 class HttpRequest(Record):
     method: str
     url: str
-    headers: list[&quot;Header&quot;]
+    headers: Vec[&quot;Header&quot;]
     body: blob
 
 
 class HttpResponse(Record):
     status_code: nat16
-    headers: list[&quot;Header&quot;]
+    headers: Vec[&quot;Header&quot;]
     body: blob
     streaming_strategy: opt[&quot;StreamingStrategy&quot;]
     upgrade: opt[bool]
 
 
-Header = tuple[str, str]
+Header = Tuple[str, str]
 
 
 class StreamingStrategy(Variant):
@@ -2344,14 +2352,9 @@ def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
         }
     ).with_cycles(cycle_cost_total)
 
-    def handle_http_result_err(err: str):
-        if err:
-            ic.trap(err)
-        ic.trap(&quot;http_result had an error&quot;)
-
     return match(
         http_result,
-        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: handle_http_result_err},
+        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: lambda err: ic.trap(err)},
     )
 
 
@@ -2377,14 +2380,9 @@ def eth_get_block_by_number(number: nat32) -&gt; Async[JSON]:
         }
     ).with_cycles(cycle_cost_total)
 
-    def handle_http_result_err(err: str):
-        if err:
-            ic.trap(err)
-        ic.trap(&quot;http_result had an error&quot;)
-
     return match(
         http_result,
-        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: handle_http_result_err},
+        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: lambda err: ic.trap(err)},
     )
 
 
@@ -3157,7 +3155,6 @@ def send_notification() -&gt; SendNotificationResult:
 
 class Cycles(Service):
     @service_update
-    @service_update
     def receive_cycles128(self) -&gt; nat:
         ...
 
@@ -3791,7 +3788,7 @@ def print_principal(principal: Principal) -&gt; Principal:
 <p>This section is a work in progress.</p>
 <p>Python classes that inherit from the Kybra type <code>Record</code> correspond to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-record--n--t--">Candid record type</a> and will become <a href="https://docs.python.org/3/library/typing.html#typing.TypedDict">Python TypedDicts</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import Record
+<pre><code class="language-python">from kybra import Record, Vec
 
 
 class Post(Record):
@@ -3804,14 +3801,14 @@ class Post(Record):
 class Thread(Record):
     id: str
     author: &quot;User&quot;
-    posts: list[Post]
+    posts: Vec[Post]
     title: str
 
 
 class User(Record):
     id: str
-    posts: list[Post]
-    thread: list[Thread]
+    posts: Vec[Post]
+    thread: Vec[Thread]
     username: str
 </code></pre>
 <p>Candid:</p>
@@ -3947,13 +3944,13 @@ type Firework = record {
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="vec-1"><a class="header" href="#vec-1">vec</a></h1>
 <p>This section is a work in progress.</p>
-<p>The Python type <code>list</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t">Candid type vec</a> and will become an array of the specified type at runtime.</p>
+<p>The Kybra type <code>Vec</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t">Candid type vec</a> and will become an array of the specified type at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import int32, query
+<pre><code class="language-python">from kybra import int32, query, Vec
 
 
 @query
-def get_numbers() -&gt; list[int32]:
+def get_numbers() -&gt; Vec[int32]:
     return [0, 1, 2, 3]
 </code></pre>
 <p>Candid:</p>
@@ -4166,25 +4163,25 @@ def heartbeat_() -&gt; void:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
+<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Tuple, Variant, Vec
 
 
 class HttpRequest(Record):
     method: str
     url: str
-    headers: list[&quot;Header&quot;]
+    headers: Vec[&quot;Header&quot;]
     body: blob
 
 
 class HttpResponse(Record):
     status_code: nat16
-    headers: list[&quot;Header&quot;]
+    headers: Vec[&quot;Header&quot;]
     body: blob
     streaming_strategy: opt[&quot;StreamingStrategy&quot;]
     upgrade: opt[bool]
 
 
-Header = tuple[str, str]
+Header = Tuple[str, str]
 
 
 class StreamingStrategy(Variant):
@@ -4224,25 +4221,25 @@ def http_request(req: HttpRequest) -&gt; HttpResponse:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
+<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Tuple, Variant, Vec
 
 
 class HttpRequest(Record):
     method: str
     url: str
-    headers: list[&quot;Header&quot;]
+    headers: Vec[&quot;Header&quot;]
     body: blob
 
 
 class HttpResponse(Record):
     status_code: nat16
-    headers: list[&quot;Header&quot;]
+    headers: Vec[&quot;Header&quot;]
     body: blob
     streaming_strategy: opt[&quot;StreamingStrategy&quot;]
     upgrade: opt[bool]
 
 
-Header = tuple[str, str]
+Header = Tuple[str, str]
 
 
 class StreamingStrategy(Variant):
@@ -4439,21 +4436,21 @@ def get_balance(address: str) -&gt; Async[ExecuteGetBalanceResult]:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, match, update, Variant
+<pre><code class="language-python">from kybra import Async, CallResult, match, update, Variant, Vec
 from kybra.canisters.management import management_canister, MillisatoshiPerByte
 
 BITCOIN_API_CYCLE_COST = 100_000_000
 
 
 class GetCurrentFeePercentilesResult(Variant, total=False):
-    Ok: list[MillisatoshiPerByte]
+    Ok: Vec[MillisatoshiPerByte]
     Err: str
 
 
 @update
 def get_current_fee_percentiles() -&gt; Async[GetCurrentFeePercentilesResult]:
     call_result: CallResult[
-        list[MillisatoshiPerByte]
+        Vec[MillisatoshiPerByte]
     ] = yield management_canister.bitcoin_get_current_fee_percentiles(
         {&quot;network&quot;: {&quot;Regtest&quot;: None}}
     ).with_cycles(
@@ -4681,12 +4678,7 @@ def xkcd() -&gt; Async[HttpResponse]:
         }
     ).with_cycles(cycle_cost_total)
 
-    def handle_http_result_err(err: str):
-        if err:
-            ic.trap(err)
-        ic.trap(err)
-
-    return match(http_result, {&quot;Ok&quot;: lambda ok: ok, &quot;Err&quot;: handle_http_result_err})
+    return match(http_result, {&quot;Ok&quot;: lambda ok: ok, &quot;Err&quot;: lambda err: ic.trap(err)})
 
 
 @query
@@ -4982,6 +4974,7 @@ def execute_update_settings(canister_id: Principal) -&gt; Async[DefaultResult]:
     nat8,
     opt,
     query,
+    Tuple,
     StableBTreeMap,
     update,
     Variant,
@@ -5022,12 +5015,12 @@ def is_empty() -&gt; bool:
 
 
 @query
-def items() -&gt; list[tuple[Key, Value]]:
+def items() -&gt; Vec[Tuple[Key, Value]]:
     return map.items()
 
 
 @query
-def keys() -&gt; list[Key]:
+def keys() -&gt; Vec[Key]:
     return map.keys()
 
 
@@ -5042,7 +5035,7 @@ def remove(key: Key) -&gt; opt[Value]:
 
 
 @query
-def values() -&gt; list[Value]:
+def values() -&gt; Vec[Value]:
     return map.values()
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="stable-bytes"><a class="header" href="#stable-bytes">stable bytes</a></h1>

@@ -163,6 +163,7 @@
     nat8,
     opt,
     query,
+    Tuple,
     StableBTreeMap,
     update,
     Variant,
@@ -203,12 +204,12 @@ def is_empty() -&gt; bool:
 
 
 @query
-def items() -&gt; list[tuple[Key, Value]]:
+def items() -&gt; Vec[Tuple[Key, Value]]:
     return map.items()
 
 
 @query
-def keys() -&gt; list[Key]:
+def keys() -&gt; Vec[Key]:
     return map.keys()
 
 
@@ -223,7 +224,7 @@ def remove(key: Key) -&gt; opt[Value]:
 
 
 @query
-def values() -&gt; list[Value]:
+def values() -&gt; Vec[Value]:
     return map.values()
 </code></pre>
 

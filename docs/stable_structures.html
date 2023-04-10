@@ -176,8 +176,10 @@ map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_
     opt,
     query,
     StableBTreeMap,
+    Tuple,
     update,
     Variant,
+    Vec,
 )
 
 Key = nat8
@@ -215,12 +217,12 @@ def is_empty() -&gt; bool:
 
 
 @query
-def items() -&gt; list[tuple[Key, Value]]:
+def items() -&gt; Vec[Tuple[Key, Value]]:
     return map.items()
 
 
 @query
-def keys() -&gt; list[Key]:
+def keys() -&gt; Vec[Key]:
     return map.keys()
 
 
@@ -235,7 +237,7 @@ def remove(key: Key) -&gt; opt[Value]:
 
 
 @query
-def values() -&gt; list[Value]:
+def values() -&gt; Vec[Value]:
     return map.values()
 
 </code></pre>
@@ -256,13 +258,14 @@ from kybra import (
     StableBTreeMap,
     update,
     Variant,
+    Vec,
 )
 
 
 class User(Record):
     id: Principal
     created_at: nat64
-    recording_ids: list[Principal]
+    recording_ids: Vec[Principal]
     username: str
 
 
@@ -305,7 +308,7 @@ def create_user(username: str) -&gt; CreateUserResult:
 
 
 @query
-def read_users() -&gt; list[User]:
+def read_users() -&gt; Vec[User]:
     return users.values()
 
 
@@ -394,7 +397,7 @@ def create_recording(
 
 
 @query
-def read_recordings() -&gt; list[Recording]:
+def read_recordings() -&gt; Vec[Recording]:
     return recordings.values()
 
 
@@ -460,13 +463,13 @@ def generate_id() -&gt; Principal:
 </code></pre>
 <p>The example above shows a very basic audio recording backend application. There are two types of entities that need to be stored, <code>User</code> and <code>Recording</code>. These are represented as <code>Candid</code> records.</p>
 <p>Each entity gets its own <code>StableBTreeMap</code>:</p>
-<pre><code class="language-python">from kybra import blob, nat64, Principal, Record, StableBTreeMap
+<pre><code class="language-python">from kybra import blob, nat64, Principal, Record, StableBTreeMap, Vec
 
 
 class User(Record):
     id: Principal
     created_at: nat64
-    recording_ids: list[Principal]
+    recording_ids: Vec[Principal]
     username: str
 
 
