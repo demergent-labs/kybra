@@ -36,12 +36,7 @@ def xkcd() -> Async[HttpResponse]:
         }
     ).with_cycles(cycle_cost_total)
 
-    def handle_http_result_err(err: str):
-        if err:
-            ic.trap(err)
-        ic.trap(err)
-
-    return match(http_result, {"Ok": lambda ok: ok, "Err": handle_http_result_err})
+    return match(http_result, {"Ok": lambda ok: ok, "Err": lambda err: ic.trap(err)})
 
 
 @query

@@ -193,20 +193,16 @@ def payout(to: Principal, amount: nat64) -> Async[PayoutResult]:
             {
                 "Ok": lambda ok: {"Ok": ok},
                 "Err": lambda err: {"Err": str(err)},
-                "_": lambda _: {
-                    "Err": f"Ok and Err both do not exist in {str(transfer_result)}"
-                },
             },
         )
 
     return match(
         call_result,
         {
-            "Ok": lambda ok: handle_transfer_result_ok(ok),
+            "Ok": handle_transfer_result_ok,
             "Err": lambda err: {"Err": err},
         },
     )
-
 ```
 
 So far we have only shown a cross-canister call from an update method. Update methods can call other update methods or query methods (but not composite query methods as discussed below). If an update method calls a query method, that query method will be called in replicated mode. Replicated mode engages the consensus process, but for queries the state will still be discarded.

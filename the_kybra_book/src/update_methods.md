@@ -96,7 +96,7 @@ Traps can be useful for ensuring that multiple operations are either all complet
 Here's an example of how to trap and ensure atomic changes to your database:
 
 ```python
-from kybra import ic, opt, query, Record, StableBTreeMap, update, void
+from kybra import ic, match, opt, query, Record, StableBTreeMap, update, void
 
 
 class Entry(Record):
@@ -121,9 +121,13 @@ def set(key: str, value: str) -> void:
 def set_many(entries: list[Entry]) -> void:
     for entry in entries:
         result = db.insert(entry["key"], entry["value"])
-
-        if result.Err is not None:
-            ic.trap(str(result.Err))
+        match(
+            result,
+            {
+                "Ok": lambda _: ...,
+                "Err": lambda err: ic.trap(err),
+            },
+        )
 ```
 
 In addition to `ic.trap`, an explicit Python `raise` or any unhandled exception will also trap.
@@ -131,7 +135,7 @@ In addition to `ic.trap`, an explicit Python `raise` or any unhandled exception 
 There is a limit to how much computation can be done in a single call to an update method. The current update call limit is [20 billion Wasm instructions](https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits). If we modify our database example, we can introduce an update method that runs the risk reaching the limit:
 
 ```python
-from kybra import ic, nat64, opt, query, Record, StableBTreeMap, update, void
+from kybra import ic, match, nat64, opt, query, Record, StableBTreeMap, update, void
 
 
 class Entry(Record):
@@ -157,8 +161,13 @@ def set_many(num_entries: nat64) -> void:
     for i in range(num_entries):
         result = db.insert(str(i), str(i))
 
-        if result.Err is not None:
-            ic.trap(str(result.Err))
+        match(
+            result,
+            {
+                "Ok": lambda _: ...,
+                "Err": lambda err: ic.trap(err),
+            },
+        )
 ```
 
 From the `dfx command line` you can call `set_many` like this:

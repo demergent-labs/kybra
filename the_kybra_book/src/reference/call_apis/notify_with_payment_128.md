@@ -12,7 +12,6 @@ from kybra import nat, NotifyResult, Principal, Service, service_update, update
 
 class Cycles(Service):
     @service_update
-    @service_update
     def receive_cycles128(self) -> nat:
         ...
 

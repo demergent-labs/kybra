@@ -123,14 +123,9 @@ def eth_get_balance(ethereum_address: str) -> Async[JSON]:
         }
     ).with_cycles(cycle_cost_total)
 
-    def handle_http_result_err(err: str):
-        if err:
-            ic.trap(err)
-        ic.trap("http_result had an error")
-
     return match(
         http_result,
-        {"Ok": lambda ok: ok["body"].decode("utf-8"), "Err": handle_http_result_err},
+        {"Ok": lambda ok: ok["body"].decode("utf-8"), "Err": lambda err: ic.trap(err)},
     )
 
 
@@ -156,14 +151,9 @@ def eth_get_block_by_number(number: nat32) -> Async[JSON]:
         }
     ).with_cycles(cycle_cost_total)
 
-    def handle_http_result_err(err: str):
-        if err:
-            ic.trap(err)
-        ic.trap("http_result had an error")
-
     return match(
         http_result,
-        {"Ok": lambda ok: ok["body"].decode("utf-8"), "Err": handle_http_result_err},
+        {"Ok": lambda ok: ok["body"].decode("utf-8"), "Err": lambda err: ic.trap(err)},
     )
 
 
