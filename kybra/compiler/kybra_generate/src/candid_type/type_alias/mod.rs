@@ -24,7 +24,7 @@ impl SourceMapped<&Located<ExprKind>> {
         match &self.node {
             ExprKind::Subscript { value, .. } => match &value.node {
                 ExprKind::Name { id, .. } => match &id[..] {
-                    "alias" => true,
+                    "Alias" => true,
                     _ => false,
                 },
                 _ => false,
