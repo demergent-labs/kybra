@@ -20,6 +20,7 @@ from kybra import (
     nat8,
     opt,
     query,
+    Tuple,
     StableBTreeMap,
     update,
     Variant,
@@ -60,7 +61,7 @@ def is_empty() -> bool:
 
 
 @query
-def items() -> Vec[tuple[Key, Value]]:
+def items() -> Vec[Tuple[Key, Value]]:
     return map.items()
 
 

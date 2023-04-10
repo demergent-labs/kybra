@@ -9,7 +9,7 @@ Examples:
 -   [http_counter](https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter)
 
 ```python
-from kybra import blob, Func, nat16, opt, query, Query, Record, Variant, Vec
+from kybra import blob, Func, nat16, opt, query, Query, Record, Tuple, Variant, Vec
 
 
 class HttpRequest(Record):
@@ -27,7 +27,7 @@ class HttpResponse(Record):
     upgrade: opt[bool]
 
 
-Header = tuple[str, str]
+Header = Tuple[str, str]
 
 
 class StreamingStrategy(Variant):

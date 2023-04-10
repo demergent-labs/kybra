@@ -43,6 +43,7 @@ from kybra import (
     opt,
     query,
     StableBTreeMap,
+    Tuple,
     update,
     Variant,
     Vec,
@@ -83,7 +84,7 @@ def is_empty() -> bool:
 
 
 @query
-def items() -> Vec[tuple[Key, Value]]:
+def items() -> Vec[Tuple[Key, Value]]:
     return map.items()
 
 
