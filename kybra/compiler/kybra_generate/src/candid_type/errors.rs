@@ -8,7 +8,7 @@ use crate::{
 impl SourceMapped<&Located<ExprKind>> {
     pub fn invalid_subscript_value_error(&self) -> Vec<Message> {
         let title =
-            "Only Async, list, manual, opt, or tuple are allowed subscripts for candid values";
+            "Only Async, Vec, Manual, Opt, or Tuple are allowed subscripts for candid values";
         let annotation = "Invalid subscript here";
         vec![self.create_error_message(title, annotation, None)]
     }
