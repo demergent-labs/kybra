@@ -82,7 +82,7 @@ def account(args: AccountArgs) -> Async[AccountResult]:
 
 @update
 def accounts() -> Async[AccountsResult]:
-    result: CallResult[list[Account]] = yield canister2.accounts()
+    result: CallResult[Vec[Account]] = yield canister2.accounts()
 
     return match(
         result,
