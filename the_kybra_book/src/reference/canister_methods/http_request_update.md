@@ -7,7 +7,7 @@ Examples:
 -   [http_counter](https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter)
 
 ```python
-from kybra import blob, Func, nat16, opt, query, Query, Record, Tuple, Variant, Vec
+from kybra import blob, Func, nat16, Opt, query, Query, Record, Tuple, Variant, Vec
 
 
 class HttpRequest(Record):
@@ -21,8 +21,8 @@ class HttpResponse(Record):
     status_code: nat16
     headers: Vec["Header"]
     body: blob
-    streaming_strategy: opt["StreamingStrategy"]
-    upgrade: opt[bool]
+    streaming_strategy: Opt["StreamingStrategy"]
+    upgrade: Opt[bool]
 
 
 Header = Tuple[str, str]
@@ -42,7 +42,7 @@ Callback = Func(Query[["Token"], "StreamingCallbackHttpResponse"])
 
 class StreamingCallbackHttpResponse(Record):
     body: blob
-    token: opt["Token"]
+    token: Opt["Token"]
 
 
 class Token(Record):

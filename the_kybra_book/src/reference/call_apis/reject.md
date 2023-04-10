@@ -9,10 +9,10 @@ Examples:
 -   [rejections](https://github.com/demergent-labs/kybra/tree/main/examples/rejections)
 
 ```python
-from kybra import empty, ic, manual, query
+from kybra import empty, ic, Manual, query
 
 
 @query
-def reject(message: str) -> manual[empty]:
+def reject(message: str) -> Manual[empty]:
     ic.reject(message)
 ```

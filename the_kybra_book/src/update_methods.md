@@ -55,13 +55,13 @@ You'll notice that we use an update method, `set_message`, only to perform the c
 Keep in mind that the heap is limited to 4 GiB, and thus there is an upper bound to global variable storage capacity. You can imagine how a simple database like the following would eventually run out of memory with too many entries:
 
 ```python
-from kybra import opt, query, update, void
+from kybra import Opt, query, update, void
 
 db: dict[str, str] = {}
 
 
 @query
-def get(key: str) -> opt[str]:
+def get(key: str) -> Opt[str]:
     return db.get(key)
 
 
@@ -74,13 +74,13 @@ def set(key: str, value: str) -> void:
 If you need more than 4 GiB of storage, consider taking advantage of the 48 GiB of stable memory. Stable structures like `StableBTreeMap` give you a nice API for interacting with stable memory. These data structures will be [covered in more detail later](./stable_structures.md). Here's a simple example:
 
 ```python
-from kybra import opt, query, StableBTreeMap, update, void
+from kybra import Opt, query, StableBTreeMap, update, void
 
 db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
 
 
 @query
-def get(key: str) -> opt[str]:
+def get(key: str) -> Opt[str]:
     return db.get(key)
 
 
@@ -96,7 +96,7 @@ Traps can be useful for ensuring that multiple operations are either all complet
 Here's an example of how to trap and ensure atomic changes to your database:
 
 ```python
-from kybra import ic, match, opt, query, Record, StableBTreeMap, update, Vec, void
+from kybra import ic, match, Opt, query, Record, StableBTreeMap, update, Vec, void
 
 
 class Entry(Record):
@@ -108,7 +108,7 @@ db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
 
 
 @query
-def get(key: str) -> opt[str]:
+def get(key: str) -> Opt[str]:
     return db.get(key)
 
 
@@ -135,7 +135,7 @@ In addition to `ic.trap`, an explicit Python `raise` or any unhandled exception 
 There is a limit to how much computation can be done in a single call to an update method. The current update call limit is [20 billion Wasm instructions](https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits). If we modify our database example, we can introduce an update method that runs the risk reaching the limit:
 
 ```python
-from kybra import ic, match, nat64, opt, query, Record, StableBTreeMap, update, void
+from kybra import ic, match, nat64, Opt, query, Record, StableBTreeMap, update, void
 
 
 class Entry(Record):
@@ -147,7 +147,7 @@ db = StableBTreeMap[str, str](memory_id=0, max_key_size=1_000, max_value_size=1_
 
 
 @query
-def get(key: str) -> opt[str]:
+def get(key: str) -> Opt[str]:
     return db.get(key)
 
 

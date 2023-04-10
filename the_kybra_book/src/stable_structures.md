@@ -40,7 +40,7 @@ from kybra import (
     match,
     nat64,
     nat8,
-    opt,
+    Opt,
     query,
     StableBTreeMap,
     Tuple,
@@ -54,7 +54,7 @@ Value = str
 
 
 class InsertResult(Variant, total=False):
-    Ok: opt[Value]
+    Ok: Opt[Value]
     Err: InsertError
 
 
@@ -67,7 +67,7 @@ def contains_key(key: Key) -> bool:
 
 
 @query
-def get(key: Key) -> opt[Value]:
+def get(key: Key) -> Opt[Value]:
     return map.get(key)
 
 
@@ -99,7 +99,7 @@ def len() -> nat64:
 
 
 @update
-def remove(key: Key) -> opt[Value]:
+def remove(key: Key) -> Opt[Value]:
     return map.remove(key)
 
 
@@ -121,7 +121,7 @@ from kybra import (
     InsertError,
     match,
     nat64,
-    opt,
+    Opt,
     Principal,
     query,
     Record,
@@ -183,7 +183,7 @@ def read_users() -> Vec[User]:
 
 
 @query
-def read_user_by_id(id: Principal) -> opt[User]:
+def read_user_by_id(id: Principal) -> Opt[User]:
     return users.get(id)
 
 
@@ -272,7 +272,7 @@ def read_recordings() -> Vec[Recording]:
 
 
 @query
-def read_recording_by_id(id: Principal) -> opt[Recording]:
+def read_recording_by_id(id: Principal) -> Opt[Recording]:
     return recordings.get(id)
 
 

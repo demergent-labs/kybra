@@ -8,7 +8,7 @@ Examples:
 -   [outgoing_http_requests](https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests)
 
 ```python
-from kybra import blob, ic, manual, null, query, Record, Variant
+from kybra import blob, ic, Manual, null, query, Record, Variant
 
 
 class RawReply(Record):
@@ -26,7 +26,7 @@ class Options(Variant, total=False):
 
 
 @query
-def reply_raw() -> manual[RawReply]:
+def reply_raw() -> Manual[RawReply]:
     ic.reply_raw(
         ic.candid_encode(
             '(record { "int" = 42; "text" = "text"; "bool" = true; "blob" = blob "Surprise!"; "variant" = variant { Medium } })'

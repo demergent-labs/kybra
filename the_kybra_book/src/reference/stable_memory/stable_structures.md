@@ -18,7 +18,7 @@ from kybra import (
     match,
     nat64,
     nat8,
-    opt,
+    Opt,
     query,
     Tuple,
     StableBTreeMap,
@@ -31,7 +31,7 @@ Value = str
 
 
 class InsertResult(Variant, total=False):
-    Ok: opt[Value]
+    Ok: Opt[Value]
     Err: InsertError
 
 
@@ -44,7 +44,7 @@ def contains_key(key: Key) -> bool:
 
 
 @query
-def get(key: Key) -> opt[Value]:
+def get(key: Key) -> Opt[Value]:
     return map.get(key)
 
 
@@ -76,7 +76,7 @@ def len() -> nat64:
 
 
 @update
-def remove(key: Key) -> opt[Value]:
+def remove(key: Key) -> Opt[Value]:
     return map.remove(key)
 
 
