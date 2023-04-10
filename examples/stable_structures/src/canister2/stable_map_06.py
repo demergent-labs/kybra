@@ -1,7 +1,7 @@
 from kybra import (
     InsertError,
     match,
-    opt,
+    Opt,
     query,
     StableBTreeMap,
     Tuple,
@@ -13,7 +13,7 @@ from kybra import nat64
 
 
 class StableMap6InsertResult(Variant, total=False):
-    Ok: opt[bool]
+    Ok: Opt[bool]
     Err: InsertError
 
 
@@ -23,7 +23,7 @@ stable_map6 = StableBTreeMap[Vec[nat64], bool](
 
 
 @query
-def stable_map6_get(key: Vec[nat64]) -> opt[bool]:
+def stable_map6_get(key: Vec[nat64]) -> Opt[bool]:
     return stable_map6.get(key)
 
 
@@ -35,7 +35,7 @@ def stable_map6_insert(key: Vec[nat64], value: bool) -> StableMap6InsertResult:
 
 
 @update
-def stable_map6_remove(key: Vec[nat64]) -> opt[bool]:
+def stable_map6_remove(key: Vec[nat64]) -> Opt[bool]:
     return stable_map6.remove(key)
 
 

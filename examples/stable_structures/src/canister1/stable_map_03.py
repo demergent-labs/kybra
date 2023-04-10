@@ -3,7 +3,7 @@ from kybra import (
     match,
     nat64,
     null,
-    opt,
+    Opt,
     query,
     StableBTreeMap,
     Tuple,
@@ -19,7 +19,7 @@ class Reaction(Variant):
 
 
 class StableMap3InsertResult(Variant, total=False):
-    Ok: opt[int]
+    Ok: Opt[int]
     Err: InsertError
 
 
@@ -29,7 +29,7 @@ stable_map3 = StableBTreeMap[Reaction, int](
 
 
 @query
-def stable_map3_get(key: Reaction) -> opt[int]:
+def stable_map3_get(key: Reaction) -> Opt[int]:
     return stable_map3.get(key)
 
 
@@ -41,7 +41,7 @@ def stable_map3_insert(key: Reaction, value: int) -> StableMap3InsertResult:
 
 
 @update
-def stable_map3_remove(key: Reaction) -> opt[int]:
+def stable_map3_remove(key: Reaction) -> Opt[int]:
     return stable_map3.remove(key)
 
 

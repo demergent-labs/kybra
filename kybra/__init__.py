@@ -39,9 +39,9 @@ float32 = float
 text = str
 
 T = TypeVar("T")
-opt = Optional[T]
-manual = Optional[T]
-alias = Annotated[T, None]
+Opt = Optional[T]
+Manual = Optional[T]
+Alias = Annotated[T, None]
 
 Tuple = tuple
 Vec = list
@@ -59,8 +59,8 @@ empty: TypeAlias = NoReturn  # TODO in Python 3.11 I believe there is a Never ty
 
 Async = Generator[Any, Any, T]
 
-TimerId = alias[nat64]
-Duration = alias[nat64]
+TimerId = Alias[nat64]
+Duration = Alias[nat64]
 
 
 class GuardResult(Variant, total=False):
@@ -281,7 +281,7 @@ class ic(Generic[T]):
         return _kybra_ic._kybra_clear_timer(id)  # type: ignore
 
     @staticmethod
-    def data_certificate() -> opt[blob]:
+    def data_certificate() -> Opt[blob]:
         return _kybra_ic._kybra_data_certificate()  # type: ignore
 
     @staticmethod
@@ -523,7 +523,7 @@ class StableBTreeMap(Generic[K, V]):
         """
         return _kybra_ic._kybra_stable_b_tree_map_contains_key(self.memory_id, key)  # type: ignore
 
-    def get(self, key: K) -> opt[V]:
+    def get(self, key: K) -> Opt[V]:
         """
         Get the value associated with a key in the map.
 
@@ -532,7 +532,7 @@ class StableBTreeMap(Generic[K, V]):
         """
         return _kybra_ic._kybra_stable_b_tree_map_get(self.memory_id, key)  # type: ignore
 
-    def insert(self, key: K, value: V) -> InsertResult[opt[V]]:
+    def insert(self, key: K, value: V) -> InsertResult[Opt[V]]:
         """
         Insert a key-value pair into the map.
 
@@ -578,7 +578,7 @@ class StableBTreeMap(Generic[K, V]):
         """
         return _kybra_ic._kybra_stable_b_tree_map_len(self.memory_id)  # type: ignore
 
-    def remove(self, key: K) -> opt[V]:
+    def remove(self, key: K) -> Opt[V]:
         """
         Remove a key-value pair from the map.
 

@@ -14,7 +14,7 @@ from kybra import (
     nat32,
     nat64,
     null,
-    opt,
+    Opt,
     Principal,
     Query,
     query,
@@ -96,8 +96,8 @@ def list_of_string(param: Vec[Vec[Vec[str]]]) -> Vec[Vec[Vec[str]]]:
 
 @query
 def list_of_option_string(
-    param: Vec[Vec[Vec[opt[str]]]],
-) -> Vec[Vec[Vec[opt[str]]]]:
+    param: Vec[Vec[Vec[Opt[str]]]],
+) -> Vec[Vec[Vec[Opt[str]]]]:
     return param
 
 

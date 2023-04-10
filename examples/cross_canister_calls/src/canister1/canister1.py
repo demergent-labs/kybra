@@ -4,7 +4,7 @@ from kybra import (
     match,
     nat64,
     NotifyResult,
-    opt,
+    Opt,
     Principal,
     update,
     Variant,
@@ -24,7 +24,7 @@ class BalanceResult(Variant, total=False):
 
 
 class AccountResult(Variant, total=False):
-    Ok: opt[Account]
+    Ok: Opt[Account]
     Err: str
 
 
@@ -69,7 +69,7 @@ def balance(id: str) -> Async[BalanceResult]:
 
 @update
 def account(args: AccountArgs) -> Async[AccountResult]:
-    result: CallResult[opt[Account]] = yield canister2.account(args)
+    result: CallResult[Opt[Account]] = yield canister2.account(args)
 
     return match(
         result,

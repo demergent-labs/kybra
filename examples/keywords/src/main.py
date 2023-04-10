@@ -1,5 +1,5 @@
 from kybra import (
-    alias,
+    Alias,
     blob,
     float32,
     float64,
@@ -14,7 +14,7 @@ from kybra import (
     nat32,
     nat64,
     null,
-    opt,
+    Opt,
     Principal,
     query,
     Record,
@@ -25,8 +25,8 @@ from kybra import (
     Vec,
 )
 
-MyTypeAlias = alias[opt[blob]]
-MyAlias = alias[Vec[int16]]
+MyTypeAlias = Alias[Opt[blob]]
+MyAlias = Alias[Vec[int16]]
 
 
 class SimpleRecord(Record):
@@ -48,7 +48,7 @@ class KeywordRecord(Record):
     global_: nat64
     import_: float32
     is_: float64
-    lambda_: opt[str]
+    lambda_: Opt[str]
     nonlocal_: text
     not_: SimpleRecord
     or_: "WithRecord"
@@ -62,7 +62,7 @@ class KeywordRecord(Record):
     await_: Vec[nat]
     break_: MyTypeAlias
     continue_: MyAlias
-    else_: opt[bool]
+    else_: Opt[bool]
     for_: bool
     if_: bool
     in_: bool

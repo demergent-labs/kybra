@@ -7,7 +7,7 @@ from kybra import (
     Principal,
     query,
     update,
-    manual,
+    Manual,
 )
 from kybra.canisters.management import (
     HttpResponse,
@@ -40,7 +40,7 @@ def xkcd() -> Async[HttpResponse]:
 
 
 @update
-def xkcd_raw() -> Async[manual[HttpResponse]]:
+def xkcd_raw() -> Async[Manual[HttpResponse]]:
     max_response_bytes = 1_000
 
     # TODO this is just a heuristic for cost, might change when the feature is officially released: https://forum.dfinity.org/t/enable-canisters-to-make-http-s-requests/9670/130

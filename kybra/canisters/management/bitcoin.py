@@ -1,7 +1,7 @@
-from kybra import alias, blob, nat32, nat64, null, opt, Record, Variant, Vec
+from kybra import Alias, blob, nat32, nat64, null, Opt, Record, Variant, Vec
 
-BitcoinAddress = alias[str]
-BlockHash = alias[blob]
+BitcoinAddress = Alias[str]
+BlockHash = Alias[blob]
 
 
 class BitcoinNetwork(Variant, total=False):
@@ -12,7 +12,7 @@ class BitcoinNetwork(Variant, total=False):
 
 class GetBalanceArgs(Record):
     address: BitcoinAddress
-    min_confirmations: opt[nat32]
+    min_confirmations: Opt[nat32]
     network: BitcoinNetwork
 
 
@@ -20,7 +20,7 @@ class GetCurrentFeePercentilesArgs(Record):
     network: BitcoinNetwork
 
 
-Page = alias[blob]
+Page = Alias[blob]
 
 
 class UtxosFilter(Variant, total=False):
@@ -30,7 +30,7 @@ class UtxosFilter(Variant, total=False):
 
 class GetUtxosArgs(Record):
     address: BitcoinAddress
-    filter: opt[UtxosFilter]
+    filter: Opt[UtxosFilter]
     network: BitcoinNetwork
 
 
@@ -39,7 +39,7 @@ class Outpoint(Record):
     vout: nat32
 
 
-Satoshi = alias[nat64]
+Satoshi = Alias[nat64]
 
 
 class Utxo(Record):
@@ -49,13 +49,13 @@ class Utxo(Record):
 
 
 class GetUtxosResult(Record):
-    next_page: opt[Page]
+    next_page: Opt[Page]
     tip_block_hash: BlockHash
     tip_height: nat32
     utxos: Vec[Utxo]
 
 
-MillisatoshiPerByte = alias[nat64]
+MillisatoshiPerByte = Alias[nat64]
 
 
 class SendTransactionArgs(Record):

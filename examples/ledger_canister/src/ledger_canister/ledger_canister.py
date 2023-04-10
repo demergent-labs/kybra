@@ -4,7 +4,7 @@ from kybra import (
     match,
     nat32,
     nat64,
-    opt,
+    Opt,
     Principal,
     query,
     update,
@@ -34,7 +34,7 @@ class ExecuteTransferResult(Variant, total=False):
 
 @update
 def execute_transfer(
-    to: Address, amount: nat64, fee: nat64, created_at_time: opt[nat64]
+    to: Address, amount: nat64, fee: nat64, created_at_time: Opt[nat64]
 ) -> Async[ExecuteTransferResult]:
     transfer_result_call_result: CallResult[
         TransferResult

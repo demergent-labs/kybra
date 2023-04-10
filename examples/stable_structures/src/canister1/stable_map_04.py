@@ -1,7 +1,7 @@
 from kybra import (
     InsertError,
     match,
-    opt,
+    Opt,
     query,
     Record,
     StableBTreeMap,
@@ -24,7 +24,7 @@ class User(Record):
 
 
 class StableMap4InsertResult(Variant, total=False):
-    Ok: opt[float32]
+    Ok: Opt[float32]
     Err: InsertError
 
 
@@ -34,7 +34,7 @@ stable_map4 = StableBTreeMap[User, float32](
 
 
 @query
-def stable_map4_get(key: User) -> opt[float32]:
+def stable_map4_get(key: User) -> Opt[float32]:
     return stable_map4.get(key)
 
 
@@ -46,7 +46,7 @@ def stable_map4_insert(key: User, value: float32) -> StableMap4InsertResult:
 
 
 @update
-def stable_map4_remove(key: User) -> opt[float32]:
+def stable_map4_remove(key: User) -> Opt[float32]:
     return stable_map4.remove(key)
 
 

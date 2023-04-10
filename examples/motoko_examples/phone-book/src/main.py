@@ -1,4 +1,4 @@
-from kybra import opt, Record, query, update, void
+from kybra import Opt, Record, query, update, void
 
 
 class Entry(Record):
@@ -15,5 +15,5 @@ def insert(name: str, entry: Entry) -> void:
 
 
 @query
-def lookup(name: str) -> opt[Entry]:
+def lookup(name: str) -> Opt[Entry]:
     return phone_book[name] if name in phone_book else None

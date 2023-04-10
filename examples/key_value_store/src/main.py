@@ -1,4 +1,4 @@
-from kybra import opt, query, update, void
+from kybra import Opt, query, update, void
 
 Store = dict[str, str]
 
@@ -6,7 +6,7 @@ store: Store = {}
 
 
 @query
-def get(key: str) -> opt[str]:
+def get(key: str) -> Opt[str]:
     return store.get(key, None)
 
 

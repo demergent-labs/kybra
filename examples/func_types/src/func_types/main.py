@@ -6,7 +6,7 @@ from kybra import (
     match,
     nat64,
     null,
-    opt,
+    Opt,
     Principal,
     Query,
     query,
@@ -44,7 +44,7 @@ BasicFunc = Func(Query[[str], str])
 ComplexFunc = Func(Update[[User, Reaction], nat64])
 StableFunc = Func(Query[[nat64, str], void])
 NullFunc = Func(
-    Query[[opt[null], Vec[null], null, Vec[Vec[null]], Vec[opt[null]]], null]
+    Query[[Opt[null], Vec[null], null, Vec[Vec[null]], Vec[Opt[null]]], null]
 )
 
 

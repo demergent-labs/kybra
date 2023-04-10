@@ -1,5 +1,5 @@
 from kybra import (
-    alias,
+    Alias,
     Async,
     CallResult,
     ic,
@@ -17,7 +17,7 @@ from kybra.canisters.management import (
     management_canister,
 )
 
-JSON = alias[str]
+JSON = Alias[str]
 
 
 stable_storage = StableBTreeMap[str, str](

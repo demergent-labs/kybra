@@ -1,4 +1,4 @@
-from kybra import Async, CallResult, ic, manual, match, nat, Principal, query, update
+from kybra import Async, CallResult, ic, Manual, match, nat, Principal, query, update
 from src.canister1.types import StringQueryResult
 from src.canister3.types import Canister3
 
@@ -25,7 +25,7 @@ def update_query() -> str:
 
 
 @query
-def manual_query() -> manual[str]:
+def manual_query() -> Manual[str]:
     ic.reply("Hello from Canister 2 manual query")
 
 

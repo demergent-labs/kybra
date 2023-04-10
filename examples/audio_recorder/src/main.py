@@ -7,7 +7,7 @@ from kybra import (
     InsertError,
     match,
     nat64,
-    opt,
+    Opt,
     Principal,
     query,
     Record,
@@ -69,7 +69,7 @@ def read_users() -> Vec[User]:
 
 
 @query
-def read_user_by_id(id: Principal) -> opt[User]:
+def read_user_by_id(id: Principal) -> Opt[User]:
     return users.get(id)
 
 
@@ -158,7 +158,7 @@ def read_recordings() -> Vec[Recording]:
 
 
 @query
-def read_recording_by_id(id: Principal) -> opt[Recording]:
+def read_recording_by_id(id: Principal) -> Opt[Recording]:
     return recordings.get(id)
 
 
