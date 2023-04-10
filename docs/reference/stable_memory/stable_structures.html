@@ -161,7 +161,7 @@
     match,
     nat64,
     nat8,
-    opt,
+    Opt,
     query,
     Tuple,
     StableBTreeMap,
@@ -174,7 +174,7 @@ Value = str
 
 
 class InsertResult(Variant, total=False):
-    Ok: opt[Value]
+    Ok: Opt[Value]
     Err: InsertError
 
 
@@ -187,7 +187,7 @@ def contains_key(key: Key) -&gt; bool:
 
 
 @query
-def get(key: Key) -&gt; opt[Value]:
+def get(key: Key) -&gt; Opt[Value]:
     return map.get(key)
 
 
@@ -219,7 +219,7 @@ def len() -&gt; nat64:
 
 
 @update
-def remove(key: Key) -&gt; opt[Value]:
+def remove(key: Key) -&gt; Opt[Value]:
     return map.remove(key)
 
 

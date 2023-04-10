@@ -151,7 +151,7 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Tuple, Variant, Vec
+<pre><code class="language-python">from kybra import blob, Func, nat16, Opt, query, Query, Record, Tuple, Variant, Vec
 
 
 class HttpRequest(Record):
@@ -165,8 +165,8 @@ class HttpResponse(Record):
     status_code: nat16
     headers: Vec[&quot;Header&quot;]
     body: blob
-    streaming_strategy: opt[&quot;StreamingStrategy&quot;]
-    upgrade: opt[bool]
+    streaming_strategy: Opt[&quot;StreamingStrategy&quot;]
+    upgrade: Opt[bool]
 
 
 Header = Tuple[str, str]
@@ -186,7 +186,7 @@ Callback = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&q
 
 class StreamingCallbackHttpResponse(Record):
     body: blob
-    token: opt[&quot;Token&quot;]
+    token: Opt[&quot;Token&quot;]
 
 
 class Token(Record):

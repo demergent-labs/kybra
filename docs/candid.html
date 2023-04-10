@@ -193,7 +193,7 @@
     nat32,
     nat64,
     null,
-    opt,
+    Opt,
     Principal,
     query,
     Query,
@@ -218,7 +218,7 @@ class Candid(Record):
     float64: float64
     float32: float32
     bool: bool
-    opt: opt[&quot;nat&quot;]
+    opt: Opt[&quot;nat&quot;]
     record: &quot;CandidRecord&quot;
     variant: &quot;CandidVariant&quot;
     func: &quot;CandidFunc&quot;
@@ -666,19 +666,19 @@ def get_numbers() -&gt; Vec[int32]:
     &quot;get_numbers&quot;: () -&gt; (vec int32) query;
 }
 </code></pre>
-<h4 id="opt"><a class="header" href="#opt">opt</a></h4>
-<p>The Kybra type <code>opt</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t">Candid type opt</a> and will become the enclosed Python type or None at runtime.</p>
+<h4 id="opt"><a class="header" href="#opt">Opt</a></h4>
+<p>The Kybra type <code>Opt</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t">Candid type opt</a> and will become the enclosed Python type or None at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import opt, query
+<pre><code class="language-python">from kybra import Opt, query
 
 
 @query
-def get_opt_some() -&gt; opt[bool]:
+def get_opt_some() -&gt; Opt[bool]:
     return True
 
 
 @query
-def get_opt_none() -&gt; opt[bool]:
+def get_opt_none() -&gt; Opt[bool]:
     return None
 </code></pre>
 <p>Candid:</p>
