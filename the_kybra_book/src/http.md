@@ -9,19 +9,19 @@ Examples:
 -   [http_counter](https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter)
 
 ```python
-from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
+from kybra import blob, Func, nat16, opt, query, Query, Record, Variant, Vec
 
 
 class HttpRequest(Record):
     method: str
     url: str
-    headers: list["Header"]
+    headers: Vec["Header"]
     body: blob
 
 
 class HttpResponse(Record):
     status_code: nat16
-    headers: list["Header"]
+    headers: Vec["Header"]
     body: blob
     streaming_strategy: opt["StreamingStrategy"]
     upgrade: opt[bool]

@@ -96,7 +96,7 @@ Traps can be useful for ensuring that multiple operations are either all complet
 Here's an example of how to trap and ensure atomic changes to your database:
 
 ```python
-from kybra import ic, match, opt, query, Record, StableBTreeMap, update, void
+from kybra import ic, match, opt, query, Record, StableBTreeMap, update, Vec, void
 
 
 class Entry(Record):
@@ -118,7 +118,7 @@ def set(key: str, value: str) -> void:
 
 
 @update
-def set_many(entries: list[Entry]) -> void:
+def set_many(entries: Vec[Entry]) -> void:
     for entry in entries:
         result = db.insert(entry["key"], entry["value"])
         match(

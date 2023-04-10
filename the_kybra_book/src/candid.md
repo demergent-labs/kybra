@@ -646,16 +646,16 @@ service: {
 
 #### vec
 
-The Python type `list` corresponds to the [Candid type vec](https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t) and will become an array of the specified type at runtime.
+The Kybra type `Vec` corresponds to the [Candid type vec](https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t) and will become an array of the specified type at runtime.
 
 Python:
 
 ```python
-from kybra import int32, query
+from kybra import int32, query, Vec
 
 
 @query
-def get_numbers() -> list[int32]:
+def get_numbers() -> Vec[int32]:
     return [0, 1, 2, 3]
 ```
 
@@ -703,7 +703,7 @@ Python classes that inherit from the Kybra type `Record` correspond to the [Cand
 Python:
 
 ```python
-from kybra import Record
+from kybra import Record, Vec
 
 
 class Post(Record):
@@ -716,14 +716,14 @@ class Post(Record):
 class Thread(Record):
     id: str
     author: "User"
-    posts: list[Post]
+    posts: Vec[Post]
     title: str
 
 
 class User(Record):
     id: str
-    posts: list[Post]
-    thread: list[Thread]
+    posts: Vec[Post]
+    thread: Vec[Thread]
     username: str
 ```
 

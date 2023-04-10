@@ -7,7 +7,7 @@ Python classes that inherit from the Kybra type `Record` correspond to the [Cand
 Python:
 
 ```python
-from kybra import Record
+from kybra import Record, Vec
 
 
 class Post(Record):
@@ -20,14 +20,14 @@ class Post(Record):
 class Thread(Record):
     id: str
     author: "User"
-    posts: list[Post]
+    posts: Vec[Post]
     title: str
 
 
 class User(Record):
     id: str
-    posts: list[Post]
-    thread: list[Thread]
+    posts: Vec[Post]
+    thread: Vec[Thread]
     username: str
 ```
 

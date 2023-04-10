@@ -60,12 +60,12 @@ def is_empty() -> bool:
 
 
 @query
-def items() -> list[tuple[Key, Value]]:
+def items() -> Vec[tuple[Key, Value]]:
     return map.items()
 
 
 @query
-def keys() -> list[Key]:
+def keys() -> Vec[Key]:
     return map.keys()
 
 
@@ -80,6 +80,6 @@ def remove(key: Key) -> opt[Value]:
 
 
 @query
-def values() -> list[Value]:
+def values() -> Vec[Value]:
     return map.values()
 ```
