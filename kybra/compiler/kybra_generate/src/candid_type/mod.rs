@@ -69,9 +69,9 @@ impl SourceMapped<&Located<ExprKind>> {
                             .to_candid_type(),
                         "Manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
                             .to_candid_type(),
-                        _ => Err(self.invalid_subscript_value_error()),
+                        _ => Err(self.invalid_subscriptable_error()),
                     },
-                    _ => Err(self.invalid_subscript_value_error()),
+                    _ => Err(self.invalid_subscriptable_error()),
                 }
             }
             ExprKind::Constant { value, .. } => match value {
