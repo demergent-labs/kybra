@@ -315,20 +315,16 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
             {
                 &quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok},
                 &quot;Err&quot;: lambda err: {&quot;Err&quot;: str(err)},
-                &quot;_&quot;: lambda _: {
-                    &quot;Err&quot;: f&quot;Ok and Err both do not exist in {str(transfer_result)}&quot;
-                },
             },
         )
 
     return match(
         call_result,
         {
-            &quot;Ok&quot;: lambda ok: handle_transfer_result_ok(ok),
+            &quot;Ok&quot;: handle_transfer_result_ok,
             &quot;Err&quot;: lambda err: {&quot;Err&quot;: err},
         },
     )
-
 </code></pre>
 <p>So far we have only shown a cross-canister call from an update method. Update methods can call other update methods or query methods (but not composite query methods as discussed below). If an update method calls a query method, that query method will be called in replicated mode. Replicated mode engages the consensus process, but for queries the state will still be discarded.</p>
 <p>Cross-canister calls can also be initiated from query methods (not yet live on IC mainnet but this works locally). These are known as composite queries, and in Kybra they are simply query methods that return a generator using the <code>Async</code> type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.</p>

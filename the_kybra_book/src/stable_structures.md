@@ -43,8 +43,10 @@ from kybra import (
     opt,
     query,
     StableBTreeMap,
+    Tuple,
     update,
     Variant,
+    Vec,
 )
 
 Key = nat8
@@ -82,12 +84,12 @@ def is_empty() -> bool:
 
 
 @query
-def items() -> list[tuple[Key, Value]]:
+def items() -> Vec[Tuple[Key, Value]]:
     return map.items()
 
 
 @query
-def keys() -> list[Key]:
+def keys() -> Vec[Key]:
     return map.keys()
 
 
@@ -102,7 +104,7 @@ def remove(key: Key) -> opt[Value]:
 
 
 @query
-def values() -> list[Value]:
+def values() -> Vec[Value]:
     return map.values()
 
 ```
@@ -126,13 +128,14 @@ from kybra import (
     StableBTreeMap,
     update,
     Variant,
+    Vec,
 )
 
 
 class User(Record):
     id: Principal
     created_at: nat64
-    recording_ids: list[Principal]
+    recording_ids: Vec[Principal]
     username: str
 
 
@@ -175,7 +178,7 @@ def create_user(username: str) -> CreateUserResult:
 
 
 @query
-def read_users() -> list[User]:
+def read_users() -> Vec[User]:
     return users.values()
 
 
@@ -264,7 +267,7 @@ def create_recording(
 
 
 @query
-def read_recordings() -> list[Recording]:
+def read_recordings() -> Vec[Recording]:
     return recordings.values()
 
 
@@ -334,13 +337,13 @@ The example above shows a very basic audio recording backend application. There 
 Each entity gets its own `StableBTreeMap`:
 
 ```python
-from kybra import blob, nat64, Principal, Record, StableBTreeMap
+from kybra import blob, nat64, Principal, Record, StableBTreeMap, Vec
 
 
 class User(Record):
     id: Principal
     created_at: nat64
-    recording_ids: list[Principal]
+    recording_ids: Vec[Principal]
     username: str
 
 

@@ -652,13 +652,13 @@ def print_null(none: None) -&gt; None:
 }
 </code></pre>
 <h4 id="vec"><a class="header" href="#vec">vec</a></h4>
-<p>The Python type <code>list</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t">Candid type vec</a> and will become an array of the specified type at runtime.</p>
+<p>The Kybra type <code>Vec</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t">Candid type vec</a> and will become an array of the specified type at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import int32, query
+<pre><code class="language-python">from kybra import int32, query, Vec
 
 
 @query
-def get_numbers() -&gt; list[int32]:
+def get_numbers() -&gt; Vec[int32]:
     return [0, 1, 2, 3]
 </code></pre>
 <p>Candid:</p>
@@ -690,7 +690,7 @@ def get_opt_none() -&gt; opt[bool]:
 <h4 id="record"><a class="header" href="#record">record</a></h4>
 <p>Python classes that inherit from the Kybra type <code>Record</code> correspond to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-record--n--t--">Candid record type</a> and will become <a href="https://docs.python.org/3/library/typing.html#typing.TypedDict">Python TypedDicts</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import Record
+<pre><code class="language-python">from kybra import Record, Vec
 
 
 class Post(Record):
@@ -703,14 +703,14 @@ class Post(Record):
 class Thread(Record):
     id: str
     author: &quot;User&quot;
-    posts: list[Post]
+    posts: Vec[Post]
     title: str
 
 
 class User(Record):
     id: str
-    posts: list[Post]
-    thread: list[Thread]
+    posts: Vec[Post]
+    thread: Vec[Thread]
     username: str
 </code></pre>
 <p>Candid:</p>

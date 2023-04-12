@@ -151,25 +151,25 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Variant
+<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Tuple, Variant, Vec
 
 
 class HttpRequest(Record):
     method: str
     url: str
-    headers: list[&quot;Header&quot;]
+    headers: Vec[&quot;Header&quot;]
     body: blob
 
 
 class HttpResponse(Record):
     status_code: nat16
-    headers: list[&quot;Header&quot;]
+    headers: Vec[&quot;Header&quot;]
     body: blob
     streaming_strategy: opt[&quot;StreamingStrategy&quot;]
     upgrade: opt[bool]
 
 
-Header = tuple[str, str]
+Header = Tuple[str, str]
 
 
 class StreamingStrategy(Variant):
@@ -262,14 +262,9 @@ def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
         }
     ).with_cycles(cycle_cost_total)
 
-    def handle_http_result_err(err: str):
-        if err:
-            ic.trap(err)
-        ic.trap(&quot;http_result had an error&quot;)
-
     return match(
         http_result,
-        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: handle_http_result_err},
+        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: lambda err: ic.trap(err)},
     )
 
 
@@ -295,14 +290,9 @@ def eth_get_block_by_number(number: nat32) -&gt; Async[JSON]:
         }
     ).with_cycles(cycle_cost_total)
 
-    def handle_http_result_err(err: str):
-        if err:
-            ic.trap(err)
-        ic.trap(&quot;http_result had an error&quot;)
-
     return match(
         http_result,
-        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: handle_http_result_err},
+        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: lambda err: ic.trap(err)},
     )
 
 
