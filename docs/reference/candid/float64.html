@@ -157,13 +157,14 @@ from kybra import float64, ic, query
 def get_float64() -&gt; float64:
     return math.e
 
+
 @query
 def print_float64(float64: float64) -&gt; float64:
     ic.print(type(float64))
     return float64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_float64&quot;: () -&gt; (float64) query;
     &quot;print_float64&quot;: (float64) -&gt; (float64) query;
 }

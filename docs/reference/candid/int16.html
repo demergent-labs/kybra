@@ -150,9 +150,11 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int16, query
 
+
 @query
 def get_int16() -&gt; int16:
     return 32_767
+
 
 @query
 def print_int16(int16: int16) -&gt; int16:
@@ -160,7 +162,7 @@ def print_int16(int16: int16) -&gt; int16:
     return int16
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int16&quot;: () -&gt; (int16) query;
     &quot;print_int16&quot;: (int16) -&gt; (int16) query;
 }

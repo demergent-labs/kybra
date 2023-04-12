@@ -150,18 +150,20 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import empty, ic, query
 
+
 def get_empty() -&gt; empty:
-    raise Exception('Anything you want')
+    raise Exception(&quot;Anything you want&quot;)
+
 
 # Note: It is impossible to call this function because it requires an argument
 # but there is no way to pass an &quot;empty&quot; value as an argument.
 @query
 def print_empty(empty: empty) -&gt; empty:
     ic.print(type(empty))
-    raise Exception('Anything you want')
+    raise Exception(&quot;Anything you want&quot;)
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_empty&quot;: () -&gt; (empty) query;
     &quot;print_empty&quot;: (empty) -&gt; (empty) query;
 }

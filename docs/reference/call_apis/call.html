@@ -165,6 +165,7 @@
 <pre><code class="language-python">from kybra import (
     Async,
     CallResult,
+    match,
     nat64,
     Principal,
     Service,
@@ -184,18 +185,15 @@ token_canister = TokenCanister(Principal.from_str(&quot;r7inp-6aaaa-aaaaa-aaabq-
 
 
 class PayoutResult(Variant, total=False):
-    ok: nat64
-    err: str
+    Ok: nat64
+    Err: str
 
 
 @update
 def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
     result: CallResult[nat64] = yield token_canister.transfer(to, amount)
 
-    if result.err is not None:
-        return {&quot;err&quot;: result.err}
-
-    return {&quot;ok&quot;: result.ok}
+    return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
 </code></pre>
 
                     </main>

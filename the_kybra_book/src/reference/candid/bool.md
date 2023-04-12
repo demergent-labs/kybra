@@ -6,12 +6,14 @@ The Python type `bool` corresponds to the [Candid type bool](https://internetcom
 
 Python:
 
-```Python
+```python
 from kybra import ic, query
+
 
 @query
 def get_bool() -> bool:
     return True
+
 
 @query
 def print_bool(bool: bool) -> bool:
@@ -21,7 +23,7 @@ def print_bool(bool: bool) -> bool:
 
 Candid:
 
-```python
+```
 service: {
     "get_bool": () -> (bool) query;
     "print_bool": (bool) -> (bool) query;

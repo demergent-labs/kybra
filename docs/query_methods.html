@@ -159,9 +159,10 @@
 <p>The most basic way to expose your canister's functionality publicly is through a query method. Here's an example of a simple query method:</p>
 <pre><code class="language-python">from kybra import query
 
+
 @query
 def get_string() -&gt; str:
-    return 'This is a query method!'
+    return &quot;This is a query method!&quot;
 </code></pre>
 <p><code>get_string</code> can be called from the outside world through the IC's HTTP API. You'll usually invoke this API from the <a href="./deployment.html#interacting-with-your-canister"><code>dfx command line</code>, <code>dfx web UI</code>, or an agent</a>.</p>
 <p>From the <code>dfx command line</code> you can call it like this:</p>
@@ -172,6 +173,7 @@ def get_string() -&gt; str:
 
 db = {}
 
+
 @query
 def set(key: str, value: str) -&gt; void:
     db[key] = value
@@ -181,13 +183,17 @@ def set(key: str, value: str) -&gt; void:
 <p>There is a limit to how much computation can be done in a single call to a query method. The current query call limit is <a href="https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits">5 billion Wasm instructions</a>. Here's an example of a query method that runs the risk of reaching the limit:</p>
 <pre><code class="language-python">from kybra import nat32, query
 
+
 @query
 def pyramid(levels: nat32) -&gt; str:
     levels_array = [0 for _ in range(levels)]
-    asterisk_array = [ ['*' for _ in range(i + 1)] + ['\n'] for i in range(len(levels_array)) ]
+    asterisk_array = [
+        [&quot;*&quot; for _ in range(i + 1)] + [&quot;\n&quot;] for i in range(len(levels_array))
+    ]
     flattened_array = [element for subarray in asterisk_array for element in subarray]
 
-    return ''.join(flattened_array)
+    return &quot;&quot;.join(flattened_array)
+
 </code></pre>
 <p>From the <code>dfx command line</code> you can call <code>pyramid</code> like this:</p>
 <pre><code class="language-bash">dfx canister call my_canister pyramid '(600)'

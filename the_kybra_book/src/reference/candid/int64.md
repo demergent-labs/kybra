@@ -23,7 +23,7 @@ def print_int64(int64: int64) -> int64:
 
 Candid:
 
-```python
+```
 service: {
     "get_int64": () -> (int64) query;
     "print_int64": (int64) -> (int64) query;

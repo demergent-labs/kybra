@@ -9,9 +9,11 @@ Python:
 ```python
 from kybra import ic, int16, query
 
+
 @query
 def get_int16() -> int16:
     return 32_767
+
 
 @query
 def print_int16(int16: int16) -> int16:
@@ -21,7 +23,7 @@ def print_int16(int16: int16) -> int16:
 
 Candid:
 
-```python
+```
 service: {
     "get_int16": () -> (int16) query;
     "print_int16": (int16) -> (int16) query;

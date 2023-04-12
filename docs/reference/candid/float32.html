@@ -164,7 +164,7 @@ def print_float32(float32: float32) -&gt; float32:
     return float32
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_float32&quot;: () -&gt; (float32) query;
     &quot;print_float32&quot;: (float32) -&gt; (float32) query;
 }

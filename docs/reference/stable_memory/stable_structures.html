@@ -158,64 +158,69 @@
 </ul>
 <pre><code class="language-python">from kybra import (
     InsertError,
+    match,
     nat64,
     nat8,
     opt,
     query,
     StableBTreeMap,
     update,
-    Variant
+    Variant,
 )
 
 Key = nat8
 Value = str
 
+
 class InsertResult(Variant, total=False):
-    ok: opt[Value]
-    err: InsertError
+    Ok: opt[Value]
+    Err: InsertError
+
 
 map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
+
 
 @query
 def contains_key(key: Key) -&gt; bool:
     return map.contains_key(key)
 
+
 @query
 def get(key: Key) -&gt; opt[Value]:
     return map.get(key)
+
 
 @update
 def insert(key: Key, value: Value) -&gt; InsertResult:
     result = map.insert(key, value)
 
-    if result.err is not None:
-        return {
-            'err': result.err
-        }
+    return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
 
-    return {
-        'ok': result.ok
-    }
 
 @query
 def is_empty() -&gt; bool:
     return map.is_empty()
 
+
 @query
 def items() -&gt; list[tuple[Key, Value]]:
     return map.items()
+
 
 @query
 def keys() -&gt; list[Key]:
     return map.keys()
 
+
 @query
 def len() -&gt; nat64:
     return map.len()
 
+
 @update
 def remove(key: Key) -&gt; opt[Value]:
     return map.remove(key)
+
 
 @query
 def values() -&gt; list[Value]:

@@ -155,30 +155,34 @@
     blob,
     CallResult,
     ic,
+    match,
     nat,
     Principal,
     update,
     Variant,
 )
 
+
 class ExecuteCallRaw128Result(Variant, total=False):
-    ok: str
-    err: str
+    Ok: str
+    Err: str
 
 
 @update
 def execute_call_raw128(
     canister_id: Principal, method: str, candid_args: str, payment: nat
 ) -&gt; Async[ExecuteCallRaw128Result]:
-    canister_result: CallResult[blob] = yield ic.call_raw128(
+    call_result: CallResult[blob] = yield ic.call_raw128(
         canister_id, method, ic.candid_encode(candid_args), payment
     )
 
-    if canister_result.err is not None:
-        return {&quot;err&quot;: canister_result.err}
-
-    return {&quot;ok&quot;: ic.candid_decode(canister_result.ok)}
-
+    return match(
+        call_result,
+        {
+            &quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ic.candid_decode(ok)},
+            &quot;Err&quot;: lambda err: {&quot;Err&quot;: err},
+        },
+    )
 </code></pre>
 
                     </main>

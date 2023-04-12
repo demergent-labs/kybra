@@ -153,6 +153,7 @@
 <pre><code class="language-python">from kybra import (
     Async,
     CallResult,
+    match,
     nat,
     Principal,
     update,
@@ -163,8 +164,8 @@ from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -177,10 +178,9 @@ def provisional_top_up_canister(
         {&quot;canister_id&quot;: canister_id, &quot;amount&quot;: amount}
     )
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 
                     </main>

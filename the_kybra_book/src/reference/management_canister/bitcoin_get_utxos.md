@@ -7,15 +7,15 @@ Examples:
 -   [bitcoin](https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin)
 
 ```python
-from kybra import Async, CallResult, update, Variant
+from kybra import Async, CallResult, match, update, Variant
 from kybra.canisters.management import GetUtxosResult, management_canister
 
 BITCOIN_API_CYCLE_COST = 100_000_000
 
 
 class ExecuteGetUtxosResult(Variant, total=False):
-    ok: GetUtxosResult
-    err: str
+    Ok: GetUtxosResult
+    Err: str
 
 
 @update
@@ -28,8 +28,7 @@ def get_utxos(address: str) -> Async[ExecuteGetUtxosResult]:
         BITCOIN_API_CYCLE_COST
     )
 
-    if call_result.err is not None:
-        return {"err": call_result.err}
-
-    return {"ok": call_result.ok}
+    return match(
+        call_result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}}
+    )
 ```

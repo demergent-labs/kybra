@@ -154,29 +154,42 @@
     Async,
     CallResult,
     ic,
+    match,
     nat,
+    Principal,
+    Service,
+    service_update,
     update,
     Variant,
 )
-from src.cycles.types import cycles
 
 
 class SendCyclesResult128(Variant, total=False):
-    ok: nat
-    err: str
+    Ok: nat
+    Err: str
+
+
+class Cycles(Service):
+    @service_update
+    def receive_cycles128(self) -&gt; nat:
+        ...
+
+
+cycles = Cycles(Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;))
 
 
 # Reports the number of cycles returned from the Cycles canister
 @update
 def send_cycles128() -&gt; Async[SendCyclesResult128]:
-    result: CallResult[nat] = yield cycles.receive_cycles128().with_cycles128(
-        1_000_000
+    result: CallResult[nat] = yield cycles.receive_cycles128().with_cycles128(1_000_000)
+
+    return match(
+        result,
+        {
+            &quot;Ok&quot;: lambda _: {&quot;Ok&quot;: ic.msg_cycles_refunded128()},
+            &quot;Err&quot;: lambda err: {&quot;Err&quot;: err},
+        },
     )
-
-    if result.err is not None:
-        return {&quot;err&quot;: result.err}
-
-    return {&quot;ok&quot;: ic.msg_cycles_refunded128()}
 </code></pre>
 
                     </main>

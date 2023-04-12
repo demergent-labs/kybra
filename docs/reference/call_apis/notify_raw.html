@@ -150,12 +150,12 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/notify_raw">notify_raw</a></li>
 </ul>
-<pre><code class="language-python">from kybra import ic, Principal, RejectionCode, update, Variant
+<pre><code class="language-python">from kybra import ic, match, Principal, RejectionCode, update, Variant
 
 
 class SendNotificationResult(Variant, total=False):
-    ok: bool
-    err: RejectionCode
+    Ok: bool
+    Err: RejectionCode
 
 
 @update
@@ -167,10 +167,9 @@ def send_notification() -&gt; SendNotificationResult:
         0,
     )
 
-    if &quot;err&quot; in result:
-        return {&quot;err&quot;: result[&quot;err&quot;]}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 
                     </main>

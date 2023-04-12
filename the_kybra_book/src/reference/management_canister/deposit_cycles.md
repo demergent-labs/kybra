@@ -7,14 +7,22 @@ Examples:
 -   [management_canister](https://github.com/demergent-labs/kybra/tree/main/examples/management_canister)
 
 ```python
+from kybra import Async, CallResult, match, Principal, update, Variant, void
+from kybra.canisters.management import management_canister
+
+
+class DefaultResult(Variant, total=False):
+    Ok: bool
+    Err: str
+
+
 @update
 def execute_deposit_cycles(canister_id: Principal) -> Async[DefaultResult]:
     call_result: CallResult[void] = yield management_canister.deposit_cycles(
         {"canister_id": canister_id}
     ).with_cycles(1_000_000)
 
-    if call_result.err is not None:
-        return {"err": call_result.err}
-
-    return {"ok": True}
+    return match(
+        call_result, {"Ok": lambda _: {"Ok": True}, "Err": lambda err: {"Err": err}}
+    )
 ```

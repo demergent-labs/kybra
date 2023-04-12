@@ -10,6 +10,7 @@ Examples:
 from kybra import (
     Async,
     CallResult,
+    match,
     nat,
     Principal,
     update,
@@ -20,8 +21,8 @@ from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -34,8 +35,7 @@ def provisional_top_up_canister(
         {"canister_id": canister_id, "amount": amount}
     )
 
-    if call_result.err is not None:
-        return {"err": call_result.err}
-
-    return {"ok": True}
+    return match(
+        call_result, {"Ok": lambda _: {"Ok": True}, "Err": lambda err: {"Err": err}}
+    )
 ```

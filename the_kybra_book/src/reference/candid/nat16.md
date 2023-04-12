@@ -9,9 +9,11 @@ Python:
 ```python
 from kybra import ic, nat16, query
 
+
 @query
 def get_nat16() -> nat16:
     return 65_535
+
 
 @query
 def print_nat16(nat16: nat16) -> nat16:
@@ -21,7 +23,7 @@ def print_nat16(nat16: nat16) -> nat16:
 
 Candid:
 
-```python
+```
 service: {
     "get_nat16": () -> (nat16) query;
     "print_nat16": (nat16) -> (nat16) query;

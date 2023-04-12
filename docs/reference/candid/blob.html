@@ -148,11 +148,13 @@
 <p>This section is a work in progress.</p>
 <p>The Kybra type <code>blob</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-blob">Candid type blob</a> and will become a <a href="https://docs.python.org/3/library/stdtypes.html#bytes">Python bytes</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-Python">from kybra import blob, ic, query
+<pre><code class="language-python">from kybra import blob, ic, query
+
 
 @query
 def get_blob() -&gt; blob:
     return bytes([68, 73, 68, 76, 0, 0])
+
 
 @query
 def print_blob(blob: blob) -&gt; blob:
@@ -160,7 +162,7 @@ def print_blob(blob: blob) -&gt; blob:
     return blob
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_blob&quot;: () -&gt; (blob) query;
     &quot;print_blob&quot;: (blob) -&gt; (blob) query;
 }

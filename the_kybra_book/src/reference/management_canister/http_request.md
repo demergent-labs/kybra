@@ -8,8 +8,12 @@ Examples:
 -   [outgoing_http_requests](https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests)
 
 ```python
-from kybra import Async, CallResult, ic, query, update
-from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
+from kybra import Async, CallResult, match, ic, query, update
+from kybra.canisters.management import (
+    HttpResponse,
+    HttpTransformArgs,
+    management_canister,
+)
 
 
 @update
@@ -32,12 +36,7 @@ def xkcd() -> Async[HttpResponse]:
         }
     ).with_cycles(cycle_cost_total)
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
-        ic.trap("http_result had an error")
-
-    return http_result.ok
+    return match(http_result, {"Ok": lambda ok: ok, "Err": lambda err: ic.trap(err)})
 
 
 @query

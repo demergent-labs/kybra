@@ -9,9 +9,11 @@ Python:
 ```python
 from kybra import ic, query, reserved
 
+
 @query
 def get_reserved() -> reserved:
-    return 'anything'
+    return "anything"
+
 
 @query
 def print_reserved(reserved: reserved) -> reserved:
@@ -21,7 +23,7 @@ def print_reserved(reserved: reserved) -> reserved:
 
 Candid:
 
-```python
+```
 service: {
     "get_reserved": () -> (reserved) query;
     "print_reserved": (reserved) -> (reserved) query;

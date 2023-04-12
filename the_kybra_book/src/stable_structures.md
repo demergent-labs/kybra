@@ -37,68 +37,74 @@ Here's an example showing all of the basic `StableBTreeMap` operations:
 ```python
 from kybra import (
     InsertError,
+    match,
     nat64,
     nat8,
     opt,
     query,
     StableBTreeMap,
     update,
-    Variant
+    Variant,
 )
 
 Key = nat8
 Value = str
 
+
 class InsertResult(Variant, total=False):
-    ok: opt[Value]
-    err: InsertError
+    Ok: opt[Value]
+    Err: InsertError
+
 
 map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
+
 
 @query
 def contains_key(key: Key) -> bool:
     return map.contains_key(key)
 
+
 @query
 def get(key: Key) -> opt[Value]:
     return map.get(key)
+
 
 @update
 def insert(key: Key, value: Value) -> InsertResult:
     result = map.insert(key, value)
 
-    if result.err is not None:
-        return {
-            'err': result.err
-        }
+    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
-    return {
-        'ok': result.ok
-    }
 
 @query
 def is_empty() -> bool:
     return map.is_empty()
 
+
 @query
 def items() -> list[tuple[Key, Value]]:
     return map.items()
+
 
 @query
 def keys() -> list[Key]:
     return map.keys()
 
+
 @query
 def len() -> nat64:
     return map.len()
+
 
 @update
 def remove(key: Key) -> opt[Value]:
     return map.remove(key)
 
+
 @query
 def values() -> list[Value]:
     return map.values()
+
 ```
 
 With these basic operations you can build more complex CRUD database applications:
@@ -111,6 +117,7 @@ from kybra import (
     blob,
     ic,
     InsertError,
+    match,
     nat64,
     opt,
     Principal,
@@ -146,8 +153,8 @@ recordings = StableBTreeMap[Principal, Recording](
 
 
 class CreateUserResult(Variant, total=False):
-    ok: User
-    err: InsertError
+    Ok: User
+    Err: InsertError
 
 
 @update
@@ -162,10 +169,9 @@ def create_user(username: str) -> CreateUserResult:
 
     result = users.insert(user["id"], user)
 
-    if result.err is not None:
-        return {"err": result.err}
-
-    return {"ok": user}
+    return match(
+        result, {"Ok": lambda _: {"Ok": user}, "Err": lambda err: {"Err": err}}
+    )
 
 
 @query
@@ -179,8 +185,8 @@ def read_user_by_id(id: Principal) -> opt[User]:
 
 
 class DeleteUserResult(Variant, total=False):
-    ok: User
-    err: "DeleteUserErr"
+    Ok: User
+    Err: "DeleteUserErr"
 
 
 class DeleteUserErr(Variant, total=False):
@@ -192,19 +198,19 @@ def delete_user(id: Principal) -> DeleteUserResult:
     user = users.get(id)
 
     if user is None:
-        return {"err": {"UserDoesNotExist": id}}
+        return {"Err": {"UserDoesNotExist": id}}
 
     for recording_id in user["recording_ids"]:
         recordings.remove(recording_id)
 
     users.remove(user["id"])
 
-    return {"ok": user}
+    return {"Ok": user}
 
 
 class CreateRecordingResult(Variant, total=False):
-    ok: Recording
-    err: "CreateRecordingErr"
+    Ok: Recording
+    Err: "CreateRecordingErr"
 
 
 class CreateRecordingErr(Variant, total=False):
@@ -219,7 +225,7 @@ def create_recording(
     user = users.get(user_id)
 
     if user is None:
-        return {"err": {"UserDoesNotExist": user_id}}
+        return {"Err": {"UserDoesNotExist": user_id}}
 
     id = generate_id()
     recording: Recording = {
@@ -232,20 +238,29 @@ def create_recording(
 
     create_recording_result = recordings.insert(recording["id"], recording)
 
-    if create_recording_result.err is not None:
-        return {"err": {"InsertError": create_recording_result.err}}
+    def handle_create_record_result_ok(_) -> CreateRecordingResult:
+        updated_user: User = {
+            **user,
+            "recording_ids": [*user["recording_ids"], recording["id"]],
+        }
 
-    updated_user: User = {
-        **user,
-        "recording_ids": [*user["recording_ids"], recording["id"]],
-    }
+        update_user_result = users.insert(updated_user["id"], updated_user)
 
-    update_user_result = users.insert(updated_user["id"], updated_user)
+        return match(
+            update_user_result,
+            {
+                "Ok": lambda _: {"Ok": recording},
+                "Err": lambda err: {"Err": {"InsertError": err}},
+            },
+        )
 
-    if update_user_result.err is not None:
-        return {"err": {"InsertError": update_user_result.err}}
-
-    return {"ok": recording}
+    return match(
+        create_recording_result,
+        {
+            "Ok": handle_create_record_result_ok,
+            "Err": lambda err: {"Err": {"InsertError": err}},
+        },
+    )
 
 
 @query
@@ -259,8 +274,8 @@ def read_recording_by_id(id: Principal) -> opt[Recording]:
 
 
 class DeleteRecordingResult(Variant, total=False):
-    ok: Recording
-    err: "DeleteRecordingError"
+    Ok: Recording
+    Err: "DeleteRecordingError"
 
 
 class DeleteRecordingError(Variant, total=False):
@@ -274,12 +289,12 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
     recording = recordings.get(id)
 
     if recording is None:
-        return {"err": {"RecordingDoesNotExist": id}}
+        return {"Err": {"RecordingDoesNotExist": id}}
 
     user = users.get(recording["user_id"])
 
     if user is None:
-        return {"err": {"UserDoesNotExist": recording["user_id"]}}
+        return {"Err": {"UserDoesNotExist": recording["user_id"]}}
 
     updated_user: User = {
         **user,
@@ -293,12 +308,17 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
 
     update_user_result = users.insert(updated_user["id"], updated_user)
 
-    if update_user_result.err is not None:
-        return {"err": {"InsertError": update_user_result.err}}
+    def handle_update_user_result_ok(_) -> DeleteRecordingResult:
+        recordings.remove(id)
+        return {"Ok": recording}
 
-    recordings.remove(id)
-
-    return {"ok": recording}
+    return match(
+        update_user_result,
+        {
+            "Ok": handle_update_user_result_ok,
+            "Err": lambda err: {"Err": {"InsertError": err}},
+        },
+    )
 
 
 def generate_id() -> Principal:
@@ -314,22 +334,7 @@ The example above shows a very basic audio recording backend application. There 
 Each entity gets its own `StableBTreeMap`:
 
 ```python
-import math
-import _random
-
-from kybra import (
-    blob,
-    ic,
-    InsertError,
-    nat64,
-    opt,
-    Principal,
-    query,
-    Record,
-    StableBTreeMap,
-    update,
-    Variant,
-)
+from kybra import blob, nat64, Principal, Record, StableBTreeMap
 
 
 class User(Record):
@@ -360,6 +365,11 @@ Notice that each `StableBTreeMap` has a unique `memory id`. The maximum key and 
 You can figure out the appropriate maximum key and value sizes by reasoning about your application and engaging in some trial and error using the `insert` method. Calling `insert` on a `StableBTreeMap` returns an `InsertResult` object that looks like this:
 
 ```python
+from typing import Generic, Optional, TypeVar
+
+from kybra import nat32, Record, Variant
+
+
 K = TypeVar("K")
 V = TypeVar("V")
 
@@ -380,12 +390,12 @@ class InsertError(Variant, total=False):
 
 
 class InsertResult(Generic[V]):
-    ok: V
-    err: Optional[InsertError]
+    Ok: V
+    Err: Optional[InsertError]
 
     def __init__(self, ok: V, err: InsertError):
-        self.ok = ok
-        self.err = err
+        self.Ok = ok
+        self.Err = err
 ```
 
 The `InsertError` variant will in some cases have the information that you need to determine the maximum key or value size. If you attempt to insert a key or value that is too large, the `KeyTooLarge` and `ValueTooLarge` records will show you the size of the value that you attempted to insert. You can increase the maximum key or value size based on the information you receive from the `KeyTooLarge` and `ValueTooLarge` records and try inserting again.

@@ -33,7 +33,7 @@ class User(Record):
 
 Candid:
 
-```python
+```
 type Post = record {
     "id": text;
     "author": User;

@@ -15,5 +15,4 @@ from kybra import ic, Principal, query
 @query
 def caller() -> Principal:
     return ic.caller()
-
 ```

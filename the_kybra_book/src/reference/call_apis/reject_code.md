@@ -7,7 +7,16 @@ Examples:
 -   [rejections](https://github.com/demergent-labs/kybra/tree/main/examples/rejections)
 
 ```python
-from kybra import Async, ic, Principal, RejectionCode, Service, service_update, update, void
+from kybra import (
+    Async,
+    ic,
+    Principal,
+    RejectionCode,
+    Service,
+    service_update,
+    update,
+    void,
+)
 
 
 class Nonexistent(Service):

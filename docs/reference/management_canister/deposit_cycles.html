@@ -150,16 +150,24 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 </ul>
-<pre><code class="language-python">@update
+<pre><code class="language-python">from kybra import Async, CallResult, match, Principal, update, Variant, void
+from kybra.canisters.management import management_canister
+
+
+class DefaultResult(Variant, total=False):
+    Ok: bool
+    Err: str
+
+
+@update
 def execute_deposit_cycles(canister_id: Principal) -&gt; Async[DefaultResult]:
     call_result: CallResult[void] = yield management_canister.deposit_cycles(
         {&quot;canister_id&quot;: canister_id}
     ).with_cycles(1_000_000)
 
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: True}
+    return match(
+        call_result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: True}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
+    )
 </code></pre>
 
                     </main>

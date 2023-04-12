@@ -7,8 +7,13 @@ Examples:
 -   [cycles](https://github.com/demergent-labs/kybra/tree/main/examples/cycles)
 
 ```python
-from kybra import NotifyResult, Principal, update
-from src.cycles.types import Cycles
+from kybra import nat, NotifyResult, Principal, Service, service_update, update
+
+
+class Cycles(Service):
+    @service_update
+    def receive_cycles128(self) -> nat:
+        ...
 
 
 cycles = Cycles(Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"))

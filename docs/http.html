@@ -209,18 +209,35 @@ def http_request(req: HttpRequest) -&gt; HttpResponse:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, CallResult, ic, init, nat32, query, StableBTreeMap, update
-from kybra.canisters.management import HttpResponse, HttpTransformArgs, management_canister
+<pre><code class="language-python">from kybra import (
+    Async,
+    CallResult,
+    ic,
+    init,
+    match,
+    nat32,
+    query,
+    StableBTreeMap,
+    update,
+    void,
+)
+from kybra.canisters.management import (
+    HttpResponse,
+    HttpTransformArgs,
+    management_canister,
+)
 
 JSON = str
 
 
-stable_storage = StableBTreeMap[str, str](memory_id=0, max_key_size=20, max_value_size=1_000)
+stable_storage = StableBTreeMap[str, str](
+    memory_id=0, max_key_size=20, max_value_size=1_000
+)
 
 
 @init
 def init_(ethereum_url: str) -&gt; void:
-    stable_storage.insert('ethereum_url', ethereum_url)
+    stable_storage.insert(&quot;ethereum_url&quot;, ethereum_url)
 
 
 @update
@@ -232,24 +249,28 @@ def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CallResult[HttpResponse] = yield management_canister.http_request({
-        'url': stable_storage.get('ethereum_url') or '',
-        'max_response_bytes': max_response_bytes,
-        'method': {'post': None},
-        'headers': [],
-        'body': f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBalance&quot;,&quot;params&quot;:[&quot;{ethereum_address}&quot;,&quot;earliest&quot;],&quot;id&quot;:1}}'.encode('utf-8'),
-        'transform': {
-            'function': (ic.id(), 'eth_transform'),
-            'context': bytes()
-        },
-    }).with_cycles(cycle_cost_total)
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request(
+        {
+            &quot;url&quot;: stable_storage.get(&quot;ethereum_url&quot;) or &quot;&quot;,
+            &quot;max_response_bytes&quot;: max_response_bytes,
+            &quot;method&quot;: {&quot;post&quot;: None},
+            &quot;headers&quot;: [],
+            &quot;body&quot;: f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBalance&quot;,&quot;params&quot;:[&quot;{ethereum_address}&quot;,&quot;earliest&quot;],&quot;id&quot;:1}}'.encode(
+                &quot;utf-8&quot;
+            ),
+            &quot;transform&quot;: {&quot;function&quot;: (ic.id(), &quot;eth_transform&quot;), &quot;context&quot;: bytes()},
+        }
+    ).with_cycles(cycle_cost_total)
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
-        ic.trap('http_result had an error')
+    def handle_http_result_err(err: str):
+        if err:
+            ic.trap(err)
+        ic.trap(&quot;http_result had an error&quot;)
 
-    return http_result.ok['body'].decode('utf-8')
+    return match(
+        http_result,
+        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: handle_http_result_err},
+    )
 
 
 @update
@@ -261,32 +282,33 @@ def eth_get_block_by_number(number: nat32) -&gt; Async[JSON]:
     cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
     cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
 
-    http_result: CallResult[HttpResponse] = yield management_canister.http_request({
-        'url': stable_storage.get('ethereum_url') or '',
-        'max_response_bytes': max_response_bytes,
-        'method': {'post': None},
-        'headers': [],
-        'body': f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBlockByNumber&quot;,&quot;params&quot;:[&quot;{hex(number)}&quot;, false],&quot;id&quot;:1}}'.encode('utf-8'),
-        'transform': {
-            'function': (ic.id(), 'eth_transform'),
-            'context': bytes()
-        },
-    }).with_cycles(cycle_cost_total)
+    http_result: CallResult[HttpResponse] = yield management_canister.http_request(
+        {
+            &quot;url&quot;: stable_storage.get(&quot;ethereum_url&quot;) or &quot;&quot;,
+            &quot;max_response_bytes&quot;: max_response_bytes,
+            &quot;method&quot;: {&quot;post&quot;: None},
+            &quot;headers&quot;: [],
+            &quot;body&quot;: f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBlockByNumber&quot;,&quot;params&quot;:[&quot;{hex(number)}&quot;, false],&quot;id&quot;:1}}'.encode(
+                &quot;utf-8&quot;
+            ),
+            &quot;transform&quot;: {&quot;function&quot;: (ic.id(), &quot;eth_transform&quot;), &quot;context&quot;: bytes()},
+        }
+    ).with_cycles(cycle_cost_total)
 
-    if http_result.err is not None:
-        if http_result.err:
-            ic.trap(http_result.err)
-        ic.trap('http_result had an error')
+    def handle_http_result_err(err: str):
+        if err:
+            ic.trap(err)
+        ic.trap(&quot;http_result had an error&quot;)
 
-    return http_result.ok['body'].decode('utf-8')
+    return match(
+        http_result,
+        {&quot;Ok&quot;: lambda ok: ok[&quot;body&quot;].decode(&quot;utf-8&quot;), &quot;Err&quot;: handle_http_result_err},
+    )
 
 
 @query
 def eth_transform(args: HttpTransformArgs) -&gt; HttpResponse:
-    return {
-        **args['response'],
-        'headers': []
-    }
+    return {**args[&quot;response&quot;], &quot;headers&quot;: []}
 </code></pre>
 
                     </main>

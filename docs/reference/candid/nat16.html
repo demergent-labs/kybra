@@ -150,9 +150,11 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat16, query
 
+
 @query
 def get_nat16() -&gt; nat16:
     return 65_535
+
 
 @query
 def print_nat16(nat16: nat16) -&gt; nat16:
@@ -160,7 +162,7 @@ def print_nat16(nat16: nat16) -&gt; nat16:
     return nat16
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat16&quot;: () -&gt; (nat16) query;
     &quot;print_nat16&quot;: (nat16) -&gt; (nat16) query;
 }

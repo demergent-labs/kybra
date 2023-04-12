@@ -150,7 +150,7 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/bitcoin">bitcoin</a></li>
 </ul>
-<pre><code class="language-python">from kybra import Async, blob, CallResult, null, update, Variant, void
+<pre><code class="language-python">from kybra import Async, blob, CallResult, match, null, update, Variant, void
 from kybra.canisters.management import management_canister
 
 BITCOIN_BASE_TRANSACTION_COST = 5_000_000_000
@@ -158,8 +158,8 @@ BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE = 20_000_000
 
 
 class SendTransactionResult(Variant, total=False):
-    ok: null
-    err: str
+    Ok: null
+    Err: str
 
 
 @update
@@ -169,18 +169,13 @@ def send_transaction(transaction: blob) -&gt; Async[SendTransactionResult]:
         + len(transaction) * BITCOIN_CYCLE_COST_PER_TRANSACTION_BYTE
     )
 
-    call_result: CallResult[
-        void
-    ] = yield management_canister.bitcoin_send_transaction(
+    call_result: CallResult[void] = yield management_canister.bitcoin_send_transaction(
         {&quot;transaction&quot;: transaction, &quot;network&quot;: {&quot;Regtest&quot;: None}}
-    ).with_cycles(
-        transaction_fee
+    ).with_cycles(transaction_fee)
+
+    return match(
+        call_result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
     )
-
-    if call_result.err is not None:
-        return {&quot;err&quot;: call_result.err}
-
-    return {&quot;ok&quot;: call_result.ok}
 </code></pre>
 
                     </main>

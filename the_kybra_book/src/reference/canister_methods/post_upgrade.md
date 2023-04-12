@@ -14,5 +14,4 @@ from kybra import ic, post_upgrade, void
 @post_upgrade
 def post_upgrade_() -> void:
     ic.print("This runs after every canister upgrade")
-
 ```

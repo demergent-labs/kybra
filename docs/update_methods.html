@@ -162,6 +162,7 @@
 
 counter = 0
 
+
 @update
 def increment() -&gt; nat64:
     global counter
@@ -173,11 +174,13 @@ def increment() -&gt; nat64:
 <p>Due to the latency and other expenses involved with update methods, it is best to use them only when necessary. Look at the following example:</p>
 <pre><code class="language-python">from kybra import query, update, void
 
-message = ''
+message = &quot;&quot;
+
 
 @query
 def get_message() -&gt; str:
     return message
+
 
 @update
 def set_message(new_message: str) -&gt; void:
@@ -190,22 +193,27 @@ def set_message(new_message: str) -&gt; void:
 
 db: dict[str, str] = {}
 
+
 @query
 def get(key: str) -&gt; opt[str]:
     return db.get(key)
 
+
 @update
 def set(key: str, value: str) -&gt; void:
     db[key] = value
+
 </code></pre>
 <p>If you need more than 4 GiB of storage, consider taking advantage of the 48 GiB of stable memory. Stable structures like <code>StableBTreeMap</code> give you a nice API for interacting with stable memory. These data structures will be <a href="./stable_structures.html">covered in more detail later</a>. Here's a simple example:</p>
 <pre><code class="language-python">from kybra import opt, query, StableBTreeMap, update, void
 
 db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
 
+
 @query
 def get(key: str) -&gt; opt[str]:
     return db.get(key)
+
 
 @update
 def set(key: str, value: str) -&gt; void:
@@ -216,53 +224,63 @@ def set(key: str, value: str) -&gt; void:
 <p>Here's an example of how to trap and ensure atomic changes to your database:</p>
 <pre><code class="language-python">from kybra import ic, opt, query, Record, StableBTreeMap, update, void
 
+
 class Entry(Record):
     key: str
     value: str
 
+
 db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
+
 
 @query
 def get(key: str) -&gt; opt[str]:
     return db.get(key)
 
+
 @update
 def set(key: str, value: str) -&gt; void:
     db.insert(key, value)
 
+
 @update
 def set_many(entries: list[Entry]) -&gt; void:
     for entry in entries:
-        result = db.insert(entry['key'], entry['value'])
+        result = db.insert(entry[&quot;key&quot;], entry[&quot;value&quot;])
 
-        if result.err is not None:
-            ic.trap(str(result.err))
+        if result.Err is not None:
+            ic.trap(str(result.Err))
 </code></pre>
 <p>In addition to <code>ic.trap</code>, an explicit Python <code>raise</code> or any unhandled exception will also trap.</p>
 <p>There is a limit to how much computation can be done in a single call to an update method. The current update call limit is <a href="https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits">20 billion Wasm instructions</a>. If we modify our database example, we can introduce an update method that runs the risk reaching the limit:</p>
 <pre><code class="language-python">from kybra import ic, nat64, opt, query, Record, StableBTreeMap, update, void
 
+
 class Entry(Record):
     key: str
     value: str
 
+
 db = StableBTreeMap[str, str](memory_id=0, max_key_size=1_000, max_value_size=1_000)
+
 
 @query
 def get(key: str) -&gt; opt[str]:
     return db.get(key)
 
+
 @update
 def set(key: str, value: str) -&gt; void:
     db.insert(key, value)
+
 
 @update
 def set_many(num_entries: nat64) -&gt; void:
     for i in range(num_entries):
         result = db.insert(str(i), str(i))
 
-        if result.err is not None:
-            ic.trap(str(result.err))
+        if result.Err is not None:
+            ic.trap(str(result.Err))
 </code></pre>
 <p>From the <code>dfx command line</code> you can call <code>set_many</code> like this:</p>
 <pre><code class="language-bash">dfx canister call my_canister set_many '(100_000)'

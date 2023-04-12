@@ -150,12 +150,13 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import int32, query
 
+
 @query
 def get_numbers() -&gt; list[int32]:
     return [0, 1, 2, 3]
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_numbers&quot;: () -&gt; (vec int32) query;
 }
 </code></pre>

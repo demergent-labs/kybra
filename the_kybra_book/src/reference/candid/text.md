@@ -9,19 +9,22 @@ Python:
 ```python
 from kybra import ic, query
 
+
 @query
 def get_string() -> str:
-    return 'Hello world!'
+    return "Hello world!"
+
 
 @query
 def print_string(string: str) -> str:
     ic.print(type(string))
     return string
+
 ```
 
 Candid:
 
-```python
+```
 service: {
     "get_string": () -> (text) query;
     "print_string": (text) -> (text) query;

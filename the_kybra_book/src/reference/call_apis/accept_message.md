@@ -7,7 +7,7 @@ Examples:
 -   [inspect_message](https://github.com/demergent-labs/kybra/blob/main/examples/inspect_message/src/main.py)
 
 ```python
-from kybra import ic, inspect_message
+from kybra import ic, inspect_message, void
 
 
 @inspect_message

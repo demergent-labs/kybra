@@ -150,9 +150,11 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, int8, query
 
+
 @query
 def get_int8() -&gt; int8:
     return 127
+
 
 @query
 def print_int8(int8: int8) -&gt; int8:
@@ -160,7 +162,7 @@ def print_int8(int8: int8) -&gt; int8:
     return int8
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_int8&quot;: () -&gt; (int8) query;
     &quot;print_int8&quot;: (int8) -&gt; (int8) query;
 }

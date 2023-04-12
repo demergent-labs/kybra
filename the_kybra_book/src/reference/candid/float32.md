@@ -25,7 +25,7 @@ def print_float32(float32: float32) -> float32:
 
 Candid:
 
-```python
+```
 service: {
     "get_float32": () -> (float32) query;
     "print_float32": (float32) -> (float32) query;

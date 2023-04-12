@@ -150,9 +150,11 @@
 <p>Python:</p>
 <pre><code class="language-python">from kybra import ic, nat64, query
 
+
 @query
 def get_nat64() -&gt; nat64:
     return 18_446_744_073_709_551_615
+
 
 @query
 def print_nat64(nat64: nat64) -&gt; nat64:
@@ -160,7 +162,7 @@ def print_nat64(nat64: nat64) -&gt; nat64:
     return nat64
 </code></pre>
 <p>Candid:</p>
-<pre><code class="language-python">service: {
+<pre><code>service: {
     &quot;get_nat64&quot;: () -&gt; (nat64) query;
     &quot;print_nat64&quot;: (nat64) -&gt; (nat64) query;
 }

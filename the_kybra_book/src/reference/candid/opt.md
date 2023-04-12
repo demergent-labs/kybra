@@ -9,9 +9,11 @@ Python:
 ```python
 from kybra import opt, query
 
+
 @query
 def get_opt_some() -> opt[bool]:
     return True
+
 
 @query
 def get_opt_none() -> opt[bool]:
@@ -20,7 +22,7 @@ def get_opt_none() -> opt[bool]:
 
 Candid:
 
-```python
+```
 service: {
     "get_opt_some": () -> (opt bool) query;
     "get_opt_none": () -> (opt bool) query;
