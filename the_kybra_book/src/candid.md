@@ -54,7 +54,7 @@ from kybra import (
     nat32,
     nat64,
     null,
-    opt,
+    Opt,
     Principal,
     query,
     Query,
@@ -79,7 +79,7 @@ class Candid(Record):
     float64: float64
     float32: float32
     bool: bool
-    opt: opt["nat"]
+    opt: Opt["nat"]
     record: "CandidRecord"
     variant: "CandidVariant"
     func: "CandidFunc"
@@ -667,23 +667,23 @@ service: {
 }
 ```
 
-#### opt
+#### Opt
 
-The Kybra type `opt` corresponds to the [Candid type opt](https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t) and will become the enclosed Python type or None at runtime.
+The Kybra type `Opt` corresponds to the [Candid type opt](https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t) and will become the enclosed Python type or None at runtime.
 
 Python:
 
 ```python
-from kybra import opt, query
+from kybra import Opt, query
 
 
 @query
-def get_opt_some() -> opt[bool]:
+def get_opt_some() -> Opt[bool]:
     return True
 
 
 @query
-def get_opt_none() -> opt[bool]:
+def get_opt_none() -> Opt[bool]:
     return None
 ```
 

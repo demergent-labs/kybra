@@ -152,11 +152,11 @@
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/manual_reply">manual_reply</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/rejections">rejections</a></li>
 </ul>
-<pre><code class="language-python">from kybra import empty, ic, manual, query
+<pre><code class="language-python">from kybra import empty, ic, Manual, query
 
 
 @query
-def reject(message: str) -&gt; manual[empty]:
+def reject(message: str) -&gt; Manual[empty]:
     ic.reject(message)
 </code></pre>
 

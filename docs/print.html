@@ -710,13 +710,13 @@ def set_message(new_message: str) -&gt; void:
 </code></pre>
 <p>You'll notice that we use an update method, <code>set_message</code>, only to perform the change to the global <code>message</code> variable. We use <code>get_message</code>, a query method, to read the message.</p>
 <p>Keep in mind that the heap is limited to 4 GiB, and thus there is an upper bound to global variable storage capacity. You can imagine how a simple database like the following would eventually run out of memory with too many entries:</p>
-<pre><code class="language-python">from kybra import opt, query, update, void
+<pre><code class="language-python">from kybra import Opt, query, update, void
 
 db: dict[str, str] = {}
 
 
 @query
-def get(key: str) -&gt; opt[str]:
+def get(key: str) -&gt; Opt[str]:
     return db.get(key)
 
 
@@ -726,13 +726,13 @@ def set(key: str, value: str) -&gt; void:
 
 </code></pre>
 <p>If you need more than 4 GiB of storage, consider taking advantage of the 48 GiB of stable memory. Stable structures like <code>StableBTreeMap</code> give you a nice API for interacting with stable memory. These data structures will be <a href="./stable_structures.html">covered in more detail later</a>. Here's a simple example:</p>
-<pre><code class="language-python">from kybra import opt, query, StableBTreeMap, update, void
+<pre><code class="language-python">from kybra import Opt, query, StableBTreeMap, update, void
 
 db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
 
 
 @query
-def get(key: str) -&gt; opt[str]:
+def get(key: str) -&gt; Opt[str]:
     return db.get(key)
 
 
@@ -743,7 +743,7 @@ def set(key: str, value: str) -&gt; void:
 <p>So far we have only seen how state changes can be persisted. State changes can also be discarded by implicit or explicit traps. A trap is an immediate stop to execution with the ability to provide a message to the execution environment.</p>
 <p>Traps can be useful for ensuring that multiple operations are either all completed or all disregarded, or in other words atomic. Keep in mind that these guarantees do not hold once cross-canister calls are introduced, but that's a more advanced topic <a href="./cross_canister.html">covered later</a>.</p>
 <p>Here's an example of how to trap and ensure atomic changes to your database:</p>
-<pre><code class="language-python">from kybra import ic, match, opt, query, Record, StableBTreeMap, update, Vec, void
+<pre><code class="language-python">from kybra import ic, match, Opt, query, Record, StableBTreeMap, update, Vec, void
 
 
 class Entry(Record):
@@ -755,7 +755,7 @@ db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
 
 
 @query
-def get(key: str) -&gt; opt[str]:
+def get(key: str) -&gt; Opt[str]:
     return db.get(key)
 
 
@@ -778,7 +778,7 @@ def set_many(entries: Vec[Entry]) -&gt; void:
 </code></pre>
 <p>In addition to <code>ic.trap</code>, an explicit Python <code>raise</code> or any unhandled exception will also trap.</p>
 <p>There is a limit to how much computation can be done in a single call to an update method. The current update call limit is <a href="https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits">20 billion Wasm instructions</a>. If we modify our database example, we can introduce an update method that runs the risk reaching the limit:</p>
-<pre><code class="language-python">from kybra import ic, match, nat64, opt, query, Record, StableBTreeMap, update, void
+<pre><code class="language-python">from kybra import ic, match, nat64, Opt, query, Record, StableBTreeMap, update, void
 
 
 class Entry(Record):
@@ -790,7 +790,7 @@ db = StableBTreeMap[str, str](memory_id=0, max_key_size=1_000, max_value_size=1_
 
 
 @query
-def get(key: str) -&gt; opt[str]:
+def get(key: str) -&gt; Opt[str]:
     return db.get(key)
 
 
@@ -866,7 +866,7 @@ def set_many(num_entries: nat64) -&gt; void:
     nat32,
     nat64,
     null,
-    opt,
+    Opt,
     Principal,
     query,
     Query,
@@ -891,7 +891,7 @@ class Candid(Record):
     float64: float64
     float32: float32
     bool: bool
-    opt: opt[&quot;nat&quot;]
+    opt: Opt[&quot;nat&quot;]
     record: &quot;CandidRecord&quot;
     variant: &quot;CandidVariant&quot;
     func: &quot;CandidFunc&quot;
@@ -1339,19 +1339,19 @@ def get_numbers() -&gt; Vec[int32]:
     &quot;get_numbers&quot;: () -&gt; (vec int32) query;
 }
 </code></pre>
-<h4 id="opt"><a class="header" href="#opt">opt</a></h4>
-<p>The Kybra type <code>opt</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t">Candid type opt</a> and will become the enclosed Python type or None at runtime.</p>
+<h4 id="opt"><a class="header" href="#opt">Opt</a></h4>
+<p>The Kybra type <code>Opt</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t">Candid type opt</a> and will become the enclosed Python type or None at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import opt, query
+<pre><code class="language-python">from kybra import Opt, query
 
 
 @query
-def get_opt_some() -&gt; opt[bool]:
+def get_opt_some() -&gt; Opt[bool]:
     return True
 
 
 @query
-def get_opt_none() -&gt; opt[bool]:
+def get_opt_none() -&gt; Opt[bool]:
     return None
 </code></pre>
 <p>Candid:</p>
@@ -1597,7 +1597,7 @@ map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_
     match,
     nat64,
     nat8,
-    opt,
+    Opt,
     query,
     StableBTreeMap,
     Tuple,
@@ -1611,7 +1611,7 @@ Value = str
 
 
 class InsertResult(Variant, total=False):
-    Ok: opt[Value]
+    Ok: Opt[Value]
     Err: InsertError
 
 
@@ -1624,7 +1624,7 @@ def contains_key(key: Key) -&gt; bool:
 
 
 @query
-def get(key: Key) -&gt; opt[Value]:
+def get(key: Key) -&gt; Opt[Value]:
     return map.get(key)
 
 
@@ -1656,7 +1656,7 @@ def len() -&gt; nat64:
 
 
 @update
-def remove(key: Key) -&gt; opt[Value]:
+def remove(key: Key) -&gt; Opt[Value]:
     return map.remove(key)
 
 
@@ -1675,7 +1675,7 @@ from kybra import (
     InsertError,
     match,
     nat64,
-    opt,
+    Opt,
     Principal,
     query,
     Record,
@@ -1737,7 +1737,7 @@ def read_users() -&gt; Vec[User]:
 
 
 @query
-def read_user_by_id(id: Principal) -&gt; opt[User]:
+def read_user_by_id(id: Principal) -&gt; Opt[User]:
     return users.get(id)
 
 
@@ -1826,7 +1826,7 @@ def read_recordings() -&gt; Vec[Recording]:
 
 
 @query
-def read_recording_by_id(id: Principal) -&gt; opt[Recording]:
+def read_recording_by_id(id: Principal) -&gt; Opt[Recording]:
     return recordings.get(id)
 
 
@@ -2241,7 +2241,7 @@ def send_notification() -&gt; ReceiveNotificationResult:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Tuple, Variant, Vec
+<pre><code class="language-python">from kybra import blob, Func, nat16, Opt, query, Query, Record, Tuple, Variant, Vec
 
 
 class HttpRequest(Record):
@@ -2255,8 +2255,8 @@ class HttpResponse(Record):
     status_code: nat16
     headers: Vec[&quot;Header&quot;]
     body: blob
-    streaming_strategy: opt[&quot;StreamingStrategy&quot;]
-    upgrade: opt[bool]
+    streaming_strategy: Opt[&quot;StreamingStrategy&quot;]
+    upgrade: Opt[bool]
 
 
 Header = Tuple[str, str]
@@ -2276,7 +2276,7 @@ Callback = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&q
 
 class StreamingCallbackHttpResponse(Record):
     body: blob
-    token: opt[&quot;Token&quot;]
+    token: Opt[&quot;Token&quot;]
 
 
 class Token(Record):
@@ -3187,11 +3187,11 @@ def performance_counter() -&gt; nat64:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/manual_reply">manual_reply</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/rejections">rejections</a></li>
 </ul>
-<pre><code class="language-python">from kybra import empty, ic, manual, query
+<pre><code class="language-python">from kybra import empty, ic, Manual, query
 
 
 @query
-def reject(message: str) -&gt; manual[empty]:
+def reject(message: str) -&gt; Manual[empty]:
     ic.reject(message)
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="reject-code"><a class="header" href="#reject-code">reject code</a></h1>
@@ -3248,11 +3248,11 @@ def get_rejection_message(message: str) -&gt; Async[str]:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/composite_queries">composite_queries</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/manual_reply">manual_reply</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, ic, manual, update
+<pre><code class="language-python">from kybra import blob, ic, Manual, update
 
 
 @update
-def update_blob() -&gt; manual[blob]:
+def update_blob() -&gt; Manual[blob]:
     ic.reply(bytes([83, 117, 114, 112, 114, 105, 115, 101, 33]))
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="reply-raw"><a class="header" href="#reply-raw">reply raw</a></h1>
@@ -3262,7 +3262,7 @@ def update_blob() -&gt; manual[blob]:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/manual_reply">manual_reply</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, ic, manual, null, query, Record, Variant
+<pre><code class="language-python">from kybra import blob, ic, Manual, null, query, Record, Variant
 
 
 class RawReply(Record):
@@ -3280,7 +3280,7 @@ class Options(Variant, total=False):
 
 
 @query
-def reply_raw() -&gt; manual[RawReply]:
+def reply_raw() -&gt; Manual[RawReply]:
     ic.reply_raw(
         ic.candid_encode(
             '(record { &quot;int&quot; = 42; &quot;text&quot; = &quot;text&quot;; &quot;bool&quot; = true; &quot;blob&quot; = blob &quot;Surprise!&quot;; &quot;variant&quot; = variant { Medium } })'
@@ -3741,18 +3741,18 @@ def print_null(none: None) -&gt; None:
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="opt-1"><a class="header" href="#opt-1">opt</a></h1>
 <p>This section is a work in progress.</p>
-<p>The Kybra type <code>opt</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t">Candid type opt</a> and will become the enclosed Python type or None at runtime.</p>
+<p>The Kybra type <code>Opt</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t">Candid type opt</a> and will become the enclosed Python type or None at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import opt, query
+<pre><code class="language-python">from kybra import Opt, query
 
 
 @query
-def get_opt_some() -&gt; opt[bool]:
+def get_opt_some() -&gt; Opt[bool]:
     return True
 
 
 @query
-def get_opt_none() -&gt; opt[bool]:
+def get_opt_none() -&gt; Opt[bool]:
     return None
 </code></pre>
 <p>Candid:</p>
@@ -4058,12 +4058,12 @@ def id() -&gt; Principal:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ic_api">ic_api</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, ic, opt, query
+<pre><code class="language-python">from kybra import blob, ic, Opt, query
 
 
 # When called from a query call, returns the data certificate authenticating certified_data set by this canister. Returns None if not called from a query call.
 @query
-def data_certificate() -&gt; opt[blob]:
+def data_certificate() -&gt; Opt[blob]:
     return ic.data_certificate()
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="print"><a class="header" href="#print">print</a></h1>
@@ -4163,7 +4163,7 @@ def heartbeat_() -&gt; void:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Tuple, Variant, Vec
+<pre><code class="language-python">from kybra import blob, Func, nat16, Opt, query, Query, Record, Tuple, Variant, Vec
 
 
 class HttpRequest(Record):
@@ -4177,8 +4177,8 @@ class HttpResponse(Record):
     status_code: nat16
     headers: Vec[&quot;Header&quot;]
     body: blob
-    streaming_strategy: opt[&quot;StreamingStrategy&quot;]
-    upgrade: opt[bool]
+    streaming_strategy: Opt[&quot;StreamingStrategy&quot;]
+    upgrade: Opt[bool]
 
 
 Header = Tuple[str, str]
@@ -4198,7 +4198,7 @@ Callback = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&q
 
 class StreamingCallbackHttpResponse(Record):
     body: blob
-    token: opt[&quot;Token&quot;]
+    token: Opt[&quot;Token&quot;]
 
 
 class Token(Record):
@@ -4221,7 +4221,7 @@ def http_request(req: HttpRequest) -&gt; HttpResponse:
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/http_counter">http_counter</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, Func, nat16, opt, query, Query, Record, Tuple, Variant, Vec
+<pre><code class="language-python">from kybra import blob, Func, nat16, Opt, query, Query, Record, Tuple, Variant, Vec
 
 
 class HttpRequest(Record):
@@ -4235,8 +4235,8 @@ class HttpResponse(Record):
     status_code: nat16
     headers: Vec[&quot;Header&quot;]
     body: blob
-    streaming_strategy: opt[&quot;StreamingStrategy&quot;]
-    upgrade: opt[bool]
+    streaming_strategy: Opt[&quot;StreamingStrategy&quot;]
+    upgrade: Opt[bool]
 
 
 Header = Tuple[str, str]
@@ -4256,7 +4256,7 @@ Callback = Func(Query[[&quot;Token&quot;], &quot;StreamingCallbackHttpResponse&q
 
 class StreamingCallbackHttpResponse(Record):
     body: blob
-    token: opt[&quot;Token&quot;]
+    token: Opt[&quot;Token&quot;]
 
 
 class Token(Record):
@@ -4972,7 +4972,7 @@ def execute_update_settings(canister_id: Principal) -&gt; Async[DefaultResult]:
     match,
     nat64,
     nat8,
-    opt,
+    Opt,
     query,
     Tuple,
     StableBTreeMap,
@@ -4985,7 +4985,7 @@ Value = str
 
 
 class InsertResult(Variant, total=False):
-    Ok: opt[Value]
+    Ok: Opt[Value]
     Err: InsertError
 
 
@@ -4998,7 +4998,7 @@ def contains_key(key: Key) -&gt; bool:
 
 
 @query
-def get(key: Key) -&gt; opt[Value]:
+def get(key: Key) -&gt; Opt[Value]:
     return map.get(key)
 
 
@@ -5030,7 +5030,7 @@ def len() -&gt; nat64:
 
 
 @update
-def remove(key: Key) -&gt; opt[Value]:
+def remove(key: Key) -&gt; Opt[Value]:
     return map.remove(key)
 
 

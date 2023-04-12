@@ -151,7 +151,7 @@
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/manual_reply">manual_reply</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, ic, manual, null, query, Record, Variant
+<pre><code class="language-python">from kybra import blob, ic, Manual, null, query, Record, Variant
 
 
 class RawReply(Record):
@@ -169,7 +169,7 @@ class Options(Variant, total=False):
 
 
 @query
-def reply_raw() -&gt; manual[RawReply]:
+def reply_raw() -&gt; Manual[RawReply]:
     ic.reply_raw(
         ic.candid_encode(
             '(record { &quot;int&quot; = 42; &quot;text&quot; = &quot;text&quot;; &quot;bool&quot; = true; &quot;blob&quot; = blob &quot;Surprise!&quot;; &quot;variant&quot; = variant { Medium } })'

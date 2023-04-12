@@ -150,12 +150,12 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ic_api">ic_api</a></li>
 </ul>
-<pre><code class="language-python">from kybra import blob, ic, opt, query
+<pre><code class="language-python">from kybra import blob, ic, Opt, query
 
 
 # When called from a query call, returns the data certificate authenticating certified_data set by this canister. Returns None if not called from a query call.
 @query
-def data_certificate() -&gt; opt[blob]:
+def data_certificate() -&gt; Opt[blob]:
     return ic.data_certificate()
 </code></pre>
 
