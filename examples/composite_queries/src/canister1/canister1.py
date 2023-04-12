@@ -6,7 +6,7 @@ from kybra import (
     Principal,
     query,
     update,
-    manual,
+    Manual,
     ic,
 )
 from src.canister1.types import Canister1, NatQueryResult, StringQueryResult
@@ -36,7 +36,7 @@ def manual_query() -> Async[StringQueryResult]:
 
 # Manual composite query calling a manual query
 @query
-def totally_manual_query() -> Async[manual[StringQueryResult]]:
+def totally_manual_query() -> Async[Manual[StringQueryResult]]:
     result: CallResult[str] = yield canister2.manual_query()
     # ic.reply(result)
 

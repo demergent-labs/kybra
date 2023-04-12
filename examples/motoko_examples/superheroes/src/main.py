@@ -1,14 +1,14 @@
-from kybra import alias, nat32, opt, query, Record, Tuple, update
+from kybra import Alias, nat32, Opt, query, Record, Tuple, update
 
-SuperheroId = alias[nat32]
+SuperheroId = Alias[nat32]
 
-List = Tuple[str, opt["List"]]
+List = Tuple[str, Opt["List"]]
 
 
 # type of a superhero.
 class Superhero(Record):
     name: str
-    superpowers: opt[List]
+    superpowers: Opt[List]
 
 
 ##########################
@@ -39,7 +39,7 @@ def create(superhero: Superhero) -> SuperheroId:
 
 @query
 # Read a superhero
-def read(superhero_id: SuperheroId) -> opt[Superhero]:
+def read(superhero_id: SuperheroId) -> Opt[Superhero]:
     return superheroes[superhero_id] if superhero_id in superheroes else None
 
 

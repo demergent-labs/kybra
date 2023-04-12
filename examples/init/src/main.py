@@ -1,4 +1,4 @@
-from kybra import init, null, opt, Principal, query, Record, Variant, void
+from kybra import init, null, Opt, Principal, query, Record, Variant, void
 
 
 class User(Record):
@@ -10,9 +10,9 @@ class Reaction(Variant, total=False):
     Wave: null
 
 
-user: opt[User] = None
-reaction: opt[Reaction] = None
-owner: opt[Principal] = None
+user: Opt[User] = None
+reaction: Opt[Reaction] = None
+owner: Opt[Principal] = None
 
 
 @init
@@ -27,15 +27,15 @@ def init_(init_user: User, init_reaction: Reaction, init_owner: Principal) -> vo
 
 
 @query
-def get_user() -> opt[User]:
+def get_user() -> Opt[User]:
     return user
 
 
 @query
-def get_reaction() -> opt[Reaction]:
+def get_reaction() -> Opt[Reaction]:
     return reaction
 
 
 @query
-def get_owner() -> opt[Principal]:
+def get_owner() -> Opt[Principal]:
     return owner

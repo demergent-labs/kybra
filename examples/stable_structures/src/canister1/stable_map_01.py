@@ -2,7 +2,7 @@ from kybra import (
     blob,
     InsertError,
     match,
-    opt,
+    Opt,
     query,
     StableBTreeMap,
     Tuple,
@@ -14,7 +14,7 @@ from kybra import nat64, nat16
 
 
 class StableMap1InsertResult(Variant, total=False):
-    Ok: opt[blob]
+    Ok: Opt[blob]
     Err: InsertError
 
 
@@ -24,7 +24,7 @@ stable_map1 = StableBTreeMap[nat16, blob](
 
 
 @query
-def stable_map1_get(key: nat16) -> opt[blob]:
+def stable_map1_get(key: nat16) -> Opt[blob]:
     return stable_map1.get(key)
 
 
@@ -36,7 +36,7 @@ def stable_map1_insert(key: nat16, value: blob) -> StableMap1InsertResult:
 
 
 @update
-def stable_map1_remove(key: nat16) -> opt[blob]:
+def stable_map1_remove(key: nat16) -> Opt[blob]:
     return stable_map1.remove(key)
 
 

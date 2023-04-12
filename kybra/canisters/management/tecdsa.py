@@ -1,4 +1,4 @@
-from kybra import blob, null, opt, Principal, Record, Variant, Vec
+from kybra import blob, null, Opt, Principal, Record, Variant, Vec
 
 
 class EcdsaCurve(Variant):
@@ -11,7 +11,7 @@ class KeyId(Record):
 
 
 class EcdsaPublicKeyArgs(Record):
-    canister_id: opt[Principal]
+    canister_id: Opt[Principal]
     derivation_path: Vec[blob]
     key_id: KeyId
 

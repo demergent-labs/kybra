@@ -1,11 +1,11 @@
 from kybra import (
-    alias,
+    Alias,
     blob,
     Func,
     ic,
     nat,
     nat16,
-    opt,
+    Opt,
     Query,
     query,
     Record,
@@ -23,7 +23,7 @@ class Token(Record):
 
 class StreamingCallbackHttpResponse(Record):
     body: blob
-    token: opt[Token]
+    token: Opt[Token]
 
 
 Callback = Func(Query[[Token], StreamingCallbackHttpResponse])
@@ -38,15 +38,15 @@ class StreamingStrategy(Variant, total=False):
     Callback: CallbackStrategy
 
 
-HeaderField = alias[Tuple[str, str]]
+HeaderField = Alias[Tuple[str, str]]
 
 
 class HttpResponse(Record):
     status_code: nat16
     headers: Vec[HeaderField]
     body: blob
-    streaming_strategy: opt[StreamingStrategy]
-    upgrade: opt[bool]
+    streaming_strategy: Opt[StreamingStrategy]
+    upgrade: Opt[bool]
 
 
 class HttpRequest(Record):

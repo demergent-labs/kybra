@@ -1,4 +1,4 @@
-from kybra import ic, nat64, opt, query, update, Vec, void
+from kybra import ic, nat64, Opt, query, update, Vec, void
 from src.canister2.types import Account, AccountArgs, State
 
 state: State = {"accounts": {"0": {"id": "0", "balance": 100}}, "notification": ""}
@@ -33,7 +33,7 @@ def balance(id: str) -> nat64:
 
 
 @query
-def account(account_args: AccountArgs) -> opt[Account]:
+def account(account_args: AccountArgs) -> Opt[Account]:
     return state["accounts"].get(account_args["id"], None)
 
 

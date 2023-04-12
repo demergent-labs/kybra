@@ -1,7 +1,7 @@
 from kybra import (
     InsertError,
     match,
-    opt,
+    Opt,
     Principal,
     query,
     StableBTreeMap,
@@ -14,7 +14,7 @@ from kybra import nat64
 
 
 class StableMap13InsertResult(Variant, total=False):
-    Ok: opt[Principal]
+    Ok: Opt[Principal]
     Err: InsertError
 
 
@@ -24,7 +24,7 @@ stable_map13 = StableBTreeMap[str, Principal](
 
 
 @query
-def stable_map13_get(key: str) -> opt[Principal]:
+def stable_map13_get(key: str) -> Opt[Principal]:
     return stable_map13.get(key)
 
 
@@ -36,7 +36,7 @@ def stable_map13_insert(key: str, value: Principal) -> StableMap13InsertResult:
 
 
 @update
-def stable_map13_remove(key: str) -> opt[Principal]:
+def stable_map13_remove(key: str) -> Opt[Principal]:
     return stable_map13.remove(key)
 
 

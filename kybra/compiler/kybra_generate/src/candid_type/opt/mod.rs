@@ -9,7 +9,7 @@ impl SourceMapped<&Located<ExprKind>> {
     pub fn is_opt(&self) -> bool {
         match &self.node {
             ExprKind::Subscript { value, .. } => match &value.node {
-                ExprKind::Name { id, .. } => id == "opt",
+                ExprKind::Name { id, .. } => id == "Opt",
                 _ => false,
             },
             _ => false,
@@ -24,7 +24,7 @@ impl SourceMapped<&Located<ExprKind>> {
             ExprKind::Subscript { value, slice, .. } => {
                 match &value.node {
                     ExprKind::Name { id, .. } => {
-                        if id != "opt" {
+                        if id != "Opt" {
                             return Err(crate::errors::unreachable());
                         }
                     }

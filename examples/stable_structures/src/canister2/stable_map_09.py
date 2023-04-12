@@ -1,7 +1,7 @@
 from kybra import (
     InsertError,
     match,
-    opt,
+    Opt,
     query,
     StableBTreeMap,
     Tuple,
@@ -14,7 +14,7 @@ from kybra import float64
 
 
 class StableMap9InsertResult(Variant, total=False):
-    Ok: opt[Vec[str]]
+    Ok: Opt[Vec[str]]
     Err: InsertError
 
 
@@ -24,7 +24,7 @@ stable_map9 = StableBTreeMap[float64, Vec[str]](
 
 
 @query
-def stable_map9_get(key: float64) -> opt[Vec[str]]:
+def stable_map9_get(key: float64) -> Opt[Vec[str]]:
     return stable_map9.get(key)
 
 
@@ -36,7 +36,7 @@ def stable_map9_insert(key: float64, value: Vec[str]) -> StableMap9InsertResult:
 
 
 @update
-def stable_map9_remove(key: float64) -> opt[Vec[str]]:
+def stable_map9_remove(key: float64) -> Opt[Vec[str]]:
     return stable_map9.remove(key)
 
 

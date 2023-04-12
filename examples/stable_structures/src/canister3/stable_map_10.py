@@ -1,7 +1,7 @@
 from kybra import (
     InsertError,
     match,
-    opt,
+    Opt,
     query,
     StableBTreeMap,
     Tuple,
@@ -14,29 +14,29 @@ from kybra import float32
 
 
 class StableMap10InsertResult(Variant, total=False):
-    Ok: opt[opt[bool]]
+    Ok: Opt[Opt[bool]]
     Err: InsertError
 
 
-stable_map10 = StableBTreeMap[float32, opt[bool]](
+stable_map10 = StableBTreeMap[float32, Opt[bool]](
     memory_id=10, max_key_size=100, max_value_size=1_000
 )
 
 
 @query
-def stable_map10_get(key: float32) -> opt[opt[bool]]:
+def stable_map10_get(key: float32) -> Opt[Opt[bool]]:
     return stable_map10.get(key)
 
 
 @update
-def stable_map10_insert(key: float32, value: opt[bool]) -> StableMap10InsertResult:
+def stable_map10_insert(key: float32, value: Opt[bool]) -> StableMap10InsertResult:
     result = stable_map10.insert(key, value)
 
     return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
 
 
 @update
-def stable_map10_remove(key: float32) -> opt[opt[bool]]:
+def stable_map10_remove(key: float32) -> Opt[Opt[bool]]:
     return stable_map10.remove(key)
 
 
@@ -56,12 +56,12 @@ def stable_map10_keys() -> Vec[float32]:
 
 
 @query
-def stable_map10_values() -> Vec[opt[bool]]:
+def stable_map10_values() -> Vec[Opt[bool]]:
     return stable_map10.values()
 
 
 @query
-def stable_map10_items() -> Vec[Tuple[float32, opt[bool]]]:
+def stable_map10_items() -> Vec[Tuple[float32, Opt[bool]]]:
     return stable_map10.items()
 
 

@@ -1,4 +1,4 @@
-from kybra import init, opt, query, Record, Tuple, void
+from kybra import init, Opt, query, Record, Tuple, void
 
 
 class User(Record):
@@ -6,7 +6,7 @@ class User(Record):
 
 
 greeting: str = "Hello User"
-user: opt[User] = None
+user: Opt[User] = None
 
 
 @init

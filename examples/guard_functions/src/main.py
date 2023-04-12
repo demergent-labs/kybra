@@ -4,7 +4,7 @@ from kybra import (
     ic,
     inspect_message,
     int32,
-    manual,
+    Manual,
     pre_upgrade,
     query,
     Record,
@@ -170,7 +170,7 @@ def loosely_guarded() -> bool:
 
 
 @query(guard=allow_all)
-def loosely_guarded_manual() -> manual[bool]:
+def loosely_guarded_manual() -> Manual[bool]:
     ic.reply(True)
 
 

@@ -1,4 +1,4 @@
-from kybra import opt, query, Record, update, Vec
+from kybra import Opt, query, Record, update, Vec
 from typing import TypedDict
 
 
@@ -15,7 +15,7 @@ db: Db = {"users": {}}
 
 
 @query
-def get_user_by_id(id: str) -> opt[User]:
+def get_user_by_id(id: str) -> Opt[User]:
     user = db["users"].get(id, None)
 
     return user

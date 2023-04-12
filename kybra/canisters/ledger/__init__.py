@@ -1,11 +1,11 @@
 from kybra import (
-    alias,
+    Alias,
     blob,
     Func,
     nat32,
     nat64,
     null,
-    opt,
+    Opt,
     Principal,
     Query,
     Record,
@@ -32,19 +32,19 @@ class TimeStamp(Record):
 
 # AccountIdentifier is a 32-byte array.
 # The first 4 bytes is big-endian encoding of a CRC32 checksum of the last 28 bytes.
-AccountIdentifier = alias[blob]
+AccountIdentifier = Alias[blob]
 
 # Subaccount is an arbitrary 32-byte byte array.
 # Ledger uses subaccounts to compute the source address, which enables one
 # principal to control multiple ledger accounts.
-SubAccount = alias[blob]
+SubAccount = Alias[blob]
 
 # Sequence number of a block produced by the ledger.
-BlockIndex = alias[nat64]
+BlockIndex = Alias[nat64]
 
 # An arbitrary number associated with a transaction.
 # The caller can set it in a `transfer` call as a correlation identifier.
-Memo = alias[nat64]
+Memo = Alias[nat64]
 
 # Arguments for the `transfer` call.
 
@@ -61,13 +61,13 @@ class TransferArgs(Record):
     # The subaccount from which the caller wants to transfer funds.
     # If null, the ledger uses the default (all zeros) subaccount to compute the source address.
     # See comments for the `SubAccount` type.
-    from_subaccount: opt[SubAccount]
+    from_subaccount: Opt[SubAccount]
     # The destination account.
     # If the transfer is successful, the balance of this address increases by `amount`.
     to: AccountIdentifier
     # The point in time when the caller created this request.
     # If null, the ledger uses current IC time as the timestamp.
-    created_at_time: opt[TimeStamp]
+    created_at_time: Opt[TimeStamp]
 
 
 class TransferError_BadFee(Record):
@@ -157,12 +157,12 @@ class Operation(Variant, total=False):
 
 class Transaction(Record):
     memo: Memo
-    operation: opt[Operation]
+    operation: Opt[Operation]
     created_at_time: TimeStamp
 
 
 class Block(Record):
-    parent_hash: opt[blob]
+    parent_hash: Opt[blob]
     transaction: Transaction
     timestamp: TimeStamp
 
@@ -249,7 +249,7 @@ class QueryBlocksResponse(Record):
 
     # System certificate for the hash of the latest block in the chain.
     # Only present if `query_blocks` is called in a non-replicated query context.
-    certificate: opt[blob]
+    certificate: Opt[blob]
 
     # List of blocks that were available in the ledger when it processed the call.
     #
@@ -292,7 +292,7 @@ class DecimalsResult(Record):
     decimals: nat32
 
 
-Address = alias[str]
+Address = Alias[str]
 
 
 class Ledger(Service):

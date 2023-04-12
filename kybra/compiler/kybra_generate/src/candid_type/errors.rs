@@ -6,10 +6,10 @@ use crate::{
 };
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn invalid_subscript_value_error(&self) -> Vec<Message> {
+    pub fn invalid_subscriptable_error(&self) -> Vec<Message> {
         let title =
-            "Only Async, list, manual, opt, or tuple are allowed subscripts for candid values";
-        let annotation = "Invalid subscript here";
+            "Only Async, Vec, Manual, Opt, or Tuple are allowed subscriptables for candid values";
+        let annotation = "Invalid subscriptable here";
         vec![self.create_error_message(title, annotation, None)]
     }
 
