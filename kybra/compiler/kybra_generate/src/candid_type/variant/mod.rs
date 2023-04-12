@@ -50,6 +50,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 Ok(Some(Variant {
                     name: Some(name.clone()),
                     members,
+                    type_params: vec![].into(),
                 }))
             }
             _ => Err(crate::errors::unreachable()),

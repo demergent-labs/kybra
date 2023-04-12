@@ -13,6 +13,7 @@ from kybra import (
     service_query,
     service_update,
     Variant,
+    Vec,
 )
 
 # Amount of tokens, measured in 10^-8 of a token.
@@ -183,7 +184,7 @@ class BlockRange(Record):
     # NOTE: the list of blocks can be empty if:
     # 1. [GetBlocksArgs.len] was zero.
     # 2. [GetBlocksArgs.from] was larger than the last block known to the canister.
-    blocks: list[Block]
+    blocks: Vec[Block]
 
 
 class QueryArchiveError_BadFirstBlockIndex(Record):
@@ -257,7 +258,7 @@ class QueryBlocksResponse(Record):
     # [first_block_index] + len(blocks) - 1.
     #
     # The block range can be an arbitrary sub-range of the originally requested range.
-    blocks: list[Block]
+    blocks: Vec[Block]
 
     # The index of the first block in "blocks".
     # If the blocks vector is empty, the exact value of this field is not specified.
@@ -268,7 +269,7 @@ class QueryBlocksResponse(Record):
     #
     # For each entry `e` in [archived_blocks], `[e.from, e.from + len)` is a sub-range
     # of the originally requested block range.
-    archived_blocks: list[QueryBlocksResponse_archived_blocks]
+    archived_blocks: Vec[QueryBlocksResponse_archived_blocks]
 
 
 class Archive(Record):
@@ -276,7 +277,7 @@ class Archive(Record):
 
 
 class Archives(Record):
-    archives: list[Archive]
+    archives: Vec[Archive]
 
 
 class SymbolResult(Record):

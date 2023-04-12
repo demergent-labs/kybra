@@ -53,6 +53,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 Ok(Some(Record {
                     name: Some(name.clone()),
                     members,
+                    type_params: vec![].into(),
                 }))
             }
             _ => Ok(None),

@@ -10,8 +10,10 @@ from kybra import (
     Record,
     query,
     reserved,
+    Tuple,
     update,
-    Variant
+    Variant,
+    Vec,
 )
 
 
@@ -31,7 +33,7 @@ class RawReply(Record):
 
 class Element(Record):
     id: str
-    orbitals: list["Orbital"]
+    orbitals: Vec["Orbital"]
     state: "State"
 
 
@@ -55,12 +57,13 @@ class Gas(Variant, total=False):
     Mixed: null
     Toxic: null
 
+
 # Updates
 
 
 @update
 def manual_update(message: str) -> manual[str]:
-    if (message == 'reject'):
+    if message == "reject":
         ic.reject(message)
         return
 
@@ -78,8 +81,8 @@ def update_float32() -> manual[float32]:
 
 
 @update
-def update_inline_type() -> manual[tuple[str, str]]:
-    ic.reply(('Hello', 'World'))
+def update_inline_type() -> manual[Tuple[str, str]]:
+    ic.reply(("Hello", "World"))
 
 
 @update
@@ -100,45 +103,35 @@ def update_null() -> manual[null]:
 @update
 def update_record() -> manual[Element]:
     element: Element = {
-        'id': 'b0283eb7-9c0e-41e5-8089-3345e6a8fa6a',
-        'orbitals': [
-            {
-                'electrons': 2,
-                'layer': 1
-            },
-            {
-                'electrons': 8,
-                'layer': 2
-            }
-        ],
-        'state': {
-            'Gas': {'Elemental': None}
-        }
+        "id": "b0283eb7-9c0e-41e5-8089-3345e6a8fa6a",
+        "orbitals": [{"electrons": 2, "layer": 1}, {"electrons": 8, "layer": 2}],
+        "state": {"Gas": {"Elemental": None}},
     }
     ic.reply(element)
 
 
 @update
 def update_reserved() -> manual[reserved]:
-    ic.reply('anything')
+    ic.reply("anything")
 
 
 @update
 def update_string() -> manual[str]:
-    ic.reply('hello')
+    ic.reply("hello")
 
 
 @update
 def update_variant() -> manual[Gas]:
-    gas: Gas = {'Toxic': None}
+    gas: Gas = {"Toxic": None}
     ic.reply(gas)
 
 
 # Queries
 
+
 @query
 def manual_query(message: str) -> manual[str]:
-    if (message == 'reject'):
+    if message == "reject":
         ic.reject(message)
         return
 
@@ -173,20 +166,9 @@ def query_null() -> manual[null]:
 @query
 def query_record() -> manual[Element]:
     element: Element = {
-        'id': 'b0283eb7-9c0e-41e5-8089-3345e6a8fa6a',
-        'orbitals': [
-            {
-                'electrons': 2,
-                'layer': 1
-            },
-            {
-                'electrons': 8,
-                'layer': 2
-            }
-        ],
-        'state': {
-            'Gas': {'Elemental': None}
-        }
+        "id": "b0283eb7-9c0e-41e5-8089-3345e6a8fa6a",
+        "orbitals": [{"electrons": 2, "layer": 1}, {"electrons": 8, "layer": 2}],
+        "state": {"Gas": {"Elemental": None}},
     }
     ic.reply(element)
 
@@ -198,12 +180,12 @@ def query_reserved() -> manual[reserved]:
 
 @query
 def query_string() -> manual[str]:
-    ic.reply('hello')
+    ic.reply("hello")
 
 
 @query
 def query_variant() -> manual[Gas]:
-    gas = {'Toxic': None}
+    gas = {"Toxic": None}
     ic.reply(gas)
 
 

@@ -10,8 +10,10 @@ from kybra import (
     query,
     Record,
     StableBTreeMap,
+    Tuple,
     update,
     Variant,
+    Vec,
 )
 
 
@@ -36,12 +38,12 @@ class StreamingStrategy(Variant, total=False):
     Callback: CallbackStrategy
 
 
-HeaderField = alias[tuple[str, str]]
+HeaderField = alias[Tuple[str, str]]
 
 
 class HttpResponse(Record):
     status_code: nat16
-    headers: list[HeaderField]
+    headers: Vec[HeaderField]
     body: blob
     streaming_strategy: opt[StreamingStrategy]
     upgrade: opt[bool]
@@ -50,7 +52,7 @@ class HttpResponse(Record):
 class HttpRequest(Record):
     method: str
     url: str
-    headers: list[HeaderField]
+    headers: Vec[HeaderField]
     body: blob
 
 

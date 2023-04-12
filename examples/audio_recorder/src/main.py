@@ -14,13 +14,14 @@ from kybra import (
     StableBTreeMap,
     update,
     Variant,
+    Vec,
 )
 
 
 class User(Record):
     id: Principal
     created_at: nat64
-    recording_ids: list[Principal]
+    recording_ids: Vec[Principal]
     username: str
 
 
@@ -63,7 +64,7 @@ def create_user(username: str) -> CreateUserResult:
 
 
 @query
-def read_users() -> list[User]:
+def read_users() -> Vec[User]:
     return users.values()
 
 
@@ -152,7 +153,7 @@ def create_recording(
 
 
 @query
-def read_recordings() -> list[Recording]:
+def read_recordings() -> Vec[Recording]:
     return recordings.values()
 
 

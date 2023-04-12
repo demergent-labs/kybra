@@ -1,4 +1,4 @@
-from kybra import Variant
+from kybra import Variant, Vec
 from kybra.canisters.management import GetUtxosResult, MillisatoshiPerByte, Satoshi
 
 
@@ -8,7 +8,7 @@ class ExecuteGetBalanceResult(Variant, total=False):
 
 
 class ExecuteGetCurrentFeePercentiles(Variant, total=False):
-    Ok: list[MillisatoshiPerByte]
+    Ok: Vec[MillisatoshiPerByte]
     Err: str
 
 

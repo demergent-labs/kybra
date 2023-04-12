@@ -1,4 +1,15 @@
-from kybra import blob, InsertError, match, opt, query, StableBTreeMap, update, Variant
+from kybra import (
+    blob,
+    InsertError,
+    match,
+    opt,
+    query,
+    StableBTreeMap,
+    Tuple,
+    update,
+    Variant,
+    Vec,
+)
 from kybra import nat64, nat16
 
 
@@ -40,17 +51,17 @@ def stable_map1_is_empty() -> bool:
 
 
 @query
-def stable_map1_keys() -> list[nat16]:
+def stable_map1_keys() -> Vec[nat16]:
     return stable_map1.keys()
 
 
 @query
-def stable_map1_values() -> list[blob]:
+def stable_map1_values() -> Vec[blob]:
     return stable_map1.values()
 
 
 @query
-def stable_map1_items() -> list[tuple[nat16, blob]]:
+def stable_map1_items() -> Vec[Tuple[nat16, blob]]:
     return stable_map1.items()
 
 

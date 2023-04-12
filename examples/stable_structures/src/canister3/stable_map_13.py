@@ -5,8 +5,10 @@ from kybra import (
     Principal,
     query,
     StableBTreeMap,
+    Tuple,
     update,
     Variant,
+    Vec,
 )
 from kybra import nat64
 
@@ -49,17 +51,17 @@ def stable_map13_is_empty() -> bool:
 
 
 @query
-def stable_map13_keys() -> list[str]:
+def stable_map13_keys() -> Vec[str]:
     return stable_map13.keys()
 
 
 @query
-def stable_map13_values() -> list[Principal]:
+def stable_map13_values() -> Vec[Principal]:
     return stable_map13.values()
 
 
 @query
-def stable_map13_items() -> list[tuple[str, Principal]]:
+def stable_map13_items() -> Vec[Tuple[str, Principal]]:
     return stable_map13.items()
 
 

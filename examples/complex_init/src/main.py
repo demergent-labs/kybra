@@ -1,4 +1,4 @@
-from kybra import init, opt, query, Record, void
+from kybra import init, opt, query, Record, Tuple, void
 
 
 class User(Record):
@@ -10,7 +10,7 @@ user: opt[User] = None
 
 
 @init
-def init_(tuple: tuple[str, User]) -> void:
+def init_(tuple: Tuple[str, User]) -> void:
     global greeting
     global user
 

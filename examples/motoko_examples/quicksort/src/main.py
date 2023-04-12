@@ -1,8 +1,8 @@
-from kybra import update
+from kybra import update, Vec
 from comparison import compare
 import quicksort
 
 
 @update
-def sort(xs: list[int]) -> list[int]:
+def sort(xs: Vec[int]) -> Vec[int]:
     return quicksort.sort_by(xs, compare)

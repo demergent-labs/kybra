@@ -1,4 +1,14 @@
-from kybra import InsertError, match, opt, query, StableBTreeMap, update, Variant
+from kybra import (
+    InsertError,
+    match,
+    opt,
+    query,
+    StableBTreeMap,
+    Tuple,
+    update,
+    Vec,
+    Variant,
+)
 from kybra import nat64
 from kybra import float32
 
@@ -41,17 +51,17 @@ def stable_map10_is_empty() -> bool:
 
 
 @query
-def stable_map10_keys() -> list[float32]:
+def stable_map10_keys() -> Vec[float32]:
     return stable_map10.keys()
 
 
 @query
-def stable_map10_values() -> list[opt[bool]]:
+def stable_map10_values() -> Vec[opt[bool]]:
     return stable_map10.values()
 
 
 @query
-def stable_map10_items() -> list[tuple[float32, opt[bool]]]:
+def stable_map10_items() -> Vec[Tuple[float32, opt[bool]]]:
     return stable_map10.items()
 
 

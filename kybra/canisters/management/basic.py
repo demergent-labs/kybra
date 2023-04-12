@@ -1,4 +1,4 @@
-from kybra import blob, nat, null, opt, Principal, Record, Variant
+from kybra import blob, nat, null, opt, Principal, Record, Variant, Vec
 
 # TODO type aliases do not work yet
 # TODO many canister_id fields need to be changed to use this alias
@@ -11,14 +11,14 @@ class CreateCanisterArgs(Record):
 
 
 class CanisterSettings(Record):
-    controllers: opt[list[Principal]]
+    controllers: opt[Vec[Principal]]
     compute_allocation: opt[nat]
     memory_allocation: opt[nat]
     freezing_threshold: opt[nat]
 
 
 class DefiniteCanisterSettings(Record):
-    controllers: list[Principal]
+    controllers: Vec[Principal]
     compute_allocation: nat
     memory_allocation: nat
     freezing_threshold: nat
