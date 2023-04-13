@@ -27,7 +27,6 @@ pub fn generate_canister(
     py_file_names: &Vec<&str>,
     entry_module_name: &str,
 ) -> KybraResult<TokenStream> {
-    Ok(PyAst::new(py_file_names, entry_module_name)
-        .to_act()?
-        .to_token_stream())
+    let py_ast = PyAst::new(py_file_names, entry_module_name);
+    py_ast.handle_cdk_framework_errors(py_ast.to_act()?.to_token_stream())
 }

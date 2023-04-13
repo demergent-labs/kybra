@@ -36,4 +36,16 @@ impl SourceMapped<&Located<ExprKind>> {
             _ => Err(crate::errors::unreachable()),
         }
     }
+
+    pub fn is_type_ref_named(&self, name: &str) -> bool {
+        if let ExprKind::Name { id, .. } = &self.node {
+            return id == name;
+        }
+        if let ExprKind::Constant { value, .. } = &self.node {
+            if let Constant::Str(string) = value {
+                return string == name;
+            }
+        }
+        false
+    }
 }

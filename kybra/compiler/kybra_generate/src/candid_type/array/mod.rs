@@ -38,4 +38,8 @@ impl SourceMapped<&Located<ExprKind>> {
             _ => Err(crate::errors::unreachable()),
         }
     }
+
+    pub fn array_uses_type_ref(&self, name: &str) -> bool {
+        self.is_array() && self.enclosed_type_uses_type_ref(name)
+    }
 }

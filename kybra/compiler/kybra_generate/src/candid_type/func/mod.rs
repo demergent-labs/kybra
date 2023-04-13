@@ -84,7 +84,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn build_func_params(&self) -> KybraResult<Vec<CandidType>> {
+    fn get_func_params(&self) -> KybraResult<Vec<SourceMapped<&Located<ExprKind>>>> {
         match &self.node {
             ExprKind::Call { args, .. } => match &args[0].node {
                 ExprKind::Subscript { slice, .. } => match &slice.node {
@@ -93,14 +93,13 @@ impl SourceMapped<&Located<ExprKind>> {
                             return Err(self.func_formatting_error());
                         }
                         match &elts[0].node {
-                            ExprKind::List { elts, .. } => crate::errors::collect_kybra_results(
-                                elts.iter()
-                                    .map(|elt| {
-                                        SourceMapped::new(elt, self.source_map.clone())
-                                            .to_candid_type()
-                                    })
-                                    .collect(),
-                            ),
+                            ExprKind::List { elts, .. } => {
+                                let thing = elts
+                                    .iter()
+                                    .map(|elt| SourceMapped::new(elt, self.source_map.clone()))
+                                    .collect::<Vec<_>>();
+                                Ok(thing)
+                            }
                             _ => Err(self.func_formatting_error()),
                         }
                     }
@@ -112,26 +111,48 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn build_func_return_type(&self, mode: Mode) -> KybraResult<CandidType> {
+    fn get_func_return_type(&self) -> KybraResult<SourceMapped<&Located<ExprKind>>> {
         match &self.node {
-            ExprKind::Call { args, .. } => match mode {
-                Mode::Oneway => Ok(CandidType::Primitive(Primitive::Void)),
-                _ => match &args[0].node {
-                    ExprKind::Subscript { slice, .. } => match &slice.node {
-                        ExprKind::Tuple { elts, .. } => {
-                            if elts.len() != 2 {
-                                return Err(self.func_formatting_error());
-                            }
-                            Ok(SourceMapped::new(&elts[1], self.source_map.clone())
-                                .to_candid_type()?)
+            ExprKind::Call { args, .. } => match &args[0].node {
+                ExprKind::Subscript { slice, .. } => match &slice.node {
+                    ExprKind::Tuple { elts, .. } => {
+                        if elts.len() != 2 {
+                            return Err(self.func_formatting_error());
                         }
-                        _ => return Err(self.func_formatting_error()),
-                    },
+                        Ok(SourceMapped::new(&elts[1], self.source_map.clone()))
+                    }
                     _ => return Err(self.func_formatting_error()),
                 },
+                _ => return Err(self.func_formatting_error()),
             },
             _ => Err(crate::errors::unreachable()),
         }
+    }
+
+    fn build_func_params(&self) -> KybraResult<Vec<CandidType>> {
+        return crate::errors::collect_kybra_results(
+            self.get_func_params()?
+                .iter()
+                .map(|param| param.to_candid_type())
+                .collect(),
+        );
+    }
+
+    fn build_func_return_type(&self, mode: Mode) -> KybraResult<CandidType> {
+        match mode {
+            Mode::Oneway => Ok(CandidType::Primitive(Primitive::Void)),
+            _ => Ok(self.get_func_return_type()?.to_candid_type()?),
+        }
+    }
+
+    pub fn func_uses_type_ref(&self, name: &str) -> bool {
+        (match self.get_func_params() {
+            Ok(params) => params.iter().any(|param| param.uses_type_ref(name)),
+            Err(_) => false,
+        } || match self.get_func_return_type() {
+            Ok(return_type) => return_type.uses_type_ref(name),
+            Err(_) => false,
+        })
     }
 }
 
@@ -166,6 +187,14 @@ impl SourceMapped<&Located<StmtKind>> {
             }
             _ => false,
         }
+    }
+
+    pub fn func_uses_type_ref(&self, name: &str) -> bool {
+        if let StmtKind::Assign { value, .. } = &self.node {
+            return SourceMapped::new(value.as_ref(), self.source_map.clone())
+                .func_uses_type_ref(name);
+        }
+        false
     }
 
     // TODO are we using this anywhere?

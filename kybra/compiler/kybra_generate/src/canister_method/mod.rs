@@ -47,6 +47,40 @@ impl PyAst {
                 acc
             })
     }
+
+    fn get_canister_method_stmts(&self) -> Vec<SourceMapped<&Located<StmtKind>>> {
+        self.source_mapped_mods
+            .iter()
+            .fold(vec![], |mut acc, program| {
+                acc.extend(match &program.deref() {
+                    Mod::Module { body, .. } => body
+                        .iter()
+                        .filter(|stmt_kind| {
+                            SourceMapped::new(*stmt_kind, program.source_map.clone())
+                                .is_canister_method()
+                        })
+                        .map(|stmt_kind| SourceMapped::new(stmt_kind, program.source_map.clone()))
+                        .collect(),
+                    _ => vec![],
+                });
+                acc
+            })
+    }
+
+    pub fn find_methods_using_guard_function_name(
+        &self,
+        function_guard_name: &str,
+    ) -> Vec<SourceMapped<&Located<StmtKind>>> {
+        self.get_canister_method_stmts()
+            .iter()
+            .filter(|m| {
+                m.get_guard_function_name().map_or(false, |guard_name_opt| {
+                    guard_name_opt == Some(function_guard_name.to_string())
+                })
+            })
+            .cloned()
+            .collect()
+    }
 }
 
 impl SourceMapped<&Located<StmtKind>> {
@@ -60,6 +94,16 @@ impl SourceMapped<&Located<StmtKind>> {
             CanisterMethodType::Query => "query",
             CanisterMethodType::Update => "update",
         })
+    }
+
+    pub fn is_canister_method(&self) -> bool {
+        self.has_decorator("heartbeat")
+            || self.has_decorator("init")
+            || self.has_decorator("inspect_message")
+            || self.has_decorator("post_upgrade")
+            || self.has_decorator("pre_upgrade")
+            || self.has_decorator("query")
+            || self.has_decorator("update")
     }
 
     fn has_decorator(&self, decorator_name: &str) -> bool {
