@@ -20,17 +20,40 @@ function run() {
     ic_wasm_already_installed=$(test -e "$global_kybra_bin_dir"/ic-wasm; echo $?)
     ic_cdk_optimizer_already_installed=$(test -e "$global_kybra_bin_dir"/ic-cdk-optimizer; echo $?)
 
-    if [ "$ic_wasm_already_installed" -eq 1 ] || [ "$ic_cdk_optimizer_already_installed" -eq 1 ]; then
-        echo -e "\nKybra "$kybra_version" prerequisite installation (this may take a few minutes)\n"
+    previous_kybra_version=$(ls ~/.config/kybra | sort -V | awk -v kybra_version="$kybra_version" '$0 < kybra_version { previous_version = $0 } END { print previous_version }')
+    previous_kybra_config_dir=~/.config/kybra/"$previous_kybra_version"
+    previous_kybra_logs_dir="$previous_kybra_config_dir"/logs
+    previous_rust_version_file="$previous_kybra_logs_dir"/rust_version
+
+    if [ -f "$previous_rust_version_file" ]; then
+        previous_rust_version=$(cat "$previous_rust_version_file")
+    else
+        previous_rust_version=""
+    fi
+
+    current_rust_version_file="$global_kybra_logs_dir"/rust_version
+
+    if [ -f "$current_rust_version_file" ]; then
+        current_rust_version=$(cat "$current_rust_version_file")
+    else
+        current_rust_version=""
+    fi
+
+    if [ "$rust_version" != "$current_rust_version" ] || ([ "$rust_version" != "$previous_rust_version" ] && ([ "$ic_wasm_already_installed" -eq 1 ] || [ "$ic_cdk_optimizer_already_installed" -eq 1 ])); then
+        echo -e "\nkybra "$kybra_version" prerequisite installation (this may take a few minutes)\n"
 
         mkdir -p "$global_kybra_config_dir"
         mkdir -p "$global_kybra_logs_dir"
+
+        echo "$rust_version" > "$global_kybra_logs_dir"/rust_version
 
         install_rustup
         install_wasm32_unknown_unknown
         install_ic_wasm "$ic_wasm_already_installed"
         install_ic_cdk_optimizer "$ic_cdk_optimizer_already_installed"
         echo -e "\n"
+    elif [ "$rust_version" == "$previous_rust_version" ]; then
+        cp "$previous_kybra_config_dir" "$global_kybra_config_dir"
     else
         update_rustup
     fi
