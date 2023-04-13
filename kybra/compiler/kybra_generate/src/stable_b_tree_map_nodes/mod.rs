@@ -1,7 +1,12 @@
 mod errors;
 pub mod rust;
 
-use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
+use crate::{
+    errors::{CollectResults, KybraResult},
+    py_ast::PyAst,
+    source_map::SourceMapped,
+    Error,
+};
 use cdk_framework::act::node::CandidType;
 use num_bigint::{BigInt, Sign};
 use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
@@ -16,16 +21,15 @@ pub struct StableBTreeMapNode {
     pub max_value_size: u32,
 }
 impl PyAst {
-    pub fn build_stable_b_tree_map_nodes(&self) -> KybraResult<Vec<StableBTreeMapNode>> {
-        Ok(crate::errors::collect_kybra_results(
-            self.get_stmt_kinds()
-                .iter()
-                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_stable_b_tree_map_node())
-                .collect(),
-        )?
-        .drain(..)
-        .filter_map(|x| x)
-        .collect())
+    pub fn build_stable_b_tree_map_nodes(&self) -> Result<Vec<StableBTreeMapNode>, Vec<Error>> {
+        Ok(self
+            .get_stmt_kinds()
+            .iter()
+            .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_stable_b_tree_map_node())
+            .collect_results()?
+            .drain(..)
+            .filter_map(|x| x)
+            .collect())
     }
 }
 
@@ -80,15 +84,24 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn as_stable_b_tree_map_node(&self) -> KybraResult<Option<StableBTreeMapNode>> {
+    pub fn as_stable_b_tree_map_node(&self) -> Result<Option<StableBTreeMapNode>, Vec<Error>> {
         if !self.is_stable_b_tree_map_node() {
             return Ok(None);
         }
-        let memory_id = self.get_memory_id()?;
+        let memory_id = match self.get_memory_id() {
+            Ok(memory_id) => memory_id,
+            Err(err) => return Err(vec![err]),
+        };
         let key_type = self.get_key_type()?;
         let value_type = self.get_value_type()?;
-        let max_key_size = self.get_max_key_size()?;
-        let max_value_size = self.get_max_value_size()?;
+        let max_key_size = match self.get_max_key_size() {
+            Ok(max_key_size) => max_key_size,
+            Err(err) => return Err(vec![err]),
+        };
+        let max_value_size = match self.get_max_value_size() {
+            Ok(max_value_size) => max_value_size,
+            Err(err) => return Err(vec![err]),
+        };
         Ok(Some(StableBTreeMapNode {
             memory_id,
             key_type,
@@ -129,25 +142,37 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    fn get_key_type(&self) -> KybraResult<CandidType> {
-        match &self.get_assign_value()?.node {
+    fn get_key_type(&self) -> Result<CandidType, Vec<Error>> {
+        let assign_value = match self.get_assign_value() {
+            Ok(assign_value) => assign_value,
+            Err(err) => return Err(vec![err]),
+        };
+        match &assign_value.node {
             ExprKind::Call { func, .. } => {
-                SourceMapped::new(func.as_ref(), self.source_map.clone())
-                    .get_key_type()?
-                    .to_candid_type()
+                match SourceMapped::new(func.as_ref(), self.source_map.clone()).get_key_type() {
+                    Ok(key_type) => key_type,
+                    Err(err) => return Err(vec![err]),
+                }
+                .to_candid_type()
             }
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(vec![crate::errors::unreachable()]),
         }
     }
 
-    fn get_value_type(&self) -> KybraResult<CandidType> {
-        match &self.get_assign_value()?.node {
+    fn get_value_type(&self) -> Result<CandidType, Vec<Error>> {
+        let assign_value = match self.get_assign_value() {
+            Ok(assign_value) => assign_value,
+            Err(err) => return Err(vec![err]),
+        };
+        match &assign_value.node {
             ExprKind::Call { func, .. } => {
-                SourceMapped::new(func.as_ref(), self.source_map.clone())
-                    .get_value_type()?
-                    .to_candid_type()
+                match SourceMapped::new(func.as_ref(), self.source_map.clone()).get_value_type() {
+                    Ok(value_type) => value_type,
+                    Err(err) => return Err(vec![err]),
+                }
+                .to_candid_type()
             }
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(vec![crate::errors::unreachable()]),
         }
     }
 

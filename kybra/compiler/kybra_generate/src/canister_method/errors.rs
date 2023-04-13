@@ -1,16 +1,13 @@
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{
-    errors::{CreateMessage, Message},
-    source_map::SourceMapped,
-};
+use crate::{errors::CreateMessage, source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn guard_function_name_error(&self) -> Vec<Message> {
-        vec![self.create_error_message(
+    pub fn guard_function_name_error(&self) -> Error {
+        Error::GuardFunctionName(self.create_error_message(
             "Guard function must be a reference to a function",
             "",
             None,
-        )]
+        ))
     }
 }

@@ -1,22 +1,21 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
+use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
 use cdk_framework::act::node::candid::variant::Variant;
 
 mod errors;
 mod variants_members;
 
 impl PyAst {
-    pub fn build_variants(&self) -> KybraResult<Vec<Variant>> {
-        Ok(crate::errors::collect_kybra_results(
-            self.get_stmt_kinds()
-                .iter()
-                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_variant())
-                .collect(),
-        )?
-        .drain(..)
-        .filter_map(|x| x)
-        .collect())
+    pub fn build_variants(&self) -> Result<Vec<Variant>, Vec<Error>> {
+        Ok(self
+            .get_stmt_kinds()
+            .iter()
+            .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_variant())
+            .collect_results()?
+            .drain(..)
+            .filter_map(|x| x)
+            .collect())
     }
 }
 
@@ -34,26 +33,25 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn as_variant(&self) -> KybraResult<Option<Variant>> {
+    pub fn as_variant(&self) -> Result<Option<Variant>, Vec<Error>> {
         if !self.is_variant() {
             return Ok(None);
         }
         match &self.node {
             StmtKind::ClassDef { name, body, .. } => {
-                let members: Vec<_> = crate::errors::collect_kybra_results(
-                    body.iter()
-                        .map(|stmt| {
-                            SourceMapped::new(stmt, self.source_map.clone()).as_variant_member()
-                        })
-                        .collect(),
-                )?;
+                let members = body
+                    .iter()
+                    .map(|stmt| {
+                        SourceMapped::new(stmt, self.source_map.clone()).as_variant_member()
+                    })
+                    .collect_results()?;
                 Ok(Some(Variant {
                     name: Some(name.clone()),
                     members,
                     type_params: vec![].into(),
                 }))
             }
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(vec![crate::errors::unreachable()]),
         }
     }
 }

@@ -1,23 +1,20 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{
-    errors::{CreateMessage, Message},
-    source_map::SourceMapped,
-};
+use crate::{errors::CreateMessage, source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn invalid_subscriptable_error(&self) -> Vec<Message> {
+    pub fn invalid_subscriptable_error(&self) -> Error {
         let title =
             "Only Async, Vec, Manual, Opt, or Tuple are allowed subscriptables for candid values";
         let annotation = "Invalid subscriptable here";
-        vec![self.create_error_message(title, annotation, None)]
+        Error::InvalidSubscriptable(self.create_error_message(title, annotation, None))
     }
 
-    pub fn none_cant_be_a_type_error(&self) -> Vec<Message> {
-        vec![self.create_error_message("None must not be used as a type, but only as a value. Please specify either kybra.null or kybra.void.", "Ambiguous None here", None)]
+    pub fn none_cant_be_a_type_error(&self) -> Error {
+        Error::NoneCantBeAType(self.create_error_message("None must not be used as a type, but only as a value. Please specify either kybra.null or kybra.void.", "Ambiguous None here", None))
     }
 
-    pub fn unsupported_type_error(&self) -> Vec<Message> {
+    pub fn unsupported_type_error(&self) -> Error {
         let expression_name = match &self.node {
             ExprKind::BoolOp { .. } => "boolean operator",
             ExprKind::NamedExpr { .. } => "named expression",
@@ -47,30 +44,30 @@ impl SourceMapped<&Located<ExprKind>> {
         };
         let title = format!("{} is not allowed here.", expression_name);
         let annotation = "Illegal expression used here";
-        vec![self.create_error_message(&title, annotation, None)]
+        Error::UnsupportedType(self.create_error_message(&title, annotation, None))
     }
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn invalid_class_error(&self) -> Message {
+    pub fn invalid_class_error(&self) -> Error {
         let title = "For a class to be included in your canister definition it must be either a Record or a Variant.";
         let annotation = "illegal class here";
-        self.create_error_message(title, annotation, None)
+        Error::InvalidClass(self.create_error_message(title, annotation, None))
     }
 
-    pub fn invalid_assign_error(&self) -> Message {
+    pub fn invalid_assign_error(&self) -> Error {
         let title = "For a global assignment to be included in your canister definition it must be be either a Tuple or a Type Alias";
         let annotation = "illegal assignment here";
-        self.create_error_message(title, annotation, None)
+        Error::InvalidAssign(self.create_error_message(title, annotation, None))
     }
 
-    pub fn invalid_annotation_assign_error(&self) -> Message {
+    pub fn invalid_annotation_assign_error(&self) -> Error {
         let title = "For a global annotation assignment to be included in your canister definition it must be be either a Func or a Type Alias";
         let annotation = "illegal annotation assignment here";
-        self.create_error_message(title, annotation, None)
+        Error::InvalidAnnAssign(self.create_error_message(title, annotation, None))
     }
 
-    pub fn unsupported_type_error(&self) -> Vec<Message> {
+    pub fn unsupported_type_error(&self) -> Error {
         let stmt_kind_name = match &self.node {
             StmtKind::FunctionDef { .. } => "Function Def",
             StmtKind::AsyncFunctionDef { .. } => "Async Function Def",
@@ -102,6 +99,6 @@ impl SourceMapped<&Located<StmtKind>> {
             stmt_kind_name
         );
         let annotation = "Illegal expression used here";
-        vec![self.create_error_message(&title, annotation, None)]
+        Error::UnsupportedType(self.create_error_message(&title, annotation, None))
     }
 }

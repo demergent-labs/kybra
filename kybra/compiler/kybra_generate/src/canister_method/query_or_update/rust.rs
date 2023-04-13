@@ -3,18 +3,16 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{
-    errors::KybraResult, method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple,
-};
+use crate::{method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple, Error};
 
 pub fn generate_body(
     source_mapped_located_stmtkind: &SourceMapped<&Located<StmtKind>>,
-) -> KybraResult<TokenStream> {
+) -> Result<TokenStream, Vec<Error>> {
     let params = source_mapped_located_stmtkind.build_params(InternalOrExternal::Internal)?;
 
     let name = match source_mapped_located_stmtkind.get_name() {
         Some(name) => name,
-        None => return Err(crate::errors::unreachable()),
+        None => return Err(vec![crate::errors::unreachable()]),
     };
 
     let param_conversions = params
@@ -60,15 +58,14 @@ pub fn generate_body(
 
 fn generate_return_expression(
     kybra_statement: &SourceMapped<&Located<StmtKind>>,
-) -> KybraResult<TokenStream> {
+) -> Result<TokenStream, Vec<Error>> {
     if kybra_statement.is_manual() {
         return Ok(quote! {
             ic_cdk::api::call::ManualReply::empty()
         });
     }
 
-    let return_type = kybra_statement.build_return_type();
-    if type_is_null_or_void(return_type?) {
+    if type_is_null_or_void(kybra_statement.build_return_type()?) {
         return Ok(quote! {
             return;
         });

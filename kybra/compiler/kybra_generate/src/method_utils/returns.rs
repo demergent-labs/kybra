@@ -1,13 +1,13 @@
 use cdk_framework::act::node::CandidType;
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{errors::KybraResult, source_map::SourceMapped};
+use crate::{source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn build_return_type(&self) -> KybraResult<CandidType> {
+    pub fn build_return_type(&self) -> Result<CandidType, Vec<Error>> {
         let returns = match &self.node {
             StmtKind::FunctionDef { returns, .. } => returns,
-            _ => return Err(crate::errors::unreachable()),
+            _ => return Err(vec![crate::errors::unreachable()]),
         };
 
         match returns {
@@ -16,7 +16,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 self.source_map.clone(),
             )
             .to_candid_type()?),
-            None => Err(self.return_type_annotation_required_error()),
+            None => Err(vec![self.return_type_annotation_required_error()]),
         }
     }
 }

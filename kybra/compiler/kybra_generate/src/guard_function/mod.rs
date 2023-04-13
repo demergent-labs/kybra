@@ -4,7 +4,7 @@ mod guard_function;
 use cdk_framework::act::node::{CandidType, GuardFunction};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::KybraResult, py_ast::PyAst, source_map::SourceMapped};
+use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_guard_function(&self) -> bool {
@@ -23,17 +23,17 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn as_guard_function(&self) -> KybraResult<Option<GuardFunction>> {
+    pub fn as_guard_function(&self) -> Result<Option<GuardFunction>, Vec<Error>> {
         if !self.is_guard_function() {
             return Ok(None);
         }
         match &self.node {
             StmtKind::FunctionDef { name, .. } => {
                 if self.has_params() {
-                    return Err(self.guard_functions_param_error());
+                    return Err(vec![self.guard_functions_param_error()]);
                 }
                 if !self.returns_guard_result() {
-                    return Err(self.guard_function_return_error());
+                    return Err(vec![self.guard_function_return_error()]);
                 }
 
                 Ok(Some(GuardFunction {
@@ -41,7 +41,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     name: name.clone(),
                 }))
             }
-            _ => return Err(crate::errors::unreachable()),
+            _ => return Err(vec![crate::errors::unreachable()]),
         }
     }
 
@@ -70,15 +70,14 @@ impl SourceMapped<&Located<StmtKind>> {
 }
 
 impl PyAst {
-    pub fn build_guard_functions(&self) -> KybraResult<Vec<GuardFunction>> {
-        Ok(crate::errors::collect_kybra_results(
-            self.get_stmt_kinds()
-                .iter()
-                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_guard_function())
-                .collect(),
-        )?
-        .drain(..)
-        .filter_map(|x| x)
-        .collect())
+    pub fn build_guard_functions(&self) -> Result<Vec<GuardFunction>, Vec<Error>> {
+        Ok(self
+            .get_stmt_kinds()
+            .iter()
+            .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_guard_function())
+            .collect_results()?
+            .drain(..)
+            .filter_map(|x| x)
+            .collect())
     }
 }

@@ -9,26 +9,28 @@ use cdk_framework::act::node::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::KybraResult, method_utils::params::InternalOrExternal, py_ast::PyAst,
+    errors::{CollectResults, KybraResult},
+    method_utils::params::InternalOrExternal,
+    py_ast::PyAst,
     source_map::SourceMapped,
+    Error,
 };
 
 impl PyAst {
-    pub fn build_services(&self) -> KybraResult<Vec<Service>> {
-        Ok(crate::errors::collect_kybra_results(
-            self.get_stmt_kinds()
-                .iter()
-                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_service())
-                .collect(),
-        )?
-        .drain(..)
-        .filter_map(|x| x)
-        .collect())
+    pub fn build_services(&self) -> Result<Vec<Service>, Vec<Error>> {
+        Ok(self
+            .get_stmt_kinds()
+            .iter()
+            .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_service())
+            .collect_results()?
+            .drain(..)
+            .filter_map(|x| x)
+            .collect())
     }
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn to_service_method(&self, canister_name: &String) -> KybraResult<Method> {
+    pub fn to_service_method(&self, canister_name: &String) -> Result<Method, Vec<Error>> {
         match &self.node {
             StmtKind::FunctionDef {
                 name,
@@ -38,15 +40,18 @@ impl SourceMapped<&Located<StmtKind>> {
                 name: name.clone(),
                 params: self.build_params(InternalOrExternal::External)?,
                 return_type: ReturnType::new(self.build_return_type()?),
-                mode: build_mode(self, decorator_list, &canister_name, name)?,
+                mode: match build_mode(self, decorator_list, &canister_name, name) {
+                    Ok(mode) => mode,
+                    Err(err) => return Err(vec![err]),
+                },
             }),
-            _ => Err(self.class_with_not_function_defs_error(canister_name)),
+            _ => Err(vec![self.class_with_not_function_defs_error(canister_name)]),
         }
     }
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_service(&self) -> KybraResult<Option<Service>> {
+    pub fn as_service(&self) -> Result<Option<Service>, Vec<Error>> {
         if !self.is_service() {
             return Ok(None);
         }
@@ -60,10 +65,10 @@ impl SourceMapped<&Located<StmtKind>> {
                     })
                     .collect();
 
-                let methods = crate::errors::collect_kybra_results(method_results)?;
+                let methods = method_results.into_iter().collect_results()?;
 
                 if methods.len() == 0 {
-                    return Err(self.class_must_have_methods_error(name));
+                    return Err(vec![self.class_must_have_methods_error(name)]);
                 }
 
                 Ok(Some(Service {
@@ -76,7 +81,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 }))
             }
             // We filter out any non classDefs in KybraProgram.get_external_canister_declarations
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(vec![crate::errors::unreachable()]),
         }
     }
 

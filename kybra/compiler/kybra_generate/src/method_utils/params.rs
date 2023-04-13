@@ -1,7 +1,7 @@
 use cdk_framework::act::node::Param;
 use rustpython_parser::ast::{ArgData, Located, StmtKind};
 
-use crate::{errors::KybraResult, source_map::SourceMapped};
+use crate::{errors::CollectResults, source_map::SourceMapped, Error};
 
 pub enum InternalOrExternal {
     Internal,
@@ -12,21 +12,23 @@ impl SourceMapped<&Located<StmtKind>> {
     pub fn build_params(
         &self,
         internal_or_external: InternalOrExternal,
-    ) -> KybraResult<Vec<Param>> {
+    ) -> Result<Vec<Param>, Vec<Error>> {
         match &self.node {
             StmtKind::FunctionDef { args, .. } => {
                 if args.kwarg.is_some() {
-                    return Err(self.dictionary_unpacking_operator_not_supported_error());
+                    return Err(vec![
+                        self.dictionary_unpacking_operator_not_supported_error()
+                    ]);
                 }
 
                 if args.vararg.is_some() {
-                    return Err(self.iterator_unpacking_operator_not_supported_error());
+                    return Err(vec![self.iterator_unpacking_operator_not_supported_error()]);
                 }
 
-                let param_results = match internal_or_external {
+                let param_results: Vec<_> = match internal_or_external {
                     InternalOrExternal::Internal => {
                         if args.args.len() > 0 && args.args[0].node.arg == "self".to_string() {
-                            return Err(self.first_parameter_must_not_be_self_error());
+                            return Err(vec![self.first_parameter_must_not_be_self_error()]);
                         }
                         args.args
                             .iter()
@@ -35,11 +37,11 @@ impl SourceMapped<&Located<StmtKind>> {
                     }
                     InternalOrExternal::External => {
                         if args.args.len() == 0 {
-                            return Err(self.first_parameter_must_be_self_error());
+                            return Err(vec![self.first_parameter_must_be_self_error()]);
                         }
 
                         if args.args[0].node.arg != "self".to_string() {
-                            return Err(self.first_parameter_must_be_self_error());
+                            return Err(vec![self.first_parameter_must_be_self_error()]);
                         }
 
                         // Ignore the first param, which is always "self"
@@ -50,15 +52,15 @@ impl SourceMapped<&Located<StmtKind>> {
                     }
                 };
 
-                Ok(crate::errors::collect_kybra_results(param_results)?)
+                param_results.into_iter().collect_results()
             }
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(vec![crate::errors::unreachable()]),
         }
     }
 }
 
 impl SourceMapped<&Located<ArgData>> {
-    pub fn to_param(&self) -> KybraResult<Param> {
+    pub fn to_param(&self) -> Result<Param, Vec<Error>> {
         let param_name = self.node.arg.clone();
         match &self.node.annotation {
             Some(annotation) => {
@@ -70,7 +72,7 @@ impl SourceMapped<&Located<ArgData>> {
                     candid_type,
                 })
             }
-            None => Err(self.param_type_annotation_required_error()),
+            None => Err(vec![self.param_type_annotation_required_error()]),
         }
     }
 }

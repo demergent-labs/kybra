@@ -1,4 +1,3 @@
-use errors::KybraResult;
 use proc_macro2::TokenStream;
 use py_ast::PyAst;
 
@@ -7,7 +6,7 @@ pub mod body;
 pub mod candid_type;
 pub mod canister_method;
 pub mod debug;
-mod errors;
+pub mod errors;
 pub mod get_name;
 pub mod guard_function;
 pub mod header;
@@ -22,13 +21,15 @@ pub mod tuple;
 pub mod unwrap_rust_python_result;
 pub mod vm_value_conversion;
 
+pub use errors::Error;
 pub use stable_b_tree_map_nodes::StableBTreeMapNode;
 
 pub fn generate_canister(
     py_file_names: &Vec<&str>,
     entry_module_name: &str,
-) -> KybraResult<TokenStream> {
-    Ok(PyAst::new(py_file_names, entry_module_name)
+) -> Result<TokenStream, Vec<Error>> {
+    PyAst::new(py_file_names, entry_module_name)
         .to_act()?
-        .to_token_stream())
+        .to_token_stream()
+        .map_err(|cdkf_errors| cdkf_errors.into_iter().map(Error::from).collect())
 }

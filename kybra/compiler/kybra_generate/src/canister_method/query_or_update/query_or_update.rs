@@ -5,9 +5,7 @@ use cdk_framework::act::node::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use super::rust;
-use crate::{
-    errors::KybraResult, method_utils::params::InternalOrExternal, source_map::SourceMapped,
-};
+use crate::{method_utils::params::InternalOrExternal, source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_manual(&self) -> bool {
@@ -61,11 +59,11 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_query_or_update_definition(&self) -> KybraResult<QueryOrUpdateDefinition> {
+    pub fn as_query_or_update_definition(&self) -> Result<QueryOrUpdateDefinition, Vec<Error>> {
         if !self.is_canister_method_type(CanisterMethodType::Query)
             && !self.is_canister_method_type(CanisterMethodType::Update)
         {
-            return Err(crate::errors::unreachable());
+            return Err(vec![crate::errors::unreachable()]);
         }
         match &self.node {
             StmtKind::FunctionDef { name, .. } => Ok(QueryOrUpdateDefinition {
@@ -75,9 +73,12 @@ impl SourceMapped<&Located<StmtKind>> {
                 name: name.clone(),
                 return_type: ReturnType::new(self.build_return_type()?),
                 is_async: self.is_async(),
-                guard_function_name: self.get_guard_function_name()?,
+                guard_function_name: match self.get_guard_function_name() {
+                    Ok(guard_function_name) => guard_function_name,
+                    Err(err) => return Err(vec![err]),
+                },
             }),
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(vec![crate::errors::unreachable()]),
         }
     }
 }

@@ -3,15 +3,17 @@ use quote::{format_ident, quote};
 use rustpython_parser::ast::Located;
 use rustpython_parser::ast::StmtKind;
 
-use crate::{
-    errors::KybraResult, method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple,
-};
+use crate::Error;
+use crate::{method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple};
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn generate_call_to_py_function(&self) -> KybraResult<TokenStream> {
+    pub fn generate_call_to_py_function(&self) -> Result<TokenStream, Vec<Error>> {
         match self.node {
             StmtKind::FunctionDef { .. } => {
-                let function_name = self.get_function_name()?;
+                let function_name = match self.get_function_name() {
+                    Ok(function_name) => function_name,
+                    Err(err) => return Err(vec![err]),
+                };
                 let params = self.build_params(InternalOrExternal::Internal)?;
 
                 let param_conversions = params
@@ -45,7 +47,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     });
                 })
             }
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(vec![crate::errors::unreachable()]),
         }
     }
 }

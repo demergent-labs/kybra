@@ -6,30 +6,83 @@ use std::fmt;
 
 use crate::source_map::GetSourceInfo;
 
-pub type KybraError = Vec<Message>;
-pub type KybraResult<T> = Result<T, KybraError>;
+#[derive(Clone, Debug)]
+pub enum Error {
+    GuardFunctionNotFound(String),
+    TypeNotFound(String),
+    Unreachable(String),
+    ClassMustHaveMethods(Message),
+    ClassWithNotFunctionDefs(Message),
+    DictionaryUnpackingOperatorNotSupported(Message),
+    FirstParamMustBeSelf(Message),
+    FirstParamMustNotBeSelf(Message),
+    FuncFormatting(Message),
+    GuardFunctionName(Message),
+    GuardFunctionParam(Message),
+    GuardFunctionReturn(Message),
+    InlineFuncNotSupported(Message),
+    InvalidAnnAssign(Message),
+    InvalidAssign(Message),
+    InvalidClass(Message),
+    InvalidDecorator(Message),
+    InvalidMember(Message),
+    InvalidSubscriptable(Message),
+    InvalidTarget(Message),
+    IteratorUnpackingOperatorNotSupported(Message),
+    NoneCantBeAType(Message),
+    MissingDecorator(Message),
+    MultipleTargets(Message),
+    MultipleHeartBeat(Message),
+    MultipleInit(Message),
+    MultipleInspectMessage(Message),
+    MultiplePostUpgrade(Message),
+    MultiplePreUpgrade(Message),
+    MustBeSubscript(Message),
+    NotAnArray(Message),
+    NotAnOpt(Message),
+    NotAPrimitive(Message),
+    NotATuple(Message),
+    NotATypeRef(Message),
+    ParamTypeAnnotationRequired(Message),
+    ReturnTypeAnnotationRequired(Message),
+    ReturnTypeMode(Message),
+    ReturnTypeMustBeVoid(Message),
+    TargetMustBeAName(Message),
+    TooManyDecorators(Message),
+    WrongDecorator(Message),
+    UnsupportedType(Message),
+    T(Message),
+}
+pub type KybraResult<T> = Result<T, Error>;
+pub type KybraListResult<T> = Result<T, Vec<Error>>;
 
-pub fn collect_kybra_results<T>(results: Vec<KybraResult<T>>) -> KybraResult<Vec<T>>
+pub trait CollectResults<T> {
+    fn collect_results(self) -> Result<Vec<T>, Vec<Error>>;
+}
+
+impl<I, T> CollectResults<T> for I
 where
-    T: Clone,
+    I: Iterator<Item = Result<T, Vec<Error>>>,
 {
-    let mut oks: Vec<T> = vec![];
-    let mut error_messages = vec![];
+    fn collect_results(self) -> Result<Vec<T>, Vec<Error>> {
+        let mut errors = Vec::new();
+        let mut ok_values = Vec::new();
 
-    results.iter().for_each(|small_result| match small_result {
-        Ok(ok) => oks.push(ok.clone()),
-        Err(error) => error_messages.extend(error.clone()),
-    });
+        self.for_each(|result| match result {
+            Ok(ok_value) => ok_values.push(ok_value),
+            Err(errs) => errors.extend(errs),
+        });
 
-    if error_messages.is_empty() {
-        Ok(oks)
-    } else {
-        Err(error_messages)
+        if errors.is_empty() {
+            Ok(ok_values)
+        } else {
+            Err(errors)
+        }
     }
 }
 
-pub fn unreachable() -> KybraError {
-    panic!("Oops! Looks like we introduced a bug while refactoring. Please open a ticket at https://github.com/demergent-labs/kybra/issues/new");
+pub fn unreachable() -> Error {
+    Error::Unreachable("Oops! Looks like we introduced a bug while refactoring. Please open a ticket at https://github.com/demergent-labs/kybra/issues/new".to_string())
 }
 
 #[derive(Clone, Debug)]
@@ -201,5 +254,24 @@ where
             annotation: annotation.to_string(),
             suggestion,
         };
+    }
+}
+
+impl From<cdk_framework::act::abstract_canister_tree::Error> for crate::Error {
+    fn from(value: cdk_framework::act::abstract_canister_tree::Error) -> Self {
+        match value {
+            cdk_framework::act::abstract_canister_tree::Error::TypeNotFound(type_ref_name) => {
+                crate::Error::TypeNotFound(format!(
+                    "The type {} is used, but never defined.",
+                    type_ref_name
+                ))
+            }
+            cdk_framework::act::abstract_canister_tree::Error::GuardFunctionNotFound(
+                guard_function_name,
+            ) => crate::Error::GuardFunctionNotFound(format!(
+                "The guard function {} is used, but never defined.",
+                guard_function_name
+            )),
+        }
     }
 }
