@@ -30,7 +30,7 @@ rustpython-derive = {{ git = "https://github.com/demergent-labs/RustPython", rev
 getrandom = {{ version = "0.2.3", features = ["custom"] }}
 serde = "1.0.137"
 async-recursion = "1.0.0"
-ic-stable-structures = "0.3.0"
+ic-stable-structures = "0.5.2"
 slotmap = "1.0.6"
 rand = "0.8.5"
     """

@@ -1,7 +1,5 @@
 from kybra import (
-    InsertError,
     blob,
-    match,
     null,
     Opt,
     query,
@@ -19,11 +17,6 @@ class Reaction(Variant):
     Sad: null
 
 
-class StableMap12InsertResult(Variant, total=False):
-    Ok: Opt[Reaction]
-    Err: InsertError
-
-
 stable_map12 = StableBTreeMap[blob, Reaction](
     memory_id=12, max_key_size=100, max_value_size=1_000
 )
@@ -35,10 +28,8 @@ def stable_map12_get(key: blob) -> Opt[Reaction]:
 
 
 @update
-def stable_map12_insert(key: blob, value: Reaction) -> StableMap12InsertResult:
-    result = stable_map12.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map12_insert(key: blob, value: Reaction) -> Opt[Reaction]:
+    return stable_map12.insert(key, value)
 
 
 @update

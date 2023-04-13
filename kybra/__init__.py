@@ -485,20 +485,6 @@ class ValueTooLarge(Record):
     max: nat32
 
 
-class InsertError(Variant, total=False):
-    KeyTooLarge: KeyTooLarge
-    ValueTooLarge: ValueTooLarge
-
-
-class InsertResult(Generic[V]):
-    Ok: V
-    Err: Optional[InsertError]
-
-    def __init__(self, Ok: V, Err: InsertError):
-        self.Ok = Ok
-        self.Err = Err
-
-
 class StableBTreeMap(Generic[K, V]):
     """
     A map based on a self-balancing tree that persists across canister upgrades.
@@ -532,7 +518,7 @@ class StableBTreeMap(Generic[K, V]):
         """
         return _kybra_ic._kybra_stable_b_tree_map_get(self.memory_id, key)  # type: ignore
 
-    def insert(self, key: K, value: V) -> InsertResult[Opt[V]]:
+    def insert(self, key: K, value: V) -> Opt[V]:
         """
         Insert a key-value pair into the map.
 

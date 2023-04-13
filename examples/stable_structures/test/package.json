@@ -9,6 +9,6 @@
     },
     "dependencies": {
         "@dfinity/agent": "^0.15.4",
-        "azle": "github:demergent-labs/azle"
+        "azle": "github:demergent-labs/azle#update_dfx"
     }
 }

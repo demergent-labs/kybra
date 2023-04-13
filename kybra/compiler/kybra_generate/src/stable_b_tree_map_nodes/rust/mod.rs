@@ -66,7 +66,7 @@ fn generate_global_stable_b_tree_maps_and_impls(
 
             (
                 quote! {
-                    static #map_name_ident: RefCell<StableBTreeMap<Memory, #key_wrapper_type_name, #value_wrapper_type_name>> = RefCell::new(StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(#memory_id))),));
+                    static #map_name_ident: RefCell<StableBTreeMap<#key_wrapper_type_name, #value_wrapper_type_name, Memory>> = RefCell::new(StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(#memory_id))),));
                 },
                 quote! {
                     #key_wrapper_type

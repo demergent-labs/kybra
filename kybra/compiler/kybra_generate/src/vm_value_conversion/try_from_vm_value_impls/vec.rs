@@ -110,6 +110,10 @@ pub fn generate() -> TokenStream {
 
         impl KybraTryFromVec for ic_cdk::export::candid::Nat {}
 
+        impl KybraTryFromVec for _CdkFloat32 {}
+
+        impl KybraTryFromVec for _CdkFloat64 {}
+
         impl<T> CdkActTryFromVmValue<Vec<T>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef
         where
             T: KybraTryFromVec,

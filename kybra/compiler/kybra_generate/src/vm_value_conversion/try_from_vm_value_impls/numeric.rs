@@ -11,11 +11,29 @@ pub fn generate() -> TokenStream {
             }
         }
 
+        impl CdkActTryFromVmValue<_CdkFloat64, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<_CdkFloat64, CdkActTryFromVmValueError> {
+                match self.try_into_value(vm) {
+                    Ok(value) => Ok(_CdkFloat64(value)),
+                    Err(err) => Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to _CdkFloat64".to_string()))
+                }
+            }
+        }
+
         impl CdkActTryFromVmValue<f32, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<f32, CdkActTryFromVmValueError> {
                 match self.try_into_value(vm) {
                     Ok(value) => Ok(value),
                     Err(err) => Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to f32".to_string()))
+                }
+            }
+        }
+
+        impl CdkActTryFromVmValue<_CdkFloat32, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<_CdkFloat32, CdkActTryFromVmValueError> {
+                match self.try_into_value(vm) {
+                    Ok(value) => Ok(_CdkFloat32(value)),
+                    Err(err) => Err(CdkActTryFromVmValueError("Could not convert PyObjectRef to _CdkFloat32".to_string()))
                 }
             }
         }
