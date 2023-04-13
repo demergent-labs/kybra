@@ -14,7 +14,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 ic-cdk = "0.8.0-beta"
-ic-cdk-macros = "0.6.8"
+ic-cdk-macros = "0.6.10"
 ic-cdk-timers = "0.1.0"
 candid = {{ version = "0.9.0-beta.2", features = ["parser"] }}
 kybra-vm-value-derive = {{ path = "./kybra_vm_value_derive" }}
