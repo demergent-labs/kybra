@@ -13,7 +13,7 @@ import kybra
 from kybra.colors import red, yellow, green, dim
 from kybra.timed import timed, timed_inline
 from kybra.types import Args, Paths
-from kybra.cargotoml import generate_cargo_toml
+from kybra.cargotoml import generate_cargo_toml, generate_cargo_lock
 from kybra.candid import generate_candid_file  # type: ignore
 
 
@@ -51,6 +51,7 @@ def main():
         shutil.rmtree(paths["canister"])
     shutil.copytree(paths["compiler"], paths["canister"], dirs_exist_ok=True)
     create_file(f"{paths['canister']}/Cargo.toml", generate_cargo_toml(canister_name))
+    create_file(f"{paths['canister']}/Cargo.lock", generate_cargo_lock())
 
     # Add CARGO_TARGET_DIR to env for all cargo commands
     cargo_env = {
@@ -150,7 +151,7 @@ def create_paths(args: Args) -> Paths:
     custom_modules_path = f"{compiler_path}/custom_modules"
 
     home_dir = os.path.expanduser("~")
-    global_kybra_config_dir = f"{home_dir}/.config/kybra/{kybra.__version__}"
+    global_kybra_config_dir = f"{home_dir}/.config/kybra/{kybra.__rust_version__}"
     global_kybra_bin_dir = f"{global_kybra_config_dir}/bin"
     global_kybra_target_dir = f"{global_kybra_config_dir}/target"
 
