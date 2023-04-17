@@ -57,8 +57,8 @@ def main():
     cargo_env = {
         **os.environ.copy(),
         "CARGO_TARGET_DIR": paths["global_kybra_target_dir"],
-        "CARGO_HOME": paths["global_kybra_config_dir"],
-        "RUSTUP_HOME": paths["global_kybra_config_dir"],
+        "CARGO_HOME": paths["global_kybra_rust_dir"],
+        "RUSTUP_HOME": paths["global_kybra_rust_dir"],
     }
 
     compile_python_or_exit(
@@ -151,7 +151,8 @@ def create_paths(args: Args) -> Paths:
     custom_modules_path = f"{compiler_path}/custom_modules"
 
     home_dir = os.path.expanduser("~")
-    global_kybra_config_dir = f"{home_dir}/.config/kybra/{kybra.__rust_version__}"
+    global_kybra_config_dir = f"{home_dir}/.config/kybra/"
+    global_kybra_rust_dir = f"{global_kybra_config_dir}/{kybra.__rust_version__}"
     global_kybra_bin_dir = f"{global_kybra_config_dir}/bin"
     global_kybra_target_dir = f"{global_kybra_config_dir}/target"
 
@@ -169,6 +170,7 @@ def create_paths(args: Args) -> Paths:
         "gzipped_wasm": gzipped_wasm_path,
         "custom_modules": custom_modules_path,
         "global_kybra_config_dir": global_kybra_config_dir,
+        "global_kybra_rust_dir": global_kybra_rust_dir,
         "global_kybra_bin_dir": global_kybra_bin_dir,
         "global_kybra_target_dir": global_kybra_target_dir,
     }

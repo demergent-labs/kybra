@@ -27,5 +27,6 @@ class Paths(TypedDict):
     gzipped_wasm: str
     custom_modules: str
     global_kybra_config_dir: str
+    global_kybra_rust_dir: str
     global_kybra_bin_dir: str
     global_kybra_target_dir: str
