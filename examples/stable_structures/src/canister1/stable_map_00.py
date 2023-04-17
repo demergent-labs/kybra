@@ -10,6 +10,11 @@ from kybra import (
 )
 
 
+# stable_map0: StableBTreeMap[nat8, str] = StableBTreeMap[nat8, str](
+#     memory_id=0, max_key_size=100, max_value_size=100
+# )
+
+
 stable_map0 = StableBTreeMap[nat8, str](
     memory_id=0, max_key_size=100, max_value_size=100
 )
