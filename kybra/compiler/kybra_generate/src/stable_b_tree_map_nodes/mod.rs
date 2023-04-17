@@ -71,10 +71,11 @@ impl SourceMapped<&Located<ExprKind>> {
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_stable_b_tree_map_node(&self) -> bool {
         match &self.node {
-            StmtKind::Assign { value, .. } => {
-                SourceMapped::new(value.as_ref(), self.source_map.clone())
-                    .is_stable_b_tree_map_node()
-            }
+            StmtKind::Assign { value, .. }
+            | StmtKind::AnnAssign {
+                value: Some(value), ..
+            } => SourceMapped::new(value.as_ref(), self.source_map.clone())
+                .is_stable_b_tree_map_node(),
             _ => false,
         }
     }
@@ -97,91 +98,86 @@ impl SourceMapped<&Located<StmtKind>> {
         }))
     }
 
-    fn get_memory_id(&self) -> KybraResult<u8> {
+    fn get_assign_value(&self) -> KybraResult<&Located<ExprKind>> {
         match &self.node {
-            StmtKind::Assign { value, .. } => match &value.node {
-                ExprKind::Call { args, keywords, .. } => {
-                    if args.len() >= 1 {
-                        return match &args[0].node {
-                            ExprKind::Constant { value, .. } => match value {
-                                Constant::Int(integer) => self.big_int_to_memory_id(integer),
-                                _ => Err(self.memory_id_must_be_an_integer_error()),
-                            },
-                            _ => Err(self.invalid_memory_id_error()),
-                        };
-                    }
-                    if let Some(memory_id) = self.get_memory_from_keywords(keywords) {
-                        return memory_id;
-                    }
-                    Err(self.missing_memory_id_error())
+            StmtKind::Assign { value, .. }
+            | StmtKind::AnnAssign {
+                value: Some(value), ..
+            } => Ok(value),
+            _ => Err(crate::errors::unreachable()),
+        }
+    }
+
+    fn get_memory_id(&self) -> KybraResult<u8> {
+        match &self.get_assign_value()?.node {
+            ExprKind::Call { args, keywords, .. } => {
+                if args.len() >= 1 {
+                    return match &args[0].node {
+                        ExprKind::Constant { value, .. } => match value {
+                            Constant::Int(integer) => self.big_int_to_memory_id(integer),
+                            _ => Err(self.memory_id_must_be_an_integer_error()),
+                        },
+                        _ => Err(self.invalid_memory_id_error()),
+                    };
                 }
-                _ => Err(self.not_a_stable_b_tree_map_node_error()),
-            },
-            _ => Err(self.not_a_stable_b_tree_map_node_error()),
+                if let Some(memory_id) = self.get_memory_from_keywords(keywords) {
+                    return memory_id;
+                }
+                Err(self.missing_memory_id_error())
+            }
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
     fn get_key_type(&self) -> KybraResult<CandidType> {
-        match &self.node {
-            StmtKind::Assign { value, .. } => match &value.node {
-                ExprKind::Call { func, .. } => {
-                    SourceMapped::new(func.as_ref(), self.source_map.clone())
-                        .get_key_type()?
-                        .to_candid_type()
-                }
-                _ => Err(self.not_a_stable_b_tree_map_node_error()),
-            },
-            _ => Err(self.not_a_stable_b_tree_map_node_error()),
+        match &self.get_assign_value()?.node {
+            ExprKind::Call { func, .. } => {
+                SourceMapped::new(func.as_ref(), self.source_map.clone())
+                    .get_key_type()?
+                    .to_candid_type()
+            }
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
     fn get_value_type(&self) -> KybraResult<CandidType> {
-        match &self.node {
-            StmtKind::Assign { value, .. } => match &value.node {
-                ExprKind::Call { func, .. } => {
-                    SourceMapped::new(func.as_ref(), self.source_map.clone())
-                        .get_value_type()?
-                        .to_candid_type()
-                }
-                _ => Err(self.not_a_stable_b_tree_map_node_error()),
-            },
-            _ => Err(self.not_a_stable_b_tree_map_node_error()),
+        match &self.get_assign_value()?.node {
+            ExprKind::Call { func, .. } => {
+                SourceMapped::new(func.as_ref(), self.source_map.clone())
+                    .get_value_type()?
+                    .to_candid_type()
+            }
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
     fn get_max_key_size(&self) -> KybraResult<u32> {
-        match &self.node {
-            StmtKind::Assign { value, .. } => match &value.node {
-                ExprKind::Call { args, keywords, .. } => {
-                    if args.len() >= 2 {
-                        return self.get_max_size_from_args(1, args);
-                    }
-                    if let Some(max_key_size) = self.get_max_size_from_keywords("key", keywords) {
-                        return max_key_size;
-                    }
-                    Err(self.max_key_size_missing_error())
+        match &self.get_assign_value()?.node {
+            ExprKind::Call { args, keywords, .. } => {
+                if args.len() >= 2 {
+                    return self.get_max_size_from_args(1, args);
                 }
-                _ => Err(self.not_a_stable_b_tree_map_node_error()),
-            },
-            _ => Err(self.not_a_stable_b_tree_map_node_error()),
+                if let Some(max_key_size) = self.get_max_size_from_keywords("key", keywords) {
+                    return max_key_size;
+                }
+                Err(self.max_key_size_missing_error())
+            }
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
     fn get_max_value_size(&self) -> KybraResult<u32> {
-        match &self.node {
-            StmtKind::Assign { value, .. } => match &value.node {
-                ExprKind::Call { args, keywords, .. } => {
-                    if args.len() >= 3 {
-                        return self.get_max_size_from_args(2, args);
-                    }
-                    if let Some(max_key_size) = self.get_max_size_from_keywords("value", keywords) {
-                        return max_key_size;
-                    }
-                    Err(self.max_value_size_missing_error())
+        match &self.get_assign_value()?.node {
+            ExprKind::Call { args, keywords, .. } => {
+                if args.len() >= 3 {
+                    return self.get_max_size_from_args(2, args);
                 }
-                _ => Err(self.not_a_stable_b_tree_map_node_error()),
-            },
-            _ => Err(self.not_a_stable_b_tree_map_node_error()),
+                if let Some(max_key_size) = self.get_max_size_from_keywords("value", keywords) {
+                    return max_key_size;
+                }
+                Err(self.max_value_size_missing_error())
+            }
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
