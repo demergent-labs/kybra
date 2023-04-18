@@ -151,9 +151,9 @@ def create_paths(args: Args) -> Paths:
     custom_modules_path = f"{compiler_path}/custom_modules"
 
     home_dir = os.path.expanduser("~")
-    global_kybra_config_dir = f"{home_dir}/.config/kybra/"
+    global_kybra_config_dir = f"{home_dir}/.config/kybra"
     global_kybra_rust_dir = f"{global_kybra_config_dir}/{kybra.__rust_version__}"
-    global_kybra_bin_dir = f"{global_kybra_config_dir}/bin"
+    global_kybra_bin_dir = f"{global_kybra_rust_dir}/bin"
     global_kybra_target_dir = f"{global_kybra_config_dir}/target"
 
     return {
