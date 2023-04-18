@@ -42,41 +42,6 @@ fn generate_match_arms(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> Vec
                     });
 
                     result.try_into_vm_value(vm).unwrap()
-
-//                     let insert_result_class = _kybra_unwrap_rust_python_result(vm.run_block_expr(
-//                     vm.new_scope_with_builtins(),
-//                         r#"
-// from kybra import InsertResult
-
-// InsertResult
-//                         "#
-//                     ), vm);
-
-//                     match result {
-//                         Ok(ok) => {
-//                             let method_result = vm.invoke(&insert_result_class, (ok.try_into_vm_value(vm).unwrap(), vm.ctx.none()));
-
-//                             _kybra_unwrap_rust_python_result(method_result, vm)
-
-//                             // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
-//                             // let dict = vm.ctx.new_dict();
-
-//                             // dict.set_item("Ok", ok.try_into_vm_value(vm).unwrap(), vm);
-
-//                             // dict
-//                         },
-//                         Err(err) => {
-//                             let method_result = vm.invoke(&insert_result_class, (vm.ctx.none(), err.try_into_vm_value(vm).unwrap()));
-//                             _kybra_unwrap_rust_python_result(method_result, vm)
-
-//                             // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
-//                             // let dict = vm.ctx.new_dict();
-
-//                             // dict.set_item("Err", err_string.try_into_vm_value(vm).unwrap(), vm);
-
-//                             // dict
-//                         }
-//                     }
                 }
             }
         })
