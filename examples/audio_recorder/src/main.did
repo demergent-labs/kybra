@@ -1,15 +1,10 @@
-type CreateRecordingErr = variant {
-  InsertError : InsertError;
-  UserDoesNotExist : principal;
-};
+type CreateRecordingErr = variant { UserDoesNotExist : principal };
 type CreateRecordingResult = variant {
   Ok : Recording;
   Err : CreateRecordingErr;
 };
-type CreateUserResult = variant { Ok : User; Err : InsertError };
 type DeleteRecordingError = variant {
   RecordingDoesNotExist : principal;
-  InsertError : InsertError;
   UserDoesNotExist : principal;
 };
 type DeleteRecordingResult = variant {
@@ -18,11 +13,6 @@ type DeleteRecordingResult = variant {
 };
 type DeleteUserErr = variant { UserDoesNotExist : principal };
 type DeleteUserResult = variant { Ok : User; Err : DeleteUserErr };
-type InsertError = variant {
-  ValueTooLarge : KeyTooLarge;
-  KeyTooLarge : KeyTooLarge;
-};
-type KeyTooLarge = record { max : nat32; given : nat32 };
 type Recording = record {
   id : principal;
   audio : vec nat8;
@@ -38,7 +28,7 @@ type User = record {
 };
 service : () -> {
   create_recording : (vec nat8, text, principal) -> (CreateRecordingResult);
-  create_user : (text) -> (CreateUserResult);
+  create_user : (text) -> (User);
   delete_recording : (principal) -> (DeleteRecordingResult);
   delete_user : (principal) -> (DeleteUserResult);
   read_recording_by_id : (principal) -> (opt Recording) query;

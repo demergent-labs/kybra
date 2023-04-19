@@ -4,8 +4,6 @@ import _random
 from kybra import (
     blob,
     ic,
-    InsertError,
-    match,
     nat64,
     Opt,
     Principal,
@@ -41,13 +39,8 @@ recordings = StableBTreeMap[Principal, Recording](
 )
 
 
-class CreateUserResult(Variant, total=False):
-    Ok: User
-    Err: InsertError
-
-
 @update
-def create_user(username: str) -> CreateUserResult:
+def create_user(username: str) -> User:
     id = generate_id()
     user: User = {
         "id": id,
@@ -56,11 +49,9 @@ def create_user(username: str) -> CreateUserResult:
         "username": username,
     }
 
-    result = users.insert(user["id"], user)
+    users.insert(user["id"], user)
 
-    return match(
-        result, {"Ok": lambda _: {"Ok": user}, "Err": lambda err: {"Err": err}}
-    )
+    return user
 
 
 @query
@@ -103,7 +94,6 @@ class CreateRecordingResult(Variant, total=False):
 
 
 class CreateRecordingErr(Variant, total=False):
-    InsertError: InsertError
     UserDoesNotExist: Principal
 
 
@@ -125,31 +115,16 @@ def create_recording(
         "user_id": user_id,
     }
 
-    create_recording_result = recordings.insert(recording["id"], recording)
+    recordings.insert(recording["id"], recording)
 
-    def handle_recording_result_ok(_) -> CreateRecordingResult:
-        updated_user: User = {
-            **user,
-            "recording_ids": [*user["recording_ids"], recording["id"]],
-        }
+    updated_user: User = {
+        **user,
+        "recording_ids": [*user["recording_ids"], recording["id"]],
+    }
 
-        update_user_result = users.insert(updated_user["id"], updated_user)
+    users.insert(updated_user["id"], updated_user)
 
-        return match(
-            update_user_result,
-            {
-                "Ok": lambda _: {"Ok": recording},
-                "Err": lambda err: {"Err": {"InsertError": err}},
-            },
-        )
-
-    return match(
-        create_recording_result,
-        {
-            "Ok": handle_recording_result_ok,
-            "Err": lambda err: {"Err": {"InsertError": err}},
-        },
-    )
+    return {"Ok": recording}
 
 
 @query
@@ -168,7 +143,6 @@ class DeleteRecordingResult(Variant, total=False):
 
 
 class DeleteRecordingError(Variant, total=False):
-    InsertError: InsertError
     RecordingDoesNotExist: Principal
     UserDoesNotExist: Principal
 
@@ -195,20 +169,11 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
         ),
     }
 
-    update_user_result = users.insert(updated_user["id"], updated_user)
+    users.insert(updated_user["id"], updated_user)
 
-    def handle_update_user_result_ok(_) -> DeleteRecordingResult:
-        recordings.remove(id)
+    recordings.remove(id)
 
-        return {"Ok": recording}
-
-    return match(
-        update_user_result,
-        {
-            "Ok": handle_update_user_result_ok,
-            "Err": lambda err: {"Err": {"InsertError": err}},
-        },
-    )
+    return {"Ok": recording}
 
 
 def generate_id() -> Principal:
