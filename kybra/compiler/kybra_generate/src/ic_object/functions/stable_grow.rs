@@ -4,7 +4,7 @@ use quote::quote;
 pub fn generate() -> TokenStream {
     quote! {
         #[pymethod]
-        fn _kybra_stable_grow(
+        fn stable_grow(
             &self,
             new_pages_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine

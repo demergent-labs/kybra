@@ -13,7 +13,7 @@ use crate::{keywords, tuple};
 pub fn generate(services: &Vec<Service>) -> Vec<TokenStream> {
     services.iter().map(|canister| {
         canister.methods.iter().map(|method| {
-            let function_name_string = format!("_kybra_notify_with_payment128_{}_{}", canister.name, method.name);
+            let function_name_string = format!("notify_with_payment128_{}_{}", canister.name, method.name);
             let real_function_name = format_ident!("{}", function_name_string);
             let wrapper_fn_name = format_ident!("{}_wrapper", function_name_string);
             let param_variable_definitions = generate_param_variables(method, &canister.name);

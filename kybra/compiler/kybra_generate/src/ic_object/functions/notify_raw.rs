@@ -4,7 +4,7 @@ use quote::quote;
 pub fn generate() -> TokenStream {
     quote! {
         #[pymethod]
-        fn _kybra_notify_raw(
+        fn notify_raw(
             &self,
             canister_id_py_object_ref: rustpython_vm::PyObjectRef,
             method_py_object_ref: rustpython_vm::PyObjectRef,

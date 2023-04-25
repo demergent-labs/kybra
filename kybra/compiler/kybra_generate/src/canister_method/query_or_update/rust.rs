@@ -33,18 +33,18 @@ pub fn generate_body(
 
     Ok(quote! {
         unsafe {
-            let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-            let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+            let vm_interpreter = VM_INTERPRETER_OPTION.as_mut().unwrap();
+            let vm_scope = VM_SCOPE.as_mut().unwrap();
 
-            let vm = &_kybra_interpreter.vm;
+            let vm = &vm_interpreter.vm;
 
-            let method_py_object_ref = _kybra_unwrap_rust_python_result(_kybra_scope.globals.get_item(#name, vm), vm);
+            let method_py_object_ref = unwrap_rust_python_result(vm_scope.globals.get_item(#name, vm), vm);
 
             let invoke_result = vm.invoke(&method_py_object_ref, #params);
 
             match invoke_result {
                 Ok(py_object_ref) => {
-                    let _kybra_final_return_value = _kybra_async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
+                    let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
 
                     #return_expression
                 },
@@ -75,7 +75,7 @@ fn generate_return_expression(
     }
 
     Ok(quote! {
-        _kybra_final_return_value.try_from_vm_value(vm).unwrap()
+        final_return_value.try_from_vm_value(vm).unwrap()
     })
 }
 

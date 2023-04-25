@@ -26,11 +26,11 @@ impl SourceMapped<&Located<StmtKind>> {
                 let params = tuple::generate_tuple(&param_conversions);
 
                 Ok(quote! {
-                    let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-                    let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+                    let vm_interpreter = VM_INTERPRETER_OPTION.as_mut().unwrap();
+                    let vm_scope = VM_SCOPE.as_mut().unwrap();
 
-                    _kybra_interpreter.enter(|vm| {
-                        let method_py_object_ref = _kybra_unwrap_rust_python_result(_kybra_scope.globals.get_item(#function_name, vm), vm);
+                    vm_interpreter.enter(|vm| {
+                        let method_py_object_ref = unwrap_rust_python_result(vm_scope.globals.get_item(#function_name, vm), vm);
 
                         let result_py_object_ref = vm.invoke(&method_py_object_ref, #params);
 

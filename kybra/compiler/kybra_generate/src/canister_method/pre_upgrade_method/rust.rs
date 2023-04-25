@@ -12,10 +12,10 @@ pub fn generate(
 
     Ok(quote! {
         unsafe {
-            let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-            let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+            let vm_interpreter = VM_INTERPRETER_OPTION.as_mut().unwrap();
+            let vm_scope = VM_SCOPE.as_mut().unwrap();
 
-            _kybra_interpreter.enter(|vm| {
+            vm_interpreter.enter(|vm| {
                 #call_to_pre_upgrade_py_function
             });
         }

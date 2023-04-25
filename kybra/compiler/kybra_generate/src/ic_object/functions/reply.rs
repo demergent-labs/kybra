@@ -17,7 +17,7 @@ pub fn generate(
     let match_arms = generate_match_arms(canister_methods, query_methods);
     quote! {
         #[pymethod]
-        fn _kybra_reply(
+        fn reply(
             &self,
             first_called_function_name_py_object_ref: rustpython_vm::PyObjectRef,
             reply_value_py_object_ref: rustpython_vm::PyObjectRef,

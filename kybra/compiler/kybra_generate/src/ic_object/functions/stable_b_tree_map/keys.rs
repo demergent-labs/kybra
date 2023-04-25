@@ -8,7 +8,7 @@ pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStrea
 
     quote! {
         #[pymethod]
-        fn _kybra_stable_b_tree_map_keys(
+        fn stable_b_tree_map_keys(
             &self,
             memory_id_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine

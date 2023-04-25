@@ -4,7 +4,7 @@ use quote::quote;
 pub fn generate() -> TokenStream {
     quote! {
         #[pymethod]
-        fn _kybra_stable64_write(
+        fn stable64_write(
             &self,
             offset_py_object_ref: rustpython_vm::PyObjectRef,
             buf_vector_py_object_ref: rustpython_vm::PyObjectRef,

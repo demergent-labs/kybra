@@ -14,8 +14,8 @@ pub fn generate() -> TokenStream {
 
         #ref_cells
 
-        static mut _KYBRA_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
-        static mut _KYBRA_SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;
+        static mut VM_INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
+        static mut VM_SCOPE: Option<rustpython_vm::scope::Scope> = None;
 
         // TODO this is broken https://github.com/dfinity/motoko/issues/3462#issuecomment-1260060874
         // #[link_section = "icp:public cdk"]

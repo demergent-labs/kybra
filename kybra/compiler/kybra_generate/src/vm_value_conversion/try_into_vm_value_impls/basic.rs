@@ -28,7 +28,7 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::Principal {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                let principal_class = _kybra_unwrap_rust_python_result(vm.run_block_expr(
+                let principal_class = unwrap_rust_python_result(vm.run_block_expr(
                     vm.new_scope_with_builtins(),
                     r#"
 from kybra import Principal
@@ -37,8 +37,8 @@ Principal
                     "#
                 ), vm);
 
-                let from_str = _kybra_unwrap_rust_python_result(principal_class.get_attr("from_str", vm), vm);
-                let principal_instance = _kybra_unwrap_rust_python_result(vm.invoke(&from_str, (self.to_text(),)), vm);
+                let from_str = unwrap_rust_python_result(principal_class.get_attr("from_str", vm), vm);
+                let principal_instance = unwrap_rust_python_result(vm.invoke(&from_str, (self.to_text(),)), vm);
 
                 Ok(principal_instance)
             }

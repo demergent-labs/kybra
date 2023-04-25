@@ -4,7 +4,7 @@ use quote::quote;
 pub fn generate() -> TokenStream {
     quote! {
         #[pymethod]
-        fn _kybra_set_timer_interval(
+        fn set_timer_interval(
             &self,
             interval_py_object_ref: rustpython_vm::PyObjectRef,
             func_py_object_ref: rustpython_vm::PyObjectRef,
@@ -15,17 +15,17 @@ pub fn generate() -> TokenStream {
 
             let closure = move || {
                 unsafe {
-                    let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-                    let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+                    let vm_interpreter = VM_INTERPRETER_OPTION.as_mut().unwrap();
+                    let vm_scope = VM_SCOPE.as_mut().unwrap();
 
-                    let vm = &_kybra_interpreter.vm;
+                    let vm = &vm_interpreter.vm;
 
                     let result_py_object_ref = vm.invoke(&func_py_object_ref, ());
 
                     match result_py_object_ref {
                         Ok(py_object_ref) => {
                             ic_cdk::spawn(async move {
-                                _kybra_async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
+                                async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
                             });
                         },
                         Err(err) => {
