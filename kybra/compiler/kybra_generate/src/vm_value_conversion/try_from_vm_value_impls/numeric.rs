@@ -40,7 +40,7 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<ic_cdk::export::candid::Int, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::candid::Int, CdkActTryFromVmValueError> {
-                let int_result: Result<PyIntRef, _> = self.try_into_value(vm);
+                let int_result: Result<rustpython_vm::builtins::PyIntRef, _> = self.try_into_value(vm);
 
                 match int_result {
                     Ok(int) => Ok(ic_cdk::export::candid::Int(int.as_bigint().clone())),
@@ -96,7 +96,7 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<ic_cdk::export::candid::Nat, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::candid::Nat, CdkActTryFromVmValueError> {
-                let int_result: Result<PyIntRef, _> = self.try_into_value(vm);
+                let int_result: Result<rustpython_vm::builtins::PyIntRef, _> = self.try_into_value(vm);
 
                 match int_result {
                     Ok(int) => Ok(ic_cdk::export::candid::Nat::from_str(&int.as_bigint().to_string()).unwrap()), // TODO probably not the best conversion

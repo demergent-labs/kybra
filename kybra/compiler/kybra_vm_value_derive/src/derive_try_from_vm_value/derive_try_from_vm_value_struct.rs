@@ -58,7 +58,7 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
 
                 quote! {
                     // TODO tuple_self is being repeated more times than necessary
-                    let tuple_self: PyTupleRef = _kybra_unwrap_rust_python_result(self.clone().try_into_value(vm), vm);
+                    let tuple_self: rustpython_vm::builtins::PyTupleRef = _kybra_unwrap_rust_python_result(self.clone().try_into_value(vm), vm);
                     let #field_name = tuple_self.get(#syn_index).unwrap();
                 }
             })

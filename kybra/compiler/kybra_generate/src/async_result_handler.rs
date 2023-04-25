@@ -14,16 +14,23 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
 
     quote! {
         #[async_recursion::async_recursion(?Send)]
-        async fn _kybra_async_result_handler(vm: &rustpython::vm::VirtualMachine, py_object_ref: &rustpython::vm::PyObjectRef, arg: PyObjectRef) -> rustpython::vm::PyObjectRef {
+        async fn _kybra_async_result_handler(
+            vm: &rustpython::vm::VirtualMachine,
+            py_object_ref: &rustpython::vm::PyObjectRef,
+            arg: rustpython_vm::PyObjectRef
+        ) -> rustpython::vm::PyObjectRef {
             if _kybra_is_generator(vm, &py_object_ref) == false {
                 return py_object_ref.clone();
             }
 
             let send_result = vm.call_method(&py_object_ref, "send", (arg.clone(),));
-            let py_iter_return = _kybra_unwrap_rust_python_result(PyIterReturn::from_pyresult(send_result, vm), vm);
+            let py_iter_return = _kybra_unwrap_rust_python_result(
+                rustpython_vm::protocol::PyIterReturn::from_pyresult(send_result, vm),
+                vm
+            );
 
             match py_iter_return {
-                PyIterReturn::Return(returned_py_object_ref) => {
+                rustpython_vm::protocol::PyIterReturn::Return(returned_py_object_ref) => {
                     if _kybra_is_generator(vm, &returned_py_object_ref) == true {
                         let recursed_py_object_ref = _kybra_async_result_handler(vm, &returned_py_object_ref, vm.ctx.none()).await;
 
@@ -31,7 +38,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
                     }
 
                     let name: String = _kybra_unwrap_rust_python_result(returned_py_object_ref.get_attr("name", vm), vm).try_from_vm_value(vm).unwrap();
-                    let args: Vec<PyObjectRef> = _kybra_unwrap_rust_python_result(_kybra_unwrap_rust_python_result(returned_py_object_ref.get_attr("args", vm), vm).try_into_value(vm), vm);
+                    let args: Vec<rustpython_vm::PyObjectRef> = _kybra_unwrap_rust_python_result(_kybra_unwrap_rust_python_result(returned_py_object_ref.get_attr("args", vm), vm).try_into_value(vm), vm);
 
                     match &name[..] {
                         "call" => _kybra_async_result_handler_call(vm, py_object_ref, &args).await,
@@ -42,7 +49,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
                         _ => panic!("async operation not supported")
                     }
                 },
-                PyIterReturn::StopIteration(returned_py_object_ref_option) => match returned_py_object_ref_option {
+                rustpython_vm::protocol::PyIterReturn::StopIteration(returned_py_object_ref_option) => match returned_py_object_ref_option {
                     Some(returned_py_object_ref) => returned_py_object_ref,
                     None => vm.ctx.none()
                 }
@@ -50,7 +57,10 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
         }
 
         // TODO do this more officially, check if py_object_ref instanceof generator type
-        fn _kybra_is_generator(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef) -> bool {
+        fn _kybra_is_generator(
+            vm: &rustpython::vm::VirtualMachine,
+            py_object_ref: &rustpython_vm::PyObjectRef
+        ) -> bool {
             if let Ok(_) = py_object_ref.get_attr("send", vm) {
                 true
             }
@@ -59,7 +69,11 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             }
         }
 
-        async fn _kybra_async_result_handler_call(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
+        async fn _kybra_async_result_handler_call(
+            vm: &rustpython::vm::VirtualMachine,
+            py_object_ref: &rustpython_vm::PyObjectRef,
+            args: &Vec<rustpython_vm::PyObjectRef>
+        ) -> rustpython_vm::PyObjectRef {
             let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
             let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
 
@@ -73,7 +87,11 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             _kybra_async_result_handler(vm, py_object_ref, call_result_instance).await
         }
 
-        async fn _kybra_async_result_handler_call_with_payment(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
+        async fn _kybra_async_result_handler_call_with_payment(
+            vm: &rustpython::vm::VirtualMachine,
+            py_object_ref: &rustpython_vm::PyObjectRef,
+            args: &Vec<rustpython_vm::PyObjectRef>
+        ) -> rustpython_vm::PyObjectRef {
             let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
             let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
 
@@ -87,7 +105,11 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             _kybra_async_result_handler(vm, py_object_ref, call_result_instance).await
         }
 
-        async fn _kybra_async_result_handler_call_with_payment128(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
+        async fn _kybra_async_result_handler_call_with_payment128(
+            vm: &rustpython::vm::VirtualMachine,
+            py_object_ref: &rustpython_vm::PyObjectRef,
+            args: &Vec<rustpython_vm::PyObjectRef>
+        ) -> rustpython_vm::PyObjectRef {
             let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
             let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
 
@@ -101,7 +123,11 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             _kybra_async_result_handler(vm, py_object_ref, call_result_instance).await
         }
 
-        async fn _kybra_async_result_handler_call_raw(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
+        async fn _kybra_async_result_handler_call_raw(
+            vm: &rustpython::vm::VirtualMachine,
+            py_object_ref: &rustpython_vm::PyObjectRef,
+            args: &Vec<rustpython_vm::PyObjectRef>
+        ) -> rustpython_vm::PyObjectRef {
             let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
             let method_string: String = args[1].clone().try_from_vm_value(vm).unwrap();
             let args_raw_vec: Vec<u8> = args[2].clone().try_from_vm_value(vm).unwrap();
@@ -117,7 +143,11 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             _kybra_async_result_handler(vm, py_object_ref, _kybra_create_call_result_instance(vm, call_raw_result)).await
         }
 
-        async fn _kybra_async_result_handler_call_raw128(vm: &rustpython::vm::VirtualMachine, py_object_ref: &PyObjectRef, args: &Vec<PyObjectRef>) -> PyObjectRef {
+        async fn _kybra_async_result_handler_call_raw128(
+            vm: &rustpython::vm::VirtualMachine,
+            py_object_ref: &rustpython_vm::PyObjectRef,
+            args: &Vec<rustpython_vm::PyObjectRef>
+        ) -> rustpython_vm::PyObjectRef {
             let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
             let method_string: String = args[1].clone().try_from_vm_value(vm).unwrap();
             let args_raw_vec: Vec<u8> = args[2].clone().try_from_vm_value(vm).unwrap();
@@ -133,7 +163,10 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             _kybra_async_result_handler(vm, py_object_ref, _kybra_create_call_result_instance(vm, call_raw_result)).await
         }
 
-        fn _kybra_create_call_result_instance<T>(vm: &rustpython::vm::VirtualMachine, call_result: CallResult<T>) -> PyObjectRef
+        fn _kybra_create_call_result_instance<T>(
+            vm: &rustpython::vm::VirtualMachine,
+            call_result: ic_cdk::api::call::CallResult<T>
+        ) -> rustpython_vm::PyObjectRef
             where T: for<'a> CdkActTryIntoVmValue<&'a rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef>
         {
             let call_result_class = _kybra_unwrap_rust_python_result(vm.run_block_expr(

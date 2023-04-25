@@ -60,29 +60,52 @@ pub fn generate() -> TokenStream {
 
         impl<T> KybraTryIntoVec for Vec<T> {}
 
-        impl<T> CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for Vec<T>
+        impl<T> CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef>
+            for Vec<T>
         where
             T: KybraTryIntoVec,
-            T: for<'a> CdkActTryIntoVmValue<&'a rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef>
+            T: for<'a> CdkActTryIntoVmValue<
+                &'a rustpython::vm::VirtualMachine,
+                rustpython::vm::PyObjectRef,
+            >,
         {
-            fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
+            fn try_into_vm_value(
+                self,
+                vm: &rustpython::vm::VirtualMachine,
+            ) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
                 try_into_vm_value_generic_array(self, vm)
             }
         }
 
-        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for Vec<u8> {
-            fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
+        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef>
+            for Vec<u8>
+        {
+            fn try_into_vm_value(
+                self,
+                vm: &rustpython::vm::VirtualMachine,
+            ) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
                 Ok(vm.ctx.new_bytes(self).into())
             }
         }
 
-        fn try_into_vm_value_generic_array<T>(generic_array: Vec<T>, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError>
+
+        fn try_into_vm_value_generic_array<T>(
+            generic_array: Vec<T>,
+            vm: &rustpython::vm::VirtualMachine,
+        ) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError>
         where
-            T:  for<'a> CdkActTryIntoVmValue<&'a rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef>
+            T: for<'a> CdkActTryIntoVmValue<
+                &'a rustpython::vm::VirtualMachine,
+                rustpython::vm::PyObjectRef,
+            >,
         {
-            let py_object_refs = generic_array.into_iter().map(|item| item.try_into_vm_value(vm).unwrap()).collect::<Vec<PyObjectRef>>();
+            let py_object_refs = generic_array
+                .into_iter()
+                .map(|item| item.try_into_vm_value(vm).unwrap())
+                .collect::<Vec<rustpython_vm::PyObjectRef>>();
 
             Ok(vm.ctx.new_list(py_object_refs).into())
         }
+
     }
 }

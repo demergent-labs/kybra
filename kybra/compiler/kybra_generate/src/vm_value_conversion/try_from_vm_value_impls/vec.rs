@@ -128,7 +128,7 @@ pub fn generate() -> TokenStream {
         where
             rustpython::vm::PyObjectRef: for<'a> CdkActTryFromVmValue<T, &'a rustpython::vm::VirtualMachine>
         {
-            let py_list: PyListRef = _kybra_unwrap_rust_python_result(py_object_ref.try_into_value(vm), vm);
+            let py_list: rustpython_vm::builtins::PyListRef = _kybra_unwrap_rust_python_result(py_object_ref.try_into_value(vm), vm);
             let vec = py_list.borrow_vec();
 
             Ok(vec.iter().map(|item| {

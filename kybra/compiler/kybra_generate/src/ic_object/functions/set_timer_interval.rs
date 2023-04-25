@@ -6,10 +6,10 @@ pub fn generate() -> TokenStream {
         #[pymethod]
         fn _kybra_set_timer_interval(
             &self,
-            interval_py_object_ref: PyObjectRef,
-            func_py_object_ref: PyObjectRef,
-            vm: &VirtualMachine
-        ) -> PyObjectRef {
+            interval_py_object_ref: rustpython_vm::PyObjectRef,
+            func_py_object_ref: rustpython_vm::PyObjectRef,
+            vm: &rustpython_vm::VirtualMachine
+        ) -> rustpython_vm::PyObjectRef {
             let interval_as_u64: u64 = interval_py_object_ref.try_from_vm_value(vm).unwrap();
             let interval = core::time::Duration::new(interval_as_u64, 0);
 

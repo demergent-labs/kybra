@@ -25,17 +25,16 @@ pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStrea
     // let bounded_storable_impls = generate_bounded_storable_impls(stable_b_tree_map_nodes);
 
     quote! {
-        use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
-        use ic_stable_structures::{BoundedStorable, DefaultMemoryImpl, StableBTreeMap, Storable};
-        use std::{borrow::Cow, cell::RefCell};
-        use candid::{CandidType, Decode, Deserialize, Encode};
-
-        // TODO prefix everything
-
-        type Memory = VirtualMemory<DefaultMemoryImpl>;
-
         thread_local! {
-            static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
+            static MEMORY_MANAGER_REF_CELL: std::cell::RefCell<
+                ic_stable_structures::memory_manager::MemoryManager<
+                    ic_stable_structures::DefaultMemoryImpl
+                >
+            > = std::cell::RefCell::new(
+                ic_stable_structures::memory_manager::MemoryManager::init(
+                    ic_stable_structures::DefaultMemoryImpl::default()
+                )
+            );
 
             #(#stable_b_tree_maps)*
         }
@@ -53,20 +52,42 @@ fn generate_global_stable_b_tree_maps_and_impls(
             let map_name_ident = ref_cell_ident::generate(stable_b_tree_map_node.memory_id);
             let memory_id = stable_b_tree_map_node.memory_id;
 
-            let (key_wrapper_type_name, key_wrapper_type) = wrapper_type::generate(&stable_b_tree_map_node.key_type, memory_id, "Key");
-            let (value_wrapper_type_name, value_wrapper_type) = wrapper_type::generate(&stable_b_tree_map_node.value_type, memory_id, "Value");
+            let (key_wrapper_type_name, key_wrapper_type) =
+                wrapper_type::generate(&stable_b_tree_map_node.key_type, memory_id, "Key");
+            let (value_wrapper_type_name, value_wrapper_type) =
+                wrapper_type::generate(&stable_b_tree_map_node.value_type, memory_id, "Value");
 
-            let key_try_into_vm_value_impl = try_into_vm_value_impl::generate(&key_wrapper_type_name);
+            let key_try_into_vm_value_impl =
+                try_into_vm_value_impl::generate(&key_wrapper_type_name);
             let key_storable_impl = storable_impl::generate(&key_wrapper_type_name);
-            let key_bounded_storable_impl = bounded_storable_impl::generate(&key_wrapper_type_name, stable_b_tree_map_node.max_key_size);
+            let key_bounded_storable_impl = bounded_storable_impl::generate(
+                &key_wrapper_type_name,
+                stable_b_tree_map_node.max_key_size
+            );
 
-            let value_try_into_vm_value_impl = try_into_vm_value_impl::generate(&value_wrapper_type_name);
+            let value_try_into_vm_value_impl =
+                try_into_vm_value_impl::generate(&value_wrapper_type_name);
             let value_storable_impl = storable_impl::generate(&value_wrapper_type_name);
-            let value_bounded_storable_impl = bounded_storable_impl::generate(&value_wrapper_type_name, stable_b_tree_map_node.max_value_size);
+            let value_bounded_storable_impl = bounded_storable_impl::generate(
+                &value_wrapper_type_name,
+                stable_b_tree_map_node.max_value_size
+            );
 
             (
                 quote! {
-                    static #map_name_ident: RefCell<StableBTreeMap<#key_wrapper_type_name, #value_wrapper_type_name, Memory>> = RefCell::new(StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(#memory_id))),));
+                    static #map_name_ident: std::cell::RefCell<
+                        ic_stable_structures::StableBTreeMap<
+                            #key_wrapper_type_name,
+                            #value_wrapper_type_name,
+                            ic_stable_structures::memory_manager::VirtualMemory<
+                                ic_stable_structures::DefaultMemoryImpl
+                            >
+                        >
+                    > = std::cell::RefCell::new(ic_stable_structures::StableBTreeMap::init(
+                            MEMORY_MANAGER_REF_CELL.with(|m| {
+                                m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(#memory_id))
+                        }),
+                    ));
                 },
                 quote! {
                     #key_wrapper_type
