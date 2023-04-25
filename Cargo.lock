@@ -82,7 +82,7 @@ dependencies = [
 [[package]]
 name = "cdk_framework"
 version = "0.0.0"
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=61123bc8b4a94ae0fd80a4f710672d3cab3ca065#61123bc8b4a94ae0fd80a4f710672d3cab3ca065"
+source = "git+https://github.com/demergent-labs/cdk_framework?rev=4993d8218acaa9102e4545fd9024e2008060d268#4993d8218acaa9102e4545fd9024e2008060d268"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -142,7 +142,7 @@ name = "kybra_generate"
 version = "0.0.0"
 dependencies = [
  "annotate-snippets",
- "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=61123bc8b4a94ae0fd80a4f710672d3cab3ca065)",
+ "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=4993d8218acaa9102e4545fd9024e2008060d268)",
  "num-bigint",
  "proc-macro2",
  "quote",

@@ -162,7 +162,7 @@ def generate_candid_file(paths) -> str:
 
     instance = Instance(module, import_object)
 
-    candid_pointer = instance.exports._cdk_get_candid_pointer()
+    candid_pointer = instance.exports.get_candid_pointer()
 
     memory = instance.exports.memory.uint8_view()
     string_bytes = []

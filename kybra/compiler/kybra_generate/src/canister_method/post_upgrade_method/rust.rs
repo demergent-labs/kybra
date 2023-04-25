@@ -47,7 +47,7 @@ pub fn generate(
 
             #call_to_post_upgrade_py_function
 
-            ic_cdk_timers::set_timer(core::time::Duration::new(0, 0), _cdk_rng_seed);
+            ic_cdk_timers::set_timer(core::time::Duration::new(0, 0), rng_seed);
         }
     })
 }
