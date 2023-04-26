@@ -41,7 +41,7 @@ fn derive_data_structure_definition(data_struct: &DataStruct) -> TokenStream {
                 .iter()
                 .enumerate()
                 .map(|(index, _)| {
-                    let field_name = format_ident!("field_{}", index);
+                    let field_name = format_ident!("field_{}_js_value", index);
 
                     quote!(#field_name)
                 })
@@ -59,10 +59,11 @@ fn derive_struct_fields_variable_definitions(data_struct: &DataStruct) -> Vec<To
             .named
             .iter()
             .map(|field| {
-                let field_name = &field.ident;
+                let field_name = field.ident.as_ref().expect("Named field must have a name");
+                let variable_name = format_ident!("{}_js_value", field_name);
 
                 quote! {
-                    let #field_name = self.#field_name.try_into_vm_value(vm).unwrap();
+                    let #variable_name = self.#field_name.try_into_vm_value(vm).unwrap();
                 }
             })
             .collect(),
@@ -71,11 +72,11 @@ fn derive_struct_fields_variable_definitions(data_struct: &DataStruct) -> Vec<To
             .iter()
             .enumerate()
             .map(|(index, _)| {
-                let field_name = format_ident!("field_{}", index);
+                let variable_name = format_ident!("field_{}_js_value", index);
                 let syn_index = Index::from(index);
 
                 quote! {
-                    let #field_name = self.#syn_index.try_into_vm_value(vm).unwrap();
+                    let #variable_name = self.#syn_index.try_into_vm_value(vm).unwrap();
                 }
             })
             .collect(),
@@ -89,23 +90,19 @@ fn derive_struct_fields_property_definitions(data_struct: &DataStruct) -> Vec<To
             .named
             .iter()
             .map(|field| {
-                let field_name = &field.ident;
+                let field_name = field.ident.as_ref().expect("Named field must have a name");
+                let variable_name = format_ident!("{}_js_value", field_name);
 
-                let restored_field_name = match field_name {
-                    Some(field_name) => Some(
-                        cdk_framework::keyword::restore_for_vm(
-                            &field_name.to_string(),
-                            &crate::get_python_keywords(),
-                        )
-                        .to_ident(),
-                    ),
-                    None => field_name.clone(),
-                };
+                let restored_field_name = cdk_framework::keyword::restore_for_vm(
+                    &field_name.to_string(),
+                    &crate::get_python_keywords(),
+                )
+                .to_ident();
 
                 quote! {
                     py_data_structure.set_item(
                         stringify!(#restored_field_name),
-                        #field_name,
+                        #variable_name,
                         vm
                     );
                 }

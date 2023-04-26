@@ -37,14 +37,14 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
             .iter()
             .map(|field| {
                 let field_name = &field.ident;
-
+                let variable_name = format_ident!("user_defined_{}", field.ident.as_ref().expect("Named field must have a name"));
                 let restored_field_name = match field_name {
                     Some(field_name) => Some(cdk_framework::keyword::restore_for_vm(&field_name.to_string(), &crate::get_python_keywords()).to_ident()),
                     None => field_name.clone(),
                 };
 
                 quote! {
-                    let #field_name = unwrap_rust_python_result(self.get_item(stringify!(#restored_field_name), vm), vm);
+                    let #variable_name = unwrap_rust_python_result(self.get_item(stringify!(#restored_field_name), vm), vm);
                 }
             })
             .collect(),
@@ -53,13 +53,13 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
             .iter()
             .enumerate()
             .map(|(index, _)| {
-                let field_name = format_ident!("field_{}", index);
+                let variable_name = format_ident!("field_{}", index);
                 let syn_index = Index::from(index);
 
                 quote! {
                     // TODO tuple_self is being repeated more times than necessary
                     let tuple_self: rustpython_vm::builtins::PyTupleRef = unwrap_rust_python_result(self.clone().try_into_value(vm), vm);
-                    let #field_name = tuple_self.get(#syn_index).unwrap();
+                    let #variable_name = tuple_self.get(#syn_index).unwrap();
                 }
             })
             .collect(),
@@ -74,9 +74,13 @@ fn generate_field_initializers(data_struct: &DataStruct) -> Vec<TokenStream> {
             .iter()
             .map(|field| {
                 let field_name = &field.ident;
+                let variable_name = format_ident!(
+                    "user_defined_{}",
+                    field.ident.as_ref().expect("Named field must have a name")
+                );
 
                 quote! {
-                    #field_name: #field_name.try_from_vm_value(vm).unwrap()
+                    #field_name: #variable_name.try_from_vm_value(vm).unwrap()
                 }
             })
             .collect(),
@@ -85,11 +89,11 @@ fn generate_field_initializers(data_struct: &DataStruct) -> Vec<TokenStream> {
             .iter()
             .enumerate()
             .map(|(index, _)| {
-                let field_name = format_ident!("field_{}", index);
+                let variable_name = format_ident!("field_{}", index);
                 let syn_index = Index::from(index);
 
                 quote! {
-                    #syn_index: #field_name.clone().try_from_vm_value(vm).unwrap()
+                    #syn_index: #variable_name.clone().try_from_vm_value(vm).unwrap()
                 }
             })
             .collect(),
