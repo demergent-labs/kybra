@@ -3,6 +3,7 @@
         "quicksort": {
             "type": "custom",
             "build": "python -m kybra quicksort src/main.py src/main.did",
+            "post_install": ".kybra/quicksort/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/quicksort/quicksort.wasm.gz",
             "declarations": {

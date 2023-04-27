@@ -3,6 +3,7 @@
         "heartbeat_async": {
             "type": "custom",
             "build": "python -m kybra heartbeat_async src/heartbeat_async/main.py src/heartbeat_async/main.did",
+            "post_install": ".kybra/heartbeat_async/post_install.sh",
             "candid": "src/heartbeat_async/main.did",
             "wasm": ".kybra/heartbeat_async/heartbeat_async.wasm.gz",
             "declarations": {
@@ -13,6 +14,7 @@
         "heartbeat_sync": {
             "type": "custom",
             "build": "python -m kybra heartbeat_sync src/heartbeat_sync/main.py src/heartbeat_sync/main.did",
+            "post_install": ".kybra/heartbeat_sync/post_install.sh",
             "candid": "src/heartbeat_sync/main.did",
             "wasm": ".kybra/heartbeat_sync/heartbeat_sync.wasm.gz",
             "declarations": {

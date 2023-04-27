@@ -3,6 +3,7 @@
         "guard_functions": {
             "type": "custom",
             "build": "python -m kybra guard_functions src/main.py src/main.did",
+            "post_install": ".kybra/guard_functions/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/guard_functions/guard_functions.wasm.gz",
             "declarations": {
