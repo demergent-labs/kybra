@@ -16,11 +16,16 @@ impl PyAst {
         let stable_b_tree_map_nodes = self.build_stable_b_tree_map_nodes()?;
         let services = self.build_services()?;
 
+        let (init_method, init_params, call_to_init_py_function) = self.build_init_method()?;
+
+        let (post_upgrade_method, call_to_post_upgrade_py_function) =
+            self.build_post_upgrade_method()?;
+
         let canister_methods = CanisterMethods {
             heartbeat_method: self.build_heartbeat_method()?,
-            init_method: Some(self.build_init_method()?),
+            init_method: Some(init_method),
             inspect_message_method: self.build_inspect_method()?,
-            post_upgrade_method: Some(self.build_post_upgrade_method()?),
+            post_upgrade_method: Some(post_upgrade_method),
             pre_upgrade_method: self.build_pre_upgrade_method()?,
             query_methods: self.build_query_methods()?,
             update_methods: self.build_update_methods()?,
@@ -48,6 +53,10 @@ impl PyAst {
                 &canister_methods.query_methods,
                 &services,
                 &stable_b_tree_map_nodes,
+                &self.entry_module_name,
+                &init_params,
+                call_to_init_py_function,
+                call_to_post_upgrade_py_function,
             ),
             candid_types,
             canister_methods,

@@ -13,6 +13,7 @@ pub mod guard_function;
 pub mod header;
 pub mod ic_object;
 pub mod keywords;
+pub mod kybra_modules_init;
 pub mod method_utils;
 pub mod py_ast;
 pub mod source_map;

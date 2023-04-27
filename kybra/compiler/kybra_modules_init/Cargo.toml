@@ -1,0 +1,12 @@
+[package]
+name = "kybra_modules_init"
+version = "0.0.0"
+edition = "2018"
+
+[dependencies]
+rustpython = { git = "https://github.com/RustPython/RustPython", rev = "c9546c2419f2e4db7e2987f30f0508dc29b30035", default-features = false, features = ["stdlib"] }
+rustpython-vm = { git = "https://github.com/RustPython/RustPython", rev = "c9546c2419f2e4db7e2987f30f0508dc29b30035", default-features = false, features = [] }
+rustpython-stdlib = { git = "https://github.com/RustPython/RustPython", rev = "c9546c2419f2e4db7e2987f30f0508dc29b30035", default-features = false, features = [] }
+rustpython-derive = { git = "https://github.com/RustPython/RustPython", rev = "c9546c2419f2e4db7e2987f30f0508dc29b30035", default-features = false, features = [] }
+rustpython-pylib = { git = "https://github.com/RustPython/RustPython", rev = "c9546c2419f2e4db7e2987f30f0508dc29b30035", default-features = false, features = ["freeze-stdlib"] }
+tempfile = "3.5.0"
