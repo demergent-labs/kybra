@@ -14,8 +14,6 @@ runTests([
         test: async () => {
             const result = await stableMemoryCanister.stable_size();
 
-            console.log('result', result);
-
             return {
                 Ok: result === 129
             };
@@ -25,8 +23,6 @@ runTests([
         name: 'stable64 size',
         test: async () => {
             const result = await stableMemoryCanister.stable64_size();
-
-            console.log('stable64 size result', result);
 
             return {
                 Ok: result === 129n
