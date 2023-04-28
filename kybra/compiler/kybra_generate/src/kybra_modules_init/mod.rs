@@ -25,7 +25,7 @@ pub fn generate(
 ) -> KybraResult<TokenStream> {
     let params_ref_cells = init_params.iter().map(|param| {
         let init_param_name = format!("INIT_PARAM_{}", param.name).to_ident();
-        let init_param_type_annotation = param.candid_type.to_type_annotation(
+        let init_param_type_annotation = param.to_type_annotation(
             &Context {
                 keyword_list: crate::keywords::get_python_keywords(),
                 cdk_name: "kybra".to_string(),
