@@ -1,4 +1,6 @@
 use cdk_framework::act::node::canister_method::{CanisterMethodType, PostUpgradeMethod};
+use proc_macro2::TokenStream;
+use quote::quote;
 
 use super::rust;
 use crate::{
@@ -6,7 +8,7 @@ use crate::{
 };
 
 impl PyAst {
-    pub fn build_post_upgrade_method(&self) -> KybraResult<PostUpgradeMethod> {
+    pub fn build_post_upgrade_method(&self) -> KybraResult<(PostUpgradeMethod, TokenStream)> {
         let post_upgrade_function_defs =
             self.get_canister_stmt_of_type(CanisterMethodType::PostUpgrade);
 
@@ -35,10 +37,20 @@ impl PyAst {
             (vec![], None)
         };
 
-        Ok(PostUpgradeMethod {
-            params,
-            body: rust::generate(post_upgrade_function_def_option, &self.entry_module_name)?,
-            guard_function_name,
-        })
+        let call_to_post_upgrade_py_function = match &post_upgrade_function_def_option {
+            Some(post_upgrade_function_def) => {
+                post_upgrade_function_def.generate_call_to_py_function()?
+            }
+            None => quote!(),
+        };
+
+        Ok((
+            PostUpgradeMethod {
+                params: params.clone(),
+                body: rust::generate(&params)?,
+                guard_function_name,
+            },
+            call_to_post_upgrade_py_function,
+        ))
     }
 }

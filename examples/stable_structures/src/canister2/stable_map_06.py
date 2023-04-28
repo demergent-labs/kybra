@@ -1,20 +1,12 @@
 from kybra import (
-    InsertError,
-    match,
     Opt,
     query,
     StableBTreeMap,
     Tuple,
     update,
     Vec,
-    Variant,
 )
 from kybra import nat64
-
-
-class StableMap6InsertResult(Variant, total=False):
-    Ok: Opt[bool]
-    Err: InsertError
 
 
 stable_map6 = StableBTreeMap[Vec[nat64], bool](
@@ -28,10 +20,8 @@ def stable_map6_get(key: Vec[nat64]) -> Opt[bool]:
 
 
 @update
-def stable_map6_insert(key: Vec[nat64], value: bool) -> StableMap6InsertResult:
-    result = stable_map6.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map6_insert(key: Vec[nat64], value: bool) -> Opt[bool]:
+    return stable_map6.insert(key, value)
 
 
 @update

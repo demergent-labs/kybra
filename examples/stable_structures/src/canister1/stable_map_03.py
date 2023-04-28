@@ -1,6 +1,4 @@
 from kybra import (
-    InsertError,
-    match,
     nat64,
     null,
     Opt,
@@ -18,11 +16,6 @@ class Reaction(Variant):
     Sad: null
 
 
-class StableMap3InsertResult(Variant, total=False):
-    Ok: Opt[int]
-    Err: InsertError
-
-
 stable_map3 = StableBTreeMap[Reaction, int](
     memory_id=3, max_key_size=100, max_value_size=1_000
 )
@@ -34,10 +27,8 @@ def stable_map3_get(key: Reaction) -> Opt[int]:
 
 
 @update
-def stable_map3_insert(key: Reaction, value: int) -> StableMap3InsertResult:
-    result = stable_map3.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map3_insert(key: Reaction, value: int) -> Opt[int]:
+    return stable_map3.insert(key, value)
 
 
 @update

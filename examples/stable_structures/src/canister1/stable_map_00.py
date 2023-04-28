@@ -1,6 +1,4 @@
 from kybra import (
-    InsertError,
-    match,
     nat64,
     nat8,
     Opt,
@@ -8,14 +6,8 @@ from kybra import (
     StableBTreeMap,
     Tuple,
     update,
-    Variant,
     Vec,
 )
-
-
-class StableMap0InsertResult(Variant, total=False):
-    Ok: Opt[str]
-    Err: InsertError
 
 
 stable_map0 = StableBTreeMap[nat8, str](
@@ -29,10 +21,8 @@ def stable_map0_get(key: nat8) -> Opt[str]:
 
 
 @update
-def stable_map0_insert(key: nat8, value: str) -> StableMap0InsertResult:
-    result = stable_map0.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map0_insert(key: nat8, value: str) -> Opt[str]:
+    return stable_map0.insert(key, value)
 
 
 @update

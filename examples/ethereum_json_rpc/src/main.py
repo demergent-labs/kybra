@@ -32,17 +32,10 @@ def init_(ethereum_url: str) -> void:
 
 @update
 def eth_get_balance(ethereum_address: str) -> Async[JSON]:
-    max_response_bytes = 200
-
-    # TODO this is just a heuristic for cost, might change when the feature is officially released: https://forum.dfinity.org/t/enable-canisters-to-make-http-s-requests/9670/130
-    cycle_cost_base = 400_000_000
-    cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
-    cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
-
     http_result: CallResult[HttpResponse] = yield management_canister.http_request(
         {
             "url": stable_storage.get("ethereum_url") or "",
-            "max_response_bytes": max_response_bytes,
+            "max_response_bytes": 2_000,
             "method": {"post": None},
             "headers": [],
             "body": f'{{"jsonrpc":"2.0","method":"eth_getBalance","params":["{ethereum_address}","earliest"],"id":1}}'.encode(
@@ -50,7 +43,7 @@ def eth_get_balance(ethereum_address: str) -> Async[JSON]:
             ),
             "transform": {"function": (ic.id(), "eth_transform"), "context": bytes()},
         }
-    ).with_cycles(cycle_cost_total)
+    ).with_cycles(50_000_000)
 
     return match(
         http_result,
@@ -60,17 +53,10 @@ def eth_get_balance(ethereum_address: str) -> Async[JSON]:
 
 @update
 def eth_get_block_by_number(number: nat32) -> Async[JSON]:
-    max_response_bytes = 2_000
-
-    # TODO this is just a heuristic for cost, might change when the feature is officially released: https://forum.dfinity.org/t/enable-canisters-to-make-http-s-requests/9670/130
-    cycle_cost_base = 400_000_000
-    cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
-    cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
-
     http_result: CallResult[HttpResponse] = yield management_canister.http_request(
         {
             "url": stable_storage.get("ethereum_url") or "",
-            "max_response_bytes": max_response_bytes,
+            "max_response_bytes": 2_000,
             "method": {"post": None},
             "headers": [],
             "body": f'{{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["{hex(number)}", false],"id":1}}'.encode(
@@ -78,7 +64,7 @@ def eth_get_block_by_number(number: nat32) -> Async[JSON]:
             ),
             "transform": {"function": (ic.id(), "eth_transform"), "context": bytes()},
         }
-    ).with_cycles(cycle_cost_total)
+    ).with_cycles(50_000_000)
 
     return match(
         http_result,

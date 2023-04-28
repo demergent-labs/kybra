@@ -11,6 +11,12 @@ pub fn generate(
 
     Ok(quote::quote! {
         unsafe {
+            // TODO is this a security vulnerability?
+            if _KYBRA_INTERPRETER_OPTION.is_none() {
+                ic_cdk::api::call::accept_message();
+                return;
+            }
+
             let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
             let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
 

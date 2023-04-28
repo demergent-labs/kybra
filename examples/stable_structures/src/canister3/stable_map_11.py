@@ -1,6 +1,4 @@
 from kybra import (
-    InsertError,
-    match,
     Opt,
     query,
     Record,
@@ -8,7 +6,6 @@ from kybra import (
     Tuple,
     update,
     Vec,
-    Variant,
 )
 from kybra import nat, nat64
 
@@ -22,11 +19,6 @@ class User(Record):
     posts: Vec[BlogPost]
 
 
-class StableMap11InsertResult(Variant, total=False):
-    Ok: Opt[User]
-    Err: InsertError
-
-
 stable_map11 = StableBTreeMap[nat, User](
     memory_id=11, max_key_size=100, max_value_size=1_000
 )
@@ -38,10 +30,8 @@ def stable_map11_get(key: nat) -> Opt[User]:
 
 
 @update
-def stable_map11_insert(key: nat, value: User) -> StableMap11InsertResult:
-    result = stable_map11.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map11_insert(key: nat, value: User) -> Opt[User]:
+    return stable_map11.insert(key, value)
 
 
 @update

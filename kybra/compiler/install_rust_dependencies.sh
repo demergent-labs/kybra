@@ -7,14 +7,16 @@
 kybra_version="$1"
 rust_version="$2"
 
-global_kybra_config_dir=~/.config/kybra/"$kybra_version"
-global_kybra_bin_dir="$global_kybra_config_dir"/bin
+global_kybra_config_dir=~/.config/kybra
+global_kybra_rust_dir="$global_kybra_config_dir"/"$rust_version"
+global_kybra_bin_dir="$global_kybra_rust_dir"/bin
+global_kybra_logs_dir="$global_kybra_rust_dir"/logs
 global_kybra_cargo_bin="$global_kybra_bin_dir"/cargo
-global_kybra_logs_dir="$global_kybra_config_dir"/logs
 global_kybra_rustup_bin="$global_kybra_bin_dir"/rustup
 
-export CARGO_HOME="$global_kybra_config_dir"
-export RUSTUP_HOME="$global_kybra_config_dir"
+export CARGO_TARGET_DIR="$global_kybra_config_dir"/target
+export CARGO_HOME="$global_kybra_rust_dir"
+export RUSTUP_HOME="$global_kybra_rust_dir"
 
 function run() {
     ic_wasm_already_installed=$(test -e "$global_kybra_bin_dir"/ic-wasm; echo $?)
@@ -23,7 +25,7 @@ function run() {
     if [ "$ic_wasm_already_installed" -eq 1 ] || [ "$ic_cdk_optimizer_already_installed" -eq 1 ]; then
         echo -e "\nKybra "$kybra_version" prerequisite installation (this may take a few minutes)\n"
 
-        mkdir -p "$global_kybra_config_dir"
+        mkdir -p "$global_kybra_rust_dir"
         mkdir -p "$global_kybra_logs_dir"
 
         install_rustup

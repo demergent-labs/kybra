@@ -3,6 +3,7 @@
         "simple_to_do": {
             "type": "custom",
             "build": "python -m kybra simple_to_do src/main.py src/main.did",
+            "post_install": ".kybra/simple_to_do/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/simple_to_do/simple_to_do.wasm.gz",
             "declarations": {

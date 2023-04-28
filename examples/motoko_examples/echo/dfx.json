@@ -3,6 +3,7 @@
         "echo": {
             "type": "custom",
             "build": "python -m kybra echo src/main.py src/main.did",
+            "post_install": ".kybra/echo/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/echo/echo.wasm.gz",
             "declarations": {

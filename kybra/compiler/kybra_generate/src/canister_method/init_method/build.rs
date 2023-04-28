@@ -1,12 +1,17 @@
 use super::rust;
-use cdk_framework::act::node::canister_method::{CanisterMethodType, InitMethod};
+use cdk_framework::act::node::{
+    canister_method::{CanisterMethodType, InitMethod},
+    Param,
+};
+use proc_macro2::TokenStream;
+use quote::quote;
 
 use crate::{
     canister_method, errors::KybraResult, method_utils::params::InternalOrExternal, py_ast::PyAst,
 };
 
 impl PyAst {
-    pub fn build_init_method(&self) -> KybraResult<InitMethod> {
+    pub fn build_init_method(&self) -> KybraResult<(InitMethod, Vec<Param>, TokenStream)> {
         let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
 
         if init_function_defs.len() > 1 {
@@ -31,10 +36,19 @@ impl PyAst {
                 (vec![], None)
             };
 
-        Ok(InitMethod {
+        let call_to_init_py_function = match init_function_def_option {
+            Some(init_function_def) => init_function_def.generate_call_to_py_function()?,
+            None => quote!(),
+        };
+
+        Ok((
+            InitMethod {
+                params: params.clone(),
+                body: rust::generate(&params)?,
+                guard_function_name,
+            },
             params,
-            body: rust::generate(init_function_def_option, &self.entry_module_name)?,
-            guard_function_name,
-        })
+            call_to_init_py_function,
+        ))
     }
 }

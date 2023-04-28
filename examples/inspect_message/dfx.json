@@ -3,6 +3,7 @@
         "inspect_message": {
             "type": "custom",
             "build": "python -m kybra inspect_message src/main.py src/main.did",
+            "post_install": ".kybra/inspect_message/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/inspect_message/inspect_message.wasm.gz",
             "declarations": {

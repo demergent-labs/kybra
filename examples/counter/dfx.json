@@ -3,6 +3,7 @@
         "counter": {
             "type": "custom",
             "build": "python -m kybra counter src/main.py src/main.did",
+            "post_install": ".kybra/counter/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/counter/counter.wasm.gz",
             "declarations": {

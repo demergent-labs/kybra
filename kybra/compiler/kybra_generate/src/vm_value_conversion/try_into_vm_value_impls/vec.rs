@@ -26,6 +26,10 @@ pub fn generate() -> TokenStream {
 
         impl KybraTryIntoVec for f32 {}
 
+        impl KybraTryIntoVec for _CdkFloat64 {}
+
+        impl KybraTryIntoVec for _CdkFloat32 {}
+
         impl KybraTryIntoVec for ic_cdk::export::candid::Int {}
 
         impl KybraTryIntoVec for i128 {}

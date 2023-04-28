@@ -3,6 +3,7 @@
         "phone_book": {
             "type": "custom",
             "build": "python -m kybra phone_book src/main.py src/main.did",
+            "post_install": ".kybra/phone_book/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/phone_book/phone_book.wasm.gz",
             "declarations": {

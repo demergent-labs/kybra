@@ -1,21 +1,13 @@
 from kybra import (
-    InsertError,
-    match,
     Opt,
     Principal,
     query,
     StableBTreeMap,
     Tuple,
     update,
-    Variant,
     Vec,
 )
 from kybra import nat64
-
-
-class StableMap13InsertResult(Variant, total=False):
-    Ok: Opt[Principal]
-    Err: InsertError
 
 
 stable_map13 = StableBTreeMap[str, Principal](
@@ -29,10 +21,8 @@ def stable_map13_get(key: str) -> Opt[Principal]:
 
 
 @update
-def stable_map13_insert(key: str, value: Principal) -> StableMap13InsertResult:
-    result = stable_map13.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map13_insert(key: str, value: Principal) -> Opt[Principal]:
+    return stable_map13.insert(key, value)
 
 
 @update

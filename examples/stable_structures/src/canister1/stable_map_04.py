@@ -1,13 +1,10 @@
 from kybra import (
-    InsertError,
-    match,
     Opt,
     query,
     Record,
     StableBTreeMap,
     Tuple,
     update,
-    Variant,
     Vec,
 )
 from kybra import nat64
@@ -23,11 +20,6 @@ class User(Record):
     posts: Vec["BlogPost"]
 
 
-class StableMap4InsertResult(Variant, total=False):
-    Ok: Opt[float32]
-    Err: InsertError
-
-
 stable_map4 = StableBTreeMap[User, float32](
     memory_id=4, max_key_size=100, max_value_size=1_000
 )
@@ -39,10 +31,8 @@ def stable_map4_get(key: User) -> Opt[float32]:
 
 
 @update
-def stable_map4_insert(key: User, value: float32) -> StableMap4InsertResult:
-    result = stable_map4.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map4_insert(key: User, value: float32) -> Opt[float32]:
+    return stable_map4.insert(key, value)
 
 
 @update

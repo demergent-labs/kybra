@@ -3,6 +3,7 @@
         "pre_and_post_upgrade": {
             "type": "custom",
             "build": "python -m kybra pre_and_post_upgrade src/main.py src/main.did",
+            "post_install": ".kybra/pre_and_post_upgrade/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/pre_and_post_upgrade/pre_and_post_upgrade.wasm.gz",
             "declarations": {
