@@ -442,7 +442,7 @@ class AsyncInfo:
             else ""
         )
         notify_function_name = (
-            f'_kybra_notify_{with_payment}{qualname.replace(".", "_")}_wrapper'
+            f'notify_{with_payment}{qualname.replace(".", "_")}_wrapper'
         )
 
         return getattr(_kybra_ic, notify_function_name)(self.args)  # type: ignore

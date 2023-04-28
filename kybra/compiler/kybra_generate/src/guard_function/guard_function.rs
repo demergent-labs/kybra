@@ -5,7 +5,7 @@ pub fn generate(function_name: &String) -> TokenStream {
     quote! {
         unsafe {
             // TODO is this a security vulnerability?
-            if _KYBRA_INTERPRETER_OPTION.is_none() {
+            if VM_INTERPRETER_OPTION.is_none() {
                 return Ok(());
             }
 
