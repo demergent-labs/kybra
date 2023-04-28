@@ -40,9 +40,10 @@ impl SourceMapped<&Located<StmtKind>> {
             return false;
         }
         match &self.node {
-            StmtKind::Assign { value, .. } => {
-                SourceMapped::new(value.as_ref(), self.source_map.clone()).is_type_alias()
-            }
+            StmtKind::Assign { value, .. }
+            | StmtKind::AnnAssign {
+                value: Some(value), ..
+            } => SourceMapped::new(value.as_ref(), self.source_map.clone()).is_type_alias(),
             _ => false,
         }
     }
@@ -57,6 +58,21 @@ impl SourceMapped<&Located<StmtKind>> {
                     return Err(self.multiple_targets_error());
                 }
                 let alias_name = match &targets[0].node {
+                    ExprKind::Name { id, .. } => id.clone(),
+                    _ => return Err(self.invalid_target_error()),
+                };
+                let value = match &value.node {
+                    ExprKind::Subscript { slice, .. } => slice,
+                    _ => return Err(self.must_be_subscript_error()),
+                };
+                (alias_name, value)
+            }
+            StmtKind::AnnAssign {
+                target,
+                value: Some(value),
+                ..
+            } => {
+                let alias_name = match &target.node {
                     ExprKind::Name { id, .. } => id.clone(),
                     _ => return Err(self.invalid_target_error()),
                 };
