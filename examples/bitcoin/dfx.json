@@ -3,6 +3,7 @@
         "bitcoin": {
             "type": "custom",
             "build": "python -m kybra bitcoin src/main.py src/main.did",
+            "post_install": ".kybra/bitcoin/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/bitcoin/bitcoin.wasm.gz",
             "declarations": {
@@ -20,7 +21,9 @@
     "defaults": {
         "bitcoin": {
             "enabled": true,
-            "nodes": ["127.0.0.1:18444"],
+            "nodes": [
+                "127.0.0.1:18444"
+            ],
             "log_level": "info"
         }
     }

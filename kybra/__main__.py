@@ -52,6 +52,8 @@ def main():
     shutil.copytree(paths["compiler"], paths["canister"], dirs_exist_ok=True)
     create_file(f"{paths['canister']}/Cargo.toml", generate_cargo_toml(canister_name))
     create_file(f"{paths['canister']}/Cargo.lock", generate_cargo_lock())
+    create_file(f"{paths['canister']}/post_install.sh", generate_post_install_script(canister_name, kybra.__rust_version__))
+    os.system(f"chmod +x {paths['canister']}/post_install.sh")
 
     # Add CARGO_TARGET_DIR to env for all cargo commands
     cargo_env = {
@@ -83,6 +85,26 @@ def main():
 
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
 
+
+def generate_post_install_script(canister_name: str, rust_version: str) -> str:
+    return f"""#!/bin/bash
+
+rust_version="{rust_version}"
+
+global_kybra_config_dir=~/.config/kybra
+global_kybra_rust_dir="$global_kybra_config_dir"/"$rust_version"
+global_kybra_bin_dir="$global_kybra_rust_dir"/bin
+global_kybra_logs_dir="$global_kybra_rust_dir"/logs
+global_kybra_cargo_bin="$global_kybra_bin_dir"/cargo
+global_kybra_rustup_bin="$global_kybra_bin_dir"/rustup
+
+export CARGO_TARGET_DIR="$global_kybra_config_dir"/target
+export CARGO_HOME="$global_kybra_rust_dir"
+export RUSTUP_HOME="$global_kybra_rust_dir"
+
+touch .kybra/{canister_name}/kybra_modules_init/src/main.rs
+cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name} &> "$global_kybra_logs_dir"/kybra_modules_init
+    """
 
 def parse_args_or_exit(args: list[str]) -> Args:
     args = args[1:]  # Discard the path to kybra
@@ -374,7 +396,6 @@ def optimize_wasm_binary_or_exit(
     paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
 ):
     # Optimize the Wasm binary
-    # TODO this should eventually be replaced with ic-wasm once this is resolved: https://forum.dfinity.org/t/wasm-module-contains-a-function-that-is-too-complex/15407/43?u=lastmjs
     optimization_result = subprocess.run(
         [
             f"{paths['global_kybra_bin_dir']}/ic-cdk-optimizer",
@@ -383,15 +404,6 @@ def optimize_wasm_binary_or_exit(
         ],
         capture_output=not verbose,
     )
-    # optimization_result = subprocess.run(
-    #     [
-    #         f"{cargo_bin_root}/bin/ic-wasm",
-    #         f"{paths['target']}/wasm32-unknown-unknown/release/{canister_name}.wasm",
-    #         f"-o={paths['wasm']}",
-    #         "shrink",
-    #     ],
-    #     capture_output=not verbose,
-    # )
 
     if optimization_result.returncode != 0:
         print(red("\n💣 Error optimizing generated Wasm:"))
@@ -402,7 +414,7 @@ def optimize_wasm_binary_or_exit(
     add_metadata_to_wasm_or_exit(paths, verbose=verbose)
 
     # gzip the Wasm binary
-    os.system(f"gzip -f -k {paths['wasm']}")
+    os.system(f"gzip -9 -f -k {paths['wasm']}")
 
 
 def add_metadata_to_wasm_or_exit(paths: Paths, verbose: bool = False):

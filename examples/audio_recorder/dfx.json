@@ -3,6 +3,7 @@
         "audio_recorder": {
             "type": "custom",
             "build": "python -m kybra audio_recorder src/main.py src/main.did",
+            "post_install": ".kybra/audio_recorder/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/audio_recorder/audio_recorder.wasm.gz",
             "declarations": {

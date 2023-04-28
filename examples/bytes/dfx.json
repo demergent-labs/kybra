@@ -3,6 +3,7 @@
         "bytes": {
             "type": "custom",
             "build": "python -m kybra bytes src/main.py src/main.did",
+            "post_install": ".kybra/bytes/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/bytes/bytes.wasm.gz",
             "declarations": {

@@ -3,7 +3,12 @@ use quote::quote;
 
 pub fn generate(function_name: &String) -> TokenStream {
     quote! {
-        unsafe{
+        unsafe {
+            // TODO is this a security vulnerability?
+            if _KYBRA_INTERPRETER_OPTION.is_none() {
+                return Ok(());
+            }
+
             let vm_interpreter = VM_INTERPRETER_OPTION.as_mut().unwrap();
             let vm_scope = VM_SCOPE.as_mut().unwrap();
             vm_interpreter.enter(|vm| {

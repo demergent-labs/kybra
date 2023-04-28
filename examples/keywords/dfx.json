@@ -3,6 +3,7 @@
         "keywords": {
             "type": "custom",
             "build": "python -m kybra keywords src/main.py src/main.did",
+            "post_install": ".kybra/keywords/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/keywords/keywords.wasm.gz",
             "declarations": {

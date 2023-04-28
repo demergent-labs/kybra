@@ -62,7 +62,6 @@ const tests: Test[] = [
                     result.const === 3n &&
                     result.crate === 7n &&
                     result.fn === 'Function' &&
-                    result.mut === null &&
                     result.pub === null &&
                     result.type.every(
                         (entry, index) =>
@@ -107,7 +106,6 @@ const tests: Test[] = [
                 with: Principal.fromText('aaaaa-aa'),
                 None: [false, true],
                 as: null,
-                async: false,
                 await: [18n, 19n, 20n],
                 break: [],
                 continue: new Int16Array([21, 22, 23]),
@@ -157,7 +155,6 @@ const tests: Test[] = [
                     result.None[0] === expected_output.None[0] &&
                     result.None[1] === expected_output.None[1] &&
                     result.as === expected_output.as &&
-                    result.async === null &&
                     result.await.every(
                         (element, index) =>
                             element === expected_output.await[index]

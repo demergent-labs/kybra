@@ -7,8 +7,8 @@ edition = "2018"
 
 [profile.release]
 opt-level = 'z'
-codegen-units = 1
-lto = true
+# codegen-units = 1
+# lto = true
 
 [lib]
 crate-type = ["cdylib"]
@@ -25,12 +25,14 @@ rustpython = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b
 rustpython-vm = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["ic"] }}
 rustpython-stdlib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }}
 rustpython-derive = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }}
+rustpython-compiler-core = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }}
+# rustpython-pylib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["freeze-stdlib"] }}
 # rustpython = {{ path = "/home/RustPython", default-features = false, features = ["stdlib"] }}
 # rustpython-vm = {{ path = "/home/RustPython/vm", default-features = false, features = ["ic"] }}
 # rustpython-stdlib = {{ path = "/home/RustPython/stdlib", default-features = false, features = [] }}
 # rustpython-derive = {{ path = "/home/RustPython/derive", default-features = false, features = [] }}
 # TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
-# rustpython-pylib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }}
+# rustpython-pylib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["freeze-stdlib"] }}
 # rustpython = {{ path = "../../../../../../RustPython", default-features = false, features = [] }}
 getrandom = {{ version = "0.2.3", features = ["custom"] }}
 serde = "1.0.137"

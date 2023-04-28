@@ -18,7 +18,6 @@ from kybra import (
     Principal,
     query,
     Record,
-    reserved,
     text,
     Tuple,
     Variant,
@@ -58,7 +57,6 @@ class KeywordRecord(Record):
     # # The below python keywords are also
     None_: Tuple[bool, bool]
     as_: null
-    async_: reserved
     await_: Vec[nat]
     break_: MyTypeAlias
     continue_: MyAlias
@@ -110,7 +108,6 @@ class RustKeywordRecord(Record):
     const: int
     crate: nat
     fn: text
-    mut: reserved
     pub: null
     type: blob
 
@@ -141,7 +138,6 @@ def rust_keyword() -> RustKeywordRecord:
         "const": 3,
         "crate": 7,
         "fn": "Function",
-        "mut": False,
         "pub": None,
         "type": "Type".encode("utf-8"),
     }
@@ -184,7 +180,6 @@ def complex_keyword() -> KeywordRecord:
         "with_": Principal.from_str("aaaaa-aa"),
         "None_": (False, True),
         "as_": None,
-        "async_": False,
         "await_": [18, 19, 20],
         "break_": None,
         "continue_": [21, 22, 23],

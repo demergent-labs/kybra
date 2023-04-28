@@ -3,6 +3,7 @@
         "optional_types": {
             "type": "custom",
             "build": "python -m kybra optional_types src/main.py src/main.did",
+            "post_install": ".kybra/optional_types/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/optional_types/optional_types.wasm.gz",
             "declarations": {

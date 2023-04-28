@@ -3,6 +3,7 @@
         "call_raw": {
             "type": "custom",
             "build": "python -m kybra call_raw src/main.py src/main.did",
+            "post_install": ".kybra/call_raw/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/call_raw/call_raw.wasm.gz",
             "declarations": {

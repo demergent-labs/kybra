@@ -3,6 +3,7 @@
         "complex_init": {
             "type": "custom",
             "build": "python -m kybra complex_init src/main.py src/main.did",
+            "post_install": ".kybra/complex_init/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/complex_init/complex_init.wasm.gz",
             "declarations": {

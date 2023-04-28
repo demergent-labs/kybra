@@ -118,7 +118,9 @@ def create_recording(
     recordings.insert(recording["id"], recording)
 
     updated_user: User = {
-        **user,
+        "id": user["id"],
+        "created_at": user["created_at"],
+        "username": user["username"],
         "recording_ids": [*user["recording_ids"], recording["id"]],
     }
 
@@ -160,7 +162,9 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
         return {"Err": {"UserDoesNotExist": recording["user_id"]}}
 
     updated_user: User = {
-        **user,
+        "id": user["id"],
+        "created_at": user["created_at"],
+        "username": user["username"],
         "recording_ids": list(
             filter(
                 lambda recording_id: recording_id.to_str() != recording["id"].to_str(),
