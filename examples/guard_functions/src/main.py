@@ -96,22 +96,22 @@ def prevent_upgrades() -> GuardResult:
 
 def return_invalid_type() -> GuardResult:
     ic.print("return_invalid_type called")
-    return "Something other than a guard result"
+    return "Something other than a guard result" # type: ignore
 
 
 def return_non_guard_result_object() -> GuardResult:
     ic.print("return_non_guard_result_object called")
-    return {badProp: "Something other than a guard result"}
+    return {badProp: "Something other than a guard result"} # type: ignore
 
 
 def return_non_null_ok_value() -> GuardResult:
     ic.print("non_null_ok_value called")
-    return {Ok: "Something other than null"}
+    return {Ok: "Something other than null"} # type: ignore
 
 
 def return_non_string_err_value() -> GuardResult:
     ic.print("non_string_err_value called")
-    return {Err: {badProp: "Something other than a string"}}
+    return {Err: {badProp: "Something other than a string"}} # type: ignore
 
 
 @query
