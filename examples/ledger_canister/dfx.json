@@ -13,8 +13,6 @@
         },
         "icp_ledger": {
             "type": "custom",
-            "build": "",
-            "post_install": ".kybra/icp_ledger/post_install.sh",
             "candid": "src/icp_ledger/ledger.private.did",
             "wasm": "src/icp_ledger/ledger.wasm"
         }
