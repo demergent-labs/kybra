@@ -33,12 +33,12 @@ pub fn generate_body(
 
     Ok(quote! {
         unsafe {
-            let vm_interpreter = VM_INTERPRETER_OPTION.as_mut().unwrap();
-            let vm_scope = VM_SCOPE.as_mut().unwrap();
+            let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
+            let scope = SCOPE_OPTION.as_mut().unwrap();
 
-            let vm = &vm_interpreter.vm;
+            let vm = &interpreter.vm;
 
-            let method_py_object_ref = unwrap_rust_python_result(vm_scope.globals.get_item(#name, vm), vm);
+            let method_py_object_ref = unwrap_rust_python_result(scope.globals.get_item(#name, vm), vm);
 
             let invoke_result = vm.invoke(&method_py_object_ref, #params);
 

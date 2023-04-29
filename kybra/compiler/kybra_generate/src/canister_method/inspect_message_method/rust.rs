@@ -12,15 +12,15 @@ pub fn generate(
     Ok(quote::quote! {
         unsafe {
             // TODO is this a security vulnerability?
-            if VM_INTERPRETER_OPTION.is_none() {
+            if INTERPRETER_OPTION.is_none() {
                 ic_cdk::api::call::accept_message();
                 return;
             }
 
-            let vm_interpreter = VM_INTERPRETER_OPTION.as_mut().unwrap();
-            let vm_scope = VM_SCOPE.as_mut().unwrap();
+            let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
+            let scope = SCOPE_OPTION.as_mut().unwrap();
 
-            vm_interpreter.enter(|vm| {
+            interpreter.enter(|vm| {
                 #call_to_inspect_message_py_function
             });
         }

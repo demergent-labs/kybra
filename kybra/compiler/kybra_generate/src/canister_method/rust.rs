@@ -26,11 +26,11 @@ impl SourceMapped<&Located<StmtKind>> {
                 let params = tuple::generate_tuple(&param_conversions);
 
                 Ok(quote! {
-                    let vm_interpreter = VM_INTERPRETER_OPTION.as_mut().unwrap();
-                    let vm_scope = VM_SCOPE.as_mut().unwrap();
+                    let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
+                    let scope = SCOPE_OPTION.as_mut().unwrap();
 
-                    vm_interpreter.enter(|vm| {
-                        let method_py_object_ref = unwrap_rust_python_result(vm_scope.globals.get_item(#function_name, vm), vm);
+                    interpreter.enter(|vm| {
+                        let method_py_object_ref = unwrap_rust_python_result(scope.globals.get_item(#function_name, vm), vm);
 
                         let result_py_object_ref = vm.invoke(&method_py_object_ref, #params);
 

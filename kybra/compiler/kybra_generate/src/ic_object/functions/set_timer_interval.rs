@@ -15,10 +15,10 @@ pub fn generate() -> TokenStream {
 
             let closure = move || {
                 unsafe {
-                    let vm_interpreter = VM_INTERPRETER_OPTION.as_mut().unwrap();
-                    let vm_scope = VM_SCOPE.as_mut().unwrap();
+                    let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
+                    let scope = SCOPE_OPTION.as_mut().unwrap();
 
-                    let vm = &vm_interpreter.vm;
+                    let vm = &interpreter.vm;
 
                     let result_py_object_ref = vm.invoke(&func_py_object_ref, ());
 

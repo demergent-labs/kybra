@@ -12,10 +12,10 @@ pub fn generate(
 
     Ok(quote! {
         unsafe {
-            let vm_interpreter = VM_INTERPRETER_OPTION.as_mut().unwrap();
-            let vm_scope = VM_SCOPE.as_mut().unwrap();
+            let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
+            let scope = SCOPE_OPTION.as_mut().unwrap();
 
-            vm_interpreter.enter(|vm| {
+            interpreter.enter(|vm| {
                 #call_to_pre_upgrade_py_function
             });
         }

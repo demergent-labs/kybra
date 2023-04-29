@@ -9,9 +9,9 @@ pub fn to_vm_value(name: String) -> TokenStream {
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for #service_name {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
                 unsafe {
-                    let vm_scope = VM_SCOPE.clone().unwrap();
+                    let scope = SCOPE_OPTION.clone().unwrap();
                     Ok(unwrap_rust_python_result(vm.run_block_expr(
-                        vm_scope, format!(
+                        scope, format!(
 r#"
 from kybra import Principal
 {}(Principal.from_str('{}'))

@@ -76,19 +76,19 @@ pub fn generate(
 
                 let bytes_reference: &'static [u8] = bytes.leak(); // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
 
-                let vm_interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
+                let interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
                     vm.add_native_modules(rustpython_stdlib::get_module_inits());
                     vm.add_frozen(rustpython_compiler_core::frozen_lib::FrozenLib::from_ref(bytes_reference));
                 });
 
-                let vm_scope = vm_interpreter.enter(|vm| vm.new_scope_with_builtins());
+                let scope = interpreter.enter(|vm| vm.new_scope_with_builtins());
 
-                vm_interpreter.enter(|vm| {
+                interpreter.enter(|vm| {
                     Ic::make_class(&vm.ctx);
                     unwrap_rust_python_result(vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm), vm);
 
                     let result = vm.run_code_string(
-                        vm_scope.clone(),
+                        scope.clone(),
                         &format!("from {} import *", #entry_module_name),
                         "".to_owned(),
                     );
@@ -100,8 +100,8 @@ pub fn generate(
                     }
                 });
 
-                VM_INTERPRETER_OPTION = Some(vm_interpreter);
-                VM_SCOPE = Some(vm_scope);
+                INTERPRETER_OPTION = Some(interpreter);
+                SCOPE_OPTION = Some(scope);
 
                 if INITIALIZED_MAP_REF_CELL.with(|initialized_map_ref_cell| *initialized_map_ref_cell.borrow().get()) == 0 {
                     #call_to_init_py_function
