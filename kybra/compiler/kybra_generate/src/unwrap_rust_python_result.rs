@@ -2,8 +2,8 @@ use proc_macro2::TokenStream;
 
 pub fn generate() -> TokenStream {
     quote::quote! {
-        pub fn _kybra_unwrap_rust_python_result<T>(
-            rust_python_result: Result<T, PyRef<PyBaseException>>,
+        pub fn unwrap_rust_python_result<T>(
+            rust_python_result: Result<T, rustpython_vm::PyRef<rustpython_vm::builtins::PyBaseException>>,
             vm: &rustpython::vm::VirtualMachine
         ) -> T {
             match rust_python_result {

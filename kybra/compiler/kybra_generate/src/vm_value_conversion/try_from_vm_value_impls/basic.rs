@@ -25,7 +25,7 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<ic_cdk::export::candid::Func, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::candid::Func, CdkActTryFromVmValueError> {
-                let tuple_self: PyTupleRef = _kybra_unwrap_rust_python_result(self.try_into_value(vm), vm);
+                let tuple_self: rustpython_vm::builtins::PyTupleRef = unwrap_rust_python_result(self.try_into_value(vm), vm);
                 let principal = tuple_self.get(0).unwrap();
                 let method = tuple_self.get(1).unwrap();
 
@@ -38,9 +38,9 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<ic_cdk::export::Principal, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::Principal, CdkActTryFromVmValueError> {
-                let to_str = _kybra_unwrap_rust_python_result(self.get_attr("to_str", vm), vm);
-                let result = _kybra_unwrap_rust_python_result(vm.invoke(&to_str, ()), vm);
-                let result_string: String = _kybra_unwrap_rust_python_result(result.try_into_value(vm), vm);
+                let to_str = unwrap_rust_python_result(self.get_attr("to_str", vm), vm);
+                let result = unwrap_rust_python_result(vm.invoke(&to_str, ()), vm);
+                let result_string: String = unwrap_rust_python_result(result.try_into_value(vm), vm);
                 Ok(ic_cdk::export::Principal::from_text(result_string).unwrap())
             }
         }
@@ -53,7 +53,7 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<ic_cdk_timers::TimerId, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk_timers::TimerId, CdkActTryFromVmValueError> {
-                let vm_value_as_u64: u64 = _kybra_unwrap_rust_python_result(self.try_into_value(vm), vm);
+                let vm_value_as_u64: u64 = unwrap_rust_python_result(self.try_into_value(vm), vm);
                 Ok(ic_cdk_timers::TimerId::from(slotmap::KeyData::from_ffi(vm_value_as_u64)))
             }
         }

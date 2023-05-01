@@ -72,11 +72,11 @@ pub fn generate(
     let trap = trap::generate();
 
     quote! {
-        #[pyclass(module = false, name = "ic")]
-        #[derive(Debug, PyPayload)]
+        #[rustpython_derive::pyclass(module = false, name = "ic")]
+        #[derive(Debug, rustpython_derive::PyPayload)]
         struct Ic {}
 
-        #[pyclass]
+        #[rustpython_derive::pyclass]
         impl Ic {
             #accept_message
             #arg_data_raw

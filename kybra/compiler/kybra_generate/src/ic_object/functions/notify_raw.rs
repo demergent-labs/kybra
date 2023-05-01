@@ -4,7 +4,14 @@ use quote::quote;
 pub fn generate() -> TokenStream {
     quote! {
         #[pymethod]
-        fn _kybra_notify_raw(&self, canister_id_py_object_ref: PyObjectRef, method_py_object_ref: PyObjectRef, args_raw_py_object_ref: PyObjectRef, payment_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {
+        fn notify_raw(
+            &self,
+            canister_id_py_object_ref: rustpython_vm::PyObjectRef,
+            method_py_object_ref: rustpython_vm::PyObjectRef,
+            args_raw_py_object_ref: rustpython_vm::PyObjectRef,
+            payment_py_object_ref: rustpython_vm::PyObjectRef,
+            vm: &rustpython_vm::VirtualMachine
+        ) -> rustpython_vm::PyObjectRef {
             let canister_id_principal: ic_cdk::export::Principal = canister_id_py_object_ref.try_from_vm_value(vm).unwrap();
             let method_string: String = method_py_object_ref.try_from_vm_value(vm).unwrap();
             let args_raw_vec: Vec<u8> = args_raw_py_object_ref.try_from_vm_value(vm).unwrap();

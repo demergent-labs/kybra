@@ -4,28 +4,28 @@ use quote::quote;
 pub fn generate() -> TokenStream {
     quote! {
         #[pymethod]
-        fn _kybra_set_timer(
+        fn set_timer(
             &self,
-            delay_py_object_ref: PyObjectRef,
-            func_py_object_ref: PyObjectRef,
-            vm: &VirtualMachine
-        ) -> PyObjectRef {
+            delay_py_object_ref: rustpython_vm::PyObjectRef,
+            func_py_object_ref: rustpython_vm::PyObjectRef,
+            vm: &rustpython_vm::VirtualMachine
+        ) -> rustpython_vm::PyObjectRef {
             let delay_as_u64: u64 = delay_py_object_ref.try_from_vm_value(vm).unwrap();
             let delay = core::time::Duration::new(delay_as_u64, 0);
 
             let closure = move || {
                 unsafe {
-                    let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-                    let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+                    let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
+                    let scope = SCOPE_OPTION.as_mut().unwrap();
 
-                    let vm = &_kybra_interpreter.vm;
+                    let vm = &interpreter.vm;
 
                     let result_py_object_ref = vm.invoke(&func_py_object_ref, ());
 
                     match result_py_object_ref {
                         Ok(py_object_ref) => {
                             ic_cdk::spawn(async move {
-                                _kybra_async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
+                                async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
                             });
                         },
                         Err(err) => {

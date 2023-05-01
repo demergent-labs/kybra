@@ -4,7 +4,12 @@ use quote::quote;
 pub fn generate() -> TokenStream {
     quote! {
         #[pymethod]
-        fn _kybra_stable64_read(&self, offset_py_object_ref: PyObjectRef, length_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {
+        fn stable64_read(
+            &self,
+            offset_py_object_ref: rustpython_vm::PyObjectRef,
+            length_py_object_ref: rustpython_vm::PyObjectRef,
+            vm: &rustpython_vm::VirtualMachine
+        ) -> rustpython_vm::PyObjectRef {
             let offset: u64 = offset_py_object_ref.try_from_vm_value(vm).unwrap();
             let length: u64 = length_py_object_ref.try_from_vm_value(vm).unwrap();
 

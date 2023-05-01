@@ -8,7 +8,11 @@ pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStrea
 
     quote! {
         #[pymethod]
-        fn _kybra_stable_b_tree_map_len(&self, memory_id_py_object_ref: PyObjectRef, vm: &VirtualMachine) -> PyObjectRef {
+        fn stable_b_tree_map_len(
+            &self,
+            memory_id_py_object_ref: rustpython_vm::PyObjectRef,
+            vm: &rustpython_vm::VirtualMachine
+        ) -> rustpython_vm::PyObjectRef {
             let memory_id: u8 = memory_id_py_object_ref.try_from_vm_value(vm).unwrap();
 
             match memory_id {

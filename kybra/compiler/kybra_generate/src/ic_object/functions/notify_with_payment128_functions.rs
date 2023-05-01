@@ -13,7 +13,7 @@ use crate::{keywords, tuple};
 pub fn generate(services: &Vec<Service>) -> Vec<TokenStream> {
     services.iter().map(|canister| {
         canister.methods.iter().map(|method| {
-            let function_name_string = format!("_kybra_notify_with_payment128_{}_{}", canister.name, method.name);
+            let function_name_string = format!("notify_with_payment128_{}_{}", canister.name, method.name);
             let real_function_name = format_ident!("{}", function_name_string);
             let wrapper_fn_name = format_ident!("{}_wrapper", function_name_string);
             let param_variable_definitions = generate_param_variables(method, &canister.name);
@@ -25,7 +25,11 @@ pub fn generate(services: &Vec<Service>) -> Vec<TokenStream> {
 
             quote!{
                 #[pymethod]
-                fn #wrapper_fn_name(&self, args_py_object_refs: Vec<PyObjectRef>, vm: &VirtualMachine) -> PyObjectRef {
+                fn #wrapper_fn_name(
+                    &self,
+                    args_py_object_refs: Vec<rustpython_vm::PyObjectRef>,
+                    vm: &rustpython_vm::VirtualMachine
+                ) -> rustpython_vm::PyObjectRef {
                     let canister_id_principal: ic_cdk::export::Principal = args_py_object_refs[0].clone().try_from_vm_value(vm).unwrap();
 
                     #(#param_variable_definitions)*

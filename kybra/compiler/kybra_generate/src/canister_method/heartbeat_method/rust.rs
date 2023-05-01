@@ -12,17 +12,17 @@ pub fn generate(
     Ok(quote! {
         unsafe {
             ic_cdk::spawn(async {
-                let _kybra_interpreter = _KYBRA_INTERPRETER_OPTION.as_mut().unwrap();
-                let _kybra_scope = _KYBRA_SCOPE_OPTION.as_mut().unwrap();
+                let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
+                let scope = SCOPE_OPTION.as_mut().unwrap();
 
-                let vm = &_kybra_interpreter.vm;
+                let vm = &interpreter.vm;
 
-                let method_py_object_ref = _kybra_unwrap_rust_python_result(_kybra_scope.globals.get_item(#function_name, vm), vm);
+                let method_py_object_ref = unwrap_rust_python_result(scope.globals.get_item(#function_name, vm), vm);
 
                 let result_py_object_ref = vm.invoke(&method_py_object_ref, ());
 
                 match result_py_object_ref {
-                    Ok(py_object_ref) => _kybra_async_result_handler(vm, &py_object_ref, vm.ctx.none()).await,
+                    Ok(py_object_ref) => async_result_handler(vm, &py_object_ref, vm.ctx.none()).await,
                     Err(err) => {
                         let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
 
