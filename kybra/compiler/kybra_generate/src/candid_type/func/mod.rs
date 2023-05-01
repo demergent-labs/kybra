@@ -140,30 +140,40 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_func() {
             return Ok(None);
         }
-        match &self.node {
-            StmtKind::Assign { targets, value, .. } => {
+        let name = match &self.node {
+            StmtKind::Assign { targets, .. } => {
                 if targets.len() != 1 {
                     return Err(self.multiple_func_targets_error());
                 }
 
-                let name = match &targets[0].node {
+                match &targets[0].node {
                     ExprKind::Name { id, .. } => Some(id.clone()),
                     _ => None,
-                };
-
-                Ok(Some(
-                    SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
-                ))
+                }
             }
+            StmtKind::AnnAssign { target, .. } => match &target.node {
+                ExprKind::Name { id, .. } => Some(id.clone()),
+                _ => None,
+            },
+            _ => None,
+        };
+        match &self.node {
+            StmtKind::Assign { value, .. }
+            | StmtKind::AnnAssign {
+                value: Some(value), ..
+            } => Ok(Some(
+                SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
+            )),
             _ => Err(crate::errors::unreachable()),
         }
     }
 
     pub fn is_func(&self) -> bool {
         match &self.node {
-            StmtKind::Assign { value, .. } => {
-                SourceMapped::new(value.as_ref(), self.source_map.clone()).is_func()
-            }
+            StmtKind::Assign { value, .. }
+            | StmtKind::AnnAssign {
+                value: Some(value), ..
+            } => SourceMapped::new(value.as_ref(), self.source_map.clone()).is_func(),
             _ => false,
         }
     }
