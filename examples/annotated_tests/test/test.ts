@@ -32,7 +32,7 @@ function getTests(annotatedCanister: ActorSubclass<_SERVICE>): Test[] {
         {
             name: 'get_func',
             test: async () => {
-                let result = await annotatedCanister.get_func();
+                const result = await annotatedCanister.get_func();
 
                 return {
                     Ok: result[1] === 'create_canister'
