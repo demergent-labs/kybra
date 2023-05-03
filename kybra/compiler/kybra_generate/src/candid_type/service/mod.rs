@@ -1,22 +1,25 @@
 pub mod errors;
 mod rust;
 
-use cdk_framework::act::node::{
-    candid::{service::Method, Service},
-    node_parts::mode::Mode,
-    ReturnType,
+use cdk_framework::{
+    act::node::{
+        candid::{service::Method, Service},
+        node_parts::mode::Mode,
+        ReturnType,
+    },
+    traits::CollectResults,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::{CollectResults, KybraResult},
-    method_utils::params::InternalOrExternal,
-    py_ast::PyAst,
-    source_map::SourceMapped,
-    Error,
+    errors::CollectResults as OtherCollectResults, method_utils::params::InternalOrExternal,
+    py_ast::PyAst, source_map::SourceMapped, Error,
 };
 
-use self::errors::ClassWithNotFunctionDefs;
+use self::errors::{
+    ClassMustHaveMethods, ClassWithNotFunctionDefs, InvalidDecorator, MissingDecorator,
+    TooManyDecorators, WrongDecorator,
+};
 
 impl PyAst {
     pub fn build_services(&self) -> Result<Vec<Service>, Vec<Error>> {
@@ -38,15 +41,22 @@ impl SourceMapped<&Located<StmtKind>> {
                 name,
                 decorator_list,
                 ..
-            } => Ok(Method {
-                name: name.clone(),
-                params: self.build_params(InternalOrExternal::External)?,
-                return_type: ReturnType::new(self.build_return_type()?),
-                mode: match build_mode(self, decorator_list, &canister_name, name) {
-                    Ok(mode) => mode,
-                    Err(err) => return Err(vec![err]),
-                },
-            }),
+            } => {
+                let (params, return_type) = (
+                    self.build_params(InternalOrExternal::External),
+                    self.build_return_type(),
+                )
+                    .collect_results()?;
+                Ok(Method {
+                    name: name.clone(),
+                    params,
+                    return_type: ReturnType::new(return_type),
+                    mode: match build_mode(self, decorator_list, &canister_name, name) {
+                        Ok(mode) => mode,
+                        Err(err) => return Err(vec![err]),
+                    },
+                })
+            }
             _ => Err(ClassWithNotFunctionDefs::err_from_stmt(self, &canister_name).into()),
         }
     }
@@ -70,7 +80,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 let methods = method_results.into_iter().collect_results()?;
 
                 if methods.len() == 0 {
-                    return Err(vec![self.class_must_have_methods_error(name)]);
+                    return Err(ClassMustHaveMethods::err_from_stmt(self, name).into());
                 }
 
                 Ok(Some(Service {
@@ -83,7 +93,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 }))
             }
             // We filter out any non classDefs in KybraProgram.get_external_canister_declarations
-            _ => Err(vec![crate::errors::unreachable()]),
+            _ => Err(crate::errors::unreachable().into()),
         }
     }
 
@@ -106,13 +116,21 @@ fn build_mode(
     decorator_list: &Vec<Located<ExprKind>>,
     canister_name: &String,
     method_name: &String,
-) -> KybraResult<Mode> {
+) -> Result<Mode, Error> {
     if decorator_list.len() == 0 {
-        return Err(method_stmt.missing_decorator_error(canister_name, method_name));
+        return Err(MissingDecorator::err_from_stmt(
+            method_stmt,
+            canister_name,
+            method_name,
+        ));
     }
 
     if decorator_list.len() > 1 {
-        return Err(method_stmt.too_many_decorators_error(canister_name, method_name));
+        return Err(TooManyDecorators::err_from_stmt(
+            method_stmt,
+            canister_name,
+            method_name,
+        ));
     }
 
     match &decorator_list[0].node {
@@ -122,9 +140,18 @@ fn build_mode(
             } else if id == "service_query" {
                 Ok(Mode::Query)
             } else {
-                Err(method_stmt.wrong_decorator_error(canister_name, method_name, &id.to_string()))
+                Err(WrongDecorator::err_from_stmt(
+                    method_stmt,
+                    canister_name,
+                    method_name,
+                    id,
+                ))
             }
         }
-        _ => Err(method_stmt.invalid_decorator_error(canister_name, method_name)),
+        _ => Err(InvalidDecorator::err_from_stmt(
+            method_stmt,
+            canister_name,
+            method_name,
+        )),
     }
 }

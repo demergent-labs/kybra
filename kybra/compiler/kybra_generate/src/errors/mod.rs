@@ -4,7 +4,10 @@ pub mod message;
 
 use std::fmt;
 
-use crate::candid_type::service::errors::{ClassMustHaveMethods, ClassWithNotFunctionDefs};
+use crate::candid_type::service::errors::{
+    ClassMustHaveMethods, ClassWithNotFunctionDefs, InvalidDecorator, MissingDecorator,
+    TooManyDecorators, WrongDecorator,
+};
 
 pub use collect_results::CollectResults;
 pub use compiler_output::CompilerOutput;
@@ -32,13 +35,13 @@ pub enum Error {
     InvalidAnnAssign(Message),
     InvalidAssign(Message),
     InvalidClass(Message),
-    InvalidDecorator(Message),
+    InvalidDecorator(InvalidDecorator),
     InvalidMember(Message),
     InvalidSubscriptable(Message),
     InvalidTarget(Message),
     IteratorUnpackingOperatorNotSupported(Message),
     NoneCantBeAType(Message),
-    MissingDecorator(Message),
+    MissingDecorator(MissingDecorator),
     MultipleTargets(Message),
     MultipleHeartBeat(Message),
     MultipleInit(Message),
@@ -56,8 +59,8 @@ pub enum Error {
     ReturnTypeMode(Message),
     ReturnTypeMustBeVoid(Message),
     TargetMustBeAName(Message),
-    TooManyDecorators(Message),
-    WrongDecorator(Message),
+    TooManyDecorators(TooManyDecorators),
+    WrongDecorator(WrongDecorator),
     UnsupportedType(Message),
     T(Message),
 }
