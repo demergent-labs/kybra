@@ -1,12 +1,15 @@
-use cdk_framework::act::node::{
-    candid::{Func, Primitive},
-    node_parts::mode::Mode,
-    CandidType, ReturnType,
+use cdk_framework::{
+    act::node::{
+        candid::{Func, Primitive},
+        node_parts::mode::Mode,
+        CandidType, ReturnType,
+    },
+    traits::CollectResults,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::{CollectResults, KybraResult},
+    errors::{CollectResults as CrateCollectResults, KybraResult},
     py_ast::PyAst,
     source_map::SourceMapped,
     Error,
@@ -45,13 +48,13 @@ impl SourceMapped<&Located<ExprKind>> {
                 if args.len() != 1 {
                     return Err(vec![self.func_formatting_error()]);
                 }
-                let mode = match self.get_func_mode() {
-                    Ok(mode) => mode,
-                    Err(error) => return Err(vec![error]),
-                };
-                let params = self.build_func_params()?;
-                let return_type =
-                    Box::from(ReturnType::new(self.build_func_return_type(mode.clone())?));
+                let (mode,) = (self.get_func_mode().map_err(Error::into),).collect_results()?;
+                let (params, return_type) = (
+                    self.build_func_params(),
+                    self.build_func_return_type(mode.clone()),
+                )
+                    .collect_results()?;
+                let return_type = Box::from(ReturnType::new(return_type));
                 Ok(Func {
                     to_vm_value: |name: String| rust::generate_func_to_vm_value(&name),
                     list_to_vm_value: |name: String| rust::generate_func_list_to_vm_value(&name),
@@ -69,7 +72,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn get_func_mode(&self) -> KybraResult<Mode> {
+    fn get_func_mode(&self) -> Result<Mode, Error> {
         match &self.node {
             ExprKind::Call { args, .. } => match &args[0].node {
                 ExprKind::Subscript { value, .. } => match &value.node {
@@ -93,21 +96,21 @@ impl SourceMapped<&Located<ExprKind>> {
                 ExprKind::Subscript { slice, .. } => match &slice.node {
                     ExprKind::Tuple { elts, .. } => {
                         if elts.len() != 2 {
-                            return Err(self.func_formatting_error());
+                            return Err(self.func_formatting_error().into());
                         }
                         match &elts[0].node {
                             ExprKind::List { elts, .. } => Ok(elts
                                 .iter()
                                 .map(|elt| SourceMapped::new(elt, self.source_map.clone()))
                                 .collect::<Vec<_>>()),
-                            _ => Err(self.func_formatting_error()),
+                            _ => Err(self.func_formatting_error().into()),
                         }
                     }
-                    _ => Err(self.func_formatting_error()),
+                    _ => Err(self.func_formatting_error().into()),
                 },
-                _ => Err(self.func_formatting_error()),
+                _ => Err(self.func_formatting_error().into()),
             },
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(crate::errors::unreachable().into()),
         }
     }
 
@@ -117,22 +120,22 @@ impl SourceMapped<&Located<ExprKind>> {
                 ExprKind::Subscript { slice, .. } => match &slice.node {
                     ExprKind::Tuple { elts, .. } => {
                         if elts.len() != 2 {
-                            return Err(self.func_formatting_error());
+                            return Err(self.func_formatting_error().into());
                         }
                         Ok(SourceMapped::new(&elts[1], self.source_map.clone()))
                     }
-                    _ => return Err(self.func_formatting_error()),
+                    _ => return Err(self.func_formatting_error().into()),
                 },
-                _ => return Err(self.func_formatting_error()),
+                _ => return Err(self.func_formatting_error().into()),
             },
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(crate::errors::unreachable().into()),
         }
     }
 
     fn build_func_params(&self) -> Result<Vec<CandidType>, Vec<Error>> {
         Ok(match self.get_func_params() {
             Ok(func_params) => func_params,
-            Err(err) => return Err(vec![err]),
+            Err(err) => return Err(err.into()),
         }
         .iter()
         .map(|param| param.to_candid_type())
@@ -144,7 +147,7 @@ impl SourceMapped<&Located<ExprKind>> {
             Mode::Oneway => Ok(CandidType::Primitive(Primitive::Void)),
             _ => Ok(match self.get_func_return_type() {
                 Ok(return_type) => return_type,
-                Err(err) => return Err(vec![err]),
+                Err(err) => return Err(err.into()),
             }
             .to_candid_type()?),
         }

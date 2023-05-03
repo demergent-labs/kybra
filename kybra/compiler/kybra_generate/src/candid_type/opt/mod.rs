@@ -3,7 +3,7 @@ pub mod errors;
 use cdk_framework::act::node::candid::Opt;
 use rustpython_parser::ast::{ExprKind, Located};
 
-use crate::{errors::KybraResult, source_map::SourceMapped, Error};
+use crate::{source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_opt(&self) -> bool {
@@ -17,7 +17,7 @@ impl SourceMapped<&Located<ExprKind>> {
     }
 
     // TODO find a neutral place for this to live
-    pub fn get_enclosed_type(&self) -> KybraResult<SourceMapped<&Located<ExprKind>>> {
+    pub fn get_enclosed_type(&self) -> Result<SourceMapped<&Located<ExprKind>>, Error> {
         match &self.node {
             ExprKind::Subscript { slice, .. } => {
                 Ok(SourceMapped::new(slice.as_ref(), self.source_map.clone()))

@@ -16,6 +16,8 @@ use crate::{
     Error,
 };
 
+use self::errors::ClassWithNotFunctionDefs;
+
 impl PyAst {
     pub fn build_services(&self) -> Result<Vec<Service>, Vec<Error>> {
         Ok(self
@@ -45,7 +47,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     Err(err) => return Err(vec![err]),
                 },
             }),
-            _ => Err(vec![self.class_with_not_function_defs_error(canister_name)]),
+            _ => Err(ClassWithNotFunctionDefs::err_from_stmt(self, &canister_name).into()),
         }
     }
 }

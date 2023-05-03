@@ -73,11 +73,11 @@ impl SourceMapped<&Located<StmtKind>> {
             } => {
                 let alias_name = match &target.node {
                     ExprKind::Name { id, .. } => id.clone(),
-                    _ => return Err(self.invalid_target_error()),
+                    _ => return Err(vec![self.invalid_target_error()]),
                 };
                 let value = match &value.node {
                     ExprKind::Subscript { slice, .. } => slice,
-                    _ => return Err(self.must_be_subscript_error()),
+                    _ => return Err(vec![self.must_be_subscript_error()]),
                 };
                 (alias_name, value)
             }

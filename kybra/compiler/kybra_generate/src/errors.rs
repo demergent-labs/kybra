@@ -4,6 +4,7 @@ use annotate_snippets::{
 };
 use std::fmt;
 
+use crate::candid_type::service::errors::{ClassMustHaveMethods, ClassWithNotFunctionDefs};
 use crate::source_map::GetSourceInfo;
 
 #[derive(Clone, Debug)]
@@ -11,8 +12,8 @@ pub enum Error {
     GuardFunctionNotFound(String),
     TypeNotFound(String),
     Unreachable(String),
-    ClassMustHaveMethods(Message),
-    ClassWithNotFunctionDefs(Message),
+    ClassMustHaveMethods(ClassMustHaveMethods),
+    ClassWithNotFunctionDefs(ClassWithNotFunctionDefs),
     DictionaryUnpackingOperatorNotSupported(Message),
     FirstParamMustBeSelf(Message),
     FirstParamMustNotBeSelf(Message),
@@ -53,8 +54,61 @@ pub enum Error {
     UnsupportedType(Message),
     T(Message),
 }
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let compiler_output: &dyn std::fmt::Display = match self {
+            Error::GuardFunctionNotFound(error) => error,
+            Error::TypeNotFound(error) => error,
+            Error::Unreachable(error) => error,
+            Error::ClassMustHaveMethods(error) => error,
+            Error::ClassWithNotFunctionDefs(error) => error,
+            Error::DictionaryUnpackingOperatorNotSupported(error) => error,
+            Error::FirstParamMustBeSelf(error) => error,
+            Error::FirstParamMustNotBeSelf(error) => error,
+            Error::FuncFormatting(error) => error,
+            Error::GuardFunctionName(error) => error,
+            Error::GuardFunctionParam(error) => error,
+            Error::GuardFunctionReturn(error) => error,
+            Error::InlineFuncNotSupported(error) => error,
+            Error::InvalidAnnAssign(error) => error,
+            Error::InvalidAssign(error) => error,
+            Error::InvalidClass(error) => error,
+            Error::InvalidDecorator(error) => error,
+            Error::InvalidMember(error) => error,
+            Error::InvalidSubscriptable(error) => error,
+            Error::InvalidTarget(error) => error,
+            Error::IteratorUnpackingOperatorNotSupported(error) => error,
+            Error::NoneCantBeAType(error) => error,
+            Error::MissingDecorator(error) => error,
+            Error::MultipleTargets(error) => error,
+            Error::MultipleHeartBeat(error) => error,
+            Error::MultipleInit(error) => error,
+            Error::MultipleInspectMessage(error) => error,
+            Error::MultiplePostUpgrade(error) => error,
+            Error::MultiplePreUpgrade(error) => error,
+            Error::MustBeSubscript(error) => error,
+            Error::NotAnArray(error) => error,
+            Error::NotAnOpt(error) => error,
+            Error::NotAPrimitive(error) => error,
+            Error::NotATuple(error) => error,
+            Error::NotATypeRef(error) => error,
+            Error::ParamTypeAnnotationRequired(error) => error,
+            Error::ReturnTypeAnnotationRequired(error) => error,
+            Error::ReturnTypeMode(error) => error,
+            Error::ReturnTypeMustBeVoid(error) => error,
+            Error::TargetMustBeAName(error) => error,
+            Error::TooManyDecorators(error) => error,
+            Error::WrongDecorator(error) => error,
+            Error::UnsupportedType(error) => error,
+            Error::T(error) => error,
+        };
+
+        write!(f, "{}", compiler_output)
+    }
+}
+
 pub type KybraResult<T> = Result<T, Error>;
-pub type KybraListResult<T> = Result<T, Vec<Error>>;
 
 pub trait CollectResults<T> {
     fn collect_results(self) -> Result<Vec<T>, Vec<Error>>;
@@ -95,33 +149,38 @@ pub struct Suggestion {
 }
 
 #[derive(Clone, Debug)]
-pub struct Contents {
+pub struct CompilerOutput {
     pub title: String,
-    pub origin: String,
-    pub line_number: usize,
-    pub source: String,
-    pub range: (usize, usize),
+    pub location: Location,
     pub annotation: String,
     pub suggestion: Option<Suggestion>,
 }
 
 #[derive(Clone, Debug)]
+pub struct Location {
+    pub origin: String,
+    pub line_number: usize,
+    pub source: String,
+    pub range: (usize, usize),
+}
+
+#[derive(Clone, Debug)]
 pub enum Message {
-    Error(Contents),
-    Warning(Contents),
+    Error(CompilerOutput),
+    Warning(CompilerOutput),
 }
 
 impl Message {
     fn to_string(&self) -> String {
         match self {
-            Message::Error(contents) => contents.to_string(AnnotationType::Error),
-            Message::Warning(contents) => contents.to_string(AnnotationType::Warning),
+            Message::Error(compiler_output) => compiler_output.to_string(AnnotationType::Error),
+            Message::Warning(compiler_output) => compiler_output.to_string(AnnotationType::Warning),
         }
     }
 }
 
-impl Contents {
-    fn to_string(&self, annotation_type: AnnotationType) -> String {
+impl CompilerOutput {
+    pub fn to_string(&self, annotation_type: AnnotationType) -> String {
         let error_snippet = Snippet {
             title: Some(Annotation {
                 label: Some(&self.title),
@@ -130,14 +189,14 @@ impl Contents {
             }),
             footer: vec![],
             slices: vec![Slice {
-                source: &self.source,
-                line_start: self.line_number,
-                origin: Some(&self.origin),
+                source: &self.location.source,
+                line_start: self.location.line_number,
+                origin: Some(&self.location.origin),
                 fold: true,
                 annotations: vec![SourceAnnotation {
                     label: &self.annotation,
                     annotation_type,
-                    range: self.range,
+                    range: self.location.range,
                 }],
             }],
             opt: FormatOptions {
@@ -152,7 +211,7 @@ impl Contents {
                 let suggestion_source = suggestion.source.clone().unwrap_or(Default::default());
                 let suggestion_slice = Slice {
                     source: suggestion_source.as_str(),
-                    line_start: self.line_number,
+                    line_start: self.location.line_number,
                     origin: None,
                     fold: false,
                     annotations: vec![SourceAnnotation {
@@ -214,7 +273,7 @@ pub trait CreateMessage {
         title: &str,
         annotation: &str,
         suggestion: Option<Suggestion>,
-    ) -> Contents;
+    ) -> CompilerOutput;
 
     fn create_error_message(
         &self,
@@ -235,6 +294,24 @@ pub trait CreateMessage {
     }
 }
 
+pub trait CreateLocation {
+    fn create_location(&self) -> Location;
+}
+
+impl<T> CreateLocation for T
+where
+    T: GetSourceInfo,
+{
+    fn create_location(&self) -> Location {
+        return Location {
+            origin: self.get_origin(),
+            line_number: self.get_line_number(),
+            source: self.get_source(),
+            range: self.get_range(),
+        };
+    }
+}
+
 impl<T> CreateMessage for T
 where
     T: GetSourceInfo,
@@ -244,13 +321,15 @@ where
         title: &str,
         annotation: &str,
         suggestion: Option<Suggestion>,
-    ) -> Contents {
-        return Contents {
+    ) -> CompilerOutput {
+        return CompilerOutput {
             title: title.to_string(),
-            origin: self.get_origin(),
-            line_number: self.get_line_number(),
-            source: self.get_source(),
-            range: self.get_range(),
+            location: Location {
+                origin: self.get_origin(),
+                line_number: self.get_line_number(),
+                source: self.get_source(),
+                range: self.get_range(),
+            },
             annotation: annotation.to_string(),
             suggestion,
         };
