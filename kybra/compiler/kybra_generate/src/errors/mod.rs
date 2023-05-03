@@ -117,6 +117,12 @@ impl std::fmt::Display for Error {
 
 pub type KybraResult<T> = Result<T, Error>;
 
+impl From<Error> for Vec<Error> {
+    fn from(value: Error) -> Self {
+        vec![value]
+    }
+}
+
 pub fn unreachable() -> Error {
     Error::Unreachable("Oops! Looks like we introduced a bug while refactoring. Please open a ticket at https://github.com/demergent-labs/kybra/issues/new".to_string())
 }
