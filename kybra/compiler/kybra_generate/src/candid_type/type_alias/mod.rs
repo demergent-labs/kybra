@@ -5,6 +5,8 @@ use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
 
+use super::errors::NotExactlyOneTarget;
+
 impl PyAst {
     pub fn build_type_aliases(&self) -> Result<Vec<TypeAlias>, Vec<Error>> {
         Ok(self
@@ -53,8 +55,8 @@ impl SourceMapped<&Located<StmtKind>> {
         }
         let (alias_name, value) = match &self.node {
             StmtKind::Assign { targets, value, .. } => {
-                if targets.len() > 1 {
-                    return Err(vec![self.multiple_targets_error()]);
+                if targets.len() != 1 {
+                    return Err(NotExactlyOneTarget::err_from_stmt(self).into());
                 }
                 let alias_name = match &targets[0].node {
                     ExprKind::Name { id, .. } => id.clone(),

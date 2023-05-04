@@ -4,6 +4,8 @@ pub mod message;
 
 use std::fmt;
 
+use crate::candid_type::errors::NotExactlyOneTarget;
+use crate::candid_type::func::errors::{FuncFormatting, InlineFuncNotSupported, ReturnTypeMode};
 use crate::candid_type::service::errors::{
     ClassMustHaveMethods, ClassWithNotFunctionDefs, InvalidDecorator, MissingDecorator,
     TooManyDecorators, WrongDecorator,
@@ -27,11 +29,11 @@ pub enum Error {
     DictionaryUnpackingOperatorNotSupported(Message),
     FirstParamMustBeSelf(Message),
     FirstParamMustNotBeSelf(Message),
-    FuncFormatting(Message),
+    FuncFormatting(FuncFormatting),
     GuardFunctionName(Message),
     GuardFunctionParam(Message),
     GuardFunctionReturn(Message),
-    InlineFuncNotSupported(Message),
+    InlineFuncNotSupported(InlineFuncNotSupported),
     InvalidAnnAssign(Message),
     InvalidAssign(Message),
     InvalidClass(Message),
@@ -42,7 +44,6 @@ pub enum Error {
     IteratorUnpackingOperatorNotSupported(Message),
     NoneCantBeAType(Message),
     MissingDecorator(MissingDecorator),
-    MultipleTargets(Message),
     MultipleHeartBeat(Message),
     MultipleInit(Message),
     MultipleInspectMessage(Message),
@@ -53,9 +54,10 @@ pub enum Error {
     NotAPrimitive(Message),
     NotATuple(Message),
     NotATypeRef(Message),
+    NotExactlyOneTarget(NotExactlyOneTarget),
     ParamTypeAnnotationRequired(Message),
     ReturnTypeAnnotationRequired(Message),
-    ReturnTypeMode(Message),
+    ReturnTypeMode(ReturnTypeMode),
     ReturnTypeMustBeVoid(Message),
     TargetMustBeAName(Message),
     TooManyDecorators(TooManyDecorators),
@@ -90,7 +92,7 @@ impl std::fmt::Display for Error {
             Error::IteratorUnpackingOperatorNotSupported(error) => error,
             Error::NoneCantBeAType(error) => error,
             Error::MissingDecorator(error) => error,
-            Error::MultipleTargets(error) => error,
+            Error::NotExactlyOneTarget(error) => error,
             Error::MultipleHeartBeat(error) => error,
             Error::MultipleInit(error) => error,
             Error::MultipleInspectMessage(error) => error,

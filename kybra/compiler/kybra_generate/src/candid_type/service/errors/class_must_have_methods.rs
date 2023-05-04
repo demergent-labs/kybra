@@ -1,3 +1,5 @@
+use std::fmt::{self, Display, Formatter};
+
 use annotate_snippets::snippet::AnnotationType;
 use rustpython_parser::ast::{Located, StmtKind};
 
@@ -29,8 +31,8 @@ impl From<ClassMustHaveMethods> for Error {
     }
 }
 
-impl std::fmt::Display for ClassMustHaveMethods {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for ClassMustHaveMethods {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "{}",

@@ -4,10 +4,6 @@ use crate::{errors::CreateMessage, source_map::SourceMapped, Error};
 
 // TODO many of these errors are also used by type alias. If they are the same errors they should live somewhere were they both can access them. If not they we need to duplicate them for type alias and make them unique
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn multiple_targets_error(&self) -> Error {
-        Error::MultipleTargets(self.create_error_message("", "", None))
-    }
-
     pub fn invalid_target_error(&self) -> Error {
         Error::InvalidTarget(self.create_error_message("", "", None))
     }

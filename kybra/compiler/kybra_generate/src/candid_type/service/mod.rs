@@ -53,7 +53,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     return_type: ReturnType::new(return_type),
                     mode: match build_mode(self, decorator_list, &canister_name, name) {
                         Ok(mode) => mode,
-                        Err(err) => return Err(vec![err]),
+                        Err(err) => return Err(err.into()),
                     },
                 })
             }

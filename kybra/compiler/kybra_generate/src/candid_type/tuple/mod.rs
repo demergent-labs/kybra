@@ -6,6 +6,8 @@ use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
 
+use super::errors::NotExactlyOneTarget;
+
 impl PyAst {
     pub fn build_tuples(&self) -> Result<Vec<Tuple>, Vec<Error>> {
         Ok(self
@@ -81,8 +83,8 @@ impl SourceMapped<&Located<StmtKind>> {
         }
         match &self.node {
             StmtKind::Assign { targets, value, .. } => {
-                if targets.len() > 1 {
-                    return Err(vec![self.multiple_targets_error()]);
+                if targets.len() != 1 {
+                    return Err(NotExactlyOneTarget::err_from_stmt(self).into());
                 }
                 let tuple_name = match &targets[0].node {
                     ExprKind::Name { id, .. } => id,

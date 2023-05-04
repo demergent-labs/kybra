@@ -9,13 +9,14 @@ use cdk_framework::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::{CollectResults as CrateCollectResults, KybraResult},
-    py_ast::PyAst,
-    source_map::SourceMapped,
-    Error,
+    errors::CollectResults as CrateCollectResults, py_ast::PyAst, source_map::SourceMapped, Error,
 };
 
-mod errors;
+use self::errors::{FuncFormatting, ReturnTypeMode};
+
+use super::errors::NotExactlyOneTarget;
+
+pub mod errors;
 mod rust;
 
 impl PyAst {
@@ -46,7 +47,7 @@ impl SourceMapped<&Located<ExprKind>> {
         match &self.node {
             ExprKind::Call { args, .. } => {
                 if args.len() != 1 {
-                    return Err(vec![self.func_formatting_error()]);
+                    return Err(FuncFormatting::err_from_expr(self).into());
                 }
                 let (mode,) = (self.get_func_mode().map_err(Error::into),).collect_results()?;
                 let (params, return_type) = (
@@ -54,7 +55,6 @@ impl SourceMapped<&Located<ExprKind>> {
                     self.build_func_return_type(mode.clone()),
                 )
                     .collect_results()?;
-                let return_type = Box::from(ReturnType::new(return_type));
                 Ok(Func {
                     to_vm_value: |name: String| rust::generate_func_to_vm_value(&name),
                     list_to_vm_value: |name: String| rust::generate_func_list_to_vm_value(&name),
@@ -64,11 +64,11 @@ impl SourceMapped<&Located<ExprKind>> {
                     },
                     name,
                     params,
-                    return_type,
+                    return_type: Box::from(ReturnType::new(return_type)),
                     mode,
                 })
             }
-            _ => return Err(vec![crate::errors::unreachable()]),
+            _ => return Err(crate::errors::unreachable().into()),
         }
     }
 
@@ -80,55 +80,55 @@ impl SourceMapped<&Located<ExprKind>> {
                         "Oneway" => Mode::Oneway,
                         "Update" => Mode::Update,
                         "Query" => Mode::Query,
-                        _ => return Err(self.return_type_mode_error()),
+                        _ => return Err(ReturnTypeMode::err_from_expr(self)),
                     }),
-                    _ => Err(self.return_type_mode_error()),
+                    _ => Err(ReturnTypeMode::err_from_expr(self)),
                 },
-                _ => Err(self.return_type_mode_error()),
+                _ => Err(ReturnTypeMode::err_from_expr(self)),
             },
             _ => Err(crate::errors::unreachable()),
         }
     }
 
-    fn get_func_params(&self) -> KybraResult<Vec<SourceMapped<&Located<ExprKind>>>> {
+    fn get_func_params(&self) -> Result<Vec<SourceMapped<&Located<ExprKind>>>, Error> {
         match &self.node {
             ExprKind::Call { args, .. } => match &args[0].node {
                 ExprKind::Subscript { slice, .. } => match &slice.node {
                     ExprKind::Tuple { elts, .. } => {
                         if elts.len() != 2 {
-                            return Err(self.func_formatting_error().into());
+                            return Err(FuncFormatting::err_from_expr(self));
                         }
                         match &elts[0].node {
                             ExprKind::List { elts, .. } => Ok(elts
                                 .iter()
                                 .map(|elt| SourceMapped::new(elt, self.source_map.clone()))
                                 .collect::<Vec<_>>()),
-                            _ => Err(self.func_formatting_error().into()),
+                            _ => Err(FuncFormatting::err_from_expr(self)),
                         }
                     }
-                    _ => Err(self.func_formatting_error().into()),
+                    _ => Err(FuncFormatting::err_from_expr(self)),
                 },
-                _ => Err(self.func_formatting_error().into()),
+                _ => Err(FuncFormatting::err_from_expr(self)),
             },
-            _ => Err(crate::errors::unreachable().into()),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
-    fn get_func_return_type(&self) -> KybraResult<SourceMapped<&Located<ExprKind>>> {
+    fn get_func_return_type(&self) -> Result<SourceMapped<&Located<ExprKind>>, Error> {
         match &self.node {
             ExprKind::Call { args, .. } => match &args[0].node {
                 ExprKind::Subscript { slice, .. } => match &slice.node {
                     ExprKind::Tuple { elts, .. } => {
                         if elts.len() != 2 {
-                            return Err(self.func_formatting_error().into());
+                            return Err(FuncFormatting::err_from_expr(self));
                         }
                         Ok(SourceMapped::new(&elts[1], self.source_map.clone()))
                     }
-                    _ => return Err(self.func_formatting_error().into()),
+                    _ => return Err(FuncFormatting::err_from_expr(self)),
                 },
-                _ => return Err(self.func_formatting_error().into()),
+                _ => return Err(FuncFormatting::err_from_expr(self)),
             },
-            _ => Err(crate::errors::unreachable().into()),
+            _ => Err(crate::errors::unreachable()),
         }
     }
 
@@ -162,7 +162,7 @@ impl SourceMapped<&Located<StmtKind>> {
         let name = match &self.node {
             StmtKind::Assign { targets, .. } => {
                 if targets.len() != 1 {
-                    return Err(vec![self.multiple_func_targets_error()]);
+                    return Err(NotExactlyOneTarget::err_from_stmt(self).into());
                 }
 
                 match &targets[0].node {
@@ -183,7 +183,7 @@ impl SourceMapped<&Located<StmtKind>> {
             } => Ok(Some(
                 SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
             )),
-            _ => Err(vec![crate::errors::unreachable()]),
+            _ => Err(crate::errors::unreachable().into()),
         }
     }
 
