@@ -21,7 +21,7 @@ impl PyAst {
 }
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn is_type_alias(&self) -> bool {
+    fn is_type_alias(&self) -> bool {
         match &self.node {
             ExprKind::Subscript { value, .. } => match &value.node {
                 ExprKind::Name { id, .. } => match &id[..] {
@@ -36,7 +36,7 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn is_type_alias(&self) -> bool {
+    fn is_type_alias(&self) -> bool {
         if self.is_func() {
             return false;
         }
@@ -49,7 +49,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn as_type_alias(&self) -> Result<Option<TypeAlias>, Vec<Error>> {
+    fn as_type_alias(&self) -> Result<Option<TypeAlias>, Vec<Error>> {
         if !self.is_type_alias() {
             return Ok(None);
         }

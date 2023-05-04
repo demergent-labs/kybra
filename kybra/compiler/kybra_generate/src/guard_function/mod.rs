@@ -4,7 +4,12 @@ mod guard_function;
 use cdk_framework::act::node::{CandidType, GuardFunction};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
+use crate::{
+    errors::{CollectResults, Unreachable},
+    py_ast::PyAst,
+    source_map::SourceMapped,
+    Error,
+};
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_guard_function(&self) -> bool {
@@ -41,7 +46,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     name: name.clone(),
                 }))
             }
-            _ => return Err(vec![crate::errors::unreachable()]),
+            _ => return Err(Unreachable::new_err().into()),
         }
     }
 

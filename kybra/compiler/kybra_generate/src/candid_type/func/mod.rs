@@ -9,7 +9,10 @@ use cdk_framework::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::CollectResults as CrateCollectResults, py_ast::PyAst, source_map::SourceMapped, Error,
+    errors::{CollectResults as CrateCollectResults, Unreachable},
+    py_ast::PyAst,
+    source_map::SourceMapped,
+    Error,
 };
 
 use self::errors::{FuncFormatting, ReturnTypeMode};
@@ -33,7 +36,7 @@ impl PyAst {
 }
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn is_func(&self) -> bool {
+    fn is_func(&self) -> bool {
         match &self.node {
             ExprKind::Call { func, .. } => match &func.node {
                 ExprKind::Name { id, .. } => id == "Func",
@@ -43,7 +46,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn to_func(&self, name: Option<String>) -> Result<Func, Vec<Error>> {
+    fn to_func(&self, name: Option<String>) -> Result<Func, Vec<Error>> {
         match &self.node {
             ExprKind::Call { args, .. } => {
                 if args.len() != 1 {
@@ -68,7 +71,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     mode,
                 })
             }
-            _ => return Err(crate::errors::unreachable().into()),
+            _ => return Err(Unreachable::new_err().into()),
         }
     }
 
@@ -86,7 +89,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 },
                 _ => Err(ReturnTypeMode::err_from_expr(self)),
             },
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(Unreachable::new_err()),
         }
     }
 
@@ -110,7 +113,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 },
                 _ => Err(FuncFormatting::err_from_expr(self)),
             },
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(Unreachable::new_err()),
         }
     }
 
@@ -128,7 +131,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 },
                 _ => return Err(FuncFormatting::err_from_expr(self)),
             },
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(Unreachable::new_err()),
         }
     }
 
@@ -183,7 +186,7 @@ impl SourceMapped<&Located<StmtKind>> {
             } => Ok(Some(
                 SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
             )),
-            _ => Err(crate::errors::unreachable().into()),
+            _ => Err(Unreachable::new_err().into()),
         }
     }
 

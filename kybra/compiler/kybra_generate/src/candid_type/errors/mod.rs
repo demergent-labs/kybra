@@ -2,7 +2,11 @@ pub mod not_exactly_one_target;
 
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::CreateMessage, source_map::SourceMapped, Error};
+use crate::{
+    errors::{CreateMessage, Unreachable},
+    source_map::SourceMapped,
+    Error,
+};
 
 pub use not_exactly_one_target::NotExactlyOneTarget;
 
@@ -96,7 +100,7 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::Pass => "Pass",
             StmtKind::Break => "Break",
             StmtKind::Continue => "Continue",
-            _ => return crate::errors::unreachable(),
+            _ => return Unreachable::new_err(),
         };
         let title = format!(
             "{} are not allowed here. They cannot be represented as a candid type.",

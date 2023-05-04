@@ -1,10 +1,10 @@
 use cdk_framework::act::node::candid::Array;
 use rustpython_parser::ast::{ExprKind, Located};
 
-use crate::{source_map::SourceMapped, Error};
+use crate::{errors::Unreachable, source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn is_array(&self) -> bool {
+    fn is_array(&self) -> bool {
         match &self.node {
             ExprKind::Subscript { value, .. } => match &value.node {
                 ExprKind::Name { id, .. } => id == "Vec",
@@ -14,17 +14,17 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn to_array(&self) -> Result<Array, Vec<Error>> {
+    pub fn as_array(&self) -> Result<Option<Array>, Vec<Error>> {
         if !self.is_array() {
-            return Err(crate::errors::unreachable().into());
+            return Ok(None);
         }
-        match &self.node {
-            ExprKind::Subscript { slice, .. } => Ok(Array {
+        Ok(Some(match &self.node {
+            ExprKind::Subscript { slice, .. } => Array {
                 enclosed_type: Box::from(
                     SourceMapped::new(slice.as_ref(), self.source_map.clone()).to_candid_type()?,
                 ),
-            }),
-            _ => Err(crate::errors::unreachable().into()),
-        }
+            },
+            _ => return Err(Unreachable::new_err().into()),
+        }))
     }
 }

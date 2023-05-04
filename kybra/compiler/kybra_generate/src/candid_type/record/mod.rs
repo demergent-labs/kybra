@@ -19,7 +19,7 @@ impl PyAst {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn is_record(&self) -> bool {
+    fn is_record(&self) -> bool {
         match &self.node {
             StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {
                 let is_record = match &base.node {
@@ -32,7 +32,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn as_record(&self) -> Result<Option<Record>, Vec<Error>> {
+    fn as_record(&self) -> Result<Option<Record>, Vec<Error>> {
         if !self.is_record() {
             return Ok(None);
         }

@@ -3,10 +3,10 @@ pub mod errors;
 use cdk_framework::act::node::candid::TypeRef;
 use rustpython_parser::ast::{Constant, ExprKind, Located};
 
-use crate::{errors::KybraResult, source_map::SourceMapped};
+use crate::{errors::Unreachable, source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn is_type_ref(&self) -> bool {
+    fn is_type_ref(&self) -> bool {
         match &self.node {
             ExprKind::Name { .. } => true,
             ExprKind::Constant { value, .. } => match value {
@@ -17,23 +17,23 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn to_type_ref(&self) -> KybraResult<TypeRef> {
+    pub fn as_type_ref(&self) -> Result<Option<TypeRef>, Error> {
         if !self.is_type_ref() {
-            return Err(self.not_type_ref_error());
+            return Ok(None);
         }
-        match &self.node {
-            ExprKind::Name { id, .. } => Ok(TypeRef {
+        Ok(Some(match &self.node {
+            ExprKind::Name { id, .. } => TypeRef {
                 name: id.to_string(),
-                type_arguments: vec![].into(),
-            }),
+                type_arguments: vec![],
+            },
             ExprKind::Constant { value, .. } => match value {
-                Constant::Str(string) => Ok(TypeRef {
+                Constant::Str(string) => TypeRef {
                     name: string.clone(),
                     type_arguments: vec![],
-                }),
-                _ => Err(crate::errors::unreachable()),
+                },
+                _ => return Err(Unreachable::new_err()),
             },
-            _ => Err(crate::errors::unreachable()),
-        }
+            _ => return Err(Unreachable::new_err()),
+        }))
     }
 }

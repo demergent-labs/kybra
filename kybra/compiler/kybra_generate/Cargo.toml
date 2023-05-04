@@ -11,6 +11,7 @@ regex = "1.7.0"
 rustpython-parser = { git = "https://github.com/demergent-labs/RustPython", branch = "kybra_initial", default-features = false, features = [] }
 annotate-snippets = "0.9.1"
 num-bigint = "0.4.3"
+backtrace = "0.3.67" # The package isn't strickly neccesary. std::backtrace::Backtrace might be able to do what we need, but it isn't clonable and backtrace::Backtrace is, so we are using to avoid adding a buch of lifetime code
 # rustpython = { path = "../../../../RustPython", default-features = false, features = [] }
 cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "d033afcface9071916839c4b15eb5f7a65193f1c" }
 # cdk_framework = { path = "/home/cdk_framework" }

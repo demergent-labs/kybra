@@ -11,6 +11,7 @@ use crate::candid_type::service::errors::{
     TooManyDecorators, WrongDecorator,
 };
 
+use backtrace::Backtrace;
 pub use collect_results::CollectResults;
 pub use compiler_output::CompilerOutput;
 pub use compiler_output::CreateLocation;
@@ -20,10 +21,44 @@ pub use message::CreateMessage;
 pub use message::Message;
 
 #[derive(Clone, Debug)]
+pub struct Unreachable {
+    pub backtrace: Backtrace,
+}
+
+impl std::fmt::Display for Unreachable {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let message = "Oops! Looks like we introduced a bug while refactoring.";
+        let ticket_url =
+            "Please open a ticket at https://github.com/demergent-labs/kybra/issues/new";
+        let stack_trace = "Please include the following backtrace:";
+        write!(
+            f,
+            "{message}\n{ticket_url}\n{stack_trace}\n{:?}",
+            self.backtrace
+        )
+    }
+}
+
+impl Unreachable {
+    pub fn new_err() -> Error {
+        Unreachable {
+            backtrace: Backtrace::new(),
+        }
+        .into()
+    }
+}
+
+impl From<Unreachable> for Error {
+    fn from(value: Unreachable) -> Self {
+        Self::Unreachable(value)
+    }
+}
+
+#[derive(Clone, Debug)]
 pub enum Error {
     GuardFunctionNotFound(String),
     TypeNotFound(String),
-    Unreachable(String),
+    Unreachable(Unreachable),
     ClassMustHaveMethods(ClassMustHaveMethods),
     ClassWithNotFunctionDefs(ClassWithNotFunctionDefs),
     DictionaryUnpackingOperatorNotSupported(Message),
@@ -50,7 +85,6 @@ pub enum Error {
     MultiplePostUpgrade(Message),
     MultiplePreUpgrade(Message),
     MustBeSubscript(Message),
-    NotAPrimitive(Message),
     NotATuple(Message),
     NotATypeRef(Message),
     NotExactlyOneTarget(NotExactlyOneTarget),
@@ -98,7 +132,6 @@ impl std::fmt::Display for Error {
             Error::MultiplePostUpgrade(error) => error,
             Error::MultiplePreUpgrade(error) => error,
             Error::MustBeSubscript(error) => error,
-            Error::NotAPrimitive(error) => error,
             Error::NotATuple(error) => error,
             Error::NotATypeRef(error) => error,
             Error::ParamTypeAnnotationRequired(error) => error,
@@ -122,10 +155,6 @@ impl From<Error> for Vec<Error> {
     fn from(value: Error) -> Self {
         vec![value]
     }
-}
-
-pub fn unreachable() -> Error {
-    Error::Unreachable("Oops! Looks like we introduced a bug while refactoring. Please open a ticket at https://github.com/demergent-labs/kybra/issues/new".to_string())
 }
 
 impl From<cdk_framework::act::abstract_canister_tree::Error> for crate::Error {

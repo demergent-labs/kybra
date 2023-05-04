@@ -3,6 +3,7 @@ use quote::{format_ident, quote};
 use rustpython_parser::ast::Located;
 use rustpython_parser::ast::StmtKind;
 
+use crate::errors::Unreachable;
 use crate::Error;
 use crate::{method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple};
 
@@ -47,7 +48,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     });
                 })
             }
-            _ => Err(vec![crate::errors::unreachable()]),
+            _ => Err(Unreachable::new_err().into()),
         }
     }
 }

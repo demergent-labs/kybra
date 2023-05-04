@@ -1,13 +1,13 @@
 use cdk_framework::act::node::CandidType;
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{source_map::SourceMapped, Error};
+use crate::{errors::Unreachable, source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn build_return_type(&self) -> Result<CandidType, Vec<Error>> {
         let returns = match &self.node {
             StmtKind::FunctionDef { returns, .. } => returns,
-            _ => return Err(vec![crate::errors::unreachable()]),
+            _ => return Err(Unreachable::new_err().into()),
         };
 
         match returns {

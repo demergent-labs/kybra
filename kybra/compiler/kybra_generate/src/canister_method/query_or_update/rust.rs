@@ -3,7 +3,10 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple, Error};
+use crate::{
+    errors::Unreachable, method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple,
+    Error,
+};
 
 pub fn generate_body(
     source_mapped_located_stmtkind: &SourceMapped<&Located<StmtKind>>,
@@ -12,7 +15,7 @@ pub fn generate_body(
 
     let name = match source_mapped_located_stmtkind.get_name() {
         Some(name) => name,
-        None => return Err(vec![crate::errors::unreachable()]),
+        None => return Err(Unreachable::new_err().into()),
     };
 
     let param_conversions = params

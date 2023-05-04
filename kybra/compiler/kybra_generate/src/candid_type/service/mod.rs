@@ -12,8 +12,11 @@ use cdk_framework::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::CollectResults as OtherCollectResults, method_utils::params::InternalOrExternal,
-    py_ast::PyAst, source_map::SourceMapped, Error,
+    errors::{CollectResults as OtherCollectResults, Unreachable},
+    method_utils::params::InternalOrExternal,
+    py_ast::PyAst,
+    source_map::SourceMapped,
+    Error,
 };
 
 use self::errors::{
@@ -35,7 +38,7 @@ impl PyAst {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn to_service_method(&self, canister_name: &String) -> Result<Method, Vec<Error>> {
+    fn to_service_method(&self, canister_name: &String) -> Result<Method, Vec<Error>> {
         match &self.node {
             StmtKind::FunctionDef {
                 name,
@@ -63,7 +66,7 @@ impl SourceMapped<&Located<StmtKind>> {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_service(&self) -> Result<Option<Service>, Vec<Error>> {
+    fn as_service(&self) -> Result<Option<Service>, Vec<Error>> {
         if !self.is_service() {
             return Ok(None);
         }
@@ -93,11 +96,11 @@ impl SourceMapped<&Located<StmtKind>> {
                 }))
             }
             // We filter out any non classDefs in KybraProgram.get_external_canister_declarations
-            _ => Err(crate::errors::unreachable().into()),
+            _ => Err(Unreachable::new_err().into()),
         }
     }
 
-    pub fn is_service(&self) -> bool {
+    fn is_service(&self) -> bool {
         match &self.node {
             StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {
                 let is_external_canister = match &base.node {

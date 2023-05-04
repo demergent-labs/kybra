@@ -19,6 +19,7 @@ use rustpython_parser::ast::Mod;
 use rustpython_parser::ast::StmtKind;
 
 use crate::errors::KybraResult;
+use crate::errors::Unreachable;
 use crate::py_ast::PyAst;
 use crate::source_map::SourceMapped;
 
@@ -83,7 +84,7 @@ impl SourceMapped<&Located<StmtKind>> {
     pub fn get_function_name(&self) -> KybraResult<String> {
         match &self.node {
             StmtKind::FunctionDef { name, .. } => Ok(name.clone()),
-            _ => Err(crate::errors::unreachable()),
+            _ => Err(Unreachable::new_err()),
         }
     }
 

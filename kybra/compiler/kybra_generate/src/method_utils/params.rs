@@ -1,7 +1,11 @@
 use cdk_framework::act::node::Param;
 use rustpython_parser::ast::{ArgData, Located, StmtKind};
 
-use crate::{errors::CollectResults, source_map::SourceMapped, Error};
+use crate::{
+    errors::{CollectResults, Unreachable},
+    source_map::SourceMapped,
+    Error,
+};
 
 pub enum InternalOrExternal {
     Internal,
@@ -54,7 +58,7 @@ impl SourceMapped<&Located<StmtKind>> {
 
                 param_results.into_iter().collect_results()
             }
-            _ => Err(vec![crate::errors::unreachable()]),
+            _ => Err(Unreachable::new_err().into()),
         }
     }
 }

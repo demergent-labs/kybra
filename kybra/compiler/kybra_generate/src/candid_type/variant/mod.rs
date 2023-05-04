@@ -1,6 +1,11 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
+use crate::{
+    errors::{CollectResults, Unreachable},
+    py_ast::PyAst,
+    source_map::SourceMapped,
+    Error,
+};
 use cdk_framework::act::node::candid::variant::Variant;
 
 mod errors;
@@ -20,7 +25,7 @@ impl PyAst {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn is_variant(&self) -> bool {
+    fn is_variant(&self) -> bool {
         match &self.node {
             StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {
                 let is_variant = match &base.node {
@@ -33,7 +38,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn as_variant(&self) -> Result<Option<Variant>, Vec<Error>> {
+    fn as_variant(&self) -> Result<Option<Variant>, Vec<Error>> {
         if !self.is_variant() {
             return Ok(None);
         }
@@ -51,7 +56,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     type_params: vec![].into(),
                 }))
             }
-            _ => Err(vec![crate::errors::unreachable()]),
+            _ => Err(Unreachable::new_err().into()),
         }
     }
 }

@@ -5,7 +5,9 @@ use cdk_framework::act::node::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use super::rust;
-use crate::{method_utils::params::InternalOrExternal, source_map::SourceMapped, Error};
+use crate::{
+    errors::Unreachable, method_utils::params::InternalOrExternal, source_map::SourceMapped, Error,
+};
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_manual(&self) -> bool {
@@ -63,7 +65,7 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_canister_method_type(CanisterMethodType::Query)
             && !self.is_canister_method_type(CanisterMethodType::Update)
         {
-            return Err(vec![crate::errors::unreachable()]);
+            return Err(Unreachable::new_err().into());
         }
         match &self.node {
             StmtKind::FunctionDef { name, .. } => Ok(QueryOrUpdateDefinition {
@@ -78,7 +80,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     Err(err) => return Err(vec![err]),
                 },
             }),
-            _ => Err(vec![crate::errors::unreachable()]),
+            _ => Err(Unreachable::new_err().into()),
         }
     }
 }

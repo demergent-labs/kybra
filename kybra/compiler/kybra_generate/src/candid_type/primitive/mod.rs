@@ -1,12 +1,10 @@
-pub mod errors;
-
 use cdk_framework::act::node::candid::Primitive;
 use rustpython_parser::ast::{ExprKind, Located};
 
-use crate::{errors::KybraResult, source_map::SourceMapped};
+use crate::{errors::Unreachable, source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn is_primitive(&self) -> bool {
+    fn is_primitive(&self) -> bool {
         match &self.node {
             ExprKind::Name { id, .. } => match &id[..] {
                 "blob" => true,
@@ -36,33 +34,36 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn to_primitive(&self) -> KybraResult<Primitive> {
-        match &self.node {
-            ExprKind::Name { id, .. } => match &id[..] {
-                "blob" => Ok(Primitive::Blob),
-                "empty" => Ok(Primitive::Empty),
-                "float64" => Ok(Primitive::Float64),
-                "float32" => Ok(Primitive::Float32),
-                "int" => Ok(Primitive::Int),
-                "int64" => Ok(Primitive::Int64),
-                "int32" => Ok(Primitive::Int32),
-                "int16" => Ok(Primitive::Int16),
-                "int8" => Ok(Primitive::Int8),
-                "nat" => Ok(Primitive::Nat),
-                "nat64" => Ok(Primitive::Nat64),
-                "nat32" => Ok(Primitive::Nat32),
-                "nat16" => Ok(Primitive::Nat16),
-                "nat8" => Ok(Primitive::Nat8),
-                "null" => Ok(Primitive::Null),
-                "Principal" => Ok(Primitive::Principal),
-                "bool" => Ok(Primitive::Bool),
-                "reserved" => Ok(Primitive::Reserved),
-                "str" => Ok(Primitive::String),
-                "text" => Ok(Primitive::String),
-                "void" => Ok(Primitive::Void),
-                _ => Err(self.not_a_primitive_error()),
-            },
-            _ => Err(self.not_a_primitive_error()),
+    pub fn as_primitive(&self) -> Result<Option<Primitive>, Error> {
+        if !self.is_primitive() {
+            return Ok(None);
         }
+        Ok(Some(match &self.node {
+            ExprKind::Name { id, .. } => match &id[..] {
+                "blob" => Primitive::Blob,
+                "empty" => Primitive::Empty,
+                "float64" => Primitive::Float64,
+                "float32" => Primitive::Float32,
+                "int" => Primitive::Int,
+                "int64" => Primitive::Int64,
+                "int32" => Primitive::Int32,
+                "int16" => Primitive::Int16,
+                "int8" => Primitive::Int8,
+                "nat" => Primitive::Nat,
+                "nat64" => Primitive::Nat64,
+                "nat32" => Primitive::Nat32,
+                "nat16" => Primitive::Nat16,
+                "nat8" => Primitive::Nat8,
+                "null" => Primitive::Null,
+                "Principal" => Primitive::Principal,
+                "bool" => Primitive::Bool,
+                "reserved" => Primitive::Reserved,
+                "str" => Primitive::String,
+                "text" => Primitive::String,
+                "void" => Primitive::Void,
+                _ => return Err(Unreachable::new_err()),
+            },
+            _ => return Err(Unreachable::new_err()),
+        }))
     }
 }

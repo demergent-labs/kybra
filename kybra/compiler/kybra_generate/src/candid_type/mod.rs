@@ -16,56 +16,21 @@ pub mod type_ref;
 pub mod variant;
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn is_candid_type(&self) -> bool {
-        self.is_primitive()
-            || self.is_array()
-            || self.is_opt()
-            || self.is_tuple()
-            || self.is_type_ref()
-            || self.is_subscript_slice_a_candid_type()
-    }
-
-    fn is_subscript_slice_a_candid_type(&self) -> bool {
-        match &self.node {
-            ExprKind::Subscript { value, slice, .. } => {
-                match &value.node {
-                    ExprKind::Name { id, .. } => match &id[..] {
-                        "Async" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
-                            .is_candid_type(),
-                        "Manual" => SourceMapped::new(slice.as_ref(), self.source_map.clone())
-                            .is_candid_type(),
-                        _ => false,
-                    },
-                    _ => false,
-                }
-            }
-            _ => false,
-        }
-    }
-}
-
-impl SourceMapped<&Located<ExprKind>> {
     pub fn to_candid_type(&self) -> Result<CandidType, Vec<Error>> {
-        if self.is_primitive() {
-            return match self.to_primitive() {
-                Ok(primitive) => Ok(CandidType::Primitive(primitive)),
-                Err(err) => Err(vec![err]),
-            };
+        if let Some(primitive) = self.as_primitive().map_err(Into::<Vec<Error>>::into)? {
+            return Ok(CandidType::Primitive(primitive));
         }
-        if self.is_array() {
-            return Ok(CandidType::Array(self.to_array()?));
+        if let Some(array) = self.as_array()? {
+            return Ok(CandidType::Array(array));
         }
-        if self.is_opt() {
-            return Ok(CandidType::Opt(self.to_opt()?));
+        if let Some(opt) = self.as_opt()? {
+            return Ok(CandidType::Opt(opt));
         }
-        if self.is_tuple() {
-            return Ok(CandidType::Tuple(self.to_tuple(None)?));
+        if let Some(tuple) = self.as_tuple(None)? {
+            return Ok(CandidType::Tuple(tuple));
         }
-        if self.is_type_ref() {
-            return match self.to_type_ref() {
-                Ok(type_ref) => Ok(CandidType::TypeRef(type_ref)),
-                Err(err) => Err(vec![err]),
-            };
+        if let Some(type_ref) = self.as_type_ref().map_err(Into::<Vec<Error>>::into)? {
+            return Ok(CandidType::TypeRef(type_ref));
         }
         match &self.node {
             ExprKind::Subscript { value, slice, .. } => match &value.node {
