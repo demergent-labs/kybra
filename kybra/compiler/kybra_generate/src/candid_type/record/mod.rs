@@ -40,11 +40,11 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::ClassDef { name, body, .. } => {
                 let members = body
                     .iter()
-                    .filter(|stmt| {
-                        SourceMapped::new(stmt.clone(), self.source_map.clone()).is_record_member()
-                    })
-                    .map(|stmt| SourceMapped::new(stmt, self.source_map.clone()).to_record_member())
-                    .collect_results()?;
+                    .map(|stmt| SourceMapped::new(stmt, self.source_map.clone()).as_record_member())
+                    .collect_results()?
+                    .into_iter()
+                    .filter_map(|member_option| member_option)
+                    .collect();
                 Ok(Some(Record {
                     name: Some(name.clone()),
                     members,
