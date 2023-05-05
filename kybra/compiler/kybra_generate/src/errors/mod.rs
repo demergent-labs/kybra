@@ -5,8 +5,7 @@ pub mod message;
 use std::fmt;
 
 use crate::candid_type::errors::{
-    InvalidAnnAssign, InvalidAssign, InvalidClass, InvalidMember, InvalidTarget,
-    NotExactlyOneTarget, TargetMustBeAName, UnsupportedType,
+    InvalidMember, InvalidTarget, NotExactlyOneTarget, TargetMustBeAName, UnsupportedType,
 };
 use crate::candid_type::func::errors::{FuncFormatting, InlineFuncNotSupported, ReturnTypeMode};
 use crate::candid_type::service::errors::{
@@ -72,9 +71,6 @@ pub enum Error {
     GuardFunctionParam(Message),
     GuardFunctionReturn(Message),
     InlineFuncNotSupported(InlineFuncNotSupported),
-    InvalidAnnAssign(InvalidAnnAssign),
-    InvalidAssign(InvalidAssign),
-    InvalidClass(InvalidClass),
     InvalidDecorator(InvalidDecorator),
     InvalidMember(InvalidMember),
     InvalidSubscriptable(Message),
@@ -117,9 +113,6 @@ impl std::fmt::Display for Error {
             Error::GuardFunctionParam(error) => error,
             Error::GuardFunctionReturn(error) => error,
             Error::InlineFuncNotSupported(error) => error,
-            Error::InvalidAnnAssign(error) => error,
-            Error::InvalidAssign(error) => error,
-            Error::InvalidClass(error) => error,
             Error::InvalidDecorator(error) => error,
             Error::InvalidMember(error) => error,
             Error::InvalidSubscriptable(error) => error,

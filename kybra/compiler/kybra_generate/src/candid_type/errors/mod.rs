@@ -1,6 +1,3 @@
-pub mod invalid_annotation_assign;
-pub mod invalid_assign;
-pub mod invalid_class;
 pub mod invalid_member;
 pub mod invalid_subscriptable;
 pub mod invalid_target;
@@ -13,9 +10,6 @@ use rustpython_parser::ast::{ExprKind, Located};
 
 use crate::{errors::CreateMessage, source_map::SourceMapped, Error};
 
-pub use invalid_annotation_assign::InvalidAnnAssign;
-pub use invalid_assign::InvalidAssign;
-pub use invalid_class::InvalidClass;
 pub use invalid_member::InvalidMember;
 pub use invalid_target::InvalidTarget;
 pub use not_exactly_one_target::NotExactlyOneTarget;
