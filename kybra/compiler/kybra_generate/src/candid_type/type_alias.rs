@@ -25,9 +25,6 @@ impl PyAst {
 
 impl SourceMapped<&Located<StmtKind>> {
     fn is_type_alias(&self) -> bool {
-        if self.is_func() {
-            return false;
-        }
         if let StmtKind::Assign { value, .. }
         | StmtKind::AnnAssign {
             value: Some(value), ..

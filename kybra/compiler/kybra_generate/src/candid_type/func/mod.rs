@@ -158,7 +158,7 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn is_func(&self) -> bool {
+    fn is_func(&self) -> bool {
         match &self.node {
             StmtKind::Assign { value, .. }
             | StmtKind::AnnAssign {
