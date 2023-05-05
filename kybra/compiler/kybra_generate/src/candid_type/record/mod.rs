@@ -3,7 +3,12 @@ mod record_members;
 use cdk_framework::act::node::candid::Record;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
+use crate::{
+    errors::{CollectResults, Unreachable},
+    py_ast::PyAst,
+    source_map::SourceMapped,
+    Error,
+};
 
 impl PyAst {
     pub fn build_records(&self) -> Result<Vec<Record>, Vec<Error>> {
@@ -51,7 +56,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     type_params: vec![].into(),
                 }))
             }
-            _ => Ok(None),
+            _ => Err(Unreachable::new_err().into()),
         }
     }
 }

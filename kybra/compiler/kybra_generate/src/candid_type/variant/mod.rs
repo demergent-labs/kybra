@@ -8,7 +8,6 @@ use crate::{
 };
 use cdk_framework::act::node::candid::variant::Variant;
 
-mod errors;
 mod variants_members;
 
 impl PyAst {
@@ -47,7 +46,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 let members = body
                     .iter()
                     .map(|stmt| {
-                        SourceMapped::new(stmt, self.source_map.clone()).as_variant_member()
+                        SourceMapped::new(stmt, self.source_map.clone()).to_variant_member()
                     })
                     .collect_results()?;
                 Ok(Some(Variant {

@@ -5,12 +5,12 @@ use crate::{
     source_map::SourceMapped,
     Error,
 };
-use cdk_framework::act::node::candid::variant::Member;
+use cdk_framework::{act::node::candid::variant::Member, traits::CollectResults};
 
 mod warnings;
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_variant_member(&self) -> Result<Member, Vec<Error>> {
+    pub fn to_variant_member(&self) -> Result<Member, Vec<Error>> {
         match &self.node {
             StmtKind::AnnAssign {
                 target,
@@ -22,12 +22,15 @@ impl SourceMapped<&Located<StmtKind>> {
                     Some(_) => eprintln!("{}", self.variant_default_value_warning()),
                     None => (),
                 }
-                let name = match &target.node {
-                    ExprKind::Name { id, .. } => id.clone(),
-                    _ => return Err(TargetMustBeAName::err_from_stmt(self).into()),
-                };
-                let candid_type = SourceMapped::new(annotation.as_ref(), self.source_map.clone())
-                    .to_candid_type()?;
+                let (name, candid_type) = (
+                    match &target.node {
+                        ExprKind::Name { id, .. } => Ok(id.clone()),
+                        _ => Err(TargetMustBeAName::err_from_stmt(self).into()),
+                    },
+                    SourceMapped::new(annotation.as_ref(), self.source_map.clone())
+                        .to_candid_type(),
+                )
+                    .collect_results()?;
                 Ok(Member { name, candid_type })
             }
             _ => Err(InvalidMember::err_from_stmt(self).into()),
