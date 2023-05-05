@@ -3,7 +3,7 @@ use rustpython_parser::ast::{Constant, ExprKind, Located};
 
 use crate::{source_map::SourceMapped, Error};
 
-use self::errors::UnsupportedType;
+use self::errors::{InvalidSubscriptable, NoneCannotBeAType, UnsupportedType};
 
 pub mod array;
 pub mod errors;
@@ -40,12 +40,12 @@ impl SourceMapped<&Located<ExprKind>> {
                     "Async" | "Manual" => {
                         SourceMapped::new(slice.as_ref(), self.source_map.clone()).to_candid_type()
                     }
-                    _ => Err(vec![self.invalid_subscriptable_error()]),
+                    _ => Err(InvalidSubscriptable::err_from_expr(self).into()),
                 },
-                _ => Err(vec![self.invalid_subscriptable_error()]),
+                _ => Err(InvalidSubscriptable::err_from_expr(self).into()),
             },
             ExprKind::Constant { value, .. } => match value {
-                Constant::None => Err(vec![self.none_cant_be_a_type_error()]),
+                Constant::None => Err(NoneCannotBeAType::err_from_expr(self).into()),
                 _ => Err(UnsupportedType::err_from_expr(self).into()),
             },
             _ => Err(UnsupportedType::err_from_expr(self).into()),

@@ -5,7 +5,8 @@ pub mod message;
 use std::fmt;
 
 use crate::candid_type::errors::{
-    InvalidMember, InvalidTarget, NotExactlyOneTarget, TargetMustBeAName, UnsupportedType,
+    InvalidMember, InvalidSubscriptable, InvalidTarget, NoneCannotBeAType, NotExactlyOneTarget,
+    TargetMustBeAName, UnsupportedType,
 };
 use crate::candid_type::func::errors::{FuncFormatting, InlineFuncNotSupported, ReturnTypeMode};
 use crate::candid_type::service::errors::{
@@ -73,10 +74,10 @@ pub enum Error {
     InlineFuncNotSupported(InlineFuncNotSupported),
     InvalidDecorator(InvalidDecorator),
     InvalidMember(InvalidMember),
-    InvalidSubscriptable(Message),
+    InvalidSubscriptable(InvalidSubscriptable),
     InvalidTarget(InvalidTarget),
     IteratorUnpackingOperatorNotSupported(Message),
-    NoneCannotBeAType(Message),
+    NoneCannotBeAType(NoneCannotBeAType),
     MissingDecorator(MissingDecorator),
     MultipleHeartBeat(Message),
     MultipleInit(Message),
