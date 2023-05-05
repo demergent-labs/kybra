@@ -158,6 +158,16 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
+    pub fn is_func(&self) -> bool {
+        match &self.node {
+            StmtKind::Assign { value, .. }
+            | StmtKind::AnnAssign {
+                value: Some(value), ..
+            } => SourceMapped::new(value.as_ref(), self.source_map.clone()).is_func(),
+            _ => false,
+        }
+    }
+
     pub fn as_func(&self) -> Result<Option<Func>, Vec<Error>> {
         if !self.is_func() {
             return Ok(None);
@@ -187,16 +197,6 @@ impl SourceMapped<&Located<StmtKind>> {
                 SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
             )),
             _ => Err(Unreachable::new_err().into()),
-        }
-    }
-
-    pub fn is_func(&self) -> bool {
-        match &self.node {
-            StmtKind::Assign { value, .. }
-            | StmtKind::AnnAssign {
-                value: Some(value), ..
-            } => SourceMapped::new(value.as_ref(), self.source_map.clone()).is_func(),
-            _ => false,
         }
     }
 

@@ -1,9 +1,12 @@
-pub mod errors;
-
-use cdk_framework::act::node::candid::TypeAlias;
+use cdk_framework::{act::node::candid::TypeAlias, traits::CollectResults};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
+use crate::{
+    errors::{CollectResults as OtherCollectResults, Unreachable},
+    py_ast::PyAst,
+    source_map::SourceMapped,
+    Error,
+};
 
 use super::errors::{InvalidTarget, NotExactlyOneTarget};
 
@@ -20,73 +23,58 @@ impl PyAst {
     }
 }
 
-impl SourceMapped<&Located<ExprKind>> {
-    fn is_type_alias(&self) -> bool {
-        match &self.node {
-            ExprKind::Subscript { value, .. } => match &value.node {
-                ExprKind::Name { id, .. } => match &id[..] {
-                    "Alias" => true,
-                    _ => false,
-                },
-                _ => false,
-            },
-            _ => false,
-        }
-    }
-}
-
 impl SourceMapped<&Located<StmtKind>> {
     fn is_type_alias(&self) -> bool {
         if self.is_func() {
             return false;
         }
-        match &self.node {
-            StmtKind::Assign { value, .. }
-            | StmtKind::AnnAssign {
-                value: Some(value), ..
-            } => SourceMapped::new(value.as_ref(), self.source_map.clone()).is_type_alias(),
-            _ => false,
+        if let StmtKind::Assign { value, .. }
+        | StmtKind::AnnAssign {
+            value: Some(value), ..
+        } = &self.node
+        {
+            if let ExprKind::Subscript { value, .. } = &value.node {
+                if let ExprKind::Name { id, .. } = &value.node {
+                    return id == "Alias";
+                }
+            }
         }
+        false
     }
 
     fn as_type_alias(&self) -> Result<Option<TypeAlias>, Vec<Error>> {
         if !self.is_type_alias() {
             return Ok(None);
         }
-        let (alias_name, value) = match &self.node {
+        let (target, value) = match &self.node {
             StmtKind::Assign { targets, value, .. } => {
                 if targets.len() != 1 {
                     return Err(NotExactlyOneTarget::err_from_stmt(self).into());
                 }
-                let alias_name = match &targets[0].node {
-                    ExprKind::Name { id, .. } => id.clone(),
-                    _ => return Err(InvalidTarget::err_from_stmt(self).into()),
-                };
-                let value = match &value.node {
-                    ExprKind::Subscript { slice, .. } => slice,
-                    _ => return Err(vec![self.must_be_subscript_error()]),
-                };
-                (alias_name, value)
+                (&targets[0], value)
             }
             StmtKind::AnnAssign {
                 target,
                 value: Some(value),
                 ..
-            } => {
-                let alias_name = match &target.node {
-                    ExprKind::Name { id, .. } => id.clone(),
-                    _ => return Err(InvalidTarget::err_from_stmt(self).into()),
-                };
-                let value = match &value.node {
-                    ExprKind::Subscript { slice, .. } => slice,
-                    _ => return Err(vec![self.must_be_subscript_error()]),
-                };
-                (alias_name, value)
-            }
+            } => (target.as_ref(), value),
             _ => return Ok(None),
         };
+
+        let (alias_name, enclosed_expr) = (
+            match &target.node {
+                ExprKind::Name { id, .. } => Ok(id.clone()),
+                _ => Err(InvalidTarget::err_from_stmt(self).into()),
+            },
+            match &value.node {
+                ExprKind::Subscript { slice, .. } => Ok(slice),
+                _ => Err(Unreachable::new_err().into()),
+            },
+        )
+            .collect_results()?;
+
         let enclosed_type =
-            SourceMapped::new(value.as_ref(), self.source_map.clone()).to_candid_type()?;
+            SourceMapped::new(enclosed_expr.as_ref(), self.source_map.clone()).to_candid_type()?;
         Ok(Some(TypeAlias {
             name: alias_name,
             aliased_type: Box::new(enclosed_type),
