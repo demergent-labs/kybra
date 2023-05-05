@@ -1,10 +1,10 @@
-pub mod errors;
 pub mod tuple_members;
 
 use cdk_framework::act::node::candid::Tuple;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
+    candid_type::errors::InvalidTarget,
     errors::{CollectResults, Unreachable},
     py_ast::PyAst,
     source_map::SourceMapped,
@@ -76,7 +76,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 }
                 let tuple_name = match &targets[0].node {
                     ExprKind::Name { id, .. } => id,
-                    _ => return Err(vec![self.invalid_target_error()]),
+                    _ => return Err(InvalidTarget::err_from_stmt(self).into()),
                 };
                 Ok(SourceMapped::new(value.as_ref(), self.source_map.clone())
                     .as_tuple(Some(tuple_name.clone()))?)

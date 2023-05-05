@@ -4,7 +4,9 @@ pub mod message;
 
 use std::fmt;
 
-use crate::candid_type::errors::NotExactlyOneTarget;
+use crate::candid_type::errors::{
+    InvalidMember, InvalidTarget, NotExactlyOneTarget, TargetMustBeAName,
+};
 use crate::candid_type::func::errors::{FuncFormatting, InlineFuncNotSupported, ReturnTypeMode};
 use crate::candid_type::service::errors::{
     ClassMustHaveMethods, ClassWithNotFunctionDefs, InvalidDecorator, MissingDecorator,
@@ -73,9 +75,9 @@ pub enum Error {
     InvalidAssign(Message),
     InvalidClass(Message),
     InvalidDecorator(InvalidDecorator),
-    InvalidMember(Message),
+    InvalidMember(InvalidMember),
     InvalidSubscriptable(Message),
-    InvalidTarget(Message),
+    InvalidTarget(InvalidTarget),
     IteratorUnpackingOperatorNotSupported(Message),
     NoneCantBeAType(Message),
     MissingDecorator(MissingDecorator),
@@ -92,7 +94,7 @@ pub enum Error {
     ReturnTypeAnnotationRequired(Message),
     ReturnTypeMode(ReturnTypeMode),
     ReturnTypeMustBeVoid(Message),
-    TargetMustBeAName(Message),
+    TargetMustBeAName(TargetMustBeAName),
     TooManyDecorators(TooManyDecorators),
     WrongDecorator(WrongDecorator),
     UnsupportedType(Message),

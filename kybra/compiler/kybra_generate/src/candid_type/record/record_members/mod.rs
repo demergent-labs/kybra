@@ -1,9 +1,12 @@
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
-use crate::{source_map::SourceMapped, Error};
+use crate::{
+    candid_type::errors::{InvalidMember, TargetMustBeAName},
+    source_map::SourceMapped,
+    Error,
+};
 use cdk_framework::act::node::candid::record::Member;
 
-mod errors;
 mod warnings;
 
 impl SourceMapped<&Located<StmtKind>> {
@@ -40,14 +43,14 @@ impl SourceMapped<&Located<StmtKind>> {
                 }
                 let name = match &target.node {
                     ExprKind::Name { id, .. } => id.clone(),
-                    _ => return Err(self.record_member_target_must_be_a_name_error().into()),
+                    _ => return Err(TargetMustBeAName::err_from_stmt(self).into()),
                 };
                 let candid_type = SourceMapped::new(annotation.as_ref(), self.source_map.clone())
                     .to_candid_type()?;
 
                 Ok(Some(Member { name, candid_type }))
             }
-            _ => Err(self.invalid_record_member_error().into()),
+            _ => Err(InvalidMember::err_from_stmt(self).into()),
         }
     }
 }

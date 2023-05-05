@@ -1,4 +1,7 @@
+pub mod invalid_member;
+pub mod invalid_target;
 pub mod not_exactly_one_target;
+pub mod target_must_be_a_name;
 
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
@@ -8,7 +11,10 @@ use crate::{
     Error,
 };
 
+pub use invalid_member::InvalidMember;
+pub use invalid_target::InvalidTarget;
 pub use not_exactly_one_target::NotExactlyOneTarget;
+pub use target_must_be_a_name::TargetMustBeAName;
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn invalid_subscriptable_error(&self) -> Error {
