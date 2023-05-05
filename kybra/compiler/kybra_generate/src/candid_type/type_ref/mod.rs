@@ -1,5 +1,3 @@
-pub mod errors;
-
 use cdk_framework::act::node::candid::TypeRef;
 use rustpython_parser::ast::{Constant, ExprKind, Located};
 
@@ -21,19 +19,18 @@ impl SourceMapped<&Located<ExprKind>> {
         if !self.is_type_ref() {
             return Ok(None);
         }
-        Ok(Some(match &self.node {
-            ExprKind::Name { id, .. } => TypeRef {
-                name: id.to_string(),
-                type_arguments: vec![],
-            },
+        let name = match &self.node {
+            ExprKind::Name { id, .. } => id,
             ExprKind::Constant { value, .. } => match value {
-                Constant::Str(string) => TypeRef {
-                    name: string.clone(),
-                    type_arguments: vec![],
-                },
+                Constant::Str(string) => string,
                 _ => return Err(Unreachable::new_err()),
             },
             _ => return Err(Unreachable::new_err()),
+        }
+        .to_string();
+        Ok(Some(TypeRef {
+            name,
+            type_arguments: vec![],
         }))
     }
 }
