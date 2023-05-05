@@ -1,4 +1,7 @@
-use cdk_framework::act::node::{candid::Primitive, CandidType};
+use cdk_framework::{
+    act::node::{candid::Primitive, CandidType},
+    traits::CollectResults,
+};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
@@ -11,7 +14,11 @@ use crate::{
 pub fn generate_body(
     source_mapped_located_stmtkind: &SourceMapped<&Located<StmtKind>>,
 ) -> Result<TokenStream, Vec<Error>> {
-    let params = source_mapped_located_stmtkind.build_params(InternalOrExternal::Internal)?;
+    let (params, return_expression) = (
+        source_mapped_located_stmtkind.build_params(InternalOrExternal::Internal),
+        generate_return_expression(source_mapped_located_stmtkind),
+    )
+        .collect_results()?;
 
     let name = match source_mapped_located_stmtkind.get_name() {
         Some(name) => name,
@@ -29,8 +36,6 @@ pub fn generate_body(
         .collect();
 
     let params = tuple::generate_tuple(&param_conversions);
-
-    let return_expression = generate_return_expression(source_mapped_located_stmtkind)?;
 
     Ok(quote! {
         unsafe {

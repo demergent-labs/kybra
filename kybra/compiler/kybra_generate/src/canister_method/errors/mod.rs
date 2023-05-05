@@ -1,13 +1,7 @@
-use rustpython_parser::ast::{Located, StmtKind};
+pub mod guard_function_name;
+pub mod multiple_system_methods;
+pub mod return_type_must_be_void;
 
-use crate::{errors::CreateMessage, source_map::SourceMapped, Error};
-
-impl SourceMapped<&Located<StmtKind>> {
-    pub fn guard_function_name_error(&self) -> Error {
-        Error::GuardFunctionName(self.create_error_message(
-            "Guard function must be a reference to a function",
-            "",
-            None,
-        ))
-    }
-}
+pub use guard_function_name::GuardFunctionName;
+pub use multiple_system_methods::MultipleSystemMethods;
+pub use return_type_must_be_void::ReturnTypeMustBeVoid;

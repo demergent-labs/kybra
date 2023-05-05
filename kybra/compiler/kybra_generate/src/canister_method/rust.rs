@@ -1,3 +1,4 @@
+use cdk_framework::traits::CollectResults;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::Located;
@@ -11,11 +12,11 @@ impl SourceMapped<&Located<StmtKind>> {
     pub fn generate_call_to_py_function(&self) -> Result<TokenStream, Vec<Error>> {
         match self.node {
             StmtKind::FunctionDef { .. } => {
-                let function_name = match self.get_function_name() {
-                    Ok(function_name) => function_name,
-                    Err(err) => return Err(vec![err]),
-                };
-                let params = self.build_params(InternalOrExternal::Internal)?;
+                let (function_name, params) = (
+                    self.get_function_name().map_err(Error::into),
+                    self.build_params(InternalOrExternal::Internal),
+                )
+                    .collect_results()?;
 
                 let param_conversions = params
                     .iter()

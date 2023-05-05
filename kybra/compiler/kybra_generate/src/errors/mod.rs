@@ -13,6 +13,9 @@ use crate::candid_type::service::errors::{
     ClassMustHaveMethods, ClassWithNotFunctionDefs, InvalidDecorator, MissingDecorator,
     TooManyDecorators, WrongDecorator,
 };
+use crate::canister_method::errors::{
+    GuardFunctionName, MultipleSystemMethods, ReturnTypeMustBeVoid,
+};
 
 use backtrace::Backtrace;
 pub use collect_results::CollectResults;
@@ -68,7 +71,7 @@ pub enum Error {
     FirstParamMustBeSelf(Message),
     FirstParamMustNotBeSelf(Message),
     FuncFormatting(FuncFormatting),
-    GuardFunctionName(Message),
+    GuardFunctionName(GuardFunctionName),
     GuardFunctionParam(Message),
     GuardFunctionReturn(Message),
     InlineFuncNotSupported(InlineFuncNotSupported),
@@ -79,6 +82,7 @@ pub enum Error {
     IteratorUnpackingOperatorNotSupported(Message),
     NoneCannotBeAType(NoneCannotBeAType),
     MissingDecorator(MissingDecorator),
+    MultipleSystemMethods(MultipleSystemMethods),
     MultipleHeartbeatMethods(Message),
     MultipleInit(Message),
     MultipleInspectMessage(Message),
@@ -90,7 +94,7 @@ pub enum Error {
     ParamTypeAnnotationRequired(Message),
     ReturnTypeAnnotationRequired(Message),
     ReturnTypeMode(ReturnTypeMode),
-    ReturnTypeMustBeVoid(Message),
+    ReturnTypeMustBeVoid(ReturnTypeMustBeVoid),
     TargetMustBeAName(TargetMustBeAName),
     TooManyDecorators(TooManyDecorators),
     WrongDecorator(WrongDecorator),
@@ -122,6 +126,7 @@ impl std::fmt::Display for Error {
             Error::NoneCannotBeAType(error) => error,
             Error::MissingDecorator(error) => error,
             Error::NotExactlyOneTarget(error) => error,
+            Error::MultipleSystemMethods(error) => error,
             Error::MultipleHeartbeatMethods(error) => error,
             Error::MultipleInit(error) => error,
             Error::MultipleInspectMessage(error) => error,

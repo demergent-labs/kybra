@@ -1,6 +1,9 @@
-use cdk_framework::act::node::{
-    canister_method::{CanisterMethodType, QueryOrUpdateDefinition},
-    ReturnType,
+use cdk_framework::{
+    act::node::{
+        canister_method::{CanisterMethodType, QueryOrUpdateDefinition},
+        ReturnType,
+    },
+    traits::CollectResults,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
@@ -67,18 +70,22 @@ impl SourceMapped<&Located<StmtKind>> {
         {
             return Err(Unreachable::new_err().into());
         }
+        let (body, params, return_type, guard_function_name) = (
+            rust::generate_body(self),
+            self.build_params(InternalOrExternal::Internal),
+            self.build_return_type(),
+            self.get_guard_function_name().map_err(Error::into),
+        )
+            .collect_results()?;
         match &self.node {
             StmtKind::FunctionDef { name, .. } => Ok(QueryOrUpdateDefinition {
-                body: rust::generate_body(self)?,
-                params: self.build_params(InternalOrExternal::Internal)?,
+                body,
+                params,
                 is_manual: self.is_manual(),
                 name: name.clone(),
-                return_type: ReturnType::new(self.build_return_type()?),
+                return_type: ReturnType::new(return_type),
                 is_async: self.is_async(),
-                guard_function_name: match self.get_guard_function_name() {
-                    Ok(guard_function_name) => guard_function_name,
-                    Err(err) => return Err(vec![err]),
-                },
+                guard_function_name,
             }),
             _ => Err(Unreachable::new_err().into()),
         }

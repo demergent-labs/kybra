@@ -22,9 +22,12 @@ use crate::errors::KybraResult;
 use crate::errors::Unreachable;
 use crate::py_ast::PyAst;
 use crate::source_map::SourceMapped;
+use crate::Error;
 
 pub use query_or_update::query_method;
 pub use query_or_update::update_method;
+
+use self::errors::GuardFunctionName;
 
 impl PyAst {
     fn get_canister_stmt_of_type(
@@ -81,7 +84,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn get_function_name(&self) -> KybraResult<String> {
+    pub fn get_function_name(&self) -> Result<String, Error> {
         match &self.node {
             StmtKind::FunctionDef { name, .. } => Ok(name.clone()),
             _ => Err(Unreachable::new_err()),
@@ -94,7 +97,9 @@ impl SourceMapped<&Located<StmtKind>> {
                 match get_guard_function_name_from_decorator_list(decorator_list) {
                     Ok(name) => Ok(name),
                     Err(err) => match err {
-                        GuardFunctionError::InvalidName => Err(self.guard_function_name_error()),
+                        GuardFunctionError::InvalidName => {
+                            Err(GuardFunctionName::err_from_stmt(self))
+                        }
                     },
                 }
             }
