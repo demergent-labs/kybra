@@ -46,7 +46,7 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_type_alias() {
             return Ok(None);
         }
-        let (target, value) = match &self.node {
+        let (assign_target, assign_value) = match &self.node {
             StmtKind::Assign { targets, value, .. } => {
                 if targets.len() != 1 {
                     return Err(NotExactlyOneTarget::err_from_stmt(self).into());
@@ -62,11 +62,11 @@ impl SourceMapped<&Located<StmtKind>> {
         };
 
         let (alias_name, enclosed_expr) = (
-            match &target.node {
+            match &assign_target.node {
                 ExprKind::Name { id, .. } => Ok(id.clone()),
                 _ => Err(InvalidTarget::err_from_stmt(self).into()),
             },
-            match &value.node {
+            match &assign_value.node {
                 ExprKind::Subscript { slice, .. } => Ok(slice),
                 _ => Err(Unreachable::new_err().into()),
             },
