@@ -15,9 +15,9 @@ pub struct FuncFormatting {
 }
 
 impl FuncFormatting {
-    pub fn err_from_expr(stmt_kind: &SourceMapped<&Located<ExprKind>>) -> Error {
+    pub fn err_from_expr(expr_kind: &SourceMapped<&Located<ExprKind>>) -> Error {
         Self {
-            location: stmt_kind.create_location(),
+            location: expr_kind.create_location(),
         }
         .into()
     }

@@ -5,7 +5,8 @@ pub mod message;
 use std::fmt;
 
 use crate::candid_type::errors::{
-    InvalidMember, InvalidTarget, NotExactlyOneTarget, TargetMustBeAName,
+    InvalidAnnAssign, InvalidAssign, InvalidClass, InvalidMember, InvalidTarget,
+    NotExactlyOneTarget, TargetMustBeAName, UnsupportedType,
 };
 use crate::candid_type::func::errors::{FuncFormatting, InlineFuncNotSupported, ReturnTypeMode};
 use crate::candid_type::service::errors::{
@@ -71,15 +72,15 @@ pub enum Error {
     GuardFunctionParam(Message),
     GuardFunctionReturn(Message),
     InlineFuncNotSupported(InlineFuncNotSupported),
-    InvalidAnnAssign(Message),
-    InvalidAssign(Message),
-    InvalidClass(Message),
+    InvalidAnnAssign(InvalidAnnAssign),
+    InvalidAssign(InvalidAssign),
+    InvalidClass(InvalidClass),
     InvalidDecorator(InvalidDecorator),
     InvalidMember(InvalidMember),
     InvalidSubscriptable(Message),
     InvalidTarget(InvalidTarget),
     IteratorUnpackingOperatorNotSupported(Message),
-    NoneCantBeAType(Message),
+    NoneCannotBeAType(Message),
     MissingDecorator(MissingDecorator),
     MultipleHeartBeat(Message),
     MultipleInit(Message),
@@ -96,7 +97,7 @@ pub enum Error {
     TargetMustBeAName(TargetMustBeAName),
     TooManyDecorators(TooManyDecorators),
     WrongDecorator(WrongDecorator),
-    UnsupportedType(Message),
+    UnsupportedType(UnsupportedType),
     T(Message),
 }
 
@@ -124,7 +125,7 @@ impl std::fmt::Display for Error {
             Error::InvalidSubscriptable(error) => error,
             Error::InvalidTarget(error) => error,
             Error::IteratorUnpackingOperatorNotSupported(error) => error,
-            Error::NoneCantBeAType(error) => error,
+            Error::NoneCannotBeAType(error) => error,
             Error::MissingDecorator(error) => error,
             Error::NotExactlyOneTarget(error) => error,
             Error::MultipleHeartBeat(error) => error,

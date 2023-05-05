@@ -3,6 +3,8 @@ use rustpython_parser::ast::{Constant, ExprKind, Located};
 
 use crate::{source_map::SourceMapped, Error};
 
+use self::errors::UnsupportedType;
+
 pub mod array;
 pub mod errors;
 pub mod func;
@@ -44,9 +46,9 @@ impl SourceMapped<&Located<ExprKind>> {
             },
             ExprKind::Constant { value, .. } => match value {
                 Constant::None => Err(vec![self.none_cant_be_a_type_error()]),
-                _ => Err(vec![self.unsupported_type_error()]),
+                _ => Err(UnsupportedType::err_from_expr(self).into()),
             },
-            _ => Err(vec![self.unsupported_type_error()]),
+            _ => Err(UnsupportedType::err_from_expr(self).into()),
         }
     }
 }
