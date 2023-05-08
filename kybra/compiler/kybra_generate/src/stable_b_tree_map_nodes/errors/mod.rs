@@ -47,10 +47,6 @@ impl SourceMapped<&Located<StmtKind>> {
         Error::T(self.create_error_message("memory id must be an integer", "", None))
     }
 
-    // pub fn generics_must_be_expressed_as_a_tuple_error(&self) -> Error {
-    //     Error::T(self.create_error_message("generics must be expressed as a tuple", "", None))
-    // }
-
     pub fn max_key_size_missing_error(&self) -> Error {
         Error::T(self.create_error_message("max_key_size_missing", "", None))
     }
