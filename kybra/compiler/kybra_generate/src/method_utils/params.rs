@@ -1,10 +1,15 @@
-use cdk_framework::act::node::Param;
+use cdk_framework::{act::node::Param, traits::CollectResults};
 use rustpython_parser::ast::{ArgData, Located, StmtKind};
 
 use crate::{
-    errors::{CollectResults, Unreachable},
+    errors::{CollectResults as OtherCollectResults, Unreachable},
     source_map::SourceMapped,
     Error,
+};
+
+use super::errors::{
+    DictionaryUnpackingOperatorNotSupported, FirstParamMustBeSelf, FirstParamMustNotBeSelf,
+    IteratorUnpackingOperatorNotSupported, ParamTypeAnnotationRequired,
 };
 
 pub enum InternalOrExternal {
@@ -19,20 +24,24 @@ impl SourceMapped<&Located<StmtKind>> {
     ) -> Result<Vec<Param>, Vec<Error>> {
         match &self.node {
             StmtKind::FunctionDef { args, .. } => {
-                if args.kwarg.is_some() {
-                    return Err(vec![
-                        self.dictionary_unpacking_operator_not_supported_error()
-                    ]);
-                }
-
-                if args.vararg.is_some() {
-                    return Err(vec![self.iterator_unpacking_operator_not_supported_error()]);
-                }
+                (
+                    match args.kwarg {
+                        None => Ok(()),
+                        _ => {
+                            Err(DictionaryUnpackingOperatorNotSupported::err_from_stmt(self).into())
+                        }
+                    },
+                    match args.vararg {
+                        None => Ok(()),
+                        _ => Err(IteratorUnpackingOperatorNotSupported::err_from_stmt(self).into()),
+                    },
+                )
+                    .collect_results()?;
 
                 let param_results: Vec<_> = match internal_or_external {
                     InternalOrExternal::Internal => {
                         if args.args.len() > 0 && args.args[0].node.arg == "self".to_string() {
-                            return Err(vec![self.first_parameter_must_not_be_self_error()]);
+                            return Err(FirstParamMustNotBeSelf::err_from_stmt(self).into());
                         }
                         args.args
                             .iter()
@@ -41,11 +50,11 @@ impl SourceMapped<&Located<StmtKind>> {
                     }
                     InternalOrExternal::External => {
                         if args.args.len() == 0 {
-                            return Err(vec![self.first_parameter_must_be_self_error()]);
+                            return Err(FirstParamMustBeSelf::err_from_stmt(self).into());
                         }
 
                         if args.args[0].node.arg != "self".to_string() {
-                            return Err(vec![self.first_parameter_must_be_self_error()]);
+                            return Err(FirstParamMustBeSelf::err_from_stmt(self).into());
                         }
 
                         // Ignore the first param, which is always "self"
@@ -76,7 +85,7 @@ impl SourceMapped<&Located<ArgData>> {
                     candid_type,
                 })
             }
-            None => Err(vec![self.param_type_annotation_required_error()]),
+            None => Err(ParamTypeAnnotationRequired::err_from_arg_data(self).into()),
         }
     }
 }

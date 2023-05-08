@@ -3,6 +3,8 @@ use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::{errors::Unreachable, source_map::SourceMapped, Error};
 
+use super::errors::ReturnTypeAnnotationRequired;
+
 impl SourceMapped<&Located<StmtKind>> {
     pub fn build_return_type(&self) -> Result<CandidType, Vec<Error>> {
         let returns = match &self.node {
@@ -16,7 +18,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 self.source_map.clone(),
             )
             .to_candid_type()?),
-            None => Err(vec![self.return_type_annotation_required_error()]),
+            None => Err(ReturnTypeAnnotationRequired::err_from_stmt(self).into()),
         }
     }
 }

@@ -53,13 +53,13 @@ impl SourceMapped<&Located<StmtKind>> {
         match &self.node {
             StmtKind::FunctionDef { name, .. } => {
                 (
-                    match self.has_params() {
-                        true => Err(GuardFunctionParam::err_from_stmt(self).into()),
-                        false => Ok(()),
+                    match !self.has_params() {
+                        true => Ok(()),
+                        false => Err(GuardFunctionParam::err_from_stmt(self).into()),
                     },
-                    match !self.returns_guard_result() {
-                        true => return Err(GuardFunctionReturn::err_from_stmt(self).into()),
-                        false => Ok(()),
+                    match self.returns_guard_result() {
+                        true => Ok(()),
+                        false => Err(GuardFunctionReturn::err_from_stmt(self).into()),
                     },
                 )
                     .collect_results()?;

@@ -18,6 +18,11 @@ use crate::canister_method::errors::{
     GuardFunctionName, MultipleSystemMethods, ReturnTypeMustBeVoid,
 };
 use crate::guard_function::errors::{GuardFunctionParam, GuardFunctionReturn};
+use crate::method_utils::errors::{
+    DictionaryUnpackingOperatorNotSupported, FirstParamMustBeSelf, FirstParamMustNotBeSelf,
+    IteratorUnpackingOperatorNotSupported, ParamTypeAnnotationRequired,
+    ReturnTypeAnnotationRequired,
+};
 
 pub use collect_results::CollectResults;
 pub use compiler_output::CompilerOutput;
@@ -35,9 +40,9 @@ pub enum Error {
     Unreachable(Unreachable),
     ClassMustHaveMethods(ClassMustHaveMethods),
     ClassWithNotFunctionDefs(ClassWithNotFunctionDefs),
-    DictionaryUnpackingOperatorNotSupported(Message),
-    FirstParamMustBeSelf(Message),
-    FirstParamMustNotBeSelf(Message),
+    DictionaryUnpackingOperatorNotSupported(DictionaryUnpackingOperatorNotSupported),
+    FirstParamMustBeSelf(FirstParamMustBeSelf),
+    FirstParamMustNotBeSelf(FirstParamMustNotBeSelf),
     FuncFormatting(FuncFormatting),
     GuardFunctionName(GuardFunctionName),
     GuardFunctionParam(GuardFunctionParam),
@@ -47,15 +52,13 @@ pub enum Error {
     InvalidMember(InvalidMember),
     InvalidSubscriptable(InvalidSubscriptable),
     InvalidTarget(InvalidTarget),
-    IteratorUnpackingOperatorNotSupported(Message),
+    IteratorUnpackingOperatorNotSupported(IteratorUnpackingOperatorNotSupported),
     NoneCannotBeAType(NoneCannotBeAType),
     MissingDecorator(MissingDecorator),
     MultipleSystemMethods(MultipleSystemMethods),
-    NotATuple(Message),
-    NotATypeRef(Message),
     NotExactlyOneTarget(NotExactlyOneTarget),
-    ParamTypeAnnotationRequired(Message),
-    ReturnTypeAnnotationRequired(Message),
+    ParamTypeAnnotationRequired(ParamTypeAnnotationRequired),
+    ReturnTypeAnnotationRequired(ReturnTypeAnnotationRequired),
     ReturnTypeMode(ReturnTypeMode),
     ReturnTypeMustBeVoid(ReturnTypeMustBeVoid),
     TargetMustBeAName(TargetMustBeAName),
@@ -90,8 +93,6 @@ impl std::fmt::Display for Error {
             Error::MissingDecorator(error) => error,
             Error::NotExactlyOneTarget(error) => error,
             Error::MultipleSystemMethods(error) => error,
-            Error::NotATuple(error) => error,
-            Error::NotATypeRef(error) => error,
             Error::ParamTypeAnnotationRequired(error) => error,
             Error::ReturnTypeAnnotationRequired(error) => error,
             Error::ReturnTypeMode(error) => error,
