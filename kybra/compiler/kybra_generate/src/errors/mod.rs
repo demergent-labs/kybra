@@ -26,7 +26,7 @@ use crate::{
     },
     stable_b_tree_map_nodes::errors::{
         InvalidMemoryId, MaxKeySizeMissing, MaxSizeMustBeInteger, MaxSizeMustBeNonNegative,
-        MaxSizeTooBig, MaxValueSizeMissing, MemoryIdMustBeAnInteger, MemoryIdMustBeIntegerConstant,
+        MaxSizeTooBig, MaxValueSizeMissing, MemoryIdMustBeAnInteger, MemoryIdMustBeInteger,
         MemoryIdMustBeNonNegative, MemoryIdTooBig, MissingMemoryId, StableBTreeMapNodeFormat,
     },
 };
@@ -79,7 +79,7 @@ pub enum Error {
     SbtmMaxSizeTooBig(MaxSizeTooBig),
     SbtmMaxValueSizeMissing(MaxValueSizeMissing),
     SbtmMemoryIdMustBeAnInteger(MemoryIdMustBeAnInteger),
-    SbtmMemoryIdMustBeIntegerConstant(MemoryIdMustBeIntegerConstant),
+    SbtmMemoryIdMustBeInteger(MemoryIdMustBeInteger),
     SbtmMemoryIdMustBeNonNegative(MemoryIdMustBeNonNegative),
     SbtmMemoryIdTooBig(MemoryIdTooBig),
     SbtmMissingMemoryId(MissingMemoryId),
@@ -126,7 +126,7 @@ impl std::fmt::Display for Error {
             Error::SbtmMaxSizeTooBig(error) => error,
             Error::SbtmMaxValueSizeMissing(error) => error,
             Error::SbtmMemoryIdMustBeAnInteger(error) => error,
-            Error::SbtmMemoryIdMustBeIntegerConstant(error) => error,
+            Error::SbtmMemoryIdMustBeInteger(error) => error,
             Error::SbtmMemoryIdMustBeNonNegative(error) => error,
             Error::SbtmMemoryIdTooBig(error) => error,
             Error::SbtmMissingMemoryId(error) => error,

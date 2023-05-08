@@ -7,13 +7,13 @@ use crate::{
     source_map::SourceMapped,
     Error,
 };
-use cdk_framework::act::node::CandidType;
+use cdk_framework::{act::node::CandidType, traits::CollectResults as OtherCollectResults};
 use num_bigint::{BigInt, Sign};
 use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
 
 use self::errors::{
     InvalidMemoryId, MaxKeySizeMissing, MaxSizeMustBeInteger, MaxSizeMustBeNonNegative,
-    MaxSizeTooBig, MaxValueSizeMissing, MemoryIdMustBeAnInteger, MemoryIdMustBeIntegerConstant,
+    MaxSizeTooBig, MaxValueSizeMissing, MemoryIdMustBeAnInteger, MemoryIdMustBeInteger,
     MemoryIdMustBeNonNegative, MemoryIdTooBig, MissingMemoryId, StableBTreeMapNodeFormat,
 };
 
@@ -26,6 +26,7 @@ pub struct StableBTreeMapNode {
     pub max_key_size: u32,
     pub max_value_size: u32,
 }
+
 impl PyAst {
     pub fn build_stable_b_tree_map_nodes(&self) -> Result<Vec<StableBTreeMapNode>, Vec<Error>> {
         Ok(self
@@ -40,7 +41,7 @@ impl PyAst {
 }
 
 impl SourceMapped<&Located<ExprKind>> {
-    pub fn is_stable_b_tree_map_node(&self) -> bool {
+    fn is_stable_b_tree_map_node(&self) -> bool {
         match &self.node {
             ExprKind::Call { func, .. } => match &func.node {
                 ExprKind::Subscript { value, .. } => match &value.node {
@@ -53,7 +54,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn get_value_type(&self) -> Result<SourceMapped<&Located<ExprKind>>, Error> {
+    fn get_value_type(&self) -> Result<SourceMapped<&Located<ExprKind>>, Error> {
         match &self.node {
             ExprKind::Subscript { slice, .. } => match &slice.node {
                 ExprKind::Tuple { elts, .. } => {
@@ -65,7 +66,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn get_key_type(&self) -> Result<SourceMapped<&Located<ExprKind>>, Error> {
+    fn get_key_type(&self) -> Result<SourceMapped<&Located<ExprKind>>, Error> {
         match &self.node {
             ExprKind::Subscript { slice, .. } => match &slice.node {
                 ExprKind::Tuple { elts, .. } => {
@@ -79,7 +80,7 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn is_stable_b_tree_map_node(&self) -> bool {
+    fn is_stable_b_tree_map_node(&self) -> bool {
         match &self.node {
             StmtKind::Assign { value, .. }
             | StmtKind::AnnAssign {
@@ -90,24 +91,18 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn as_stable_b_tree_map_node(&self) -> Result<Option<StableBTreeMapNode>, Vec<Error>> {
+    fn as_stable_b_tree_map_node(&self) -> Result<Option<StableBTreeMapNode>, Vec<Error>> {
         if !self.is_stable_b_tree_map_node() {
             return Ok(None);
         }
-        let memory_id = match self.get_memory_id() {
-            Ok(memory_id) => memory_id,
-            Err(err) => return Err(err.into()),
-        };
-        let key_type = self.get_key_type()?;
-        let value_type = self.get_value_type()?;
-        let max_key_size = match self.get_max_key_size() {
-            Ok(max_key_size) => max_key_size,
-            Err(err) => return Err(err.into()),
-        };
-        let max_value_size = match self.get_max_value_size() {
-            Ok(max_value_size) => max_value_size,
-            Err(err) => return Err(err.into()),
-        };
+        let (memory_id, key_type, value_type, max_key_size, max_value_size) = (
+            self.get_memory_id().map_err(Error::into),
+            self.get_key_type(),
+            self.get_value_type(),
+            self.get_max_key_size().map_err(Error::into),
+            self.get_max_value_size().map_err(Error::into),
+        )
+            .collect_results()?;
         Ok(Some(StableBTreeMapNode {
             memory_id,
             key_type,
@@ -117,19 +112,24 @@ impl SourceMapped<&Located<StmtKind>> {
         }))
     }
 
-    fn get_assign_value(&self) -> Result<&Located<ExprKind>, Error> {
+    fn get_assign_value(&self) -> Option<&Located<ExprKind>> {
         match &self.node {
             StmtKind::Assign { value, .. }
             | StmtKind::AnnAssign {
                 value: Some(value), ..
-            } => Ok(value),
-            _ => Err(Unreachable::new_err()),
+            } => Some(value),
+            _ => None,
         }
     }
 
     fn get_memory_id(&self) -> Result<u8, Error> {
-        match &self.get_assign_value()?.node {
+        let assign_value = match self.get_assign_value() {
+            Some(assign_value) => assign_value,
+            None => return Err(Unreachable::new_err()),
+        };
+        match &assign_value.node {
             ExprKind::Call { args, keywords, .. } => {
+                // Try to get it from args
                 if args.len() >= 1 {
                     return match &args[0].node {
                         ExprKind::Constant { value, .. } => match value {
@@ -139,9 +139,11 @@ impl SourceMapped<&Located<StmtKind>> {
                         _ => Err(InvalidMemoryId::err_from_stmt(self)),
                     };
                 }
-                if let Some(memory_id) = self.get_memory_from_keywords(keywords) {
-                    return memory_id;
+                // Try to get it from keywords
+                if let Some(memory_id) = self.get_memory_id_from_keywords(keywords)? {
+                    return Ok(memory_id);
                 }
+                // It was in neither the keywords nor the args
                 Err(MissingMemoryId::err_from_stmt(self))
             }
             _ => Err(Unreachable::new_err()),
@@ -150,16 +152,15 @@ impl SourceMapped<&Located<StmtKind>> {
 
     fn get_key_type(&self) -> Result<CandidType, Vec<Error>> {
         let assign_value = match self.get_assign_value() {
-            Ok(assign_value) => assign_value,
-            Err(err) => return Err(err.into()),
+            Some(assign_value) => assign_value,
+            None => return Err(Unreachable::new_err().into()),
         };
         match &assign_value.node {
             ExprKind::Call { func, .. } => {
-                match SourceMapped::new(func.as_ref(), self.source_map.clone()).get_key_type() {
-                    Ok(key_type) => key_type,
-                    Err(err) => return Err(err.into()),
-                }
-                .to_candid_type()
+                SourceMapped::new(func.as_ref(), self.source_map.clone())
+                    .get_key_type()
+                    .map_err(Into::<Vec<Error>>::into)?
+                    .to_candid_type()
             }
             _ => Err(Unreachable::new_err().into()),
         }
@@ -167,30 +168,36 @@ impl SourceMapped<&Located<StmtKind>> {
 
     fn get_value_type(&self) -> Result<CandidType, Vec<Error>> {
         let assign_value = match self.get_assign_value() {
-            Ok(assign_value) => assign_value,
-            Err(err) => return Err(err.into()),
+            Some(assign_value) => assign_value,
+            None => return Err(Unreachable::new_err().into()),
         };
         match &assign_value.node {
             ExprKind::Call { func, .. } => {
-                match SourceMapped::new(func.as_ref(), self.source_map.clone()).get_value_type() {
-                    Ok(value_type) => value_type,
-                    Err(err) => return Err(err.into()),
-                }
-                .to_candid_type()
+                SourceMapped::new(func.as_ref(), self.source_map.clone())
+                    .get_value_type()
+                    .map_err(Into::<Vec<Error>>::into)?
+                    .to_candid_type()
             }
             _ => Err(Unreachable::new_err().into()),
         }
     }
 
     fn get_max_key_size(&self) -> Result<u32, Error> {
-        match &self.get_assign_value()?.node {
+        let assign_value = match self.get_assign_value() {
+            Some(assign_value) => assign_value,
+            None => return Err(Unreachable::new_err().into()),
+        };
+        match &assign_value.node {
             ExprKind::Call { args, keywords, .. } => {
+                // Try to get it from args
                 if args.len() >= 2 {
                     return self.get_max_size_from_args(1, args);
                 }
-                if let Some(max_key_size) = self.get_max_size_from_keywords("key", keywords) {
-                    return max_key_size;
+                // Try to get it from keywords
+                if let Some(max_key_size) = self.get_max_size_from_keywords("key", keywords)? {
+                    return Ok(max_key_size);
                 }
+                // It was in neither the keywords nor the args
                 Err(MaxKeySizeMissing::err_from_stmt(self))
             }
             _ => Err(Unreachable::new_err()),
@@ -198,14 +205,21 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     fn get_max_value_size(&self) -> Result<u32, Error> {
-        match &self.get_assign_value()?.node {
+        let assign_value = match self.get_assign_value() {
+            Some(assign_value) => assign_value,
+            None => return Err(Unreachable::new_err().into()),
+        };
+        match &assign_value.node {
             ExprKind::Call { args, keywords, .. } => {
+                // Try to get it from args
                 if args.len() >= 3 {
                     return self.get_max_size_from_args(2, args);
                 }
-                if let Some(max_key_size) = self.get_max_size_from_keywords("value", keywords) {
-                    return max_key_size;
+                // Try to get it from keywords
+                if let Some(max_key_size) = self.get_max_size_from_keywords("value", keywords)? {
+                    return Ok(max_key_size);
                 }
+                // It was in neither the keywords nor the args
                 Err(MaxValueSizeMissing::err_from_stmt(self))
             }
             _ => Err(Unreachable::new_err()),
@@ -217,32 +231,17 @@ impl SourceMapped<&Located<StmtKind>> {
         &self,
         name: &str,
         keywords: &Vec<Located<KeywordData>>,
-    ) -> Option<Result<u32, Error>> {
-        keywords.iter().fold(None, |act_key_type, keyword| {
-            if let Some(arg_name) = &keyword.node.arg {
-                if arg_name == format!("max_{}_size", name).as_str() {
-                    Some(match &keyword.node.value.node {
-                        ExprKind::Constant { value, .. } => match value {
-                            Constant::Int(int) => self.big_int_to_max_size(int),
-                            _ => Err(MaxSizeMustBeInteger::err_from_stmt(self)),
-                        },
-                        _ => Err(MaxSizeMustBeInteger::err_from_stmt(self)),
-                    })
-                } else {
-                    if let Some(_) = act_key_type {
-                        act_key_type
-                    } else {
-                        None
-                    }
-                }
-            } else {
-                if let Some(_) = act_key_type {
-                    act_key_type
-                } else {
-                    None
-                }
-            }
-        })
+    ) -> Result<Option<u32>, Error> {
+        match get_keyword_by_name(format!("max_{}_size", name).as_str(), keywords) {
+            Some(keyword) => match &keyword.node.value.node {
+                ExprKind::Constant { value, .. } => match value {
+                    Constant::Int(int) => Ok(Some(self.big_int_to_max_size(int)?)),
+                    _ => Err(MaxSizeMustBeInteger::err_from_stmt(self)),
+                },
+                _ => Err(MaxSizeMustBeInteger::err_from_stmt(self)),
+            },
+            None => Ok(None),
+        }
     }
 
     fn get_max_size_from_args(
@@ -260,32 +259,23 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     // Helper method for get_memory_id
-    fn get_memory_from_keywords(
+    fn get_memory_id_from_keywords(
         &self,
         keywords: &Vec<Located<KeywordData>>,
-    ) -> Option<Result<u8, Error>> {
-        keywords.iter().fold(None, |act_key_type, keyword| {
-            let result = if let Some(arg_name) = &keyword.node.arg {
-                if arg_name == "memory_id" {
-                    Some(match &keyword.node.value.node {
-                        ExprKind::Constant { value, .. } => match value {
-                            Constant::Int(int) => self.big_int_to_memory_id(int),
-                            _ => Err(MemoryIdMustBeIntegerConstant::err_from_stmt(self)),
-                        },
-                        _ => Err(MemoryIdMustBeIntegerConstant::err_from_stmt(self)),
-                    })
-                } else {
-                    None
-                }
-            } else {
-                None
-            };
-            if let Some(_) = act_key_type {
-                act_key_type
-            } else {
-                result
+    ) -> Result<Option<u8>, Error> {
+        match get_keyword_by_name("memory_id", keywords) {
+            Some(keyword) => {
+                let memory_id = match &keyword.node.value.node {
+                    ExprKind::Constant { value, .. } => match value {
+                        Constant::Int(int) => self.big_int_to_memory_id(int)?,
+                        _ => return Err(MemoryIdMustBeInteger::err_from_stmt(self)),
+                    },
+                    _ => return Err(MemoryIdMustBeInteger::err_from_stmt(self)),
+                };
+                Ok(Some(memory_id))
             }
-        })
+            None => return Ok(None),
+        }
     }
 
     fn big_int_to_max_size(&self, num: &BigInt) -> Result<u32, Error> {
@@ -316,4 +306,13 @@ impl SourceMapped<&Located<StmtKind>> {
         }
         Ok(value as u8)
     }
+}
+
+fn get_keyword_by_name<'a>(
+    name: &str,
+    keywords: &'a Vec<Located<KeywordData>>,
+) -> Option<&'a Located<KeywordData>> {
+    keywords
+        .iter()
+        .find(|keyword| keyword.node.arg.as_deref() == Some(name))
 }

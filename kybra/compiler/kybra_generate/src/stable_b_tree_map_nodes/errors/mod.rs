@@ -18,7 +18,7 @@ pub use max_size_must_be_non_negative::MaxSizeMustBeNonNegative;
 pub use max_size_too_big::MaxSizeTooBig;
 pub use max_value_size_missing::MaxValueSizeMissing;
 pub use memory_id_must_be_an_integer::MemoryIdMustBeAnInteger;
-pub use memory_id_must_be_integer_constant::MemoryIdMustBeIntegerConstant;
+pub use memory_id_must_be_integer_constant::MemoryIdMustBeInteger;
 pub use memory_id_must_be_non_negative::MemoryIdMustBeNonNegative;
 pub use memory_id_too_big::MemoryIdTooBig;
 pub use missing_memory_id::MissingMemoryId;

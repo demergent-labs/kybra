@@ -10,11 +10,11 @@ use crate::{
 };
 
 #[derive(Clone, Debug)]
-pub struct MemoryIdMustBeIntegerConstant {
+pub struct MemoryIdMustBeInteger {
     pub location: Location,
 }
 
-impl MemoryIdMustBeIntegerConstant {
+impl MemoryIdMustBeInteger {
     pub fn err_from_stmt(stmt_kind: &SourceMapped<&Located<StmtKind>>) -> Error {
         Self {
             location: stmt_kind.create_location(),
@@ -23,13 +23,13 @@ impl MemoryIdMustBeIntegerConstant {
     }
 }
 
-impl From<MemoryIdMustBeIntegerConstant> for Error {
-    fn from(value: MemoryIdMustBeIntegerConstant) -> Self {
-        Self::SbtmMemoryIdMustBeIntegerConstant(value)
+impl From<MemoryIdMustBeInteger> for Error {
+    fn from(value: MemoryIdMustBeInteger) -> Self {
+        Self::SbtmMemoryIdMustBeInteger(value)
     }
 }
 
-impl Display for MemoryIdMustBeIntegerConstant {
+impl Display for MemoryIdMustBeInteger {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let title = format!("Guards functions can't have parameters");
         let annotation = "".to_string();
