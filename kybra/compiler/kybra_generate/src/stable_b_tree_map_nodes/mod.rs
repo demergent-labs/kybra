@@ -1,4 +1,4 @@
-mod errors;
+pub mod errors;
 pub mod rust;
 
 use crate::{
@@ -10,6 +10,12 @@ use crate::{
 use cdk_framework::act::node::CandidType;
 use num_bigint::{BigInt, Sign};
 use rustpython_parser::ast::{Constant, ExprKind, KeywordData, Located, StmtKind};
+
+use self::errors::{
+    InvalidMemoryId, MaxKeySizeMissing, MaxSizeMustBeInteger, MaxSizeMustBeNonNegative,
+    MaxSizeTooBig, MaxValueSizeMissing, MemoryIdMustBeAnInteger, MemoryIdMustBeIntegerConstant,
+    MemoryIdMustBeNonNegative, MemoryIdTooBig, MissingMemoryId, StableBTreeMapNodeFormat,
+};
 
 // TODO all variables should be called stable_b_tree_map_nodes
 #[derive(Clone)]
@@ -53,7 +59,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 ExprKind::Tuple { elts, .. } => {
                     Ok(SourceMapped::new(&elts[1], self.source_map.clone()))
                 }
-                _ => Err(self.stable_b_tree_map_node_format_error()),
+                _ => Err(StableBTreeMapNodeFormat::err_from_expr(self)),
             },
             _ => Err(Unreachable::new_err()),
         }
@@ -65,7 +71,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 ExprKind::Tuple { elts, .. } => {
                     Ok(SourceMapped::new(&elts[0], self.source_map.clone()))
                 }
-                _ => Err(self.stable_b_tree_map_node_format_error()),
+                _ => Err(StableBTreeMapNodeFormat::err_from_expr(self).into()),
             },
             _ => Err(Unreachable::new_err()),
         }
@@ -128,15 +134,15 @@ impl SourceMapped<&Located<StmtKind>> {
                     return match &args[0].node {
                         ExprKind::Constant { value, .. } => match value {
                             Constant::Int(integer) => self.big_int_to_memory_id(integer),
-                            _ => Err(self.memory_id_must_be_an_integer_error()),
+                            _ => Err(MemoryIdMustBeAnInteger::err_from_stmt(self)),
                         },
-                        _ => Err(self.invalid_memory_id_error()),
+                        _ => Err(InvalidMemoryId::err_from_stmt(self)),
                     };
                 }
                 if let Some(memory_id) = self.get_memory_from_keywords(keywords) {
                     return memory_id;
                 }
-                Err(self.missing_memory_id_error())
+                Err(MissingMemoryId::err_from_stmt(self))
             }
             _ => Err(Unreachable::new_err()),
         }
@@ -185,7 +191,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 if let Some(max_key_size) = self.get_max_size_from_keywords("key", keywords) {
                     return max_key_size;
                 }
-                Err(self.max_key_size_missing_error())
+                Err(MaxKeySizeMissing::err_from_stmt(self))
             }
             _ => Err(Unreachable::new_err()),
         }
@@ -200,7 +206,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 if let Some(max_key_size) = self.get_max_size_from_keywords("value", keywords) {
                     return max_key_size;
                 }
-                Err(self.max_value_size_missing_error())
+                Err(MaxValueSizeMissing::err_from_stmt(self))
             }
             _ => Err(Unreachable::new_err()),
         }
@@ -218,9 +224,9 @@ impl SourceMapped<&Located<StmtKind>> {
                     Some(match &keyword.node.value.node {
                         ExprKind::Constant { value, .. } => match value {
                             Constant::Int(int) => self.big_int_to_max_size(int),
-                            _ => Err(self.max_size_must_be_integer_constant_error()),
+                            _ => Err(MaxSizeMustBeInteger::err_from_stmt(self)),
                         },
-                        _ => Err(self.max_size_must_be_integer_constant_error()),
+                        _ => Err(MaxSizeMustBeInteger::err_from_stmt(self)),
                     })
                 } else {
                     if let Some(_) = act_key_type {
@@ -247,9 +253,9 @@ impl SourceMapped<&Located<StmtKind>> {
         match &keywords[name].node {
             ExprKind::Constant { value, .. } => match value {
                 Constant::Int(integer) => self.big_int_to_max_size(integer),
-                _ => Err(self.max_size_must_be_integer_constant_error()),
+                _ => Err(MaxSizeMustBeInteger::err_from_stmt(self)),
             },
-            _ => Err(self.max_size_must_be_integer_constant_error()),
+            _ => Err(MaxSizeMustBeInteger::err_from_stmt(self)),
         }
     }
 
@@ -264,9 +270,9 @@ impl SourceMapped<&Located<StmtKind>> {
                     Some(match &keyword.node.value.node {
                         ExprKind::Constant { value, .. } => match value {
                             Constant::Int(int) => self.big_int_to_memory_id(int),
-                            _ => Err(self.memory_id_must_by_integer_constant_error()),
+                            _ => Err(MemoryIdMustBeIntegerConstant::err_from_stmt(self)),
                         },
-                        _ => Err(self.memory_id_must_by_integer_constant_error()),
+                        _ => Err(MemoryIdMustBeIntegerConstant::err_from_stmt(self)),
                     })
                 } else {
                     None
@@ -285,10 +291,10 @@ impl SourceMapped<&Located<StmtKind>> {
     fn big_int_to_max_size(&self, num: &BigInt) -> Result<u32, Error> {
         let digits = num.to_u32_digits();
         if digits.0 == Sign::Minus {
-            return Err(self.max_size_must_be_non_negative());
+            return Err(MaxSizeMustBeNonNegative::err_from_stmt(self));
         }
         if digits.1.len() > 1 {
-            return Err(self.max_size_too_big_error());
+            return Err(MaxSizeTooBig::err_from_stmt(self));
         }
         Ok(digits.1[0])
     }
@@ -296,17 +302,17 @@ impl SourceMapped<&Located<StmtKind>> {
     fn big_int_to_memory_id(&self, num: &BigInt) -> Result<u8, Error> {
         let digits = num.to_u32_digits();
         if digits.0 == Sign::Minus {
-            return Err(self.memory_id_must_be_non_negative());
+            return Err(MemoryIdMustBeNonNegative::err_from_stmt(self));
         }
         if digits.1.len() > 1 {
-            return Err(self.memory_id_too_big_error());
+            return Err(MemoryIdTooBig::err_from_stmt(self));
         }
         if digits.1.len() == 0 {
             return Ok(0);
         }
         let value = digits.1[0];
         if value > u8::MAX as u32 {
-            return Err(self.memory_id_too_big_error());
+            return Err(MemoryIdTooBig::err_from_stmt(self));
         }
         Ok(value as u8)
     }

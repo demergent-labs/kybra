@@ -1,65 +1,25 @@
-use rustpython_parser::ast::{ExprKind, Located, StmtKind};
+pub mod invalid_memory_id;
+pub mod max_key_size_missing;
+pub mod max_size_must_be_integer_constant;
+pub mod max_size_must_be_non_negative;
+pub mod max_size_too_big;
+pub mod max_value_size_missing;
+pub mod memory_id_must_be_an_integer;
+pub mod memory_id_must_be_integer_constant;
+pub mod memory_id_must_be_non_negative;
+pub mod memory_id_too_big;
+pub mod missing_memory_id;
+pub mod stable_b_tree_map_node_format;
 
-use crate::{errors::CreateMessage, source_map::SourceMapped, Error};
-
-impl SourceMapped<&Located<ExprKind>> {
-    pub fn stable_b_tree_map_node_format_error(&self) -> Error {
-        Error::T(self.create_error_message(
-            "This is not how a stable b tree map node ought to be formatted",
-            "",
-            None,
-        ))
-    }
-}
-
-impl SourceMapped<&Located<StmtKind>> {
-    pub fn invalid_memory_id_error(&self) -> Error {
-        Error::T(self.create_error_message("invalid memory id", "", None))
-    }
-
-    pub fn missing_memory_id_error(&self) -> Error {
-        Error::T(self.create_error_message("Missing memory Id", "", None))
-    }
-
-    pub fn memory_id_must_by_integer_constant_error(&self) -> Error {
-        Error::T(self.create_error_message("memory id must be an integer", "", None))
-    }
-
-    pub fn max_size_must_be_integer_constant_error(&self) -> Error {
-        Error::T(self.create_error_message("max size must be an integer", "", None))
-    }
-
-    pub fn not_a_stable_b_tree_map_node_error(&self) -> Error {
-        Error::T(self.create_error_message("not a stable b tree map node", "", None))
-    }
-
-    pub fn max_size_too_big_error(&self) -> Error {
-        // Max size must be less than MAX_U32 + 1
-        Error::T(self.create_error_message("max size must be less than MAX_U32 + 1", "", None))
-    }
-
-    pub fn memory_id_too_big_error(&self) -> Error {
-        // Max size must be less than MAX_U32 + 1
-        Error::T(self.create_error_message("Memory ID must be less than MAX_U32 + 1", "", None))
-    }
-
-    pub fn memory_id_must_be_an_integer_error(&self) -> Error {
-        Error::T(self.create_error_message("memory id must be an integer", "", None))
-    }
-
-    pub fn max_key_size_missing_error(&self) -> Error {
-        Error::T(self.create_error_message("max_key_size_missing", "", None))
-    }
-
-    pub fn max_value_size_missing_error(&self) -> Error {
-        Error::T(self.create_error_message("max_value_size missing", "", None))
-    }
-
-    pub fn memory_id_must_be_non_negative(&self) -> Error {
-        Error::T(self.create_error_message("memory id must be non negative", "", None))
-    }
-
-    pub fn max_size_must_be_non_negative(&self) -> Error {
-        Error::T(self.create_error_message("max size must be non negative", "", None))
-    }
-}
+pub use invalid_memory_id::InvalidMemoryId;
+pub use max_key_size_missing::MaxKeySizeMissing;
+pub use max_size_must_be_integer_constant::MaxSizeMustBeInteger;
+pub use max_size_must_be_non_negative::MaxSizeMustBeNonNegative;
+pub use max_size_too_big::MaxSizeTooBig;
+pub use max_value_size_missing::MaxValueSizeMissing;
+pub use memory_id_must_be_an_integer::MemoryIdMustBeAnInteger;
+pub use memory_id_must_be_integer_constant::MemoryIdMustBeIntegerConstant;
+pub use memory_id_must_be_non_negative::MemoryIdMustBeNonNegative;
+pub use memory_id_too_big::MemoryIdTooBig;
+pub use missing_memory_id::MissingMemoryId;
+pub use stable_b_tree_map_node_format::StableBTreeMapNodeFormat;

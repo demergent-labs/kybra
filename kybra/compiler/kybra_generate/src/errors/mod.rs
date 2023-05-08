@@ -5,23 +5,30 @@ pub mod unreachable;
 
 use std::fmt;
 
-use crate::candid_type::errors::{
-    InvalidMember, InvalidSubscriptable, InvalidTarget, NoneCannotBeAType, NotExactlyOneTarget,
-    TargetMustBeAName, UnsupportedType,
-};
-use crate::candid_type::func::errors::{FuncFormatting, InlineFuncNotSupported, ReturnTypeMode};
-use crate::candid_type::service::errors::{
-    ClassMustHaveMethods, ClassWithNotFunctionDefs, InvalidDecorator, MissingDecorator,
-    TooManyDecorators, WrongDecorator,
-};
-use crate::canister_method::errors::{
-    GuardFunctionName, MultipleSystemMethods, ReturnTypeMustBeVoid,
-};
-use crate::guard_function::errors::{GuardFunctionParam, GuardFunctionReturn};
-use crate::method_utils::errors::{
-    DictionaryUnpackingOperatorNotSupported, FirstParamMustBeSelf, FirstParamMustNotBeSelf,
-    IteratorUnpackingOperatorNotSupported, ParamTypeAnnotationRequired,
-    ReturnTypeAnnotationRequired,
+use crate::{
+    candid_type::{
+        errors::{
+            InvalidMember, InvalidSubscriptable, InvalidTarget, NoneCannotBeAType,
+            NotExactlyOneTarget, TargetMustBeAName, UnsupportedType,
+        },
+        func::errors::{FuncFormatting, InlineFuncNotSupported, ReturnTypeMode},
+        service::errors::{
+            ClassMustHaveMethods, ClassWithNotFunctionDefs, InvalidDecorator, MissingDecorator,
+            TooManyDecorators, WrongDecorator,
+        },
+    },
+    canister_method::errors::{GuardFunctionName, MultipleSystemMethods, ReturnTypeMustBeVoid},
+    guard_function::errors::{GuardFunctionParam, GuardFunctionReturn},
+    method_utils::errors::{
+        DictionaryUnpackingOperatorNotSupported, FirstParamMustBeSelf, FirstParamMustNotBeSelf,
+        IteratorUnpackingOperatorNotSupported, ParamTypeAnnotationRequired,
+        ReturnTypeAnnotationRequired,
+    },
+    stable_b_tree_map_nodes::errors::{
+        InvalidMemoryId, MaxKeySizeMissing, MaxSizeMustBeInteger, MaxSizeMustBeNonNegative,
+        MaxSizeTooBig, MaxValueSizeMissing, MemoryIdMustBeAnInteger, MemoryIdMustBeIntegerConstant,
+        MemoryIdMustBeNonNegative, MemoryIdTooBig, MissingMemoryId, StableBTreeMapNodeFormat,
+    },
 };
 
 pub use collect_results::CollectResults;
@@ -65,7 +72,18 @@ pub enum Error {
     TooManyDecorators(TooManyDecorators),
     WrongDecorator(WrongDecorator),
     UnsupportedType(UnsupportedType),
-    T(Message),
+    SbtmInvalidMemoryId(InvalidMemoryId),
+    SbtmMaxKeySizeMissing(MaxKeySizeMissing),
+    SbtmMaxSizeMustBeInteger(MaxSizeMustBeInteger),
+    SbtmMaxSizeMustBeNonNegative(MaxSizeMustBeNonNegative),
+    SbtmMaxSizeTooBig(MaxSizeTooBig),
+    SbtmMaxValueSizeMissing(MaxValueSizeMissing),
+    SbtmMemoryIdMustBeAnInteger(MemoryIdMustBeAnInteger),
+    SbtmMemoryIdMustBeIntegerConstant(MemoryIdMustBeIntegerConstant),
+    SbtmMemoryIdMustBeNonNegative(MemoryIdMustBeNonNegative),
+    SbtmMemoryIdTooBig(MemoryIdTooBig),
+    SbtmMissingMemoryId(MissingMemoryId),
+    SbtmStableBTreeMapNodeFormat(StableBTreeMapNodeFormat),
 }
 
 impl std::fmt::Display for Error {
@@ -101,7 +119,18 @@ impl std::fmt::Display for Error {
             Error::TooManyDecorators(error) => error,
             Error::WrongDecorator(error) => error,
             Error::UnsupportedType(error) => error,
-            Error::T(error) => error,
+            Error::SbtmInvalidMemoryId(error) => error,
+            Error::SbtmMaxKeySizeMissing(error) => error,
+            Error::SbtmMaxSizeMustBeInteger(error) => error,
+            Error::SbtmMaxSizeMustBeNonNegative(error) => error,
+            Error::SbtmMaxSizeTooBig(error) => error,
+            Error::SbtmMaxValueSizeMissing(error) => error,
+            Error::SbtmMemoryIdMustBeAnInteger(error) => error,
+            Error::SbtmMemoryIdMustBeIntegerConstant(error) => error,
+            Error::SbtmMemoryIdMustBeNonNegative(error) => error,
+            Error::SbtmMemoryIdTooBig(error) => error,
+            Error::SbtmMissingMemoryId(error) => error,
+            Error::SbtmStableBTreeMapNodeFormat(error) => error,
         };
 
         write!(f, "{}", compiler_output)
