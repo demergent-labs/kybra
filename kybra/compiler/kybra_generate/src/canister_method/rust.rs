@@ -49,7 +49,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     });
                 })
             }
-            _ => Err(Unreachable::new_err().into()),
+            _ => Err(Unreachable::error().into()),
         }
     }
 }

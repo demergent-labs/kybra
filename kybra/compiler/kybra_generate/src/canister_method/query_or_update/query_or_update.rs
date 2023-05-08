@@ -68,7 +68,7 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_canister_method_type(CanisterMethodType::Query)
             && !self.is_canister_method_type(CanisterMethodType::Update)
         {
-            return Err(Unreachable::new_err().into());
+            return Err(Unreachable::error().into());
         }
         let (body, params, return_type, guard_function_name) = (
             rust::generate_body(self),
@@ -87,7 +87,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 is_async: self.is_async(),
                 guard_function_name,
             }),
-            _ => Err(Unreachable::new_err().into()),
+            _ => Err(Unreachable::error().into()),
         }
     }
 }

@@ -96,7 +96,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 }))
             }
             // We filter out any non classDefs in KybraProgram.get_external_canister_declarations
-            _ => Err(Unreachable::new_err().into()),
+            _ => Err(Unreachable::error().into()),
         }
     }
 

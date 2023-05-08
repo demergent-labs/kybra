@@ -9,7 +9,7 @@ impl SourceMapped<&Located<StmtKind>> {
     pub fn build_return_type(&self) -> Result<CandidType, Vec<Error>> {
         let returns = match &self.node {
             StmtKind::FunctionDef { returns, .. } => returns,
-            _ => return Err(Unreachable::new_err().into()),
+            _ => return Err(Unreachable::error().into()),
         };
 
         match returns {

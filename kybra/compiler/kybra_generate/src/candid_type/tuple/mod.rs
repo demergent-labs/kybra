@@ -62,7 +62,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     type_params: vec![].into(),
                 }))
             }
-            _ => Err(Unreachable::new_err().into()),
+            _ => Err(Unreachable::error().into()),
         }
     }
 }

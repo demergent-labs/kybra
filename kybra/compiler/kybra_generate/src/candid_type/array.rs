@@ -24,7 +24,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     SourceMapped::new(slice.as_ref(), self.source_map.clone()).to_candid_type()?,
                 ),
             },
-            _ => return Err(Unreachable::new_err().into()),
+            _ => return Err(Unreachable::error().into()),
         }))
     }
 }

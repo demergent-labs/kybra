@@ -23,9 +23,9 @@ impl SourceMapped<&Located<ExprKind>> {
             ExprKind::Name { id, .. } => id,
             ExprKind::Constant { value, .. } => match value {
                 Constant::Str(string) => string,
-                _ => return Err(Unreachable::new_err()),
+                _ => return Err(Unreachable::error()),
             },
-            _ => return Err(Unreachable::new_err()),
+            _ => return Err(Unreachable::error()),
         }
         .to_string();
         Ok(Some(TypeRef {

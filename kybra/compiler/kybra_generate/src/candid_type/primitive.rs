@@ -61,9 +61,9 @@ impl SourceMapped<&Located<ExprKind>> {
                 "str" => Primitive::String,
                 "text" => Primitive::String,
                 "void" => Primitive::Void,
-                _ => return Err(Unreachable::new_err()),
+                _ => return Err(Unreachable::error()),
             },
-            _ => return Err(Unreachable::new_err()),
+            _ => return Err(Unreachable::error()),
         }))
     }
 }

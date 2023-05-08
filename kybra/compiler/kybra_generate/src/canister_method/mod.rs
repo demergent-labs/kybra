@@ -86,7 +86,7 @@ impl SourceMapped<&Located<StmtKind>> {
     pub fn get_function_name(&self) -> Result<String, Error> {
         match &self.node {
             StmtKind::FunctionDef { name, .. } => Ok(name.clone()),
-            _ => Err(Unreachable::new_err()),
+            _ => Err(Unreachable::error()),
         }
     }
 

@@ -71,7 +71,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     mode,
                 })
             }
-            _ => return Err(Unreachable::new_err().into()),
+            _ => return Err(Unreachable::error().into()),
         }
     }
 
@@ -89,7 +89,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 },
                 _ => Err(ReturnTypeMode::err_from_expr(self)),
             },
-            _ => Err(Unreachable::new_err()),
+            _ => Err(Unreachable::error()),
         }
     }
 
@@ -113,7 +113,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 },
                 _ => Err(FuncFormatting::err_from_expr(self)),
             },
-            _ => Err(Unreachable::new_err()),
+            _ => Err(Unreachable::error()),
         }
     }
 
@@ -131,7 +131,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 },
                 _ => return Err(FuncFormatting::err_from_expr(self)),
             },
-            _ => Err(Unreachable::new_err()),
+            _ => Err(Unreachable::error()),
         }
     }
 
@@ -196,7 +196,7 @@ impl SourceMapped<&Located<StmtKind>> {
             } => Ok(Some(
                 SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
             )),
-            _ => Err(Unreachable::new_err().into()),
+            _ => Err(Unreachable::error().into()),
         }
     }
 

@@ -22,7 +22,7 @@ pub fn generate_body(
 
     let name = match source_mapped_located_stmtkind.get_name() {
         Some(name) => name,
-        None => return Err(Unreachable::new_err().into()),
+        None => return Err(Unreachable::error().into()),
     };
 
     let param_conversions = params

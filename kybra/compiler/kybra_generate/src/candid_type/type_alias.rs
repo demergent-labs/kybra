@@ -65,7 +65,7 @@ impl SourceMapped<&Located<StmtKind>> {
             },
             match &assign_value.node {
                 ExprKind::Subscript { slice, .. } => Ok(slice),
-                _ => Err(Unreachable::new_err().into()),
+                _ => Err(Unreachable::error().into()),
             },
         )
             .collect_results()?;

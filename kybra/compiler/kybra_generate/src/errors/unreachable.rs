@@ -24,7 +24,7 @@ impl std::fmt::Display for Unreachable {
 }
 
 impl Unreachable {
-    pub fn new_err() -> Error {
+    pub fn error() -> Error {
         Unreachable {
             backtrace: Backtrace::new(),
         }

@@ -69,7 +69,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     name: name.clone(),
                 }))
             }
-            _ => return Err(Unreachable::new_err().into()),
+            _ => return Err(Unreachable::error().into()),
         }
     }
 
