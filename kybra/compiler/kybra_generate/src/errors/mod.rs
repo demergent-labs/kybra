@@ -108,8 +108,6 @@ impl std::fmt::Display for Error {
     }
 }
 
-pub type KybraResult<T> = Result<T, Error>;
-
 impl From<Error> for Vec<Error> {
     fn from(value: Error) -> Self {
         vec![value]

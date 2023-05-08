@@ -2,7 +2,7 @@ mod errors;
 pub mod rust;
 
 use crate::{
-    errors::{CollectResults, KybraResult, Unreachable},
+    errors::{CollectResults, Unreachable},
     py_ast::PyAst,
     source_map::SourceMapped,
     Error,
@@ -47,7 +47,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn get_value_type(&self) -> KybraResult<SourceMapped<&Located<ExprKind>>> {
+    pub fn get_value_type(&self) -> Result<SourceMapped<&Located<ExprKind>>, Error> {
         match &self.node {
             ExprKind::Subscript { slice, .. } => match &slice.node {
                 ExprKind::Tuple { elts, .. } => {
@@ -59,7 +59,7 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    pub fn get_key_type(&self) -> KybraResult<SourceMapped<&Located<ExprKind>>> {
+    pub fn get_key_type(&self) -> Result<SourceMapped<&Located<ExprKind>>, Error> {
         match &self.node {
             ExprKind::Subscript { slice, .. } => match &slice.node {
                 ExprKind::Tuple { elts, .. } => {
@@ -111,7 +111,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }))
     }
 
-    fn get_assign_value(&self) -> KybraResult<&Located<ExprKind>> {
+    fn get_assign_value(&self) -> Result<&Located<ExprKind>, Error> {
         match &self.node {
             StmtKind::Assign { value, .. }
             | StmtKind::AnnAssign {
@@ -121,7 +121,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    fn get_memory_id(&self) -> KybraResult<u8> {
+    fn get_memory_id(&self) -> Result<u8, Error> {
         match &self.get_assign_value()?.node {
             ExprKind::Call { args, keywords, .. } => {
                 if args.len() >= 1 {
@@ -176,7 +176,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    fn get_max_key_size(&self) -> KybraResult<u32> {
+    fn get_max_key_size(&self) -> Result<u32, Error> {
         match &self.get_assign_value()?.node {
             ExprKind::Call { args, keywords, .. } => {
                 if args.len() >= 2 {
@@ -191,7 +191,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    fn get_max_value_size(&self) -> KybraResult<u32> {
+    fn get_max_value_size(&self) -> Result<u32, Error> {
         match &self.get_assign_value()?.node {
             ExprKind::Call { args, keywords, .. } => {
                 if args.len() >= 3 {
@@ -211,7 +211,7 @@ impl SourceMapped<&Located<StmtKind>> {
         &self,
         name: &str,
         keywords: &Vec<Located<KeywordData>>,
-    ) -> Option<KybraResult<u32>> {
+    ) -> Option<Result<u32, Error>> {
         keywords.iter().fold(None, |act_key_type, keyword| {
             if let Some(arg_name) = &keyword.node.arg {
                 if arg_name == format!("max_{}_size", name).as_str() {
@@ -243,7 +243,7 @@ impl SourceMapped<&Located<StmtKind>> {
         &self,
         name: usize,
         keywords: &Vec<Located<ExprKind>>,
-    ) -> KybraResult<u32> {
+    ) -> Result<u32, Error> {
         match &keywords[name].node {
             ExprKind::Constant { value, .. } => match value {
                 Constant::Int(integer) => self.big_int_to_max_size(integer),
@@ -257,7 +257,7 @@ impl SourceMapped<&Located<StmtKind>> {
     fn get_memory_from_keywords(
         &self,
         keywords: &Vec<Located<KeywordData>>,
-    ) -> Option<KybraResult<u8>> {
+    ) -> Option<Result<u8, Error>> {
         keywords.iter().fold(None, |act_key_type, keyword| {
             let result = if let Some(arg_name) = &keyword.node.arg {
                 if arg_name == "memory_id" {
@@ -282,7 +282,7 @@ impl SourceMapped<&Located<StmtKind>> {
         })
     }
 
-    fn big_int_to_max_size(&self, num: &BigInt) -> KybraResult<u32> {
+    fn big_int_to_max_size(&self, num: &BigInt) -> Result<u32, Error> {
         let digits = num.to_u32_digits();
         if digits.0 == Sign::Minus {
             return Err(self.max_size_must_be_non_negative());
@@ -293,7 +293,7 @@ impl SourceMapped<&Located<StmtKind>> {
         Ok(digits.1[0])
     }
 
-    fn big_int_to_memory_id(&self, num: &BigInt) -> KybraResult<u8> {
+    fn big_int_to_memory_id(&self, num: &BigInt) -> Result<u8, Error> {
         let digits = num.to_u32_digits();
         if digits.0 == Sign::Minus {
             return Err(self.memory_id_must_be_non_negative());

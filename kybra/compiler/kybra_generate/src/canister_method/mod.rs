@@ -18,7 +18,6 @@ use rustpython_parser::ast::Located;
 use rustpython_parser::ast::Mod;
 use rustpython_parser::ast::StmtKind;
 
-use crate::errors::KybraResult;
 use crate::errors::Unreachable;
 use crate::py_ast::PyAst;
 use crate::source_map::SourceMapped;
@@ -91,7 +90,7 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn get_guard_function_name(&self) -> KybraResult<Option<String>> {
+    pub fn get_guard_function_name(&self) -> Result<Option<String>, Error> {
         match &self.node {
             StmtKind::FunctionDef { decorator_list, .. } => {
                 match get_guard_function_name_from_decorator_list(decorator_list) {
