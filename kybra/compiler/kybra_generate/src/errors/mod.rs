@@ -1,6 +1,7 @@
 pub mod collect_results;
 pub mod compiler_output;
 pub mod message;
+pub mod unreachable;
 
 use std::fmt;
 
@@ -16,8 +17,8 @@ use crate::candid_type::service::errors::{
 use crate::canister_method::errors::{
     GuardFunctionName, MultipleSystemMethods, ReturnTypeMustBeVoid,
 };
+use crate::guard_function::errors::{GuardFunctionParam, GuardFunctionReturn};
 
-use backtrace::Backtrace;
 pub use collect_results::CollectResults;
 pub use compiler_output::CompilerOutput;
 pub use compiler_output::CreateLocation;
@@ -25,40 +26,7 @@ pub use compiler_output::Location;
 pub use compiler_output::Suggestion;
 pub use message::CreateMessage;
 pub use message::Message;
-
-#[derive(Clone, Debug)]
-pub struct Unreachable {
-    pub backtrace: Backtrace,
-}
-
-impl std::fmt::Display for Unreachable {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let message = "Oops! Looks like we introduced a bug while refactoring.";
-        let ticket_url =
-            "Please open a ticket at https://github.com/demergent-labs/kybra/issues/new";
-        let stack_trace = "Please include the following backtrace:";
-        write!(
-            f,
-            "{message}\n{ticket_url}\n{stack_trace}\n{:?}",
-            self.backtrace
-        )
-    }
-}
-
-impl Unreachable {
-    pub fn new_err() -> Error {
-        Unreachable {
-            backtrace: Backtrace::new(),
-        }
-        .into()
-    }
-}
-
-impl From<Unreachable> for Error {
-    fn from(value: Unreachable) -> Self {
-        Self::Unreachable(value)
-    }
-}
+pub use unreachable::Unreachable;
 
 #[derive(Clone, Debug)]
 pub enum Error {
@@ -72,8 +40,8 @@ pub enum Error {
     FirstParamMustNotBeSelf(Message),
     FuncFormatting(FuncFormatting),
     GuardFunctionName(GuardFunctionName),
-    GuardFunctionParam(Message),
-    GuardFunctionReturn(Message),
+    GuardFunctionParam(GuardFunctionParam),
+    GuardFunctionReturn(GuardFunctionReturn),
     InlineFuncNotSupported(InlineFuncNotSupported),
     InvalidDecorator(InvalidDecorator),
     InvalidMember(InvalidMember),

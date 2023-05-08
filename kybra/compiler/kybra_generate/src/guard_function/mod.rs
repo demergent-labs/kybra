@@ -1,15 +1,33 @@
 pub mod errors;
 mod guard_function;
 
-use cdk_framework::act::node::{CandidType, GuardFunction};
+use cdk_framework::{
+    act::node::{CandidType, GuardFunction},
+    traits::CollectResults,
+};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::{CollectResults, Unreachable},
+    errors::{CollectResults as OtherCollectResults, Unreachable},
     py_ast::PyAst,
     source_map::SourceMapped,
     Error,
 };
+
+use self::errors::{GuardFunctionParam, GuardFunctionReturn};
+
+impl PyAst {
+    pub fn build_guard_functions(&self) -> Result<Vec<GuardFunction>, Vec<Error>> {
+        Ok(self
+            .get_stmt_kinds()
+            .iter()
+            .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_guard_function())
+            .collect_results()?
+            .drain(..)
+            .filter_map(|x| x)
+            .collect())
+    }
+}
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_guard_function(&self) -> bool {
@@ -34,12 +52,17 @@ impl SourceMapped<&Located<StmtKind>> {
         }
         match &self.node {
             StmtKind::FunctionDef { name, .. } => {
-                if self.has_params() {
-                    return Err(vec![self.guard_functions_param_error()]);
-                }
-                if !self.returns_guard_result() {
-                    return Err(vec![self.guard_function_return_error()]);
-                }
+                (
+                    match self.has_params() {
+                        true => Err(GuardFunctionParam::err_from_stmt(self).into()),
+                        false => Ok(()),
+                    },
+                    match !self.returns_guard_result() {
+                        true => return Err(GuardFunctionReturn::err_from_stmt(self).into()),
+                        false => Ok(()),
+                    },
+                )
+                    .collect_results()?;
 
                 Ok(Some(GuardFunction {
                     body: guard_function::generate(name),
@@ -71,18 +94,5 @@ impl SourceMapped<&Located<StmtKind>> {
             }
             _ => false,
         }
-    }
-}
-
-impl PyAst {
-    pub fn build_guard_functions(&self) -> Result<Vec<GuardFunction>, Vec<Error>> {
-        Ok(self
-            .get_stmt_kinds()
-            .iter()
-            .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_guard_function())
-            .collect_results()?
-            .drain(..)
-            .filter_map(|x| x)
-            .collect())
     }
 }

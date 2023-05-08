@@ -34,8 +34,7 @@ pub fn generate(
         init_params,
         call_init_py_function,
         call_post_upgrade_py_function,
-    )
-    .unwrap();
+    );
 
     quote::quote! {
         #ic_object
