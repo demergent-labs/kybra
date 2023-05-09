@@ -1,30 +1,30 @@
 use cdk_framework::act::node::candid::Opt;
 use rustpython_parser::ast::{ExprKind, Located};
 
-use crate::{errors::Unreachable, source_map::SourceMapped, Error};
+use crate::{source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<ExprKind>> {
-    fn is_opt(&self) -> bool {
+    fn get_opt(&self) -> Option<&Located<ExprKind>> {
         match &self.node {
-            ExprKind::Subscript { value, .. } => match &value.node {
-                ExprKind::Name { id, .. } => id == "Opt",
-                _ => false,
+            ExprKind::Subscript { value, slice, .. } => match &value.node {
+                ExprKind::Name { id, .. } => match id == "Opt" {
+                    true => Some(slice.as_ref()),
+                    false => None,
+                },
+                _ => None,
             },
-            _ => false,
+            _ => None,
         }
     }
 
     pub fn as_opt(&self) -> Result<Option<Opt>, Vec<Error>> {
-        if !self.is_opt() {
-            return Ok(None);
-        }
-        Ok(Some(match &self.node {
-            ExprKind::Subscript { slice, .. } => Opt {
+        match self.get_opt() {
+            Some(opt) => Ok(Some(Opt {
                 enclosed_type: Box::from(
-                    SourceMapped::new(slice.as_ref(), self.source_map.clone()).to_candid_type()?,
+                    SourceMapped::new(opt, self.source_map.clone()).to_candid_type()?,
                 ),
-            },
-            _ => return Err(Unreachable::error().into()),
-        }))
+            })),
+            None => todo!(),
+        }
     }
 }
