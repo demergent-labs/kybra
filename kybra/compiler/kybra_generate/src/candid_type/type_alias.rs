@@ -1,4 +1,4 @@
-use cdk_framework::{act::node::candid::TypeAlias, traits::CollectResults};
+use cdk_framework::{act::node::candid, traits::CollectResults};
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
@@ -11,7 +11,7 @@ use crate::{
 use super::errors::{InvalidTarget, NotExactlyOneTarget};
 
 impl PyAst {
-    pub fn build_type_aliases(&self) -> Result<Vec<TypeAlias>, Vec<Error>> {
+    pub fn build_type_aliases(&self) -> Result<Vec<candid::TypeAlias>, Vec<Error>> {
         Ok(self
             .get_stmt_kinds()
             .iter()
@@ -23,13 +23,13 @@ impl PyAst {
     }
 }
 
-struct TypeAliasIntermediate<'a> {
+struct TypeAlias<'a> {
     target: &'a Located<ExprKind>,
     value: &'a Located<ExprKind>,
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    fn get_type_alias(&self) -> Result<Option<TypeAliasIntermediate>, Error> {
+    fn get_type_alias(&self) -> Result<Option<TypeAlias>, Error> {
         if let StmtKind::Assign { value, .. }
         | StmtKind::AnnAssign {
             value: Some(value), ..
@@ -53,7 +53,7 @@ impl SourceMapped<&Located<StmtKind>> {
                                 } => (target.as_ref(), value),
                                 _ => return Ok(None),
                             };
-                            return Ok(Some(TypeAliasIntermediate {
+                            return Ok(Some(TypeAlias {
                                 target: assign_target,
                                 value: assign_value,
                             }));
@@ -66,7 +66,7 @@ impl SourceMapped<&Located<StmtKind>> {
         Ok(None)
     }
 
-    fn as_type_alias(&self) -> Result<Option<TypeAlias>, Vec<Error>> {
+    fn as_type_alias(&self) -> Result<Option<candid::TypeAlias>, Vec<Error>> {
         let (assign_target, assign_value) =
             match self.get_type_alias().map_err(Into::<Vec<Error>>::into)? {
                 Some(type_alias) => (type_alias.target, type_alias.value),
@@ -87,7 +87,7 @@ impl SourceMapped<&Located<StmtKind>> {
 
         let enclosed_type =
             SourceMapped::new(enclosed_expr.as_ref(), self.source_map.clone()).to_candid_type()?;
-        Ok(Some(TypeAlias {
+        Ok(Some(candid::TypeAlias {
             name: alias_name,
             aliased_type: Box::new(enclosed_type),
             type_params: vec![].into(),
