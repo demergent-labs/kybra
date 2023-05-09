@@ -1,36 +1,28 @@
 use cdk_framework::act::node::candid::TypeRef;
 use rustpython_parser::ast::{Constant, ExprKind, Located};
 
-use crate::{errors::Unreachable, source_map::SourceMapped, Error};
+use crate::source_map::SourceMapped;
 
 impl SourceMapped<&Located<ExprKind>> {
-    fn is_type_ref(&self) -> bool {
+    fn get_type_ref_name(&self) -> Option<String> {
         match &self.node {
-            ExprKind::Name { .. } => true,
+            ExprKind::Name { id, .. } => Some(id.clone()),
             ExprKind::Constant { value, .. } => match value {
-                Constant::Str(_) => true,
-                _ => false,
+                Constant::Str(str) => Some(str.clone()),
+                _ => None,
             },
-            _ => false,
+            _ => None,
         }
     }
 
-    pub fn as_type_ref(&self) -> Result<Option<TypeRef>, Error> {
-        if !self.is_type_ref() {
-            return Ok(None);
-        }
-        let name = match &self.node {
-            ExprKind::Name { id, .. } => id,
-            ExprKind::Constant { value, .. } => match value {
-                Constant::Str(string) => string,
-                _ => return Err(Unreachable::error()),
-            },
-            _ => return Err(Unreachable::error()),
-        }
-        .to_string();
-        Ok(Some(TypeRef {
+    pub fn as_type_ref(&self) -> Option<TypeRef> {
+        let name = match self.get_type_ref_name() {
+            Some(type_ref) => type_ref,
+            None => return None,
+        };
+        Some(TypeRef {
             name,
             type_arguments: vec![],
-        }))
+        })
     }
 }

@@ -19,7 +19,7 @@ impl SourceMapped<&Located<ExprKind>> {
         if let Some(tuple) = self.as_tuple(None)? {
             return Ok(CandidType::Tuple(tuple));
         }
-        if let Some(type_ref) = self.as_type_ref().map_err(Into::<Vec<Error>>::into)? {
+        if let Some(type_ref) = self.as_type_ref() {
             return Ok(CandidType::TypeRef(type_ref));
         }
         match &self.node {
