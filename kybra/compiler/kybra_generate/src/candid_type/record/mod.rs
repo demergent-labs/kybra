@@ -1,7 +1,7 @@
 mod record_members;
 
 use cdk_framework::act::node::candid;
-use rustpython_parser::ast::{ExprKind, Located, StmtKind};
+use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
 
@@ -18,31 +18,9 @@ impl PyAst {
     }
 }
 
-struct Record<'a> {
-    name: &'a String,
-    body: &'a Vec<Located<StmtKind>>,
-}
-
 impl SourceMapped<&Located<StmtKind>> {
-    fn get_record(&self) -> Option<Record> {
-        match &self.node {
-            StmtKind::ClassDef {
-                bases, name, body, ..
-            } => {
-                if bases.iter().any(|base| match &base.node {
-                    ExprKind::Name { id, .. } => id == "Record",
-                    _ => false,
-                }) {
-                    return Some(Record { name, body });
-                }
-                None
-            }
-            _ => None,
-        }
-    }
-
     fn as_record(&self) -> Result<Option<candid::Record>, Vec<Error>> {
-        match self.get_record() {
+        match self.get_child_class_of("Record") {
             Some(record) => {
                 let members = record
                     .body

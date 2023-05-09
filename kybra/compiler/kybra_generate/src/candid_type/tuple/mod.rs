@@ -4,11 +4,8 @@ use cdk_framework::act::node::candid::Tuple;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    candid_type::errors::InvalidTarget,
-    errors::{CollectResults, Unreachable},
-    py_ast::PyAst,
-    source_map::SourceMapped,
-    Error,
+    candid_type::errors::InvalidTarget, errors::CollectResults, py_ast::PyAst,
+    source_map::SourceMapped, Error,
 };
 
 use super::errors::NotExactlyOneTarget;
@@ -27,29 +24,16 @@ impl PyAst {
 }
 
 impl SourceMapped<&Located<ExprKind>> {
-    fn is_tuple(&self) -> bool {
-        match &self.node {
-            ExprKind::Subscript { value, .. } => match &value.node {
-                ExprKind::Name { id, .. } => id == "Tuple",
-                _ => false,
-            },
-            _ => false,
-        }
-    }
-
     pub fn as_tuple(&self, tuple_name: Option<String>) -> Result<Option<Tuple>, Vec<Error>> {
-        if !self.is_tuple() {
-            return Ok(None);
-        }
-        match &self.node {
-            ExprKind::Subscript { slice, .. } => {
+        match self.get_subscript_slice_for("Tuple") {
+            Some(slice) => {
                 let tuple_members_exprs = match &slice.node {
                     ExprKind::Tuple { elts, .. } => elts
                         .iter()
                         .map(|elt| SourceMapped::new(elt, self.source_map.clone()))
                         .collect(),
                     _ => {
-                        vec![SourceMapped::new(slice.as_ref(), self.source_map.clone())]
+                        vec![SourceMapped::new(slice, self.source_map.clone())]
                     }
                 };
                 let elems = tuple_members_exprs
@@ -62,7 +46,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     type_params: vec![].into(),
                 }))
             }
-            _ => Err(Unreachable::error().into()),
+            None => Ok(None),
         }
     }
 }

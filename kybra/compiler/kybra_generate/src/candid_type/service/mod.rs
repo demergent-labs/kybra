@@ -3,7 +3,7 @@ mod rust;
 
 use cdk_framework::{
     act::node::{
-        candid::{service::Method, Service},
+        candid::{self, service::Method},
         node_parts::mode::Mode,
         ReturnType,
     },
@@ -12,11 +12,8 @@ use cdk_framework::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::{CollectResults as OtherCollectResults, Unreachable},
-    method_utils::params::InternalOrExternal,
-    py_ast::PyAst,
-    source_map::SourceMapped,
-    Error,
+    errors::CollectResults as OtherCollectResults, method_utils::params::InternalOrExternal,
+    py_ast::PyAst, source_map::SourceMapped, Error,
 };
 
 use self::errors::{
@@ -25,7 +22,7 @@ use self::errors::{
 };
 
 impl PyAst {
-    pub fn build_services(&self) -> Result<Vec<Service>, Vec<Error>> {
+    pub fn build_services(&self) -> Result<Vec<candid::Service>, Vec<Error>> {
         Ok(self
             .get_stmt_kinds()
             .iter()
@@ -66,28 +63,26 @@ impl SourceMapped<&Located<StmtKind>> {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    fn as_service(&self) -> Result<Option<Service>, Vec<Error>> {
-        if !self.is_service() {
-            return Ok(None);
-        }
-        match &self.node {
-            StmtKind::ClassDef { name, body, .. } => {
-                let method_results: Vec<_> = body
+    fn as_service(&self) -> Result<Option<candid::Service>, Vec<Error>> {
+        match self.get_child_class_of("Service") {
+            Some(service) => {
+                let method_results: Vec<_> = service
+                    .body
                     .iter()
                     .map(|located_statement| {
                         SourceMapped::new(located_statement, self.source_map.clone())
-                            .to_service_method(&name)
+                            .to_service_method(&service.name)
                     })
                     .collect();
 
                 let methods = method_results.into_iter().collect_results()?;
 
                 if methods.len() == 0 {
-                    return Err(ClassMustHaveMethods::err_from_stmt(self, name).into());
+                    return Err(ClassMustHaveMethods::err_from_stmt(self, service.name).into());
                 }
 
-                Ok(Some(Service {
-                    name: name.clone(),
+                Ok(Some(candid::Service {
+                    name: service.name.clone(),
                     methods,
                     to_vm_value: rust::to_vm_value,
                     list_to_vm_value: rust::list_to_vm_value,
@@ -95,21 +90,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     list_from_vm_value: rust::list_from_vm_value,
                 }))
             }
-            // We filter out any non classDefs in KybraProgram.get_external_canister_declarations
-            _ => Err(Unreachable::error().into()),
-        }
-    }
-
-    fn is_service(&self) -> bool {
-        match &self.node {
-            StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {
-                let is_external_canister = match &base.node {
-                    ExprKind::Name { id, .. } => id == "Service",
-                    _ => false,
-                };
-                acc || is_external_canister
-            }),
-            _ => false,
+            None => Ok(None),
         }
     }
 }

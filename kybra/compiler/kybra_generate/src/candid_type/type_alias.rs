@@ -10,6 +10,11 @@ use crate::{
 
 use super::errors::{InvalidTarget, NotExactlyOneTarget};
 
+struct TypeAlias<'a> {
+    target: &'a Located<ExprKind>,
+    value: &'a Located<ExprKind>,
+}
+
 impl PyAst {
     pub fn build_type_aliases(&self) -> Result<Vec<candid::TypeAlias>, Vec<Error>> {
         Ok(self
@@ -21,11 +26,6 @@ impl PyAst {
             .filter_map(|x| x)
             .collect())
     }
-}
-
-struct TypeAlias<'a> {
-    target: &'a Located<ExprKind>,
-    value: &'a Located<ExprKind>,
 }
 
 impl SourceMapped<&Located<StmtKind>> {

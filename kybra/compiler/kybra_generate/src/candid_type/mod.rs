@@ -1,6 +1,7 @@
 pub mod array;
 pub mod errors;
 pub mod func;
+pub mod get_subscript_slice;
 pub mod opt;
 pub mod primitive;
 pub mod record;
