@@ -23,8 +23,13 @@ impl PyAst {
     }
 }
 
+struct TypeAliasIntermediate<'a> {
+    target: &'a Located<ExprKind>,
+    value: &'a Located<ExprKind>,
+}
+
 impl SourceMapped<&Located<StmtKind>> {
-    fn is_type_alias(&self) -> bool {
+    fn get_type_alias(&self) -> Result<Option<TypeAliasIntermediate>, Error> {
         if let StmtKind::Assign { value, .. }
         | StmtKind::AnnAssign {
             value: Some(value), ..
@@ -32,31 +37,41 @@ impl SourceMapped<&Located<StmtKind>> {
         {
             if let ExprKind::Subscript { value, .. } = &value.node {
                 if let ExprKind::Name { id, .. } = &value.node {
-                    return id == "Alias";
+                    match id == "Alias" {
+                        true => {
+                            let (assign_target, assign_value) = match &self.node {
+                                StmtKind::Assign { targets, value, .. } => {
+                                    if targets.len() != 1 {
+                                        return Err(NotExactlyOneTarget::err_from_stmt(self).into());
+                                    }
+                                    (&targets[0], value)
+                                }
+                                StmtKind::AnnAssign {
+                                    target,
+                                    value: Some(value),
+                                    ..
+                                } => (target.as_ref(), value),
+                                _ => return Ok(None),
+                            };
+                            return Ok(Some(TypeAliasIntermediate {
+                                target: assign_target,
+                                value: assign_value,
+                            }));
+                        }
+                        false => return Ok(None),
+                    }
                 }
             }
         }
-        false
+        Ok(None)
     }
 
     fn as_type_alias(&self) -> Result<Option<TypeAlias>, Vec<Error>> {
-        if !self.is_type_alias() {
-            return Ok(None);
-        }
-        let (assign_target, assign_value) = match &self.node {
-            StmtKind::Assign { targets, value, .. } => {
-                if targets.len() != 1 {
-                    return Err(NotExactlyOneTarget::err_from_stmt(self).into());
-                }
-                (&targets[0], value)
-            }
-            StmtKind::AnnAssign {
-                target,
-                value: Some(value),
-                ..
-            } => (target.as_ref(), value),
-            _ => return Ok(None),
-        };
+        let (assign_target, assign_value) =
+            match self.get_type_alias().map_err(Into::<Vec<Error>>::into)? {
+                Some(type_alias) => (type_alias.target, type_alias.value),
+                None => return Ok(None),
+            };
 
         let (alias_name, enclosed_expr) = (
             match &assign_target.node {
