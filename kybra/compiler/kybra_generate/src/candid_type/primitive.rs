@@ -1,43 +1,10 @@
 use cdk_framework::act::node::candid::Primitive;
 use rustpython_parser::ast::{ExprKind, Located};
 
-use crate::{errors::Unreachable, source_map::SourceMapped, Error};
+use crate::{source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<ExprKind>> {
-    fn is_primitive(&self) -> bool {
-        match &self.node {
-            ExprKind::Name { id, .. } => match &id[..] {
-                "blob" => true,
-                "empty" => true,
-                "float64" => true,
-                "float32" => true,
-                "int" => true,
-                "int64" => true,
-                "int32" => true,
-                "int16" => true,
-                "int8" => true,
-                "nat" => true,
-                "nat64" => true,
-                "nat32" => true,
-                "nat16" => true,
-                "nat8" => true,
-                "null" => true,
-                "Principal" => true,
-                "bool" => true,
-                "reserved" => true,
-                "str" => true,
-                "text" => true,
-                "void" => true,
-                _ => false,
-            },
-            _ => false,
-        }
-    }
-
     pub fn as_primitive(&self) -> Result<Option<Primitive>, Error> {
-        if !self.is_primitive() {
-            return Ok(None);
-        }
         Ok(Some(match &self.node {
             ExprKind::Name { id, .. } => match &id[..] {
                 "blob" => Primitive::Blob,
@@ -61,9 +28,9 @@ impl SourceMapped<&Located<ExprKind>> {
                 "str" => Primitive::String,
                 "text" => Primitive::String,
                 "void" => Primitive::Void,
-                _ => return Err(Unreachable::error()),
+                _ => return Ok(None),
             },
-            _ => return Err(Unreachable::error()),
+            _ => return Ok(None),
         }))
     }
 }
