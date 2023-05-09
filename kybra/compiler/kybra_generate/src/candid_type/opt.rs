@@ -11,7 +11,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     SourceMapped::new(opt, self.source_map.clone()).to_candid_type()?,
                 ),
             })),
-            None => todo!(),
+            None => Ok(None),
         }
     }
 }

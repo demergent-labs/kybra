@@ -1,18 +1,13 @@
-use cdk_framework::{act::node::candid, traits::CollectResults};
+use cdk_framework::act::node::candid;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{
-    errors::{CollectResults as OtherCollectResults, Unreachable},
-    py_ast::PyAst,
-    source_map::SourceMapped,
-    Error,
-};
+use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
 
 use super::errors::{InvalidTarget, NotExactlyOneTarget};
 
 struct TypeAlias<'a> {
     target: &'a Located<ExprKind>,
-    value: &'a Located<ExprKind>,
+    enclosed_expr: &'a Located<ExprKind>,
 }
 
 impl PyAst {
@@ -35,27 +30,23 @@ impl SourceMapped<&Located<StmtKind>> {
             value: Some(value), ..
         } = &self.node
         {
-            if let ExprKind::Subscript { value, .. } = &value.node {
+            if let ExprKind::Subscript { value, slice, .. } = &value.node {
                 if let ExprKind::Name { id, .. } = &value.node {
                     match id == "Alias" {
                         true => {
-                            let (assign_target, assign_value) = match &self.node {
-                                StmtKind::Assign { targets, value, .. } => {
+                            let assign_target = match &self.node {
+                                StmtKind::Assign { targets, .. } => {
                                     if targets.len() != 1 {
                                         return Err(NotExactlyOneTarget::err_from_stmt(self).into());
                                     }
-                                    (&targets[0], value)
+                                    &targets[0]
                                 }
-                                StmtKind::AnnAssign {
-                                    target,
-                                    value: Some(value),
-                                    ..
-                                } => (target.as_ref(), value),
+                                StmtKind::AnnAssign { target, .. } => target.as_ref(),
                                 _ => return Ok(None),
                             };
                             return Ok(Some(TypeAlias {
                                 target: assign_target,
-                                value: assign_value,
+                                enclosed_expr: slice,
                             }));
                         }
                         false => return Ok(None),
@@ -67,26 +58,18 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     fn as_type_alias(&self) -> Result<Option<candid::TypeAlias>, Vec<Error>> {
-        let (assign_target, assign_value) =
-            match self.get_type_alias().map_err(Into::<Vec<Error>>::into)? {
-                Some(type_alias) => (type_alias.target, type_alias.value),
-                None => return Ok(None),
-            };
+        let type_alias = match self.get_type_alias().map_err(Into::<Vec<Error>>::into)? {
+            Some(type_alias) => type_alias,
+            None => return Ok(None),
+        };
 
-        let (alias_name, enclosed_expr) = (
-            match &assign_target.node {
-                ExprKind::Name { id, .. } => Ok(id.clone()),
-                _ => Err(InvalidTarget::err_from_stmt(self).into()),
-            },
-            match &assign_value.node {
-                ExprKind::Subscript { slice, .. } => Ok(slice),
-                _ => Err(Unreachable::error().into()),
-            },
-        )
-            .collect_results()?;
+        let alias_name = match &type_alias.target.node {
+            ExprKind::Name { id, .. } => id.clone(),
+            _ => return Err(InvalidTarget::err_from_stmt(self).into()),
+        };
 
-        let enclosed_type =
-            SourceMapped::new(enclosed_expr.as_ref(), self.source_map.clone()).to_candid_type()?;
+        let enclosed_type = SourceMapped::new(type_alias.enclosed_expr, self.source_map.clone())
+            .to_candid_type()?;
         Ok(Some(candid::TypeAlias {
             name: alias_name,
             aliased_type: Box::new(enclosed_type),
