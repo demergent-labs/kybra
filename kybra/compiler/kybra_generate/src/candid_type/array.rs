@@ -19,9 +19,9 @@ impl SourceMapped<&Located<ExprKind>> {
 
     pub fn as_array(&self) -> Result<Option<Array>, Vec<Error>> {
         match self.get_array() {
-            Some(slice) => Ok(Some(Array {
+            Some(array) => Ok(Some(Array {
                 enclosed_type: Box::from(
-                    SourceMapped::new(slice, self.source_map.clone()).to_candid_type()?,
+                    SourceMapped::new(array, self.source_map.clone()).to_candid_type()?,
                 ),
             })),
             None => Ok(None),
