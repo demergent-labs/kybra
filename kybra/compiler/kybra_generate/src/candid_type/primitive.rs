@@ -1,12 +1,12 @@
 use cdk_framework::act::node::candid::Primitive;
 use rustpython_parser::ast::{ExprKind, Located};
 
-use crate::{source_map::SourceMapped, Error};
+use crate::{get_name::HasName, source_map::SourceMapped, Error};
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn as_primitive(&self) -> Result<Option<Primitive>, Error> {
-        Ok(Some(match &self.node {
-            ExprKind::Name { id, .. } => match &id[..] {
+        Ok(Some(match self.get_name() {
+            Some(name) => match name {
                 "blob" => Primitive::Blob,
                 "empty" => Primitive::Empty,
                 "float64" => Primitive::Float64,
@@ -30,7 +30,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 "void" => Primitive::Void,
                 _ => return Ok(None),
             },
-            _ => return Ok(None),
+            None => return Ok(None),
         }))
     }
 }

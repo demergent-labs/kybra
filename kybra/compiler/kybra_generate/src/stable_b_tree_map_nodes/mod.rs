@@ -2,7 +2,9 @@ pub mod errors;
 pub mod rust;
 
 use crate::{
+    constants::STABLE_B_TREE_MAP,
     errors::{CollectResults, Unreachable},
+    get_name::HasName,
     py_ast::PyAst,
     source_map::SourceMapped,
     Error,
@@ -42,16 +44,12 @@ impl PyAst {
 
 impl SourceMapped<&Located<ExprKind>> {
     fn is_stable_b_tree_map_node(&self) -> bool {
-        match &self.node {
-            ExprKind::Call { func, .. } => match &func.node {
-                ExprKind::Subscript { value, .. } => match &value.node {
-                    ExprKind::Name { id, .. } => id == "StableBTreeMap",
-                    _ => false,
-                },
-                _ => false,
-            },
-            _ => false,
+        if let ExprKind::Call { func, .. } = &self.node {
+            if let ExprKind::Subscript { value, .. } = &func.node {
+                return value.get_name() == Some(STABLE_B_TREE_MAP);
+            }
         }
+        false
     }
 
     fn get_value_type(&self) -> Result<SourceMapped<&Located<ExprKind>>, Error> {

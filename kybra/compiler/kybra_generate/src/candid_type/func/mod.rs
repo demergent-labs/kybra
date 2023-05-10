@@ -9,8 +9,12 @@ use cdk_framework::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::CollectResults as CrateCollectResults, get_name::HasName, py_ast::PyAst,
-    source_map::SourceMapped, Error,
+    constants::{FUNC, ONEWAY, QUERY, UPDATE},
+    errors::CollectResults as CrateCollectResults,
+    get_name::HasName,
+    py_ast::PyAst,
+    source_map::SourceMapped,
+    Error,
 };
 
 use self::errors::{FuncCallTakesOneArg, FuncFormatting, ReturnTypeMode};
@@ -36,11 +40,6 @@ struct Func<'a> {
     params: &'a Vec<Located<ExprKind>>,
     returns: &'a Located<ExprKind>,
 }
-
-const FUNC: &str = "Func";
-const ONEWAY: &str = "Oneway";
-const UPDATE: &str = "Update";
-const QUERY: &str = "Query";
 
 impl SourceMapped<&Located<ExprKind>> {
     fn get_func_arg(&self) -> Result<Option<&Located<ExprKind>>, Error> {

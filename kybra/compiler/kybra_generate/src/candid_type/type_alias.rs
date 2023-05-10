@@ -1,7 +1,10 @@
 use cdk_framework::act::node::candid;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
+use crate::{
+    constants::ALIAS, errors::CollectResults, get_name::HasName, py_ast::PyAst,
+    source_map::SourceMapped, Error,
+};
 
 struct TypeAlias<'a> {
     enclosed_expr: &'a Located<ExprKind>,
@@ -28,15 +31,10 @@ impl SourceMapped<&Located<StmtKind>> {
         } = &self.node
         {
             if let ExprKind::Subscript { value, slice, .. } = &value.node {
-                if let ExprKind::Name { id, .. } = &value.node {
-                    match id == "Alias" {
-                        true => {
-                            return Ok(Some(TypeAlias {
-                                enclosed_expr: slice,
-                            }));
-                        }
-                        false => return Ok(None),
-                    }
+                if let Some(ALIAS) = value.get_name() {
+                    return Ok(Some(TypeAlias {
+                        enclosed_expr: slice,
+                    }));
                 }
             }
         }

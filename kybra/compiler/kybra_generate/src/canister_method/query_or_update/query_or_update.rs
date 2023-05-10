@@ -9,7 +9,12 @@ use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use super::rust;
 use crate::{
-    errors::Unreachable, method_utils::params::InternalOrExternal, source_map::SourceMapped, Error,
+    constants::{ASYNC, MANUAL},
+    errors::Unreachable,
+    get_name::HasName,
+    method_utils::params::InternalOrExternal,
+    source_map::SourceMapped,
+    Error,
 };
 
 impl SourceMapped<&Located<StmtKind>> {
@@ -26,40 +31,28 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 
     pub fn is_async(&self) -> bool {
-        let returns = match &self.node {
-            StmtKind::FunctionDef { returns, .. } => returns,
-            _ => return false,
-        };
-
-        match returns {
-            Some(returns) => match &returns.node {
-                ExprKind::Subscript { value, .. } => match &value.node {
-                    ExprKind::Name { id, .. } => id == "Async",
-                    _ => false,
-                },
-                _ => false,
-            },
-            None => false,
+        if let StmtKind::FunctionDef {
+            returns: Some(returns),
+            ..
+        } = &self.node
+        {
+            if let ExprKind::Subscript { value, .. } = &returns.node {
+                return value.get_name() == Some(ASYNC);
+            }
         }
+        false
     }
 }
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn is_manual(&self) -> bool {
-        match &self.node {
-            ExprKind::Subscript { value, slice, .. } => match &value.node {
-                ExprKind::Name { id, .. } => {
-                    if id == "Manual" {
-                        return true;
-                    } else {
-                        return SourceMapped::new(slice.as_ref(), self.source_map.clone())
-                            .is_manual();
-                    }
-                }
-                _ => false,
-            },
-            _ => false,
+        if let ExprKind::Subscript { value, slice, .. } = &self.node {
+            if let Some(MANUAL) = &value.get_name() {
+                return true;
+            }
+            return SourceMapped::new(slice.as_ref(), self.source_map.clone()).is_manual();
         }
+        false
     }
 }
 

@@ -18,7 +18,12 @@ use rustpython_parser::ast::Located;
 use rustpython_parser::ast::Mod;
 use rustpython_parser::ast::StmtKind;
 
+use crate::constants::{
+    HEARTBEAT_DECORATOR, INIT_DECORATOR, INSPECT_MESSAGE_DECORATOR, POST_UPGRADE_DECORATOR,
+    PRE_UPGRADE_DECORATOR, QUERY_METHOD_DECORATOR, UPDATE_METHOD_DECORATOR,
+};
 use crate::errors::Unreachable;
+use crate::get_name::HasName;
 use crate::py_ast::PyAst;
 use crate::source_map::SourceMapped;
 use crate::Error;
@@ -55,13 +60,13 @@ impl PyAst {
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_canister_method_type(&self, canister_method_type: CanisterMethodType) -> bool {
         self.has_decorator(match canister_method_type {
-            CanisterMethodType::Heartbeat => "heartbeat",
-            CanisterMethodType::Init => "init",
-            CanisterMethodType::InspectMessage => "inspect_message",
-            CanisterMethodType::PostUpgrade => "post_upgrade",
-            CanisterMethodType::PreUpgrade => "pre_upgrade",
-            CanisterMethodType::Query => "query",
-            CanisterMethodType::Update => "update",
+            CanisterMethodType::Heartbeat => HEARTBEAT_DECORATOR,
+            CanisterMethodType::Init => INIT_DECORATOR,
+            CanisterMethodType::InspectMessage => INSPECT_MESSAGE_DECORATOR,
+            CanisterMethodType::PostUpgrade => POST_UPGRADE_DECORATOR,
+            CanisterMethodType::PreUpgrade => PRE_UPGRADE_DECORATOR,
+            CanisterMethodType::Query => QUERY_METHOD_DECORATOR,
+            CanisterMethodType::Update => UPDATE_METHOD_DECORATOR,
         })
     }
 
@@ -127,8 +132,8 @@ fn get_guard_function_name_from_keywords(
         .iter()
         .find(|keyword| keyword.node.arg.as_deref() == Some("guard"))
     {
-        return match &keyword.node.value.node {
-            ExprKind::Name { id, .. } => Ok(Some(id.clone())),
+        return match &keyword.node.value.get_name() {
+            Some(name) => Ok(Some(name.to_string())),
             _ => Err(GuardFunctionError::InvalidName),
         };
     }

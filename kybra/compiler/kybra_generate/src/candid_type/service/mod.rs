@@ -12,8 +12,13 @@ use cdk_framework::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::CollectResults as OtherCollectResults, get_name::HasName,
-    method_utils::params::InternalOrExternal, py_ast::PyAst, source_map::SourceMapped, Error,
+    constants::{SERVICE, SERVICE_QUERY, SERVICE_UPDATE},
+    errors::CollectResults as OtherCollectResults,
+    get_name::HasName,
+    method_utils::params::InternalOrExternal,
+    py_ast::PyAst,
+    source_map::SourceMapped,
+    Error,
 };
 
 use self::errors::{
@@ -64,7 +69,7 @@ impl SourceMapped<&Located<StmtKind>> {
 
 impl SourceMapped<&Located<StmtKind>> {
     fn as_service(&self) -> Result<Option<candid::Service>, Vec<Error>> {
-        match self.get_child_class_of("Service") {
+        match self.get_child_class_of(SERVICE) {
             Some(service) => {
                 let method_results: Vec<_> = service
                     .body
@@ -94,9 +99,6 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 }
-
-const SERVICE_UPDATE: &str = "service_update";
-const SERVICE_QUERY: &str = "service_query";
 
 fn build_mode(
     method_stmt: &SourceMapped<&Located<StmtKind>>,

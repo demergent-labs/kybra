@@ -3,7 +3,9 @@ pub mod tuple_members;
 use cdk_framework::act::node::candid::Tuple;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
+use crate::{
+    constants::TUPLE, errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error,
+};
 
 impl PyAst {
     pub fn build_tuples(&self) -> Result<Vec<Tuple>, Vec<Error>> {
@@ -20,7 +22,7 @@ impl PyAst {
 
 impl SourceMapped<&Located<ExprKind>> {
     pub fn as_tuple(&self, tuple_name: Option<String>) -> Result<Option<Tuple>, Vec<Error>> {
-        match self.get_subscript_slice_for("Tuple") {
+        match self.get_subscript_slice_for(TUPLE) {
             Some(slice) => {
                 let tuple_members_exprs = match &slice.node {
                     ExprKind::Tuple { elts, .. } => elts

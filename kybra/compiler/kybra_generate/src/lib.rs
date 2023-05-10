@@ -5,6 +5,7 @@ pub mod async_result_handler;
 pub mod body;
 pub mod candid_type;
 pub mod canister_method;
+pub mod constants;
 pub mod debug;
 pub mod errors;
 pub mod get_name;

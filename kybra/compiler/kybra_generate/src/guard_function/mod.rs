@@ -2,9 +2,12 @@ pub mod errors;
 mod guard_function;
 
 use cdk_framework::act::node;
-use rustpython_parser::ast::{ExprKind, Located, StmtKind};
+use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
+use crate::{
+    constants::GUARD_RESULT, errors::CollectResults, get_name::HasName, py_ast::PyAst,
+    source_map::SourceMapped, Error,
+};
 
 use self::errors::GuardFunctionParam;
 
@@ -27,13 +30,14 @@ impl PyAst {
 
 impl SourceMapped<&Located<StmtKind>> {
     fn get_guard_function(&self) -> Option<GuardFunction> {
-        if let StmtKind::FunctionDef { name, returns, .. } = &self.node {
-            if let Some(returns) = returns {
-                if let ExprKind::Name { id, .. } = &returns.node {
-                    if id == "GuardResult" {
-                        return Some(GuardFunction { name });
-                    }
-                }
+        if let StmtKind::FunctionDef {
+            name,
+            returns: Some(returns),
+            ..
+        } = &self.node
+        {
+            if returns.get_name() == Some(GUARD_RESULT) {
+                return Some(GuardFunction { name });
             }
         }
         None
