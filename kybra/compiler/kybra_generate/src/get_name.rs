@@ -1,6 +1,10 @@
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{candid_type::errors::NotExactlyOneTarget, source_map::SourceMapped, Error};
+use crate::{
+    candid_type::errors::{InvalidName, NotExactlyOneTarget},
+    source_map::SourceMapped,
+    Error,
+};
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn get_name(&self) -> Result<Option<String>, Error> {
@@ -19,6 +23,13 @@ impl SourceMapped<&Located<StmtKind>> {
             }
             _ => None,
         })
+    }
+
+    pub fn get_name_or_err(&self) -> Result<String, Error> {
+        match self.get_name()? {
+            Some(name) => Ok(name),
+            None => Err(InvalidName::err_from_stmt(self).into()),
+        }
     }
 }
 

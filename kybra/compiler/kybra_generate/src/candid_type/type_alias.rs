@@ -3,8 +3,6 @@ use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
 
-use super::errors::InvalidName;
-
 struct TypeAlias<'a> {
     enclosed_expr: &'a Located<ExprKind>,
 }
@@ -51,10 +49,7 @@ impl SourceMapped<&Located<StmtKind>> {
             None => return Ok(None),
         };
 
-        let name = match self.get_name()? {
-            Some(name) => name,
-            None => return Err(InvalidName::err_from_stmt(self).into()),
-        };
+        let name = self.get_name_or_err()?;
 
         let enclosed_type = SourceMapped::new(type_alias.enclosed_expr, self.source_map.clone())
             .to_candid_type()?;

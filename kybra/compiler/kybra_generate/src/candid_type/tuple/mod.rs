@@ -5,8 +5,6 @@ use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
 
-use super::errors::InvalidName;
-
 impl PyAst {
     pub fn build_tuples(&self) -> Result<Vec<Tuple>, Vec<Error>> {
         Ok(self
@@ -52,10 +50,7 @@ impl SourceMapped<&Located<StmtKind>> {
     fn as_tuple(&self) -> Result<Option<Tuple>, Vec<Error>> {
         match &self.node {
             StmtKind::Assign { value, .. } => {
-                let name = match self.get_name()? {
-                    Some(name) => name,
-                    None => return Err(InvalidName::err_from_stmt(self).into()),
-                };
+                let name = self.get_name_or_err()?;
                 Ok(SourceMapped::new(value.as_ref(), self.source_map.clone())
                     .as_tuple(Some(name))?)
             }

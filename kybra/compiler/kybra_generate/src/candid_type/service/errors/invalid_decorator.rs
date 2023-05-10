@@ -11,7 +11,7 @@ use crate::{
 
 #[derive(Clone, Debug)]
 pub struct InvalidDecorator {
-    pub canister_name: String,
+    pub service_name: String,
     pub method_name: String,
     pub location: Location,
 }
@@ -23,7 +23,7 @@ impl InvalidDecorator {
         method_name: &str,
     ) -> Error {
         Self {
-            canister_name: canister_name.to_string(),
+            service_name: canister_name.to_string(),
             location: stmt_kind.create_location(),
             method_name: method_name.to_string(),
         }
@@ -40,8 +40,8 @@ impl From<InvalidDecorator> for Error {
 impl Display for InvalidDecorator {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let title = format!(
-            "{}.{} has an invalid decorator. Change it to either @service_update or @service_query",
-            self.canister_name, self.method_name
+            "{}.{} has an invalid decorator. Service methods should be decorated with either @service_update or @service_query",
+            self.service_name, self.method_name
         );
         let annotation = "".to_string();
         let suggestion = None;

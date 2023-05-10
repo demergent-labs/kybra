@@ -14,8 +14,6 @@ use crate::{
 
 use self::errors::{FuncCallTakesOneArg, FuncFormatting, ReturnTypeMode};
 
-use super::errors::InvalidName;
-
 pub mod errors;
 mod rust;
 
@@ -134,10 +132,7 @@ impl SourceMapped<&Located<StmtKind>> {
             | StmtKind::AnnAssign {
                 value: Some(value), ..
             } => {
-                let name = match self.get_name()? {
-                    Some(name) => name,
-                    None => return Err(InvalidName::err_from_stmt(self).into()),
-                };
+                let name = self.get_name_or_err()?;
                 Ok(SourceMapped::new(value.as_ref(), self.source_map.clone())
                     .as_func(Some(name))?)
             }

@@ -8,32 +8,32 @@ use crate::{
 };
 
 #[derive(Clone, Debug)]
-pub struct ClassWithNotFunctionDefs {
-    pub class_name: String,
+pub struct ServiceWithNotFunctionDefs {
+    pub service_name: String,
     pub location: Location,
 }
 
-impl ClassWithNotFunctionDefs {
+impl ServiceWithNotFunctionDefs {
     pub fn err_from_stmt(stmt_kind: &SourceMapped<&Located<StmtKind>>, class_name: &str) -> Error {
         Self {
-            class_name: class_name.to_string(),
+            service_name: class_name.to_string(),
             location: stmt_kind.create_location(),
         }
         .into()
     }
 }
 
-impl From<ClassWithNotFunctionDefs> for Error {
-    fn from(value: ClassWithNotFunctionDefs) -> Self {
+impl From<ServiceWithNotFunctionDefs> for Error {
+    fn from(value: ServiceWithNotFunctionDefs) -> Self {
         Self::ClassWithNotFunctionDefs(value)
     }
 }
 
-impl std::fmt::Display for ClassWithNotFunctionDefs {
+impl std::fmt::Display for ServiceWithNotFunctionDefs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}",
         CompilerOutput {
-            title: format!("class \"{}\" should only contain function definitions. Please remove everything else.", self.class_name),
+            title: format!("service \"{}\" should only contain function definitions. Please remove everything else.", self.service_name),
             location: self.location.clone(),
             annotation: "".to_string(),
             suggestion: None,

@@ -10,12 +10,12 @@ use crate::{
 };
 
 #[derive(Clone, Debug)]
-pub struct ClassMustHaveMethods {
+pub struct ServiceMustHaveMethods {
     pub class_name: String,
     pub location: Location,
 }
 
-impl ClassMustHaveMethods {
+impl ServiceMustHaveMethods {
     pub fn err_from_stmt(stmt_kind: &SourceMapped<&Located<StmtKind>>, class_name: &str) -> Error {
         Self {
             class_name: class_name.to_string(),
@@ -25,19 +25,19 @@ impl ClassMustHaveMethods {
     }
 }
 
-impl From<ClassMustHaveMethods> for Error {
-    fn from(value: ClassMustHaveMethods) -> Self {
+impl From<ServiceMustHaveMethods> for Error {
+    fn from(value: ServiceMustHaveMethods) -> Self {
         Self::ClassMustHaveMethods(value)
     }
 }
 
-impl Display for ClassMustHaveMethods {
+impl Display for ServiceMustHaveMethods {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "{}",
             CompilerOutput {
-                title: format!("class \"{}\" doesn't have any methods. External canisters are required to expose at least one method.", self.class_name),
+                title: format!("service \"{}\" doesn't have any methods. Services are required to expose at least one method.", self.class_name),
                 location: self.location.clone(),
                 annotation: "".to_string(),
                 suggestion: None,

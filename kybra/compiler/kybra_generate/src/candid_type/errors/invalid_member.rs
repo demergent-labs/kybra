@@ -31,7 +31,7 @@ impl From<InvalidMember> for Error {
 
 impl Display for InvalidMember {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let title = format!("Target must be a name");
+        let title = format!("Members must be in the form `name: type`");
         let annotation = "".to_string();
         let suggestion = None;
 

@@ -31,8 +31,10 @@ impl From<InvalidSubscriptable> for Error {
 
 impl Display for InvalidSubscriptable {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let title = format!("You need to have Func([]) and not any other way");
-        let annotation = "".to_string();
+        let title =
+            "Only Async, Vec, Manual, Opt, or Tuple are allowable subscriptables for candid values"
+                .to_string();
+        let annotation = "Invalid subscriptable here".to_string();
         let suggestion = None;
 
         write!(

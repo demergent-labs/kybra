@@ -17,7 +17,7 @@ use crate::{
 };
 
 use self::errors::{
-    ClassMustHaveMethods, ClassWithNotFunctionDefs, InvalidDecorator, MissingDecorator,
+    InvalidDecorator, MissingDecorator, ServiceMustHaveMethods, ServiceWithNotFunctionDefs,
     TooManyDecorators, WrongDecorator,
 };
 
@@ -57,7 +57,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     },
                 })
             }
-            _ => Err(ClassWithNotFunctionDefs::err_from_stmt(self, &canister_name).into()),
+            _ => Err(ServiceWithNotFunctionDefs::err_from_stmt(self, &canister_name).into()),
         }
     }
 }
@@ -78,7 +78,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 let methods = method_results.into_iter().collect_results()?;
 
                 if methods.len() == 0 {
-                    return Err(ClassMustHaveMethods::err_from_stmt(self, service.name).into());
+                    return Err(ServiceMustHaveMethods::err_from_stmt(self, service.name).into());
                 }
 
                 Ok(Some(candid::Service {

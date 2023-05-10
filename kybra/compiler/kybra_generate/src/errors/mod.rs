@@ -9,13 +9,13 @@ use crate::{
     candid_type::{
         errors::{
             InvalidMember, InvalidName, InvalidSubscriptable, NoneCannotBeAType,
-            NotExactlyOneTarget, TargetMustBeAName, UnsupportedType,
+            NotExactlyOneTarget, UnsupportedType,
         },
         func::errors::{
             FuncCallTakesOneArg, FuncFormatting, InlineFuncNotSupported, ReturnTypeMode,
         },
         service::errors::{
-            ClassMustHaveMethods, ClassWithNotFunctionDefs, InvalidDecorator, MissingDecorator,
+            InvalidDecorator, MissingDecorator, ServiceMustHaveMethods, ServiceWithNotFunctionDefs,
             TooManyDecorators, WrongDecorator,
         },
     },
@@ -47,8 +47,8 @@ pub enum Error {
     GuardFunctionNotFound(String),
     TypeNotFound(String),
     Unreachable(Unreachable),
-    ClassMustHaveMethods(ClassMustHaveMethods),
-    ClassWithNotFunctionDefs(ClassWithNotFunctionDefs),
+    ClassMustHaveMethods(ServiceMustHaveMethods),
+    ClassWithNotFunctionDefs(ServiceWithNotFunctionDefs),
     DictionaryUnpackingOperatorNotSupported(DictionaryUnpackingOperatorNotSupported),
     FirstParamMustBeSelf(FirstParamMustBeSelf),
     FirstParamMustNotBeSelf(FirstParamMustNotBeSelf),
@@ -71,7 +71,6 @@ pub enum Error {
     ReturnTypeAnnotationRequired(ReturnTypeAnnotationRequired),
     ReturnTypeMode(ReturnTypeMode),
     ReturnTypeMustBeVoid(ReturnTypeMustBeVoid),
-    TargetMustBeAName(TargetMustBeAName),
     TooManyDecorators(TooManyDecorators),
     WrongDecorator(WrongDecorator),
     UnsupportedType(UnsupportedType),
@@ -119,7 +118,6 @@ impl std::fmt::Display for Error {
             Error::ReturnTypeAnnotationRequired(error) => error,
             Error::ReturnTypeMode(error) => error,
             Error::ReturnTypeMustBeVoid(error) => error,
-            Error::TargetMustBeAName(error) => error,
             Error::TooManyDecorators(error) => error,
             Error::WrongDecorator(error) => error,
             Error::UnsupportedType(error) => error,

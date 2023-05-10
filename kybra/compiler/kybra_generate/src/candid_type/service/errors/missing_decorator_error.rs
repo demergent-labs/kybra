@@ -11,7 +11,7 @@ use crate::{
 
 #[derive(Clone, Debug)]
 pub struct MissingDecorator {
-    pub canister_name: String,
+    pub service_name: String,
     pub method_name: String,
     pub location: Location,
 }
@@ -19,11 +19,11 @@ pub struct MissingDecorator {
 impl MissingDecorator {
     pub fn err_from_stmt(
         stmt_kind: &SourceMapped<&Located<StmtKind>>,
-        canister_name: &str,
+        service_name: &str,
         method_name: &str,
     ) -> Error {
         Self {
-            canister_name: canister_name.to_string(),
+            service_name: service_name.to_string(),
             location: stmt_kind.create_location(),
             method_name: method_name.to_string(),
         }
@@ -40,8 +40,8 @@ impl From<MissingDecorator> for Error {
 impl Display for MissingDecorator {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let title = format!(
-            "{}.{} is missing a @service_query or @service_update decorator. Please add it above the method",
-            self.canister_name, self.method_name
+            "{}.{} is missing a @service_query or @service_update decorator",
+            self.service_name, self.method_name
         );
         let annotation = "".to_string();
         let suggestion = None;
