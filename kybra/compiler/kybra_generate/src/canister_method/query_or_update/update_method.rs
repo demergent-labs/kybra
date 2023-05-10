@@ -1,7 +1,9 @@
 use cdk_framework::act::node::canister_method::{CanisterMethodType, UpdateMethod};
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
+use crate::{
+    errors::CollectResults, kybra_unreachable, py_ast::PyAst, source_map::SourceMapped, Error,
+};
 
 impl PyAst {
     pub fn build_update_methods(&self) -> Result<Vec<UpdateMethod>, Vec<Error>> {
@@ -21,8 +23,10 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_canister_method_type(CanisterMethodType::Update) {
             return Ok(None);
         }
-        Ok(Some(UpdateMethod {
-            definition: self.as_query_or_update_definition()?,
-        }))
+        let definition = match self.as_query_or_update_definition()? {
+            Some(def) => def,
+            None => kybra_unreachable!(),
+        };
+        Ok(Some(UpdateMethod { definition }))
     }
 }

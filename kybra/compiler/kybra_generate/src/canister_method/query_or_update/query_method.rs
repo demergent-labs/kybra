@@ -1,4 +1,6 @@
-use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
+use crate::{
+    errors::CollectResults, kybra_unreachable, py_ast::PyAst, source_map::SourceMapped, Error,
+};
 use cdk_framework::act::node::canister_method::{CanisterMethodType, QueryMethod};
 use rustpython_parser::ast::{Located, StmtKind};
 
@@ -20,8 +22,10 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_canister_method_type(CanisterMethodType::Query) {
             return Ok(None);
         }
-        Ok(Some(QueryMethod {
-            definition: self.as_query_or_update_definition()?,
-        }))
+        let definition = match self.as_query_or_update_definition()? {
+            Some(def) => def,
+            None => kybra_unreachable!(),
+        };
+        Ok(Some(QueryMethod { definition }))
     }
 }
