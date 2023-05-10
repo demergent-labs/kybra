@@ -11,9 +11,7 @@ use crate::{
             InvalidMember, InvalidName, InvalidSubscriptable, NoneCannotBeAType,
             NotExactlyOneTarget, UnsupportedType,
         },
-        func::errors::{
-            FuncCallTakesOneArg, FuncFormatting, InlineFuncNotSupported, ReturnTypeMode,
-        },
+        func::errors::{FuncCallTakesOneArg, FuncFormatting, ReturnTypeMode},
         service::errors::{
             MissingDecorator, ServiceMustHaveMethods, ServiceWithNotFunctionDefs,
             TooManyDecorators, WrongDecorator,
@@ -57,7 +55,6 @@ pub enum Error {
     GuardFunctionName(GuardFunctionName),
     GuardFunctionParam(GuardFunctionParam),
     GuardFunctionReturn(GuardFunctionReturn),
-    InlineFuncNotSupported(InlineFuncNotSupported),
     InvalidMember(InvalidMember),
     InvalidName(InvalidName),
     InvalidSubscriptable(InvalidSubscriptable),
@@ -103,7 +100,6 @@ impl std::fmt::Display for Error {
             Error::GuardFunctionName(error) => error,
             Error::GuardFunctionParam(error) => error,
             Error::GuardFunctionReturn(error) => error,
-            Error::InlineFuncNotSupported(error) => error,
             Error::InvalidMember(error) => error,
             Error::InvalidName(error) => error,
             Error::InvalidSubscriptable(error) => error,
