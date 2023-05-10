@@ -31,7 +31,7 @@ impl From<NotExactlyOneTarget> for Error {
 
 impl Display for NotExactlyOneTarget {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let title = format!("Only exactly one target is supported");
+        let title = format!("Destructuring isn't supported here");
         let annotation = "".to_string();
         let suggestion = None;
 

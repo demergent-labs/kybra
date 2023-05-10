@@ -31,7 +31,7 @@ impl From<NoneCannotBeAType> for Error {
 
 impl Display for NoneCannotBeAType {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let title = "None must not be used as a type, but only as a value. Please specify either kybra.null or kybra.void".to_string();
+        let title = "None must not be used as a type, but only as a value. Consider using kybra.null or kybra.void as appropriate".to_string();
         let annotation = "Ambiguous None here".to_string();
         let suggestion = None;
 
