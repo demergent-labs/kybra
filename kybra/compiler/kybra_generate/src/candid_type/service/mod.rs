@@ -22,7 +22,7 @@ use crate::{
 };
 
 use self::errors::{
-    MissingDecorator, ServiceMustHaveMethods, ServiceWithNotFunctionDefs, TooManyDecorators,
+    MissingDecorator, ServiceMustHaveMethods, ServiceWithNonFunctionDefs, TooManyDecorators,
     WrongDecorator,
 };
 
@@ -62,7 +62,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     },
                 })
             }
-            _ => Err(ServiceWithNotFunctionDefs::err_from_stmt(self, &canister_name).into()),
+            _ => Err(ServiceWithNonFunctionDefs::err_from_stmt(self, &canister_name).into()),
         }
     }
 }

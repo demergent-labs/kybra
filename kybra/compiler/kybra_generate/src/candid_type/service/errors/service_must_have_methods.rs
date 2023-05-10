@@ -27,7 +27,7 @@ impl ServiceMustHaveMethods {
 
 impl From<ServiceMustHaveMethods> for Error {
     fn from(value: ServiceMustHaveMethods) -> Self {
-        Self::ClassMustHaveMethods(value)
+        Self::ServiceMustHaveMethods(value)
     }
 }
 
