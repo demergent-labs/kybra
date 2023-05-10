@@ -18,7 +18,7 @@ fn main() {
         Err(errors) => {
             eprintln!("Canister Compilation failed:");
             for error in errors {
-                eprintln!("{:#?}", error)
+                eprintln!("{}", error)
             }
             return;
         }
