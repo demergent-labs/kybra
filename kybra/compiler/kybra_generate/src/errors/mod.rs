@@ -11,7 +11,9 @@ use crate::{
             InvalidMember, InvalidSubscriptable, InvalidTarget, NoneCannotBeAType,
             NotExactlyOneTarget, TargetMustBeAName, UnsupportedType,
         },
-        func::errors::{FuncFormatting, InlineFuncNotSupported, ReturnTypeMode},
+        func::errors::{
+            FuncCallTakesOneArg, FuncFormatting, InlineFuncNotSupported, ReturnTypeMode,
+        },
         service::errors::{
             ClassMustHaveMethods, ClassWithNotFunctionDefs, InvalidDecorator, MissingDecorator,
             TooManyDecorators, WrongDecorator,
@@ -51,6 +53,7 @@ pub enum Error {
     FirstParamMustBeSelf(FirstParamMustBeSelf),
     FirstParamMustNotBeSelf(FirstParamMustNotBeSelf),
     FuncFormatting(FuncFormatting),
+    FuncCallTakesOneArg(FuncCallTakesOneArg),
     GuardFunctionName(GuardFunctionName),
     GuardFunctionParam(GuardFunctionParam),
     GuardFunctionReturn(GuardFunctionReturn),
@@ -98,6 +101,7 @@ impl std::fmt::Display for Error {
             Error::FirstParamMustBeSelf(error) => error,
             Error::FirstParamMustNotBeSelf(error) => error,
             Error::FuncFormatting(error) => error,
+            Error::FuncCallTakesOneArg(error) => error,
             Error::GuardFunctionName(error) => error,
             Error::GuardFunctionParam(error) => error,
             Error::GuardFunctionReturn(error) => error,

@@ -1,6 +1,6 @@
 use cdk_framework::{
     act::node::{
-        candid::{Func, Primitive},
+        candid::{self, Primitive},
         node_parts::mode::Mode,
         CandidType, ReturnType,
     },
@@ -9,13 +9,10 @@ use cdk_framework::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::{CollectResults as CrateCollectResults, Unreachable},
-    py_ast::PyAst,
-    source_map::SourceMapped,
-    Error,
+    errors::CollectResults as CrateCollectResults, py_ast::PyAst, source_map::SourceMapped, Error,
 };
 
-use self::errors::{FuncFormatting, ReturnTypeMode};
+use self::errors::{FuncCallTakesOneArg, FuncFormatting, ReturnTypeMode};
 
 use super::errors::NotExactlyOneTarget;
 
@@ -23,7 +20,7 @@ pub mod errors;
 mod rust;
 
 impl PyAst {
-    pub fn build_funcs(&self) -> Result<Vec<Func>, Vec<Error>> {
+    pub fn build_funcs(&self) -> Result<Vec<candid::Func>, Vec<Error>> {
         Ok(self
             .get_stmt_kinds()
             .iter()
@@ -35,30 +32,88 @@ impl PyAst {
     }
 }
 
+struct Func<'a> {
+    mode: &'a String,
+    params: &'a Vec<Located<ExprKind>>,
+    returns: &'a Located<ExprKind>,
+}
+
 impl SourceMapped<&Located<ExprKind>> {
-    fn is_func(&self) -> bool {
+    fn get_func_arg(&self) -> Result<Option<&Located<ExprKind>>, Error> {
         match &self.node {
-            ExprKind::Call { func, .. } => match &func.node {
-                ExprKind::Name { id, .. } => id == "Func",
-                _ => false,
+            ExprKind::Call { func, args, .. } => match &func.node {
+                ExprKind::Name { id, .. } => match id == "Func" {
+                    true => {
+                        if args.len() != 1 {
+                            return Err(FuncCallTakesOneArg::err_from_expr(self, args.len()).into());
+                        }
+                        Ok(Some(&args[0]))
+                    }
+                    false => Ok(None),
+                },
+                _ => Ok(None),
             },
-            _ => false,
+            _ => Ok(None),
         }
     }
 
-    fn to_func(&self, name: Option<String>) -> Result<Func, Vec<Error>> {
-        match &self.node {
-            ExprKind::Call { args, .. } => {
-                if args.len() != 1 {
-                    return Err(FuncFormatting::err_from_expr(self).into());
+    fn get_func(&self) -> Result<Option<Func>, Error> {
+        match self.get_func_arg()? {
+            Some(thing) => match &thing.node {
+                ExprKind::Subscript { value, slice, .. } => {
+                    let mode = match &value.node {
+                        ExprKind::Name { id, .. } => id,
+                        _ => return Err(ReturnTypeMode::err_from_expr(self)),
+                    };
+                    let (params, returns) = if let ExprKind::Tuple { elts, .. } = &slice.node {
+                        if elts.len() != 2 {
+                            return Err(FuncFormatting::err_from_expr(self));
+                        }
+                        let params = match &elts[0].node {
+                            ExprKind::List { elts, .. } => elts,
+                            _ => return Err(FuncFormatting::err_from_expr(self)),
+                        };
+                        (params, &elts[1])
+                    } else {
+                        return Err(FuncFormatting::err_from_expr(self));
+                    };
+
+                    Ok(Some(Func {
+                        mode,
+                        params,
+                        returns,
+                    }))
                 }
-                let (mode,) = (self.get_func_mode().map_err(Error::into),).collect_results()?;
+                _ => Err(ReturnTypeMode::err_from_expr(self)),
+            },
+            None => Ok(None),
+        }
+    }
+
+    fn as_func(&self, name: Option<String>) -> Result<Option<candid::Func>, Vec<Error>> {
+        match self.get_func().map_err(Into::<Vec<Error>>::into)? {
+            Some(func) => {
+                let mode = match func.mode.as_str() {
+                    "Oneway" => Mode::Oneway,
+                    "Update" => Mode::Update,
+                    "Query" => Mode::Query,
+                    _ => return Err(ReturnTypeMode::err_from_expr(self).into()),
+                };
                 let (params, return_type) = (
-                    self.build_func_params(),
-                    self.build_func_return_type(mode.clone()),
+                    func.params
+                        .into_iter()
+                        .map(|param| {
+                            SourceMapped::new(param, self.source_map.clone()).to_candid_type()
+                        })
+                        .collect(),
+                    match mode {
+                        Mode::Query => Ok(CandidType::Primitive(Primitive::Void)),
+                        _ => SourceMapped::new(func.returns, self.source_map.clone())
+                            .to_candid_type(),
+                    },
                 )
                     .collect_results()?;
-                Ok(Func {
+                Ok(Some(candid::Func {
                     to_vm_value: |name: String| rust::generate_func_to_vm_value(&name),
                     list_to_vm_value: |name: String| rust::generate_func_list_to_vm_value(&name),
                     from_vm_value: |name: String| rust::generate_func_from_vm_value(&name),
@@ -69,109 +124,15 @@ impl SourceMapped<&Located<ExprKind>> {
                     params,
                     return_type: Box::from(ReturnType::new(return_type)),
                     mode,
-                })
+                }))
             }
-            _ => return Err(Unreachable::error().into()),
-        }
-    }
-
-    fn get_func_mode(&self) -> Result<Mode, Error> {
-        match &self.node {
-            ExprKind::Call { args, .. } => match &args[0].node {
-                ExprKind::Subscript { value, .. } => match &value.node {
-                    ExprKind::Name { id, .. } => Ok(match id.as_str() {
-                        "Oneway" => Mode::Oneway,
-                        "Update" => Mode::Update,
-                        "Query" => Mode::Query,
-                        _ => return Err(ReturnTypeMode::err_from_expr(self)),
-                    }),
-                    _ => Err(ReturnTypeMode::err_from_expr(self)),
-                },
-                _ => Err(ReturnTypeMode::err_from_expr(self)),
-            },
-            _ => Err(Unreachable::error()),
-        }
-    }
-
-    fn get_func_params(&self) -> Result<Vec<SourceMapped<&Located<ExprKind>>>, Error> {
-        match &self.node {
-            ExprKind::Call { args, .. } => match &args[0].node {
-                ExprKind::Subscript { slice, .. } => match &slice.node {
-                    ExprKind::Tuple { elts, .. } => {
-                        if elts.len() != 2 {
-                            return Err(FuncFormatting::err_from_expr(self));
-                        }
-                        match &elts[0].node {
-                            ExprKind::List { elts, .. } => Ok(elts
-                                .iter()
-                                .map(|elt| SourceMapped::new(elt, self.source_map.clone()))
-                                .collect::<Vec<_>>()),
-                            _ => Err(FuncFormatting::err_from_expr(self)),
-                        }
-                    }
-                    _ => Err(FuncFormatting::err_from_expr(self)),
-                },
-                _ => Err(FuncFormatting::err_from_expr(self)),
-            },
-            _ => Err(Unreachable::error()),
-        }
-    }
-
-    fn get_func_return_type(&self) -> Result<SourceMapped<&Located<ExprKind>>, Error> {
-        match &self.node {
-            ExprKind::Call { args, .. } => match &args[0].node {
-                ExprKind::Subscript { slice, .. } => match &slice.node {
-                    ExprKind::Tuple { elts, .. } => {
-                        if elts.len() != 2 {
-                            return Err(FuncFormatting::err_from_expr(self));
-                        }
-                        Ok(SourceMapped::new(&elts[1], self.source_map.clone()))
-                    }
-                    _ => return Err(FuncFormatting::err_from_expr(self)),
-                },
-                _ => return Err(FuncFormatting::err_from_expr(self)),
-            },
-            _ => Err(Unreachable::error()),
-        }
-    }
-
-    fn build_func_params(&self) -> Result<Vec<CandidType>, Vec<Error>> {
-        Ok(match self.get_func_params() {
-            Ok(func_params) => func_params,
-            Err(err) => return Err(err.into()),
-        }
-        .iter()
-        .map(|param| param.to_candid_type())
-        .collect_results()?)
-    }
-
-    fn build_func_return_type(&self, mode: Mode) -> Result<CandidType, Vec<Error>> {
-        match mode {
-            Mode::Oneway => Ok(CandidType::Primitive(Primitive::Void)),
-            _ => Ok(match self.get_func_return_type() {
-                Ok(return_type) => return_type,
-                Err(err) => return Err(err.into()),
-            }
-            .to_candid_type()?),
+            None => Ok(None),
         }
     }
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    fn is_func(&self) -> bool {
-        match &self.node {
-            StmtKind::Assign { value, .. }
-            | StmtKind::AnnAssign {
-                value: Some(value), ..
-            } => SourceMapped::new(value.as_ref(), self.source_map.clone()).is_func(),
-            _ => false,
-        }
-    }
-
-    pub fn as_func(&self) -> Result<Option<Func>, Vec<Error>> {
-        if !self.is_func() {
-            return Ok(None);
-        }
+    pub fn as_func(&self) -> Result<Option<candid::Func>, Vec<Error>> {
         let name = match &self.node {
             StmtKind::Assign { targets, .. } => {
                 if targets.len() != 1 {
@@ -193,28 +154,8 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::Assign { value, .. }
             | StmtKind::AnnAssign {
                 value: Some(value), ..
-            } => Ok(Some(
-                SourceMapped::new(value.as_ref(), self.source_map.clone()).to_func(name)?,
-            )),
-            _ => Err(Unreachable::error().into()),
-        }
-    }
-
-    // TODO are we using this anywhere?
-    pub fn get_func_args(&self) -> Option<&Vec<Located<ExprKind>>> {
-        if !self.is_func() {
-            return None;
-        }
-
-        match &self.node {
-            StmtKind::AnnAssign { value, .. } => match &value {
-                Some(value) => match &value.node {
-                    ExprKind::Call { args, .. } => Some(args),
-                    _ => None,
-                },
-                None => None,
-            },
-            _ => None,
+            } => Ok(SourceMapped::new(value.as_ref(), self.source_map.clone()).as_func(name)?),
+            _ => Ok(None),
         }
     }
 }
