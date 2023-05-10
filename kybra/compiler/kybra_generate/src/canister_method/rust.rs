@@ -14,7 +14,7 @@ impl SourceMapped<&Located<StmtKind>> {
         match self.node {
             StmtKind::FunctionDef { .. } => {
                 let (function_name, params) = (
-                    self.get_function_name().map_err(Error::into),
+                    self.get_name_or_err().map_err(Error::into),
                     self.build_params(InternalOrExternal::Internal),
                 )
                     .collect_results()?;

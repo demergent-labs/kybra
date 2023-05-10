@@ -23,7 +23,6 @@ use crate::constants::{
     PRE_UPGRADE_DECORATOR, QUERY_METHOD_DECORATOR, UPDATE_METHOD_DECORATOR,
 };
 use crate::get_name::HasName;
-use crate::kybra_unreachable;
 use crate::py_ast::PyAst;
 use crate::source_map::SourceMapped;
 use crate::Error;
@@ -85,13 +84,6 @@ impl SourceMapped<&Located<StmtKind>> {
                     })
             }
             _ => false,
-        }
-    }
-
-    pub fn get_function_name(&self) -> Result<String, Error> {
-        match &self.node {
-            StmtKind::FunctionDef { name, .. } => Ok(name.clone()),
-            _ => kybra_unreachable!(),
         }
     }
 

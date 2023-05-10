@@ -11,7 +11,6 @@ use super::rust;
 use crate::{
     constants::{ASYNC, MANUAL},
     get_name::HasName,
-    kybra_unreachable,
     method_utils::params::InternalOrExternal,
     source_map::SourceMapped,
     Error,
@@ -57,11 +56,13 @@ impl SourceMapped<&Located<ExprKind>> {
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_query_or_update_definition(&self) -> Result<QueryOrUpdateDefinition, Vec<Error>> {
+    pub fn as_query_or_update_definition(
+        &self,
+    ) -> Result<Option<QueryOrUpdateDefinition>, Vec<Error>> {
         if !self.is_canister_method_type(CanisterMethodType::Query)
             && !self.is_canister_method_type(CanisterMethodType::Update)
         {
-            kybra_unreachable!()
+            return Ok(None);
         }
         let (body, params, return_type, guard_function_name) = (
             rust::generate_body(self),
@@ -71,7 +72,7 @@ impl SourceMapped<&Located<StmtKind>> {
         )
             .collect_results()?;
         match &self.node {
-            StmtKind::FunctionDef { name, .. } => Ok(QueryOrUpdateDefinition {
+            StmtKind::FunctionDef { name, .. } => Ok(Some(QueryOrUpdateDefinition {
                 body,
                 params,
                 is_manual: self.is_manual(),
@@ -79,8 +80,8 @@ impl SourceMapped<&Located<StmtKind>> {
                 return_type: ReturnType::new(return_type),
                 is_async: self.is_async(),
                 guard_function_name,
-            }),
-            _ => kybra_unreachable!(),
+            })),
+            _ => Ok(None),
         }
     }
 }

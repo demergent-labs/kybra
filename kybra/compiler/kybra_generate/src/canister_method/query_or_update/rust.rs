@@ -6,10 +6,7 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{
-    kybra_unreachable, method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple,
-    Error,
-};
+use crate::{method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple, Error};
 
 pub fn generate_body(
     source_mapped_located_stmtkind: &SourceMapped<&Located<StmtKind>>,
@@ -20,10 +17,7 @@ pub fn generate_body(
     )
         .collect_results()?;
 
-    let name = match source_mapped_located_stmtkind.get_name()? {
-        Some(name) => name,
-        None => kybra_unreachable!(),
-    };
+    let name = source_mapped_located_stmtkind.get_name_or_err()?;
 
     let param_conversions = params
         .iter()

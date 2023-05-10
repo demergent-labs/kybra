@@ -7,7 +7,7 @@ use crate::{source_map::SourceMapped, Error};
 pub fn generate(
     heartbeat_function_def: &SourceMapped<&Located<StmtKind>>,
 ) -> Result<TokenStream, Error> {
-    let function_name = heartbeat_function_def.get_function_name()?;
+    let function_name = heartbeat_function_def.get_name_or_err()?;
 
     Ok(quote! {
         unsafe {
