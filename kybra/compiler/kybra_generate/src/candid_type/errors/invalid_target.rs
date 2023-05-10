@@ -10,11 +10,11 @@ use crate::{
 };
 
 #[derive(Clone, Debug)]
-pub struct InvalidTarget {
+pub struct InvalidName {
     pub location: Location,
 }
 
-impl InvalidTarget {
+impl InvalidName {
     pub fn err_from_stmt(stmt_kind: &SourceMapped<&Located<StmtKind>>) -> Error {
         Self {
             location: stmt_kind.create_location(),
@@ -23,15 +23,17 @@ impl InvalidTarget {
     }
 }
 
-impl From<InvalidTarget> for Error {
-    fn from(value: InvalidTarget) -> Self {
-        Self::InvalidTarget(value)
+impl From<InvalidName> for Error {
+    fn from(value: InvalidName) -> Self {
+        Self::InvalidName(value)
     }
 }
 
-impl Display for InvalidTarget {
+impl Display for InvalidName {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let title = format!("Invalid Target");
+        let title = format!(
+            "A single valid name for the type must be provided. For example `my_bool` in `my_bool = Alias[bool]`"
+        );
         let annotation = "".to_string();
         let suggestion = None;
 

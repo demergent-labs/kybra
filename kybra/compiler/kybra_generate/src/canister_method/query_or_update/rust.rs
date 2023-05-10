@@ -20,7 +20,7 @@ pub fn generate_body(
     )
         .collect_results()?;
 
-    let name = match source_mapped_located_stmtkind.get_name() {
+    let name = match source_mapped_located_stmtkind.get_name()? {
         Some(name) => name,
         None => return Err(Unreachable::error().into()),
     };

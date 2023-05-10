@@ -8,7 +8,7 @@ use std::fmt;
 use crate::{
     candid_type::{
         errors::{
-            InvalidMember, InvalidSubscriptable, InvalidTarget, NoneCannotBeAType,
+            InvalidMember, InvalidName, InvalidSubscriptable, NoneCannotBeAType,
             NotExactlyOneTarget, TargetMustBeAName, UnsupportedType,
         },
         func::errors::{
@@ -60,8 +60,8 @@ pub enum Error {
     InlineFuncNotSupported(InlineFuncNotSupported),
     InvalidDecorator(InvalidDecorator),
     InvalidMember(InvalidMember),
+    InvalidName(InvalidName),
     InvalidSubscriptable(InvalidSubscriptable),
-    InvalidTarget(InvalidTarget),
     IteratorUnpackingOperatorNotSupported(IteratorUnpackingOperatorNotSupported),
     NoneCannotBeAType(NoneCannotBeAType),
     MissingDecorator(MissingDecorator),
@@ -108,8 +108,8 @@ impl std::fmt::Display for Error {
             Error::InlineFuncNotSupported(error) => error,
             Error::InvalidDecorator(error) => error,
             Error::InvalidMember(error) => error,
+            Error::InvalidName(error) => error,
             Error::InvalidSubscriptable(error) => error,
-            Error::InvalidTarget(error) => error,
             Error::IteratorUnpackingOperatorNotSupported(error) => error,
             Error::NoneCannotBeAType(error) => error,
             Error::MissingDecorator(error) => error,

@@ -3,12 +3,9 @@ pub mod tuple_members;
 use cdk_framework::act::node::candid::Tuple;
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
-use crate::{
-    candid_type::errors::InvalidTarget, errors::CollectResults, py_ast::PyAst,
-    source_map::SourceMapped, Error,
-};
+use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
 
-use super::errors::NotExactlyOneTarget;
+use super::errors::InvalidName;
 
 impl PyAst {
     pub fn build_tuples(&self) -> Result<Vec<Tuple>, Vec<Error>> {
@@ -54,16 +51,13 @@ impl SourceMapped<&Located<ExprKind>> {
 impl SourceMapped<&Located<StmtKind>> {
     fn as_tuple(&self) -> Result<Option<Tuple>, Vec<Error>> {
         match &self.node {
-            StmtKind::Assign { targets, value, .. } => {
-                if targets.len() != 1 {
-                    return Err(NotExactlyOneTarget::err_from_stmt(self).into());
-                }
-                let tuple_name = match &targets[0].node {
-                    ExprKind::Name { id, .. } => id,
-                    _ => return Err(InvalidTarget::err_from_stmt(self).into()),
+            StmtKind::Assign { value, .. } => {
+                let name = match self.get_name()? {
+                    Some(name) => name,
+                    None => return Err(InvalidName::err_from_stmt(self).into()),
                 };
                 Ok(SourceMapped::new(value.as_ref(), self.source_map.clone())
-                    .as_tuple(Some(tuple_name.clone()))?)
+                    .as_tuple(Some(name))?)
             }
             _ => Ok(None),
         }

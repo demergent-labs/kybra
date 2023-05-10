@@ -14,7 +14,7 @@ use crate::{
 
 use self::errors::{FuncCallTakesOneArg, FuncFormatting, ReturnTypeMode};
 
-use super::errors::NotExactlyOneTarget;
+use super::errors::InvalidName;
 
 pub mod errors;
 mod rust;
@@ -40,21 +40,17 @@ struct Func<'a> {
 
 impl SourceMapped<&Located<ExprKind>> {
     fn get_func_arg(&self) -> Result<Option<&Located<ExprKind>>, Error> {
-        match &self.node {
-            ExprKind::Call { func, args, .. } => match &func.node {
-                ExprKind::Name { id, .. } => match id == "Func" {
-                    true => {
-                        if args.len() != 1 {
-                            return Err(FuncCallTakesOneArg::err_from_expr(self, args.len()).into());
-                        }
-                        Ok(Some(&args[0]))
+        if let ExprKind::Call { func, args, .. } = &self.node {
+            if let ExprKind::Name { id, .. } = &func.node {
+                if id == "Func" {
+                    if args.len() != 1 {
+                        return Err(FuncCallTakesOneArg::err_from_expr(self, args.len()).into());
                     }
-                    false => Ok(None),
-                },
-                _ => Ok(None),
-            },
-            _ => Ok(None),
+                    return Ok(Some(&args[0]));
+                }
+            }
         }
+        Ok(None)
     }
 
     fn get_func(&self) -> Result<Option<Func>, Error> {
@@ -133,28 +129,18 @@ impl SourceMapped<&Located<ExprKind>> {
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn as_func(&self) -> Result<Option<candid::Func>, Vec<Error>> {
-        let name = match &self.node {
-            StmtKind::Assign { targets, .. } => {
-                if targets.len() != 1 {
-                    return Err(NotExactlyOneTarget::err_from_stmt(self).into());
-                }
-
-                match &targets[0].node {
-                    ExprKind::Name { id, .. } => Some(id.clone()),
-                    _ => None,
-                }
-            }
-            StmtKind::AnnAssign { target, .. } => match &target.node {
-                ExprKind::Name { id, .. } => Some(id.clone()),
-                _ => None,
-            },
-            _ => None,
-        };
         match &self.node {
             StmtKind::Assign { value, .. }
             | StmtKind::AnnAssign {
                 value: Some(value), ..
-            } => Ok(SourceMapped::new(value.as_ref(), self.source_map.clone()).as_func(name)?),
+            } => {
+                let name = match self.get_name()? {
+                    Some(name) => name,
+                    None => return Err(InvalidName::err_from_stmt(self).into()),
+                };
+                Ok(SourceMapped::new(value.as_ref(), self.source_map.clone())
+                    .as_func(Some(name))?)
+            }
             _ => Ok(None),
         }
     }

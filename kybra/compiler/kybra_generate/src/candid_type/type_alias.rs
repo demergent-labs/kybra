@@ -3,10 +3,9 @@ use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{errors::CollectResults, py_ast::PyAst, source_map::SourceMapped, Error};
 
-use super::errors::{InvalidTarget, NotExactlyOneTarget};
+use super::errors::InvalidName;
 
 struct TypeAlias<'a> {
-    target: &'a Located<ExprKind>,
     enclosed_expr: &'a Located<ExprKind>,
 }
 
@@ -34,18 +33,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 if let ExprKind::Name { id, .. } = &value.node {
                     match id == "Alias" {
                         true => {
-                            let assign_target = match &self.node {
-                                StmtKind::Assign { targets, .. } => {
-                                    if targets.len() != 1 {
-                                        return Err(NotExactlyOneTarget::err_from_stmt(self).into());
-                                    }
-                                    &targets[0]
-                                }
-                                StmtKind::AnnAssign { target, .. } => target.as_ref(),
-                                _ => return Ok(None),
-                            };
                             return Ok(Some(TypeAlias {
-                                target: assign_target,
                                 enclosed_expr: slice,
                             }));
                         }
@@ -63,15 +51,15 @@ impl SourceMapped<&Located<StmtKind>> {
             None => return Ok(None),
         };
 
-        let alias_name = match &type_alias.target.node {
-            ExprKind::Name { id, .. } => id.clone(),
-            _ => return Err(InvalidTarget::err_from_stmt(self).into()),
+        let name = match self.get_name()? {
+            Some(name) => name,
+            None => return Err(InvalidName::err_from_stmt(self).into()),
         };
 
         let enclosed_type = SourceMapped::new(type_alias.enclosed_expr, self.source_map.clone())
             .to_candid_type()?;
         Ok(Some(candid::TypeAlias {
-            name: alias_name,
+            name,
             aliased_type: Box::new(enclosed_type),
             type_params: vec![].into(),
         }))
