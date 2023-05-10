@@ -7,7 +7,7 @@ use quote::{format_ident, quote};
 use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::{
-    errors::Unreachable, method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple,
+    kybra_unreachable, method_utils::params::InternalOrExternal, source_map::SourceMapped, tuple,
     Error,
 };
 
@@ -22,7 +22,7 @@ pub fn generate_body(
 
     let name = match source_mapped_located_stmtkind.get_name()? {
         Some(name) => name,
-        None => return Err(Unreachable::error().into()),
+        None => kybra_unreachable!(),
     };
 
     let param_conversions = params

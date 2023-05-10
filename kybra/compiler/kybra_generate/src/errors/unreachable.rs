@@ -37,3 +37,20 @@ impl From<Unreachable> for Error {
         Self::Unreachable(value)
     }
 }
+
+/// Indicates a branch of logic that should be unreachable because other checks
+/// should have caught this case before.
+///
+/// Unlike the builtin `unreachable!` however, this does not panic, but rather
+/// returns an error.
+///
+/// Expands to:
+/// ```rust
+/// return Err(Error::Unreachable::error().into())
+/// ```
+#[macro_export]
+macro_rules! kybra_unreachable {
+    () => {
+        return Err(crate::errors::Unreachable::error().into())
+    };
+}

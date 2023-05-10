@@ -2,12 +2,8 @@ pub mod errors;
 pub mod rust;
 
 use crate::{
-    constants::STABLE_B_TREE_MAP,
-    errors::{CollectResults, Unreachable},
-    get_name::HasName,
-    py_ast::PyAst,
-    source_map::SourceMapped,
-    Error,
+    constants::STABLE_B_TREE_MAP, errors::CollectResults, get_name::HasName, kybra_unreachable,
+    py_ast::PyAst, source_map::SourceMapped, Error,
 };
 use cdk_framework::{act::node::CandidType, traits::CollectResults as OtherCollectResults};
 use num_bigint::{BigInt, Sign};
@@ -60,7 +56,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 }
                 _ => Err(StableBTreeMapNodeFormat::err_from_expr(self)),
             },
-            _ => Err(Unreachable::error()),
+            _ => kybra_unreachable!(),
         }
     }
 
@@ -72,7 +68,7 @@ impl SourceMapped<&Located<ExprKind>> {
                 }
                 _ => Err(StableBTreeMapNodeFormat::err_from_expr(self).into()),
             },
-            _ => Err(Unreachable::error()),
+            _ => kybra_unreachable!(),
         }
     }
 }
@@ -123,7 +119,7 @@ impl SourceMapped<&Located<StmtKind>> {
     fn get_memory_id(&self) -> Result<u8, Error> {
         let assign_value = match self.get_assign_value() {
             Some(assign_value) => assign_value,
-            None => return Err(Unreachable::error()),
+            None => kybra_unreachable!(),
         };
         match &assign_value.node {
             ExprKind::Call { args, keywords, .. } => {
@@ -144,14 +140,14 @@ impl SourceMapped<&Located<StmtKind>> {
                 // It was in neither the keywords nor the args
                 Err(MissingMemoryId::err_from_stmt(self))
             }
-            _ => Err(Unreachable::error()),
+            _ => kybra_unreachable!(),
         }
     }
 
     fn get_key_type(&self) -> Result<CandidType, Vec<Error>> {
         let assign_value = match self.get_assign_value() {
             Some(assign_value) => assign_value,
-            None => return Err(Unreachable::error().into()),
+            None => kybra_unreachable!(),
         };
         match &assign_value.node {
             ExprKind::Call { func, .. } => {
@@ -160,14 +156,14 @@ impl SourceMapped<&Located<StmtKind>> {
                     .map_err(Into::<Vec<Error>>::into)?
                     .to_candid_type()
             }
-            _ => Err(Unreachable::error().into()),
+            _ => kybra_unreachable!(),
         }
     }
 
     fn get_value_type(&self) -> Result<CandidType, Vec<Error>> {
         let assign_value = match self.get_assign_value() {
             Some(assign_value) => assign_value,
-            None => return Err(Unreachable::error().into()),
+            None => kybra_unreachable!(),
         };
         match &assign_value.node {
             ExprKind::Call { func, .. } => {
@@ -176,14 +172,14 @@ impl SourceMapped<&Located<StmtKind>> {
                     .map_err(Into::<Vec<Error>>::into)?
                     .to_candid_type()
             }
-            _ => Err(Unreachable::error().into()),
+            _ => kybra_unreachable!(),
         }
     }
 
     fn get_max_key_size(&self) -> Result<u32, Error> {
         let assign_value = match self.get_assign_value() {
             Some(assign_value) => assign_value,
-            None => return Err(Unreachable::error().into()),
+            None => kybra_unreachable!(),
         };
         match &assign_value.node {
             ExprKind::Call { args, keywords, .. } => {
@@ -198,14 +194,14 @@ impl SourceMapped<&Located<StmtKind>> {
                 // It was in neither the keywords nor the args
                 Err(MaxKeySizeMissing::err_from_stmt(self))
             }
-            _ => Err(Unreachable::error()),
+            _ => kybra_unreachable!(),
         }
     }
 
     fn get_max_value_size(&self) -> Result<u32, Error> {
         let assign_value = match self.get_assign_value() {
             Some(assign_value) => assign_value,
-            None => return Err(Unreachable::error().into()),
+            None => kybra_unreachable!(),
         };
         match &assign_value.node {
             ExprKind::Call { args, keywords, .. } => {
@@ -220,7 +216,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 // It was in neither the keywords nor the args
                 Err(MaxValueSizeMissing::err_from_stmt(self))
             }
-            _ => Err(Unreachable::error()),
+            _ => kybra_unreachable!(),
         }
     }
 

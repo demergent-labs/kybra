@@ -2,8 +2,7 @@ use cdk_framework::{act::node::Param, traits::CollectResults};
 use rustpython_parser::ast::{ArgData, Located, StmtKind};
 
 use crate::{
-    errors::{CollectResults as OtherCollectResults, Unreachable},
-    source_map::SourceMapped,
+    errors::CollectResults as OtherCollectResults, kybra_unreachable, source_map::SourceMapped,
     Error,
 };
 
@@ -67,7 +66,7 @@ impl SourceMapped<&Located<StmtKind>> {
 
                 param_results.into_iter().collect_results()
             }
-            _ => Err(Unreachable::error().into()),
+            _ => kybra_unreachable!(),
         }
     }
 }

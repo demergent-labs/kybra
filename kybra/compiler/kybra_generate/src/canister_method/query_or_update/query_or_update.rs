@@ -10,8 +10,8 @@ use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 use super::rust;
 use crate::{
     constants::{ASYNC, MANUAL},
-    errors::Unreachable,
     get_name::HasName,
+    kybra_unreachable,
     method_utils::params::InternalOrExternal,
     source_map::SourceMapped,
     Error,
@@ -61,7 +61,7 @@ impl SourceMapped<&Located<StmtKind>> {
         if !self.is_canister_method_type(CanisterMethodType::Query)
             && !self.is_canister_method_type(CanisterMethodType::Update)
         {
-            return Err(Unreachable::error().into());
+            kybra_unreachable!()
         }
         let (body, params, return_type, guard_function_name) = (
             rust::generate_body(self),
@@ -80,7 +80,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 is_async: self.is_async(),
                 guard_function_name,
             }),
-            _ => Err(Unreachable::error().into()),
+            _ => kybra_unreachable!(),
         }
     }
 }
