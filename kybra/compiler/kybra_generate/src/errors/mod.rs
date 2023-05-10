@@ -1,6 +1,5 @@
 pub mod collect_results;
 pub mod compiler_output;
-pub mod message;
 pub mod unreachable;
 
 use std::fmt;
@@ -36,8 +35,6 @@ pub use compiler_output::CompilerOutput;
 pub use compiler_output::CreateLocation;
 pub use compiler_output::Location;
 pub use compiler_output::Suggestion;
-pub use message::CreateMessage;
-pub use message::Message;
 pub use unreachable::Unreachable;
 
 #[derive(Clone, Debug)]

@@ -1,9 +1,11 @@
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
-use crate::{candid_type::errors::InvalidMember, source_map::SourceMapped, Error};
+use crate::{
+    candid_type::{errors::InvalidMember, warnings::DefaultValueIgnored},
+    source_map::SourceMapped,
+    Error,
+};
 use cdk_framework::{act::node::candid::record::Member, traits::CollectResults};
-
-mod warnings;
 
 impl SourceMapped<&Located<StmtKind>> {
     // Ellipses can show up in records but are not record members, and should
@@ -31,7 +33,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 annotation, value, ..
             } => {
                 match value {
-                    Some(_) => eprintln!("{}", self.record_default_value_warning()),
+                    Some(_) => eprintln!("{}", DefaultValueIgnored::new(self)),
                     None => (),
                 }
                 let (name, candid_type) = (

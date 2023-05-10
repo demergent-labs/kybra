@@ -10,3 +10,4 @@ pub mod tuple;
 pub mod type_alias;
 pub mod type_ref;
 pub mod variant;
+pub mod warnings;

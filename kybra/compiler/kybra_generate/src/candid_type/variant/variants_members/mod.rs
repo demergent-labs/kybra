@@ -1,9 +1,11 @@
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::{candid_type::errors::InvalidMember, source_map::SourceMapped, Error};
+use crate::{
+    candid_type::{errors::InvalidMember, warnings::DefaultValueIgnored},
+    source_map::SourceMapped,
+    Error,
+};
 use cdk_framework::{act::node::candid::variant::Member, traits::CollectResults};
-
-mod warnings;
 
 impl SourceMapped<&Located<StmtKind>> {
     pub fn to_variant_member(&self) -> Result<Member, Vec<Error>> {
@@ -12,7 +14,7 @@ impl SourceMapped<&Located<StmtKind>> {
                 annotation, value, ..
             } => {
                 match value {
-                    Some(_) => eprintln!("{}", self.variant_default_value_warning()),
+                    Some(_) => eprintln!("{}", DefaultValueIgnored::new(self)),
                     None => (),
                 }
                 let (name, candid_type) = (
