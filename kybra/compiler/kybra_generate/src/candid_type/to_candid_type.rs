@@ -22,6 +22,9 @@ impl SourceMapped<&Located<ExprKind>> {
         if let Some(type_ref) = self.as_type_ref() {
             return Ok(CandidType::TypeRef(type_ref));
         }
+        if let Some(func) = self.as_func(None)? {
+            return Ok(CandidType::Func(func));
+        }
         match &self.node {
             ExprKind::Subscript { value, slice, .. } => match &value.node {
                 ExprKind::Name { id, .. } => match &id[..] {

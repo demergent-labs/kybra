@@ -40,7 +40,10 @@ impl SourceMapped<&Located<StmtKind>> {
                         .to_candid_type(),
                 )
                     .collect_results()?;
-                Ok(Some(Member { name, candid_type }))
+                Ok(Some(Member {
+                    name: name.to_string(),
+                    candid_type,
+                }))
             }
             _ => Err(InvalidMember::err_from_stmt(self).into()),
         }

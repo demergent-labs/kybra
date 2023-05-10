@@ -52,7 +52,7 @@ impl SourceMapped<&Located<StmtKind>> {
             StmtKind::Assign { value, .. } => {
                 let name = self.get_name_or_err()?;
                 Ok(SourceMapped::new(value.as_ref(), self.source_map.clone())
-                    .as_tuple(Some(name))?)
+                    .as_tuple(Some(name.to_string()))?)
             }
             _ => Ok(None),
         }

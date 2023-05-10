@@ -12,13 +12,13 @@ use cdk_framework::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::CollectResults as OtherCollectResults, method_utils::params::InternalOrExternal,
-    py_ast::PyAst, source_map::SourceMapped, Error,
+    errors::CollectResults as OtherCollectResults, get_name::HasName,
+    method_utils::params::InternalOrExternal, py_ast::PyAst, source_map::SourceMapped, Error,
 };
 
 use self::errors::{
-    InvalidDecorator, MissingDecorator, ServiceMustHaveMethods, ServiceWithNotFunctionDefs,
-    TooManyDecorators, WrongDecorator,
+    MissingDecorator, ServiceMustHaveMethods, ServiceWithNotFunctionDefs, TooManyDecorators,
+    WrongDecorator,
 };
 
 impl PyAst {
@@ -95,6 +95,9 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 }
 
+const SERVICE_UPDATE: &str = "service_update";
+const SERVICE_QUERY: &str = "service_query";
+
 fn build_mode(
     method_stmt: &SourceMapped<&Located<StmtKind>>,
     decorator_list: &Vec<Located<ExprKind>>,
@@ -117,25 +120,20 @@ fn build_mode(
         ));
     }
 
-    match &decorator_list[0].node {
-        ExprKind::Name { id, ctx: _ } => {
-            if id == "service_update" {
-                Ok(Mode::Update)
-            } else if id == "service_query" {
-                Ok(Mode::Query)
-            } else {
-                Err(WrongDecorator::err_from_stmt(
-                    method_stmt,
-                    canister_name,
-                    method_name,
-                    id,
-                ))
-            }
-        }
-        _ => Err(InvalidDecorator::err_from_stmt(
+    match decorator_list[0].get_name() {
+        Some(SERVICE_QUERY) => Ok(Mode::Query),
+        Some(SERVICE_UPDATE) => Ok(Mode::Update),
+        Some(decorator_name) => Err(WrongDecorator::err_from_stmt(
             method_stmt,
             canister_name,
             method_name,
+            Some(decorator_name),
+        )),
+        None => Err(WrongDecorator::err_from_stmt(
+            method_stmt,
+            canister_name,
+            method_name,
+            None,
         )),
     }
 }

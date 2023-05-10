@@ -9,7 +9,8 @@ use cdk_framework::{
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::CollectResults as CrateCollectResults, py_ast::PyAst, source_map::SourceMapped, Error,
+    errors::CollectResults as CrateCollectResults, get_name::HasName, py_ast::PyAst,
+    source_map::SourceMapped, Error,
 };
 
 use self::errors::{FuncCallTakesOneArg, FuncFormatting, ReturnTypeMode};
@@ -31,21 +32,24 @@ impl PyAst {
 }
 
 struct Func<'a> {
-    mode: &'a String,
+    mode_name: &'a str,
     params: &'a Vec<Located<ExprKind>>,
     returns: &'a Located<ExprKind>,
 }
 
+const FUNC: &str = "Func";
+const ONEWAY: &str = "Oneway";
+const UPDATE: &str = "Update";
+const QUERY: &str = "Query";
+
 impl SourceMapped<&Located<ExprKind>> {
     fn get_func_arg(&self) -> Result<Option<&Located<ExprKind>>, Error> {
         if let ExprKind::Call { func, args, .. } = &self.node {
-            if let ExprKind::Name { id, .. } = &func.node {
-                if id == "Func" {
-                    if args.len() != 1 {
-                        return Err(FuncCallTakesOneArg::err_from_expr(self, args.len()).into());
-                    }
-                    return Ok(Some(&args[0]));
+            if let Some(FUNC) = func.get_name() {
+                if args.len() != 1 {
+                    return Err(FuncCallTakesOneArg::err_from_expr(self, args.len()).into());
                 }
+                return Ok(Some(&args[0]));
             }
         }
         Ok(None)
@@ -55,8 +59,8 @@ impl SourceMapped<&Located<ExprKind>> {
         match self.get_func_arg()? {
             Some(thing) => match &thing.node {
                 ExprKind::Subscript { value, slice, .. } => {
-                    let mode = match &value.node {
-                        ExprKind::Name { id, .. } => id,
+                    let mode_name = match value.get_name() {
+                        Some(mode_name) => mode_name,
                         _ => return Err(ReturnTypeMode::err_from_expr(self)),
                     };
                     let (params, returns) = if let ExprKind::Tuple { elts, .. } = &slice.node {
@@ -73,7 +77,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     };
 
                     Ok(Some(Func {
-                        mode,
+                        mode_name,
                         params,
                         returns,
                     }))
@@ -84,13 +88,13 @@ impl SourceMapped<&Located<ExprKind>> {
         }
     }
 
-    fn as_func(&self, name: Option<String>) -> Result<Option<candid::Func>, Vec<Error>> {
+    pub fn as_func(&self, name: Option<&str>) -> Result<Option<candid::Func>, Vec<Error>> {
         match self.get_func().map_err(Into::<Vec<Error>>::into)? {
             Some(func) => {
-                let mode = match func.mode.as_str() {
-                    "Oneway" => Mode::Oneway,
-                    "Update" => Mode::Update,
-                    "Query" => Mode::Query,
+                let mode = match func.mode_name {
+                    ONEWAY => Mode::Oneway,
+                    UPDATE => Mode::Update,
+                    QUERY => Mode::Query,
                     _ => return Err(ReturnTypeMode::err_from_expr(self).into()),
                 };
                 let (params, return_type) = (
@@ -114,7 +118,7 @@ impl SourceMapped<&Located<ExprKind>> {
                     list_from_vm_value: |name: String| {
                         rust::generate_func_list_from_vm_value(&name)
                     },
-                    name,
+                    name: name.map(|op| op.to_string()),
                     params,
                     return_type: Box::from(ReturnType::new(return_type)),
                     mode,

@@ -7,25 +7,23 @@ use crate::{
 };
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn get_name(&self) -> Result<Option<String>, Error> {
+    pub fn get_name(&self) -> Result<Option<&str>, Error> {
         Ok(match &self.node {
-            StmtKind::FunctionDef { name, .. } => Some(name.clone()),
-            StmtKind::AsyncFunctionDef { name, .. } => Some(name.clone()),
-            StmtKind::ClassDef { name, .. } => Some(name.clone()),
+            StmtKind::FunctionDef { name, .. } => Some(name),
+            StmtKind::AsyncFunctionDef { name, .. } => Some(name),
+            StmtKind::ClassDef { name, .. } => Some(name),
             StmtKind::Assign { targets, .. } => {
                 if targets.len() != 1 {
                     return Err(NotExactlyOneTarget::err_from_stmt(self).into());
                 }
-                SourceMapped::new(&targets[0], self.source_map.clone()).get_name()
+                targets[0].get_name()
             }
-            StmtKind::AnnAssign { target, .. } => {
-                SourceMapped::new(target.as_ref(), self.source_map.clone()).get_name()
-            }
+            StmtKind::AnnAssign { target, .. } => target.get_name(),
             _ => None,
         })
     }
 
-    pub fn get_name_or_err(&self) -> Result<String, Error> {
+    pub fn get_name_or_err(&self) -> Result<&str, Error> {
         match self.get_name()? {
             Some(name) => Ok(name),
             None => Err(InvalidName::err_from_stmt(self).into()),
@@ -33,10 +31,14 @@ impl SourceMapped<&Located<StmtKind>> {
     }
 }
 
-impl SourceMapped<&Located<ExprKind>> {
-    pub fn get_name(&self) -> Option<String> {
+pub trait HasName {
+    fn get_name(&self) -> Option<&str>;
+}
+
+impl HasName for Located<ExprKind> {
+    fn get_name(&self) -> Option<&str> {
         match &self.node {
-            ExprKind::Name { id, .. } => Some(id.clone()),
+            ExprKind::Name { id, .. } => Some(id),
             _ => None,
         }
     }

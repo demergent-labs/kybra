@@ -14,7 +14,7 @@ pub struct WrongDecorator {
     pub canister_name: String,
     pub method_name: String,
     pub location: Location,
-    pub id: String,
+    pub decorator_name: Option<String>,
 }
 
 impl WrongDecorator {
@@ -22,13 +22,13 @@ impl WrongDecorator {
         stmt_kind: &SourceMapped<&Located<StmtKind>>,
         canister_name: &str,
         method_name: &str,
-        id: &str,
+        id: Option<&str>,
     ) -> Error {
         Self {
             canister_name: canister_name.to_string(),
             location: stmt_kind.create_location(),
             method_name: method_name.to_string(),
-            id: id.to_string(),
+            decorator_name: id.map(str::to_string),
         }
         .into()
     }
@@ -42,10 +42,20 @@ impl From<WrongDecorator> for Error {
 
 impl Display for WrongDecorator {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let title = format!(
-            "{}.{} has the wrong decorator: expected @service_update or @service_query, got \"@{}\"",
-            self.canister_name, self.method_name, self.id
-        );
+        let title = match &self.decorator_name {
+            Some(decorator_name) => {
+                format!(
+                    "{}.{} has the wrong decorator: expected @service_update or @service_query, got \"@{}\"",
+                    self.canister_name, self.method_name, decorator_name
+                )
+            }
+            None => {
+                format!(
+                    "{}.{} has the wrong decorator: expected @service_update or @service_query",
+                    self.canister_name, self.method_name
+                )
+            }
+        };
         let annotation = "".to_string();
         let suggestion = None;
 

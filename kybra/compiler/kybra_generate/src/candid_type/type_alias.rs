@@ -54,7 +54,7 @@ impl SourceMapped<&Located<StmtKind>> {
         let enclosed_type = SourceMapped::new(type_alias.enclosed_expr, self.source_map.clone())
             .to_candid_type()?;
         Ok(Some(candid::TypeAlias {
-            name,
+            name: name.to_string(),
             aliased_type: Box::new(enclosed_type),
             type_params: vec![].into(),
         }))
