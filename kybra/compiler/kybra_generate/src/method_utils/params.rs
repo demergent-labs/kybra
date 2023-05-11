@@ -8,9 +8,10 @@ use crate::{
 
 use super::errors::{
     DictionaryUnpackingOperatorNotSupported, FirstParamMustBeSelf, FirstParamMustNotBeSelf,
-    IteratorUnpackingOperatorNotSupported, ParamTypeAnnotationRequired,
+    IteratorUnpackingOperatorNotSupported, ParamTypeAnnotationRequired, TooManyParams,
 };
 
+#[derive(Debug, Clone)]
 pub enum InternalOrExternal {
     Internal,
     External,
@@ -42,6 +43,14 @@ impl SourceMapped<&Located<StmtKind>> {
                         if args.args.len() > 0 && args.args[0].node.arg == "self".to_string() {
                             return Err(FirstParamMustNotBeSelf::err_from_stmt(self).into());
                         }
+                        if args.args.len() > 5 {
+                            return Err(TooManyParams::err_from_stmt(
+                                self,
+                                InternalOrExternal::Internal,
+                            )
+                            .into());
+                        }
+
                         args.args
                             .iter()
                             .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
@@ -54,6 +63,14 @@ impl SourceMapped<&Located<StmtKind>> {
 
                         if args.args[0].node.arg != "self".to_string() {
                             return Err(FirstParamMustBeSelf::err_from_stmt(self).into());
+                        }
+
+                        if args.args.len() > 6 {
+                            return Err(TooManyParams::err_from_stmt(
+                                self,
+                                InternalOrExternal::External,
+                            )
+                            .into());
                         }
 
                         // Ignore the first param, which is always "self"

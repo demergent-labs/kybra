@@ -21,7 +21,7 @@ use crate::{
     method_utils::errors::{
         DictionaryUnpackingOperatorNotSupported, FirstParamMustBeSelf, FirstParamMustNotBeSelf,
         IteratorUnpackingOperatorNotSupported, ParamTypeAnnotationRequired,
-        ReturnTypeAnnotationRequired,
+        ReturnTypeAnnotationRequired, TooManyParams,
     },
     stable_b_tree_map_nodes::errors::{
         InvalidMemoryId, MaxKeySizeMissing, MaxSizeMustBeInteger, MaxSizeMustBeNonNegative,
@@ -75,6 +75,7 @@ pub enum Error {
     ServiceMustHaveMethods(ServiceMustHaveMethods),
     ServiceWithNonFunctionDefs(ServiceWithNonFunctionDefs),
     TooManyDecorators(TooManyDecorators),
+    TooManyParams(TooManyParams),
     TypeNotFound(String),
     WrongDecorator(WrongDecorator),
     Unreachable(Unreachable),
@@ -124,6 +125,7 @@ impl std::fmt::Display for Error {
             Error::SbtmMemoryIdTooBig(error) => error,
             Error::SbtmMissingMemoryId(error) => error,
             Error::SbtmStableBTreeMapNodeFormat(error) => error,
+            Error::TooManyParams(error) => error,
         };
 
         write!(f, "{}", compiler_output)
