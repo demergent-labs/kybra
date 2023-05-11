@@ -15,14 +15,12 @@ use cdk_framework::{
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::errors::KybraResult;
-
 pub fn generate(
     entry_module_name: &String,
     init_params: &Vec<Param>,
     call_to_init_py_function: TokenStream,
     call_to_post_upgrade_py_function: TokenStream,
-) -> KybraResult<TokenStream> {
+) -> TokenStream {
     let params_ref_cells = init_params.iter().map(|param| {
         let init_param_name = format!("INIT_PARAM_{}", param.name).to_ident();
         let init_param_type_annotation = param.to_type_annotation(
@@ -47,7 +45,7 @@ pub fn generate(
         }
     });
 
-    Ok(quote::quote! {
+    quote::quote! {
         thread_local! {
             static INITIALIZED_MAP_REF_CELL: std::cell::RefCell<
                 ic_stable_structures::cell::Cell<
@@ -115,5 +113,5 @@ pub fn generate(
                 ic_cdk_timers::set_timer(core::time::Duration::new(0, 0), rng_seed);
             }
         }
-    })
+    }
 }

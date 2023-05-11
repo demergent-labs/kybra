@@ -18,12 +18,19 @@ use rustpython_parser::ast::Located;
 use rustpython_parser::ast::Mod;
 use rustpython_parser::ast::StmtKind;
 
-use crate::errors::KybraResult;
+use crate::constants::{
+    HEARTBEAT_DECORATOR, INIT_DECORATOR, INSPECT_MESSAGE_DECORATOR, POST_UPGRADE_DECORATOR,
+    PRE_UPGRADE_DECORATOR, QUERY_METHOD_DECORATOR, UPDATE_METHOD_DECORATOR,
+};
+use crate::get_name::HasName;
 use crate::py_ast::PyAst;
 use crate::source_map::SourceMapped;
+use crate::Error;
 
 pub use query_or_update::query_method;
 pub use query_or_update::update_method;
+
+use self::errors::GuardFunctionName;
 
 impl PyAst {
     fn get_canister_stmt_of_type(
@@ -52,13 +59,13 @@ impl PyAst {
 impl SourceMapped<&Located<StmtKind>> {
     pub fn is_canister_method_type(&self, canister_method_type: CanisterMethodType) -> bool {
         self.has_decorator(match canister_method_type {
-            CanisterMethodType::Heartbeat => "heartbeat",
-            CanisterMethodType::Init => "init",
-            CanisterMethodType::InspectMessage => "inspect_message",
-            CanisterMethodType::PostUpgrade => "post_upgrade",
-            CanisterMethodType::PreUpgrade => "pre_upgrade",
-            CanisterMethodType::Query => "query",
-            CanisterMethodType::Update => "update",
+            CanisterMethodType::Heartbeat => HEARTBEAT_DECORATOR,
+            CanisterMethodType::Init => INIT_DECORATOR,
+            CanisterMethodType::InspectMessage => INSPECT_MESSAGE_DECORATOR,
+            CanisterMethodType::PostUpgrade => POST_UPGRADE_DECORATOR,
+            CanisterMethodType::PreUpgrade => PRE_UPGRADE_DECORATOR,
+            CanisterMethodType::Query => QUERY_METHOD_DECORATOR,
+            CanisterMethodType::Update => UPDATE_METHOD_DECORATOR,
         })
     }
 
@@ -80,20 +87,15 @@ impl SourceMapped<&Located<StmtKind>> {
         }
     }
 
-    pub fn get_function_name(&self) -> KybraResult<String> {
-        match &self.node {
-            StmtKind::FunctionDef { name, .. } => Ok(name.clone()),
-            _ => Err(crate::errors::unreachable()),
-        }
-    }
-
-    pub fn get_guard_function_name(&self) -> KybraResult<Option<String>> {
+    pub fn get_guard_function_name(&self) -> Result<Option<String>, Error> {
         match &self.node {
             StmtKind::FunctionDef { decorator_list, .. } => {
                 match get_guard_function_name_from_decorator_list(decorator_list) {
                     Ok(name) => Ok(name),
                     Err(err) => match err {
-                        GuardFunctionError::InvalidName => Err(self.guard_function_name_error()),
+                        GuardFunctionError::InvalidName => {
+                            Err(GuardFunctionName::err_from_stmt(self))
+                        }
                     },
                 }
             }
@@ -122,8 +124,8 @@ fn get_guard_function_name_from_keywords(
         .iter()
         .find(|keyword| keyword.node.arg.as_deref() == Some("guard"))
     {
-        return match &keyword.node.value.node {
-            ExprKind::Name { id, .. } => Ok(Some(id.clone())),
+        return match &keyword.node.value.get_name() {
+            Some(name) => Ok(Some(name.to_string())),
             _ => Err(GuardFunctionError::InvalidName),
         };
     }

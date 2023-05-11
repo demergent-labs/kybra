@@ -1,34 +1,55 @@
-use cdk_framework::act::node::canister_method::{CanisterMethodType, PreUpgradeMethod};
+use cdk_framework::{
+    act::node::canister_method::{CanisterMethodType, PreUpgradeMethod},
+    traits::CollectResults,
+};
 
 use super::rust;
-use crate::{canister_method, errors::KybraResult, py_ast::PyAst};
+use crate::{
+    canister_method::{
+        self,
+        errors::{MultipleSystemMethods, ReturnTypeMustBeVoid},
+    },
+    py_ast::PyAst,
+    Error,
+};
 
 impl PyAst {
-    pub fn build_pre_upgrade_method(&self) -> KybraResult<Option<PreUpgradeMethod>> {
+    pub fn build_pre_upgrade_method(&self) -> Result<Option<PreUpgradeMethod>, Vec<Error>> {
         let pre_upgrade_function_defs =
             self.get_canister_stmt_of_type(CanisterMethodType::PreUpgrade);
 
         if pre_upgrade_function_defs.len() > 1 {
-            return Err(pre_upgrade_function_defs
-                .iter()
-                .map(|pre_upgrade_function_def| {
-                    pre_upgrade_function_def.only_one_pre_upgrade_method_allowed_error()
-                })
-                .collect());
+            return Err(MultipleSystemMethods::err_from_stmt(
+                &pre_upgrade_function_defs,
+                CanisterMethodType::PreUpgrade,
+            )
+            .into());
         }
 
         let pre_upgrade_function_def_option = pre_upgrade_function_defs.get(0);
 
         Ok(
             if let Some(pre_upgrade_function_def) = pre_upgrade_function_def_option {
-                if !canister_method::is_void(pre_upgrade_function_def.build_return_type()?) {
-                    return Err(
-                        pre_upgrade_function_def.post_upgrade_method_must_return_void_error()
-                    );
+                let (guard_function_name, body, return_type) = (
+                    pre_upgrade_function_def
+                        .get_guard_function_name()
+                        .map_err(Error::into),
+                    rust::generate(pre_upgrade_function_def),
+                    pre_upgrade_function_def.build_return_type(),
+                )
+                    .collect_results()?;
+
+                if !canister_method::is_void(return_type) {
+                    return Err(ReturnTypeMustBeVoid::err_from_stmt(
+                        pre_upgrade_function_def,
+                        CanisterMethodType::Heartbeat,
+                    )
+                    .into());
                 }
+
                 Some(PreUpgradeMethod {
-                    body: rust::generate(pre_upgrade_function_def)?,
-                    guard_function_name: pre_upgrade_function_def.get_guard_function_name()?,
+                    body,
+                    guard_function_name,
                 })
             } else {
                 None
