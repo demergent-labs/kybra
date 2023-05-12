@@ -9,7 +9,7 @@ use crate::debug::WhatIsIt;
 
 use self::token_length::{TokenLength, REGULAR_CHARACTERS, SPECIAL_CHARACTERS};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct SourceMap {
     pub file_contents: String,
     pub lines: Vec<String>,
@@ -17,7 +17,7 @@ pub struct SourceMap {
     pub file_name: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct SourceMapped<T> {
     inner: T,
     pub source_map: SourceMap,
