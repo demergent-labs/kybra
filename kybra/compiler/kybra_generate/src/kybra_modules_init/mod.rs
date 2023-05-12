@@ -64,21 +64,77 @@ pub fn generate(
 
             #(#params_ref_cells)*
 
-            // static PYTHON_SOURCE_BYTECODE_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
-            // static NATIVE_STDLIB_BYTECODE_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
-            // static PYTHON_STDLIB_BYTECODE_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
+            static PYTHON_SOURCE_BYTECODE_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
+            static PYTHON_STDLIB_BYTECODE_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
+
+            static INSTALLER_PRINCIPAL_REF_CELL: std::cell::RefCell<Option<ic_cdk::export::Principal>> = std::cell::RefCell::new(None);
+        }
+
+        // TODO make sure to actually manually test this authorization
+        // TODO we might want an automated test for this as well
+        fn authorize_python_module_init() {
+            INSTALLER_PRINCIPAL_REF_CELL.with(|installer_principal_ref_cell| {
+                let installer_principal = installer_principal_ref_cell.borrow().expect("Installer Principal must be set");
+
+                if ic_cdk::api::caller().to_text() != installer_principal.to_text() {
+                    panic!("Not authorized to initialize Python modules");
+                }
+            });
         }
 
         #[ic_cdk_macros::update]
-        pub fn create_python_source_module(bytes: Vec<u8>) {
+        pub fn clear_python_bytecode_chunks() {
+            authorize_python_module_init();
+
+            PYTHON_SOURCE_BYTECODE_REF_CELL.with(|bytecode_ref_cell| {
+                let mut bytecode_ref_mut = bytecode_ref_cell.borrow_mut();
+                bytecode_ref_mut.clear();
+            });
+
+            PYTHON_STDLIB_BYTECODE_REF_CELL.with(|bytecode_ref_cell| {
+                let mut bytecode_ref_mut = bytecode_ref_cell.borrow_mut();
+                bytecode_ref_mut.clear();
+            });
+        }
+
+        // TODO think about what happens if this process is interrupted
+        // TODO we should probably be able to clear the chunks
+        #[ic_cdk_macros::update]
+        pub fn upload_python_source_bytecode_chunk(bytes: Vec<u8>) {
+            authorize_python_module_init();
+
+            PYTHON_SOURCE_BYTECODE_REF_CELL.with(|bytecode_ref_cell| {
+                let mut bytecode_ref_mut = bytecode_ref_cell.borrow_mut();
+                bytecode_ref_mut.extend(bytes);
+            });
+        }
+
+        #[ic_cdk_macros::update]
+        pub fn upload_python_stdlib_bytecode_chunk(bytes: Vec<u8>) {
+            authorize_python_module_init();
+
+            PYTHON_STDLIB_BYTECODE_REF_CELL.with(|bytecode_ref_cell| {
+                let mut bytecode_ref_mut = bytecode_ref_cell.borrow_mut();
+                bytecode_ref_mut.extend(bytes);
+            });
+        }
+
+        // TODO think of all of the permissions and such required here
+        // TODO for example, should we protect it so that it can only run once?
+        #[ic_cdk_macros::update]
+        pub fn initialize_python_modules() {
+            authorize_python_module_init();
+
             unsafe {
                 #(#params_initializations)*
 
-                let bytes_reference: &'static [u8] = bytes.leak(); // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
+                let python_source_bytes_reference: &'static [u8] = PYTHON_SOURCE_BYTECODE_REF_CELL.with(|x| x.borrow().clone()).leak(); // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
+                let python_stdlib_bytes_reference: &'static [u8] = PYTHON_STDLIB_BYTECODE_REF_CELL.with(|x| x.borrow().clone()).leak(); // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
 
                 let interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
                     vm.add_native_modules(rustpython_stdlib::get_module_inits());
-                    vm.add_frozen(rustpython_compiler_core::frozen_lib::FrozenLib::from_ref(bytes_reference));
+                    vm.add_frozen(rustpython_compiler_core::frozen_lib::FrozenLib::from_ref(python_source_bytes_reference));
+                    vm.add_frozen(rustpython_compiler_core::frozen_lib::FrozenLib::from_ref(python_stdlib_bytes_reference));
                 });
 
                 let scope = interpreter.enter(|vm| vm.new_scope_with_builtins());
@@ -111,8 +167,6 @@ pub fn generate(
                 else {
                     #call_to_post_upgrade_py_function
                 }
-
-                ic_cdk_timers::set_timer(core::time::Duration::new(0, 0), rng_seed);
             }
         }
     })

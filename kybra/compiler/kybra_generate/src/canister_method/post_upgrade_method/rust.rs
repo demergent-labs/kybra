@@ -16,6 +16,15 @@ pub fn generate(params: &Vec<Param>) -> KybraResult<TokenStream> {
 
     // TODO I think we will want to put some permissions on this, like the original installer
     Ok(quote! {
+        ic_wasi_polyfill::init(0);
+
         #(#params_initializations)*
+
+        INSTALLER_PRINCIPAL_REF_CELL.with(|installer_principal_ref_cell| {
+            let mut installer_principal = installer_principal_ref_cell.borrow_mut();
+            *installer_principal = Some(ic_cdk::api::caller());
+        });
+
+        ic_cdk_timers::set_timer(core::time::Duration::new(0, 0), rng_seed);
     })
 }

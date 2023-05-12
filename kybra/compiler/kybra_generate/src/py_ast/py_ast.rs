@@ -12,6 +12,10 @@ pub struct PyAst {
 
 impl PyAst {
     pub fn new(py_file_names: &Vec<&str>, entry_module_name: &str) -> PyAst {
+        let py_file_names: Vec<&&str> = py_file_names
+            .iter()
+            .filter(|py_file_name| py_file_name.ends_with(".py"))
+            .collect();
         let mut mods: Vec<_> = py_file_names
             .iter()
             .enumerate()

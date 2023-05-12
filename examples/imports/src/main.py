@@ -1,10 +1,12 @@
-from kybra import query
+import hashlib
+import math
+
+import boltons.mathutils
+from kybra import float64, query
+
 import import1
 import import2
 import import2.import3
-import math
-# from sample_adds.add import add_one #type: ignore TODO add an externally installed pip library in the future
-import hashlib
 
 
 @query
@@ -31,7 +33,7 @@ def sha224_hash(message: str) -> str:
 def get_math_message() -> int:
     return math.ceil(10.4)
 
-# TODO add an externally installed pip library in the future
-# @query
-# def get_external_module_message() -> int:
-#     return add_one(1, 2) #type: ignore
+
+@query
+def boltons_floor(number: float64) -> int:
+    return boltons.mathutils.floor(number)  # type: ignore

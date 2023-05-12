@@ -52,7 +52,10 @@ def main():
     shutil.copytree(paths["compiler"], paths["canister"], dirs_exist_ok=True)
     create_file(f"{paths['canister']}/Cargo.toml", generate_cargo_toml(canister_name))
     create_file(f"{paths['canister']}/Cargo.lock", generate_cargo_lock())
-    create_file(f"{paths['canister']}/post_install.sh", generate_post_install_script(canister_name, kybra.__rust_version__))
+    create_file(
+        f"{paths['canister']}/post_install.sh",
+        generate_post_install_script(canister_name, kybra.__rust_version__),
+    )
     os.system(f"chmod +x {paths['canister']}/post_install.sh")
 
     # Add CARGO_TARGET_DIR to env for all cargo commands
@@ -103,8 +106,10 @@ export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
 touch .kybra/{canister_name}/kybra_modules_init/src/main.rs
-cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name} &> "$global_kybra_logs_dir"/kybra_modules_init
+# cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name} &> "$global_kybra_logs_dir"/kybra_modules_init
+cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name}
     """
+
 
 def parse_args_or_exit(args: list[str]) -> Args:
     args = args[1:]  # Discard the path to kybra
@@ -303,7 +308,7 @@ def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose:
         )
         print(parse_kybra_generate_error(kybra_generate_result.stderr))
         print(
-            "\nIf you are unable to decipher the error above, reach out in the #typescript"
+            "\nIf you are unable to decipher the error above, reach out in the #python"
         )
         print("channel of the DFINITY DEV OFFICIAL discord:")
         print("\nhttps://discord.com/channels/748416164832608337/1019372359775440988\n")
@@ -368,7 +373,7 @@ def build_wasm_binary_or_exit(
             f"{paths['global_kybra_bin_dir']}/cargo",
             "build",
             f"--manifest-path={paths['canister']}/Cargo.toml",
-            "--target=wasm32-unknown-unknown",
+            "--target=wasm32-wasi",
             f"--package={canister_name}",
             "--release",
         ],
@@ -383,24 +388,39 @@ def build_wasm_binary_or_exit(
         sys.exit(1)
 
     shutil.copy(
-        f"{paths['global_kybra_target_dir']}/wasm32-unknown-unknown/release/{canister_name}.wasm",
+        f"{paths['global_kybra_target_dir']}/wasm32-wasi/release/{canister_name}.wasm",
         paths["wasm"],
     )
 
     candid_file = generate_candid_file(paths)
     create_file(paths["did"], candid_file)
 
+    wasi2ic_result = subprocess.run(
+        [f"{paths['global_kybra_bin_dir']}/wasi2ic", paths["wasm"], paths["wasm"]],
+        capture_output=not verbose,
+        env=cargo_env,
+    )
+
+    if wasi2ic_result.returncode != 0:
+        print(red("\n💣 Error building Wasm binary:"))
+        print(wasi2ic_result.stderr.decode("utf-8"))
+        print("💀 Build failed")
+        sys.exit(1)
+
 
 @timed_inline
 def optimize_wasm_binary_or_exit(
     paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
 ):
-    # Optimize the Wasm binary
     optimization_result = subprocess.run(
         [
-            f"{paths['global_kybra_bin_dir']}/ic-cdk-optimizer",
+            f"{paths['global_kybra_bin_dir']}/ic-wasm",
             paths["wasm"],
-            f"-o={paths['wasm']}",
+            "-o",
+            paths["wasm"],
+            "shrink",
+            "--optimize",
+            "Oz",
         ],
         capture_output=not verbose,
     )
