@@ -10,95 +10,103 @@
 # from kybra import thing
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])
+# BasicFunc: TypeAlias = Func(Query[[str], str])
 
 
 # Function with matching inside
-def my_function_2_25(arg1):
-    match 3:
-        case 1:
-            print()
-        case 2:
-            print()
-        case 3:
-            print()
-        case _:
-            print()
+# def my_function_2_25(arg1):
+#     match 3:
+#         case 1:
+#             print()
+#         case 2:
+#             print()
+#         case 3:
+#             print()
+#         case _:
+#             print()
 
 
 # TODO Match don't work
-match 3:
-    case 1:
-        print()
-    case 2:
-        print()
-    case 3:
-        print()
-    case _:
-        print()
+# match 3:
+#     case 1:
+#         print()
+#     case 2:
+#         print()
+#     case 3:
+#         print()
+#     case _:
+#         print()
 
 
 # TODO this is going to be more challenging and I'll come back to it later.
 # Use an attribute reference to access an attribute of an object
+# TODO to add to the challenge this line is breaking my generate_span function,
+# which in turn is breaking my get_end_row and get_range functions. For some
+# reason it is getting the end to be 1 which is all sorts of wrong. In the
+# meantime I have adjusted all of the above functions to return the start
+# location in the event that the end location is smaller. That way when it tries
+# to plug those numbers into an array we don't horrifically break everything. I
+# will want to dive more into this but that will have to wait for very nice
+# errors
 "hello".upper()
 
 
 # Make sure that f strings work
-class c3:
-    def function_with_f_string(self, person: str) -> str:
-        return f"Hello {person}"
+# class c3:
+#     def function_with_f_string(self, person: str) -> str:
+#         return f"Hello {person}"
 
 
-# bstring statement
-# TODO
-_b32alphabet = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+# # bstring statement
+# # TODO
+# _b32alphabet = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
 
 
-# bstring and fstring if a function
-# TODO
-def function_with_f_and_b_string():
-    bstring = b"==="
-    fstring = f"Hello {bstring}"
-    print(fstring)
+# # bstring and fstring if a function
+# # TODO
+# def function_with_f_and_b_string():
+#     bstring = b"==="
+#     fstring = f"Hello {bstring}"
+#     print(fstring)
 
 
-# It doesn't catch the very first quote nor the last three
-"""
-    # !@#$!@#$!@#$$#%^$^&^%&*^&^()*()&(^*&$%^&#$#%#@)
-    thing = 1 ** 2
-    thing = [[1]] @ [[2]]
-    thing = 1 + 2
-    thing = 1 ^ 2
-    thing = 1 - 1
-    thing = 1 * 1
-    thing = 1 / 1
-    thing = 1 % 1
-    thing = 1 << 1
-    thing = 1 >> 1
-    thing = 1 | 1
-    thing = 1 & 1
-    print(thing)
-"""
+# # It doesn't catch the very first quote nor the last three
+# """
+#     # !@#$!@#$!@#$$#%^$^&^%&*^&^()*()&(^*&$%^&#$#%#@)
+#     thing = 1 ** 2
+#     thing = [[1]] @ [[2]]
+#     thing = 1 + 2
+#     thing = 1 ^ 2
+#     thing = 1 - 1
+#     thing = 1 * 1
+#     thing = 1 / 1
+#     thing = 1 % 1
+#     thing = 1 << 1
+#     thing = 1 >> 1
+#     thing = 1 | 1
+#     thing = 1 & 1
+#     print(thing)
+# """
 
 
-# # TODO The canister results with the ellipsis aren't quite right
-# # Handle the ellipsis
-class CanisterResult(Generic[T]):
-    ok: T
-    err: Optional[str]
+# # # TODO The canister results with the ellipsis aren't quite right
+# # # Handle the ellipsis
+# class CanisterResult(Generic[T]):
+#     ok: T
+#     err: Optional[str]
 
-    def __init__(self, ok: T, err: str):
-        self.ok = ok
-        self.err = err
+#     def __init__(self, ok: T, err: str):
+#         self.ok = ok
+#         self.err = err
 
-    def notify(self) -> "NotifyResult":
-        ...
+#     def notify(self) -> "NotifyResult":
+#         ...
 
-    def with_cycles(self, cycles: nat64) -> "CanisterResult[T]":
-        ...
+#     def with_cycles(self, cycles: nat64) -> "CanisterResult[T]":
+#         ...
 
-    def with_cycles128(self, cycles: nat) -> "CanisterResult[T]":
-        ...
+#     def with_cycles128(self, cycles: nat) -> "CanisterResult[T]":
+#         ...
 
 
-# # TODO The IC object is also not working.
+# # # TODO The IC object is also not working.

@@ -323,11 +323,19 @@ impl SourceMap {
                 break; // There should be nothing left to see
             }
         }
+        if end < start {
+            eprintln!(
+                "INTERNAL WARNING: End was less than start. start: {} end: {}",
+                start, end
+            );
+            end = start
+        }
         Span { start, end }
     }
 }
 
 /// The span here is going to represent the absolute character count
+#[derive(Debug)]
 pub struct Span {
     start: usize,
     end: usize,
@@ -345,12 +353,34 @@ impl SourceMap {
     /// Rather it is the range within the the source.
     /// So we want to get the column and the row and use that to get the range
     pub fn get_range(&self, span: Span, location: Location) -> (usize, usize) {
-        let end = self.lines[self.get_start_row(location) - 1..self.get_end_row(&span) - 1]
+        let start_row = self.get_start_row(location);
+        let end_row = match self.get_end_row(&span) {
+            end_row if end_row < start_row => {
+                eprintln!(
+                    "INTERNAL WARNING: End row was less than start row. start: {} end: {}",
+                    start_row, end_row
+                );
+                start_row
+            }
+            end_row => end_row,
+        };
+        // End = start + length of all lines between start row and end row + length of the end_row up to the end column
+        let start = self.get_start_col(location);
+        let end = match self.lines[start_row - 1..end_row - 1]
             .iter()
-            .fold(0, |acc, line| acc + line.len() + 1);
-        // eprintln!("When calculating the end this is the ");
-        let end = end + self.get_end_col(&span);
-        (self.get_start_col(location), end)
+            .fold(0, |acc, line| acc + line.len() + 1)
+            + self.get_end_col(&span)
+        {
+            end if end < start => {
+                eprintln!(
+                    "INTERNAL WARNING: End was less than start. start: {} end: {}",
+                    start, end
+                );
+                start
+            }
+            end => end,
+        };
+        (start, end)
     }
 
     /// Get the source text surrounding the token.
@@ -361,7 +391,16 @@ impl SourceMap {
         //     first_line,
         //     self.lines[first_line - 1]
         // );
-        let last_line = self.get_end_row(&span);
+        let last_line = match self.get_end_row(&span) {
+            end_row if end_row < first_line => {
+                eprintln!(
+                    "INTERNAL WARNING: End row was less than start row. start: {} end: {}",
+                    first_line, end_row
+                );
+                first_line
+            }
+            end_row => end_row,
+        };
         // eprintln!(
         //     "The last line is {} and the text at that line is {}",
         //     last_line,
