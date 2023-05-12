@@ -1,10 +1,16 @@
+# type: ignore
+# This file has a bunch of expressions that do not get the token length
+# calculated correctly and therefore would not be properly highlighted in
+# errors.
+
+
 # These three bring in a lot of stuff that doesn't work and is enumerated bellow
 # from kybra import query, opt, text, Record
 # import kybra as kybra2
 # from kybra import thing
 
 
-BasicFunc: TypeAlias = Func(Query[[str], str])  # type: ignore
+BasicFunc: TypeAlias = Func(Query[[str], str])
 
 
 # Function with matching inside
@@ -38,26 +44,26 @@ match 3:
 
 
 # Make sure that f strings work
-class c3():
+class c3:
     def function_with_f_string(self, person: str) -> str:
-        return f'Hello {person}'
+        return f"Hello {person}"
 
 
 # bstring statement
 # TODO
-_b32alphabet = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+_b32alphabet = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
 
 
 # bstring and fstring if a function
 # TODO
 def function_with_f_and_b_string():
-    bstring = b'==='
-    fstring = f'Hello {bstring}'
+    bstring = b"==="
+    fstring = f"Hello {bstring}"
     print(fstring)
 
 
 # It doesn't catch the very first quote nor the last three
-'''
+"""
     # !@#$!@#$!@#$$#%^$^&^%&*^&^()*()&(^*&$%^&#$#%#@)
     thing = 1 ** 2
     thing = [[1]] @ [[2]]
@@ -72,7 +78,7 @@ def function_with_f_and_b_string():
     thing = 1 | 1
     thing = 1 & 1
     print(thing)
-'''
+"""
 
 
 # # TODO The canister results with the ellipsis aren't quite right
@@ -85,11 +91,14 @@ class CanisterResult(Generic[T]):
         self.ok = ok
         self.err = err
 
-    def notify(self) -> "NotifyResult": ...
+    def notify(self) -> "NotifyResult":
+        ...
 
-    def with_cycles(self, cycles: nat64) -> "CanisterResult[T]": ...
+    def with_cycles(self, cycles: nat64) -> "CanisterResult[T]":
+        ...
 
-    def with_cycles128(self, cycles: nat) -> "CanisterResult[T]": ...
+    def with_cycles128(self, cycles: nat) -> "CanisterResult[T]":
+        ...
 
 
 # # TODO The IC object is also not working.

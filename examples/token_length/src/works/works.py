@@ -1,3 +1,10 @@
+# type: ignore
+# All of the expressions in this file should have their token lengths calculated
+# correctly and should be highlighted correctly if they show up in an error. So
+# after a major change you should be able to test this file to make sure they
+# are all still highlighted corretly
+
+
 import os as cool_os
 from sys import argv as cool_argv
 import os.path
@@ -45,7 +52,7 @@ len([1, 2, 3])
 # Make sure decorators work
 
 
-class c2():
+class c2:
     @staticmethod
     def a():
         return ic123.k()
@@ -70,16 +77,15 @@ def my_function_2_125(arg1: int, arg2: str, arg3: bool) -> bool:
     print("arg1:", arg1)  # Here is a comment
 
 
-def call_raw(canister_id: Principal, method: str, args_raw: blob, payment: nat64) -> CanisterResult[T]:
+def call_raw(
+    canister_id: Principal, method: str, args_raw: blob, payment: nat64
+) -> CanisterResult[T]:
     print(canister_id)
 
 
 def my_function_2_25(arg1):
     print("arg1:", arg1)  # Here is a comment
-    print(
-
-
-    )
+    print()
 
 
 def my_function_2_5():
@@ -141,16 +147,16 @@ def hello_upper() -> str:
 "positive" if x > 0 else "negative"
 
 # Use a generator expression to create a generator
-(i ** 2 for i in range(10))
+(i**2 for i in range(10))
 
 # Use a list comprehension to create a list
-[i ** 2 for i in range(10)]
+[i**2 for i in range(10)]
 
 # Use a set comprehension to create a set
-{i ** 2 for i in range(10)}
+{i**2 for i in range(10)}
 
 # Use a dictionary comprehension to create a dictionary
-{i: i ** 2 for i in range(10)}
+{i: i**2 for i in range(10)}
 
 # Use an exception handler to handle an exception
 try:
@@ -169,14 +175,16 @@ def infinite_sequence():
 
 
 # Make sure calls that are part of attributes work
-class c1():
+class c1:
     def a():
         return ic123.k()
 
     def b():
         a()
 
-    def call_raw(canister_id: Principal, method: str, args_raw: blob, payment: nat64) -> CanisterResult[T]:
+    def call_raw(
+        canister_id: Principal, method: str, args_raw: blob, payment: nat64
+    ) -> CanisterResult[T]:
         return None
 
 
@@ -211,7 +219,7 @@ async def simple_query() -> opt[text]:
     raise
     raise ValueError("invalid value") from TypeError("invalid type")
     with open("file.text", "w") as f:
-        f.write('Hello')
+        f.write("Hello")
     global thing
     thing = [1, 2, 3, 4, 5]
     [x for x in thing if x == 1]
@@ -241,8 +249,8 @@ async def simple_query() -> opt[text]:
     else:
         print("Thats a wrap")
     thing = {"hello": 1}
-    del thing['hello']
-    return 'This is a simple query'
+    del thing["hello"]
+    return "This is a simple query"
 
 
 thing = 3
@@ -251,8 +259,4 @@ thing = 1
 
 def thingy():
     # This is a comment
-    print(
-        {
-            'thing': 1
-        }
-    )
+    print({"thing": 1})
