@@ -149,14 +149,14 @@ impl From<cdk_framework::act::abstract_canister_tree::Error> for crate::Error {
         match value {
             cdk_framework::act::abstract_canister_tree::Error::TypeNotFound(type_ref_name) => {
                 crate::Error::TypeNotFound(format!(
-                    "The type {} is used, but never defined",
+                    "The type {} is used, but never defined. Make sure all candid types are defined correctly",
                     type_ref_name
                 ))
             }
             cdk_framework::act::abstract_canister_tree::Error::GuardFunctionNotFound(
                 guard_function_name,
             ) => crate::Error::GuardFunctionNotFound(format!(
-                "The guard function {} is used, but never defined",
+                "The guard function {} is used, but never defined. Make sure all guard functions return kybra.GuardResult",
                 guard_function_name
             )),
             cdk_framework::act::abstract_canister_tree::Error::MultipleTypeDefinitions(
