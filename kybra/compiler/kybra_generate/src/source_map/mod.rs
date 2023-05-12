@@ -324,7 +324,7 @@ impl SourceMap {
             }
         }
         if end < start {
-            eprintln!(
+            println!(
                 "INTERNAL WARNING: End was less than start. start: {} end: {}",
                 start, end
             );
@@ -356,7 +356,7 @@ impl SourceMap {
         let start_row = self.get_start_row(location);
         let end_row = match self.get_end_row(&span) {
             end_row if end_row < start_row => {
-                eprintln!(
+                println!(
                     "INTERNAL WARNING: End row was less than start row. start: {} end: {}",
                     start_row, end_row
                 );
@@ -372,7 +372,7 @@ impl SourceMap {
             + self.get_end_col(&span)
         {
             end if end < start => {
-                eprintln!(
+                println!(
                     "INTERNAL WARNING: End was less than start. start: {} end: {}",
                     start, end
                 );
@@ -393,7 +393,7 @@ impl SourceMap {
         // );
         let last_line = match self.get_end_row(&span) {
             end_row if end_row < first_line => {
-                eprintln!(
+                println!(
                     "INTERNAL WARNING: End row was less than start row. start: {} end: {}",
                     first_line, end_row
                 );
