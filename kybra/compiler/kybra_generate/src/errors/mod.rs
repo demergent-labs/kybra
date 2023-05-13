@@ -53,7 +53,10 @@ pub enum Error {
     InvalidSubscriptable(InvalidSubscriptable),
     IteratorUnpackingOperatorNotSupported(IteratorUnpackingOperatorNotSupported),
     MissingDecorator(MissingDecorator),
+    MultipleCanisterMethodDefinitions(String),
+    MultipleGuardFunctionDefinitions(String),
     MultipleSystemMethods(MultipleSystemMethods),
+    MultipleTypeDefinitions(String),
     NoneCannotBeAType(NoneCannotBeAType),
     NotExactlyOneTarget(NotExactlyOneTarget),
     ParamTypeAnnotationRequired(ParamTypeAnnotationRequired),
@@ -105,7 +108,10 @@ impl std::fmt::Display for Error {
             Error::NoneCannotBeAType(error) => error,
             Error::MissingDecorator(error) => error,
             Error::NotExactlyOneTarget(error) => error,
+            Error::MultipleCanisterMethodDefinitions(error) => error,
+            Error::MultipleGuardFunctionDefinitions(error) => error,
             Error::MultipleSystemMethods(error) => error,
+            Error::MultipleTypeDefinitions(error) => error,
             Error::ParamTypeAnnotationRequired(error) => error,
             Error::ReturnTypeAnnotationRequired(error) => error,
             Error::ReturnTypeMode(error) => error,
@@ -143,15 +149,33 @@ impl From<cdk_framework::act::abstract_canister_tree::Error> for crate::Error {
         match value {
             cdk_framework::act::abstract_canister_tree::Error::TypeNotFound(type_ref_name) => {
                 crate::Error::TypeNotFound(format!(
-                    "The type {} is used, but never defined.",
+                    "The type {} is used, but never defined. Make sure all candid types are defined correctly",
                     type_ref_name
                 ))
             }
             cdk_framework::act::abstract_canister_tree::Error::GuardFunctionNotFound(
                 guard_function_name,
             ) => crate::Error::GuardFunctionNotFound(format!(
-                "The guard function {} is used, but never defined.",
+                "The guard function {} is used, but never defined. Make sure all guard functions return kybra.GuardResult",
                 guard_function_name
+            )),
+            cdk_framework::act::abstract_canister_tree::Error::MultipleTypeDefinitions(
+                type_ref_name,
+            ) => Error::MultipleTypeDefinitions(format!(
+                "The type {} is defined multiple times",
+                type_ref_name
+            )),
+            cdk_framework::act::abstract_canister_tree::Error::MultipleGuardFunctionDefinitions(
+                guard_function_name,
+            ) => Error::MultipleGuardFunctionDefinitions(format!(
+                "The guard function {} is defined multiple times",
+                guard_function_name
+            )),
+            cdk_framework::act::abstract_canister_tree::Error::MultipleCanisterMethodDefinitions(
+                canister_method_name,
+            ) => Error::MultipleCanisterMethodDefinitions(format!(
+                "The canister method {} is defined multiple times",
+                canister_method_name
             )),
         }
     }
