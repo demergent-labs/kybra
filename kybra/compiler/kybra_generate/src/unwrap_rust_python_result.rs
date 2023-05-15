@@ -9,9 +9,12 @@ pub fn generate() -> TokenStream {
             match rust_python_result {
                 Ok(ok) => ok,
                 Err(err) => {
-                    let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                    panic!("{}", err_string);
+                    let type_name = err.clone().to_pyobject(vm).class().name().to_string();
+                    let err_message = match &err.to_pyobject(vm).str(vm) {
+                        Ok(string) => string.to_string(),
+                        Err(_) => ic_cdk::trap(format!("Attribute Error: '{}' object has no attribute '__str__'", type_name).as_str()),
+                    };
+                    ic_cdk::trap(format!("{type_name}: {err_message}").as_str())
                 },
             }
         }

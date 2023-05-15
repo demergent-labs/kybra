@@ -42,18 +42,11 @@ pub fn generate_body(
 
             let invoke_result = vm.invoke(&method_py_object_ref, #params);
 
-            match invoke_result {
-                Ok(py_object_ref) => {
-                    let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
+            let py_object_ref = unwrap_rust_python_result(invoke_result, vm);
 
-                    #return_expression
-                },
-                Err(err) => {
-                    let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+            let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
 
-                    panic!("{}", err_string);
-                }
-            }
+            #return_expression
         }
     })
 }
