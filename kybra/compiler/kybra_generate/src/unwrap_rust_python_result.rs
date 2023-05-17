@@ -51,10 +51,32 @@ pub fn generate() -> TokenStream {
         }
 
         pub trait UnwrapOrTrap<T> {
+            fn unwrap_or_trap(self) -> T;
+        }
+
+        impl<T> UnwrapOrTrap<T> for Result<T, CdkActTryIntoVmValueError> {
+            fn unwrap_or_trap(self) -> T {
+                match self {
+                    Ok(ok) => return ok,
+                    Err(err) => ic_cdk::trap(&err.0)
+                }
+            }
+        }
+
+        impl<T> UnwrapOrTrap<T> for Result<T, CdkActTryFromVmValueError> {
+            fn unwrap_or_trap(self) -> T {
+                match self {
+                    Ok(ok) => return ok,
+                    Err(err) => ic_cdk::trap(&err.0)
+                }
+            }
+        }
+
+        pub trait UnwrapOrTrapWithVm<T> {
             fn unwrap_or_trap(self, vm: &rustpython::vm::VirtualMachine, err_message: Option<&str>) -> T;
         }
 
-        impl<T> UnwrapOrTrap<T> for Result<T, rustpython::vm::PyRef<rustpython_vm::builtins::PyBaseException>> {
+        impl<T> UnwrapOrTrapWithVm<T> for Result<T, rustpython::vm::PyRef<rustpython_vm::builtins::PyBaseException>> {
             fn unwrap_or_trap(self, vm: &rustpython::vm::VirtualMachine, err_message: Option<&str>) -> T {
                 match self {
                     Ok(ok) => return ok,
