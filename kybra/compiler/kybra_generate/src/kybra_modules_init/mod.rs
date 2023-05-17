@@ -83,7 +83,7 @@ pub fn generate(
 
                 interpreter.enter(|vm| {
                     Ic::make_class(&vm.ctx);
-                    unwrap_rust_python_result(vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm), vm);
+                    vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm).unwrap_or_trap(vm, None);
 
                     let result = vm.run_code_string(
                         scope.clone(),

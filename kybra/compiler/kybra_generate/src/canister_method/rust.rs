@@ -35,7 +35,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     let scope = SCOPE_OPTION.as_mut().unwrap();
 
                     interpreter.enter(|vm| {
-                        let method_py_object_ref = unwrap_rust_python_result(scope.globals.get_item(#function_name, vm), vm);
+                        let method_py_object_ref = scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm, None);
 
                         let result_py_object_ref = vm.invoke(&method_py_object_ref, #params);
 

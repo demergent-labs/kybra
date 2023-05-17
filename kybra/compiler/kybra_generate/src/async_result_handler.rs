@@ -24,10 +24,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             }
 
             let send_result = vm.call_method(&py_object_ref, "send", (arg.clone(),));
-            let py_iter_return = unwrap_rust_python_result(
-                rustpython_vm::protocol::PyIterReturn::from_pyresult(send_result, vm),
-                vm
-            );
+            let py_iter_return = rustpython_vm::protocol::PyIterReturn::from_pyresult(send_result, vm).unwrap_or_trap(vm, None);
 
             match py_iter_return {
                 rustpython_vm::protocol::PyIterReturn::Return(returned_py_object_ref) => {
@@ -37,8 +34,8 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
                         return async_result_handler(vm, py_object_ref, recursed_py_object_ref).await;
                     }
 
-                    let name: String = unwrap_rust_python_result(returned_py_object_ref.get_attr("name", vm), vm).try_from_vm_value(vm).unwrap();
-                    let args: Vec<rustpython_vm::PyObjectRef> = unwrap_rust_python_result(unwrap_rust_python_result(returned_py_object_ref.get_attr("args", vm), vm).try_into_value(vm), vm);
+                    let name: String = returned_py_object_ref.get_attr("name", vm).unwrap_or_trap(vm, None).try_from_vm_value(vm).unwrap();
+                    let args: Vec<rustpython_vm::PyObjectRef> = returned_py_object_ref.get_attr("args", vm).unwrap_or_trap(vm, None).try_into_value(vm).unwrap_or_trap(vm, None);
 
                     match &name[..] {
                         "call" => async_result_handler_call(vm, py_object_ref, &args).await,
@@ -169,20 +166,20 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
         ) -> rustpython_vm::PyObjectRef
             where T: for<'a> CdkActTryIntoVmValue<&'a rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef>
         {
-            let call_result_class = unwrap_rust_python_result(vm.run_block_expr(
+            let call_result_class = vm.run_block_expr(
                 vm.new_scope_with_builtins(),
                 r#"
 from kybra import CallResult
 
 CallResult
                 "#
-            ), vm);
+            ).unwrap_or_trap(vm, None);
 
             match call_result {
                 Ok(ok) => {
                     let method_result = vm.invoke(&call_result_class, (ok.try_into_vm_value(vm).unwrap(), vm.ctx.none()));
 
-                    unwrap_rust_python_result(method_result, vm)
+                    method_result.unwrap_or_trap(vm, None)
 
                     // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
                     // let dict = vm.ctx.new_dict();
@@ -196,7 +193,7 @@ CallResult
 
                     let method_result = vm.invoke(&call_result_class, (vm.ctx.none(), err_string.try_into_vm_value(vm).unwrap()));
 
-                    unwrap_rust_python_result(method_result, vm)
+                    method_result.unwrap_or_trap(vm, None)
 
                     // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
                     // let dict = vm.ctx.new_dict();
