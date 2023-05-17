@@ -44,7 +44,7 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
                 };
 
                 quote! {
-                    let #variable_name = self.get_item(stringify!(#restored_field_name), vm).unwrap_or_trap(vm, None);
+                    let #variable_name = self.get_item(stringify!(#restored_field_name), vm).unwrap_or_trap(vm);
                 }
             })
             .collect(),
@@ -58,7 +58,7 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
 
                 quote! {
                     // TODO tuple_self is being repeated more times than necessary
-                    let tuple_self: rustpython_vm::builtins::PyTupleRef = self.clone().try_into_value(vm).unwrap_or_trap(vm, None);
+                    let tuple_self: rustpython_vm::builtins::PyTupleRef = self.clone().try_into_value(vm).unwrap_or_trap(vm);
                     let #variable_name = tuple_self.get(#syn_index).unwrap();
                 }
             })

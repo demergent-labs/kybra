@@ -17,7 +17,7 @@ pub fn generate(
 
                 let vm = &interpreter.vm;
 
-                let method_py_object_ref = scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm, None);
+                let method_py_object_ref = scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm);
 
                 let result_py_object_ref = vm.invoke(&method_py_object_ref, ());
 

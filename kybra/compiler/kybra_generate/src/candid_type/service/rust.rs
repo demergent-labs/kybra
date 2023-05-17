@@ -15,7 +15,7 @@ pub fn to_vm_value(name: String) -> TokenStream {
 r#"
 from kybra import Principal
 {}(Principal.from_str('{}'))
-"#, stringify!(#service_name), self.0.principal.to_string()).as_str()).unwrap_or_trap(vm, None))
+"#, stringify!(#service_name), self.0.principal.to_string()).as_str()).unwrap_or_trap(vm))
                 }
             }
         }
@@ -38,10 +38,10 @@ pub fn from_vm_value(name: String) -> TokenStream {
     quote! {
         impl CdkActTryFromVmValue<#service_name, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<#service_name, CdkActTryFromVmValueError> {
-                let canister_id = self.get_attr("canister_id", vm).unwrap_or_trap(vm, None);
-                let to_str = canister_id.get_attr("to_str", vm).unwrap_or_trap(vm, None);
-                let result = vm.invoke(&to_str, ()).unwrap_or_trap(vm, None);
-                let result_string: String = result.try_into_value(vm).unwrap_or_trap(vm, None);
+                let canister_id = self.get_attr("canister_id", vm).unwrap_or_trap(vm);
+                let to_str = canister_id.get_attr("to_str", vm).unwrap_or_trap(vm);
+                let result = vm.invoke(&to_str, ()).unwrap_or_trap(vm);
+                let result_string: String = result.try_into_value(vm).unwrap_or_trap(vm);
 
                 Ok(#service_name::new(ic_cdk::export::Principal::from_str(&result_string).unwrap()))
             }

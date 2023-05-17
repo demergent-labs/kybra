@@ -13,7 +13,7 @@ pub fn generate(function_name: &String) -> TokenStream {
             let scope = SCOPE_OPTION.as_mut().unwrap();
             interpreter.enter(|vm| {
                 let method_py_object_ref =
-                    scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm, None);
+                    scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm);
                 let result_py_object_ref = vm.invoke(&method_py_object_ref, ());
                 match result_py_object_ref {
                     Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap(),

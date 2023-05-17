@@ -38,11 +38,11 @@ pub fn generate_body(
 
             let vm = &interpreter.vm;
 
-            let method_py_object_ref = scope.globals.get_item(#name, vm).unwrap_or_trap(vm, None);
+            let method_py_object_ref = scope.globals.get_item(#name, vm).unwrap_or_trap(vm);
 
             let invoke_result = vm.invoke(&method_py_object_ref, #params);
 
-            let py_object_ref = invoke_result.unwrap_or_trap(vm, None);
+            let py_object_ref = invoke_result.unwrap_or_trap(vm);
 
             let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
 

@@ -35,10 +35,10 @@ from kybra import Principal
 
 Principal
                     "#
-                ).unwrap_or_trap(vm, None);
+                ).unwrap_or_trap(vm);
 
-                let from_str = principal_class.get_attr("from_str", vm).unwrap_or_trap(vm, None);
-                let principal_instance = vm.invoke(&from_str, (self.to_text(),)).unwrap_or_trap(vm, None);
+                let from_str = principal_class.get_attr("from_str", vm).unwrap_or_trap(vm);
+                let principal_instance = vm.invoke(&from_str, (self.to_text(),)).unwrap_or_trap(vm);
 
                 Ok(principal_instance)
             }

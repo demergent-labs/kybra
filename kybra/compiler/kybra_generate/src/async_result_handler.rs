@@ -24,7 +24,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             }
 
             let send_result = vm.call_method(&py_object_ref, "send", (arg.clone(),));
-            let py_iter_return = rustpython_vm::protocol::PyIterReturn::from_pyresult(send_result, vm).unwrap_or_trap(vm, None);
+            let py_iter_return = rustpython_vm::protocol::PyIterReturn::from_pyresult(send_result, vm).unwrap_or_trap(vm);
 
             match py_iter_return {
                 rustpython_vm::protocol::PyIterReturn::Return(returned_py_object_ref) => {
@@ -34,8 +34,8 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
                         return async_result_handler(vm, py_object_ref, recursed_py_object_ref).await;
                     }
 
-                    let name: String = returned_py_object_ref.get_attr("name", vm).unwrap_or_trap(vm, None).try_from_vm_value(vm).unwrap();
-                    let args: Vec<rustpython_vm::PyObjectRef> = returned_py_object_ref.get_attr("args", vm).unwrap_or_trap(vm, None).try_into_value(vm).unwrap_or_trap(vm, None);
+                    let name: String = returned_py_object_ref.get_attr("name", vm).unwrap_or_trap(vm).try_from_vm_value(vm).unwrap();
+                    let args: Vec<rustpython_vm::PyObjectRef> = returned_py_object_ref.get_attr("args", vm).unwrap_or_trap(vm).try_into_value(vm).unwrap_or_trap(vm);
 
                     match &name[..] {
                         "call" => async_result_handler_call(vm, py_object_ref, &args).await,
@@ -173,13 +173,13 @@ from kybra import CallResult
 
 CallResult
                 "#
-            ).unwrap_or_trap(vm, None);
+            ).unwrap_or_trap(vm);
 
             match call_result {
                 Ok(ok) => {
                     let method_result = vm.invoke(&call_result_class, (ok.try_into_vm_value(vm).unwrap(), vm.ctx.none()));
 
-                    method_result.unwrap_or_trap(vm, None)
+                    method_result.unwrap_or_trap(vm)
 
                     // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
                     // let dict = vm.ctx.new_dict();
@@ -193,7 +193,7 @@ CallResult
 
                     let method_result = vm.invoke(&call_result_class, (vm.ctx.none(), err_string.try_into_vm_value(vm).unwrap()));
 
-                    method_result.unwrap_or_trap(vm, None)
+                    method_result.unwrap_or_trap(vm)
 
                     // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
                     // let dict = vm.ctx.new_dict();
