@@ -19,19 +19,25 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<ic_cdk::export::candid::Empty, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::candid::Empty, CdkActTryFromVmValueError> {
-                panic!("PyObjectRef cannot be converted into Empty");
+                Err(CdkActTryFromVmValueError("PyObjectRef cannot be converted into Empty".to_string()))
             }
         }
 
         impl CdkActTryFromVmValue<ic_cdk::export::candid::Func, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::candid::Func, CdkActTryFromVmValueError> {
                 let tuple_self: rustpython_vm::builtins::PyTupleRef = self.try_into_value(vm).unwrap_or_trap(vm);
-                let principal = tuple_self.get(0).unwrap();
-                let method = tuple_self.get(1).unwrap();
+                let principal = match tuple_self.get(0) {
+                    Some(principal) => principal,
+                    None => return Err(CdkActTryFromVmValueError("Could not convert value to Func. Missing Principal".to_string()))
+                };
+                let method = match tuple_self.get(1) {
+                    Some(method) => method,
+                    None => return Err(CdkActTryFromVmValueError("Could not convert value to Func. Missing method".to_string()))
+                };
 
                 Ok(ic_cdk::export::candid::Func {
-                    principal: principal.clone().try_from_vm_value(vm).unwrap(),
-                    method: method.clone().try_from_vm_value(vm).unwrap()
+                    principal: principal.clone().try_from_vm_value(vm)?,
+                    method: method.clone().try_from_vm_value(vm)?
                 })
             }
         }
@@ -41,7 +47,10 @@ pub fn generate() -> TokenStream {
                 let to_str = self.get_attr("to_str", vm).unwrap_or_trap(vm);
                 let result = vm.invoke(&to_str, ()).unwrap_or_trap(vm);
                 let result_string: String = result.try_into_value(vm).unwrap_or_trap(vm);
-                Ok(ic_cdk::export::Principal::from_text(result_string).unwrap())
+                match ic_cdk::export::Principal::from_text(result_string) {
+                    Ok(principal) => Ok(principal),
+                    Err(err) => Err(CdkActTryFromVmValueError(format!("Could not convert value to Principal: {}", err.to_string()))),
+                }
             }
         }
 
@@ -71,7 +80,7 @@ pub fn generate() -> TokenStream {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Result<(), String>, CdkActTryFromVmValueError> {
                 let err = self.get_item("Err", vm);
                 if let Ok(error_message) = err {
-                    return Ok(Err(error_message.try_from_vm_value(vm).unwrap()));
+                    return Ok(Err(error_message.try_from_vm_value(vm)?));
                 }
                 let ok = self.get_item("Ok", vm);
                 if let Ok(value) = ok {

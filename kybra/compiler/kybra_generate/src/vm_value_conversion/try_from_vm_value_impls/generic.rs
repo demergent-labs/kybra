@@ -7,7 +7,10 @@ pub fn generate() -> TokenStream {
             rustpython::vm::PyObjectRef: for<'a> CdkActTryFromVmValue<T, &'a rustpython::vm::VirtualMachine>
         {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<(T,), CdkActTryFromVmValueError> {
-                Ok((self.try_from_vm_value(vm).unwrap(),))
+                match self.try_from_vm_value(vm) {
+                    Ok(value) => Ok((value,)),
+                    Err(_) => Err(CdkActTryFromVmValueError("Could not convert value to tuple".to_string()))
+                }
             }
         }
 

@@ -99,7 +99,10 @@ pub fn generate() -> TokenStream {
                 let int_result: Result<rustpython_vm::builtins::PyIntRef, _> = self.try_into_value(vm);
 
                 match int_result {
-                    Ok(int) => Ok(ic_cdk::export::candid::Nat::from_str(&int.as_bigint().to_string()).unwrap()), // TODO probably not the best conversion
+                    Ok(int) => match ic_cdk::export::candid::Nat::from_str(&int.as_bigint().to_string()) { // TODO probably not the best conversion
+                        Ok(nat) => Ok(nat),
+                        Err(_) => Err(CdkActTryFromVmValueError("Could not convert value to nat".to_string()))
+                    },
                     Err(_) => Err(CdkActTryFromVmValueError("PyObjectRef is not a PyIntRef".to_string()))
                 }
             }
