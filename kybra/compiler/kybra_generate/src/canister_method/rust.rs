@@ -33,10 +33,10 @@ impl SourceMapped<&Located<StmtKind>> {
                 Ok(quote! {
                     let interpreter = INTERPRETER_OPTION
                         .as_mut()
-                        .unwrap_or_trap("Unable to mutate interpreter");
+                        .unwrap_or_trap("SystemError: missing python interpreter");
                     let scope = SCOPE_OPTION
                         .as_mut()
-                        .unwrap_or_trap("Unable to mutate scope");
+                        .unwrap_or_trap("SystemError: missing python scope");
 
                     interpreter.enter(|vm| {
                         let method_py_object_ref = scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm);
