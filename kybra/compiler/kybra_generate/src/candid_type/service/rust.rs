@@ -45,7 +45,7 @@ pub fn from_vm_value(name: String) -> TokenStream {
                 let principal = match ic_cdk::export::Principal::from_text(result_string) {
                     Ok(principal) => principal,
                     Err(err) => return Err(CdkActTryFromVmValueError(format!("TypeError: Could not convert value to Principal: {}", err.to_string()))),
-                }
+                };
 
                 Ok(#service_name::new(principal))
             }
