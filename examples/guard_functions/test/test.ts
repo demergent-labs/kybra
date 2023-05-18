@@ -31,7 +31,7 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'CdkActTryFromVmValueError(\\"Could not convert PyObjectRef to Result<(), String>\\")'
+                        'TypeError: Could not convert PyObjectRef to Result<(), String>'
                     )
                 };
             }
