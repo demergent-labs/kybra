@@ -22,7 +22,7 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::candid::Func {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                Ok(vm.ctx.new_tuple(vec![self.principal.try_into_vm_value(vm).unwrap(), self.method.try_into_vm_value(vm).unwrap()]).into())
+                Ok(vm.ctx.new_tuple(vec![self.principal.try_into_vm_value(vm).unwrap_or_trap(), self.method.try_into_vm_value(vm).unwrap_or_trap()]).into())
             }
         }
 
@@ -146,8 +146,8 @@ Principal
                         let dict = vm.ctx.new_dict();
 
                         let key_too_large_dict = vm.ctx.new_dict();
-                        key_too_large_dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
-                        key_too_large_dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+                        key_too_large_dict.set_item("given", given.try_into_vm_value(vm).unwrap_or_trap(), vm);
+                        key_too_large_dict.set_item("max", max.try_into_vm_value(vm).unwrap_or_trap(), vm);
 
                         dict.set_item("KeyTooLarge", key_too_large_dict.into(), vm);
 
@@ -157,8 +157,8 @@ Principal
                         let dict = vm.ctx.new_dict();
 
                         let value_too_large_dict = vm.ctx.new_dict();
-                        value_too_large_dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
-                        value_too_large_dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+                        value_too_large_dict.set_item("given", given.try_into_vm_value(vm).unwrap_or_trap(), vm);
+                        value_too_large_dict.set_item("max", max.try_into_vm_value(vm).unwrap_or_trap(), vm);
 
                         dict.set_item("ValueTooLarge", value_too_large_dict.into(), vm);
 

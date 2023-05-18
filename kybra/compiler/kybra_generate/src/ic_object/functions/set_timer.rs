@@ -10,13 +10,17 @@ pub fn generate() -> TokenStream {
             func_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine
         ) -> rustpython_vm::PyObjectRef {
-            let delay_as_u64: u64 = delay_py_object_ref.try_from_vm_value(vm).unwrap();
+            let delay_as_u64: u64 = delay_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
             let delay = core::time::Duration::new(delay_as_u64, 0);
 
             let closure = move || {
                 unsafe {
-                    let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
-                    let scope = SCOPE_OPTION.as_mut().unwrap();
+                    let interpreter = INTERPRETER_OPTION
+                        .as_mut()
+                        .unwrap_or_trap("Unable to mutate interpreter");
+                    let scope = SCOPE_OPTION
+                        .as_mut()
+                        .unwrap_or_trap("Unable to mutate scope");
 
                     let vm = &interpreter.vm;
 
@@ -37,7 +41,7 @@ pub fn generate() -> TokenStream {
                 }
             };
 
-            ic_cdk_timers::set_timer(delay, closure).try_into_vm_value(vm).unwrap()
+            ic_cdk_timers::set_timer(delay, closure).try_into_vm_value(vm).unwrap_or_trap()
         }
     }
 }

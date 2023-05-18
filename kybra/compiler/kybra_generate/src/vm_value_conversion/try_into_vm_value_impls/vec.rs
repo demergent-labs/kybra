@@ -101,7 +101,7 @@ pub fn generate() -> TokenStream {
         {
             let py_object_refs = generic_array
                 .into_iter()
-                .map(|item| item.try_into_vm_value(vm).unwrap())
+                .map(|item| item.try_into_vm_value(vm).unwrap_or_trap())
                 .collect::<Vec<rustpython_vm::PyObjectRef>>();
 
             Ok(vm.ctx.new_list(py_object_refs).into())

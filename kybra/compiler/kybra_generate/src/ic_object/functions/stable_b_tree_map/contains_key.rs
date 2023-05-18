@@ -14,7 +14,7 @@ pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStrea
             key_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine
         ) -> rustpython_vm::PyObjectRef {
-            let memory_id: u8 = memory_id_py_object_ref.try_from_vm_value(vm).unwrap();
+            let memory_id: u8 = memory_id_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
 
             match memory_id {
                 #(#match_arms)*
@@ -35,7 +35,7 @@ fn generate_match_arms(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> Vec
 
             quote! {
                 #memory_id => {
-                    #map_name_ident.with(|p| p.borrow().contains_key(&#key_wrapper_type_name(key_py_object_ref.try_from_vm_value(vm).unwrap()))).try_into_vm_value(vm).unwrap()
+                    #map_name_ident.with(|p| p.borrow().contains_key(&#key_wrapper_type_name(key_py_object_ref.try_from_vm_value(vm).unwrap_or_trap()))).try_into_vm_value(vm).unwrap_or_trap()
                 }
             }
         })

@@ -8,7 +8,7 @@ pub fn generate() -> TokenStream {
             &self,
             vm: &rustpython_vm::VirtualMachine
         ) -> rustpython_vm::PyObjectRef {
-            ic_cdk::api::caller().try_into_vm_value(vm).unwrap()
+            ic_cdk::api::caller().try_into_vm_value(vm).unwrap_or_trap()
         }
     }
 }

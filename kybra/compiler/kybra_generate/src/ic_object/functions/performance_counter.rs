@@ -9,9 +9,9 @@ pub fn generate() -> TokenStream {
             counter_type_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine
         ) -> rustpython_vm::PyObjectRef {
-            let counter_type: u32 = counter_type_py_object_ref.try_from_vm_value(vm).unwrap();
+            let counter_type: u32 = counter_type_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
 
-            ic_cdk::api::call::performance_counter(counter_type).try_into_vm_value(vm).unwrap()
+            ic_cdk::api::call::performance_counter(counter_type).try_into_vm_value(vm).unwrap_or_trap()
         }
     }
 }

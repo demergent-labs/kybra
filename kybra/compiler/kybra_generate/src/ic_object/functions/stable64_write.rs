@@ -10,8 +10,8 @@ pub fn generate() -> TokenStream {
             buf_vector_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine,
         ) {
-            let offset: u64 = offset_py_object_ref.try_from_vm_value(vm).unwrap();
-            let buf_vector: Vec<u8> = buf_vector_py_object_ref.try_from_vm_value(vm).unwrap();
+            let offset: u64 = offset_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
+            let buf_vector: Vec<u8> = buf_vector_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
             let buf: &[u8] = &buf_vector[..];
             ic_cdk::api::stable::stable64_write(offset, buf);
         }

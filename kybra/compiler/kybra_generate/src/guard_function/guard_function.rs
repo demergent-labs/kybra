@@ -20,7 +20,7 @@ pub fn generate(function_name: &String) -> TokenStream {
                     scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm);
                 let result_py_object_ref = vm.invoke(&method_py_object_ref, ());
                 match result_py_object_ref {
-                    Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap(),
+                    Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap_or_trap(),
                     Err(err) => {
                         let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
                         panic!("{}", err_string);

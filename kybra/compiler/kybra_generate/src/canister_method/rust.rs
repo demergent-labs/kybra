@@ -24,7 +24,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     .map(|param| {
                         let name = format_ident!("{}", param.get_prefixed_name());
                         quote! {
-                            #name.try_into_vm_value(vm).unwrap()
+                            #name.try_into_vm_value(vm).unwrap_or_trap()
                         }
                     })
                     .collect();
@@ -44,7 +44,7 @@ impl SourceMapped<&Located<StmtKind>> {
                         let result_py_object_ref = vm.invoke(&method_py_object_ref, #params);
 
                         match result_py_object_ref {
-                            Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap(),
+                            Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap_or_trap(),
                             Err(err) => {
                                 let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
 

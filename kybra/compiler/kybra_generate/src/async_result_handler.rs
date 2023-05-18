@@ -34,7 +34,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
                         return async_result_handler(vm, py_object_ref, recursed_py_object_ref).await;
                     }
 
-                    let name: String = returned_py_object_ref.get_attr("name", vm).unwrap_or_trap(vm).try_from_vm_value(vm).unwrap();
+                    let name: String = returned_py_object_ref.get_attr("name", vm).unwrap_or_trap(vm).try_from_vm_value(vm).unwrap_or_trap();
                     let args: Vec<rustpython_vm::PyObjectRef> = returned_py_object_ref.get_attr("args", vm).unwrap_or_trap(vm).try_into_value(vm).unwrap_or_trap(vm);
 
                     match &name[..] {
@@ -71,8 +71,8 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             py_object_ref: &rustpython_vm::PyObjectRef,
             args: &Vec<rustpython_vm::PyObjectRef>
         ) -> rustpython_vm::PyObjectRef {
-            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
-            let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
+            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap_or_trap();
+            let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap_or_trap();
 
             let cross_canister_call_function_name = format!("call_{}", qualname.replace(".", "_"));
 
@@ -89,8 +89,8 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             py_object_ref: &rustpython_vm::PyObjectRef,
             args: &Vec<rustpython_vm::PyObjectRef>
         ) -> rustpython_vm::PyObjectRef {
-            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
-            let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
+            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap_or_trap();
+            let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap_or_trap();
 
             let cross_canister_call_with_payment_function_name = format!("call_with_payment_{}", qualname.replace(".", "_"));
 
@@ -107,8 +107,8 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             py_object_ref: &rustpython_vm::PyObjectRef,
             args: &Vec<rustpython_vm::PyObjectRef>
         ) -> rustpython_vm::PyObjectRef {
-            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
-            let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap();
+            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap_or_trap();
+            let qualname: String = args[1].clone().try_from_vm_value(vm).unwrap_or_trap();
 
             let cross_canister_call_with_payment128_function_name = format!("call_with_payment128_{}", qualname.replace(".", "_"));
 
@@ -125,10 +125,10 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             py_object_ref: &rustpython_vm::PyObjectRef,
             args: &Vec<rustpython_vm::PyObjectRef>
         ) -> rustpython_vm::PyObjectRef {
-            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
-            let method_string: String = args[1].clone().try_from_vm_value(vm).unwrap();
-            let args_raw_vec: Vec<u8> = args[2].clone().try_from_vm_value(vm).unwrap();
-            let payment: u64 = args[3].clone().try_from_vm_value(vm).unwrap();
+            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap_or_trap();
+            let method_string: String = args[1].clone().try_from_vm_value(vm).unwrap_or_trap();
+            let args_raw_vec: Vec<u8> = args[2].clone().try_from_vm_value(vm).unwrap_or_trap();
+            let payment: u64 = args[3].clone().try_from_vm_value(vm).unwrap_or_trap();
 
             let call_raw_result = ic_cdk::api::call::call_raw(
                 canister_id_principal,
@@ -145,10 +145,10 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             py_object_ref: &rustpython_vm::PyObjectRef,
             args: &Vec<rustpython_vm::PyObjectRef>
         ) -> rustpython_vm::PyObjectRef {
-            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
-            let method_string: String = args[1].clone().try_from_vm_value(vm).unwrap();
-            let args_raw_vec: Vec<u8> = args[2].clone().try_from_vm_value(vm).unwrap();
-            let payment: u128 = args[3].clone().try_from_vm_value(vm).unwrap();
+            let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap_or_trap();
+            let method_string: String = args[1].clone().try_from_vm_value(vm).unwrap_or_trap();
+            let args_raw_vec: Vec<u8> = args[2].clone().try_from_vm_value(vm).unwrap_or_trap();
+            let payment: u128 = args[3].clone().try_from_vm_value(vm).unwrap_or_trap();
 
             let call_raw_result = ic_cdk::api::call::call_raw128(
                 canister_id_principal,
@@ -177,28 +177,28 @@ CallResult
 
             match call_result {
                 Ok(ok) => {
-                    let method_result = vm.invoke(&call_result_class, (ok.try_into_vm_value(vm).unwrap(), vm.ctx.none()));
+                    let method_result = vm.invoke(&call_result_class, (ok.try_into_vm_value(vm).unwrap_or_trap(), vm.ctx.none()));
 
                     method_result.unwrap_or_trap(vm)
 
                     // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
                     // let dict = vm.ctx.new_dict();
 
-                    // dict.set_item("Ok", ok.try_into_vm_value(vm).unwrap(), vm);
+                    // dict.set_item("Ok", ok.try_into_vm_value(vm).unwrap_or_trap(), vm);
 
                     // dict
                 },
                 Err(err) => {
                     let err_string = format!("Rejection code {rejection_code}, {error_message}", rejection_code = (err.0 as i32).to_string(), error_message = err.1);
 
-                    let method_result = vm.invoke(&call_result_class, (vm.ctx.none(), err_string.try_into_vm_value(vm).unwrap()));
+                    let method_result = vm.invoke(&call_result_class, (vm.ctx.none(), err_string.try_into_vm_value(vm).unwrap_or_trap()));
 
                     method_result.unwrap_or_trap(vm)
 
                     // TODO Consider using dict once we are on Python 3.11: https://github.com/python/cpython/issues/89026
                     // let dict = vm.ctx.new_dict();
 
-                    // dict.set_item("Err", err_string.try_into_vm_value(vm).unwrap(), vm);
+                    // dict.set_item("Err", err_string.try_into_vm_value(vm).unwrap_or_trap(), vm);
 
                     // dict
                 }
@@ -235,7 +235,7 @@ fn generate_call_match_arms(services: &Vec<Service>) -> Vec<TokenStream> {
                     let actual_index = index + 2;
 
                     quote! {
-                        let #variable_name: #variable_type = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
+                        let #variable_name: #variable_type = args[#actual_index].clone().try_from_vm_value(vm).unwrap_or_trap();
                     }
                 }).collect();
 
@@ -247,7 +247,7 @@ fn generate_call_match_arms(services: &Vec<Service>) -> Vec<TokenStream> {
 
                 quote! {
                     #cross_canister_function_call_name => {
-                        let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
+                        let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap_or_trap();
 
                         #(#param_variable_definitions)*
 
@@ -292,7 +292,7 @@ fn generate_call_with_payment_match_arms(services: &Vec<Service>) -> Vec<TokenSt
                     let actual_index = index + 2;
 
                     quote! {
-                        let #variable_name: #variable_type = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
+                        let #variable_name: #variable_type = args[#actual_index].clone().try_from_vm_value(vm).unwrap_or_trap();
                     }
                 }).collect();
 
@@ -303,11 +303,11 @@ fn generate_call_with_payment_match_arms(services: &Vec<Service>) -> Vec<TokenSt
                 let params = tuple::generate_tuple(&param_names);
 
                 let payment_index = method.params.len() + 2;
-                let payment_variable_definition = quote!(let payment: u64 = args[#payment_index].clone().try_from_vm_value(vm).unwrap(););
+                let payment_variable_definition = quote!(let payment: u64 = args[#payment_index].clone().try_from_vm_value(vm).unwrap_or_trap(););
 
                 quote! {
                     #cross_canister_function_call_with_payment_name => {
-                        let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
+                        let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap_or_trap();
 
                         #(#param_variable_definitions)*
                         #payment_variable_definition
@@ -353,7 +353,7 @@ fn generate_call_with_payment128_match_arms(services: &Vec<Service>) -> Vec<Toke
                     let actual_index = index + 2;
 
                     quote! {
-                        let #variable_name: #variable_type = args[#actual_index].clone().try_from_vm_value(vm).unwrap();
+                        let #variable_name: #variable_type = args[#actual_index].clone().try_from_vm_value(vm).unwrap_or_trap();
                     }
                 }).collect();
 
@@ -364,11 +364,11 @@ fn generate_call_with_payment128_match_arms(services: &Vec<Service>) -> Vec<Toke
                 let params = tuple::generate_tuple(&param_names);
 
                 let payment_index = method.params.len() + 2;
-                let payment_variable_definition = quote!(let payment: u128 = args[#payment_index].clone().try_from_vm_value(vm).unwrap(););
+                let payment_variable_definition = quote!(let payment: u128 = args[#payment_index].clone().try_from_vm_value(vm).unwrap_or_trap(););
 
                 quote! {
                     #cross_canister_function_call_with_payment128_name => {
-                        let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap();
+                        let canister_id_principal: ic_cdk::export::Principal = args[0].clone().try_from_vm_value(vm).unwrap_or_trap();
 
                         #(#param_variable_definitions)*
                         #payment_variable_definition

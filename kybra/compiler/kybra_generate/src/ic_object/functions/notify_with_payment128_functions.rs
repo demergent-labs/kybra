@@ -30,11 +30,11 @@ pub fn generate(services: &Vec<Service>) -> Vec<TokenStream> {
                     args_py_object_refs: Vec<rustpython_vm::PyObjectRef>,
                     vm: &rustpython_vm::VirtualMachine
                 ) -> rustpython_vm::PyObjectRef {
-                    let canister_id_principal: ic_cdk::export::Principal = args_py_object_refs[0].clone().try_from_vm_value(vm).unwrap();
+                    let canister_id_principal: ic_cdk::export::Principal = args_py_object_refs[0].clone().try_from_vm_value(vm).unwrap_or_trap();
 
                     #(#param_variable_definitions)*
 
-                    let cycles: u128 = args_py_object_refs[args_py_object_refs.len() - 1].clone().try_from_vm_value(vm).unwrap();
+                    let cycles: u128 = args_py_object_refs[args_py_object_refs.len() - 1].clone().try_from_vm_value(vm).unwrap_or_trap();
 
                     let notify_result = #real_function_name(
                         canister_id_principal,
@@ -42,7 +42,7 @@ pub fn generate(services: &Vec<Service>) -> Vec<TokenStream> {
                         cycles
                     );
 
-                    notify_result.try_into_vm_value(vm).unwrap()
+                    notify_result.try_into_vm_value(vm).unwrap_or_trap()
                 }
             }
         }).collect()
@@ -60,7 +60,7 @@ fn generate_param_variables(method: &Method, canister_name: &String) -> Vec<Toke
         let actual_index = index + 2;
 
         quote! {
-            let #variable_name: #variable_type = args_py_object_refs[#actual_index].clone().try_from_vm_value(vm).unwrap();
+            let #variable_name: #variable_type = args_py_object_refs[#actual_index].clone().try_from_vm_value(vm).unwrap_or_trap();
         }
     }).collect()
 }

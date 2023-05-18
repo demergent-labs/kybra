@@ -10,12 +10,12 @@ pub fn generate() -> TokenStream {
             length_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine
         ) -> rustpython_vm::PyObjectRef {
-            let offset: u32 = offset_py_object_ref.try_from_vm_value(vm).unwrap();
-            let length: u32 = length_py_object_ref.try_from_vm_value(vm).unwrap();
+            let offset: u32 = offset_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
+            let length: u32 = length_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
 
             let mut buf: Vec<u8> = vec![0; length as usize];
             ic_cdk::api::stable::stable_read(offset, &mut buf);
-            buf.try_into_vm_value(vm).unwrap()
+            buf.try_into_vm_value(vm).unwrap_or_trap()
         }
     }
 }
