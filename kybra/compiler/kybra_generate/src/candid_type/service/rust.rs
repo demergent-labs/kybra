@@ -9,7 +9,7 @@ pub fn to_vm_value(name: String) -> TokenStream {
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for #service_name {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
                 unsafe {
-                    let scope = SCOPE_OPTION.clone().unwrap();
+                    let scope = SCOPE_OPTION.clone().unwrap_or_trap("No scope available");
                     Ok(vm.run_block_expr(
                         scope, format!(
 r#"
@@ -42,8 +42,12 @@ pub fn from_vm_value(name: String) -> TokenStream {
                 let to_str = canister_id.get_attr("to_str", vm).unwrap_or_trap(vm);
                 let result = vm.invoke(&to_str, ()).unwrap_or_trap(vm);
                 let result_string: String = result.try_into_value(vm).unwrap_or_trap(vm);
+                let principal = match ic_cdk::export::Principal::from_text(result_string) {
+                    Ok(principal) => principal,
+                    Err(err) => return Err(CdkActTryFromVmValueError(format!("TypeError: Could not convert value to Principal: {}", err.to_string()))),
+                }
 
-                Ok(#service_name::new(ic_cdk::export::Principal::from_str(&result_string).unwrap()))
+                Ok(#service_name::new(principal))
             }
         }
     }

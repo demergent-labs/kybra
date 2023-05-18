@@ -12,8 +12,12 @@ pub fn generate(
     Ok(quote! {
         unsafe {
             ic_cdk::spawn(async {
-                let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
-                let scope = SCOPE_OPTION.as_mut().unwrap();
+                let interpreter = INTERPRETER_OPTION
+                    .as_mut()
+                    .unwrap_or_trap("Unable to mutate interpreter");
+                let scope = SCOPE_OPTION
+                    .as_mut()
+                    .unwrap_or_trap("Unable to mutate scope");
 
                 let vm = &interpreter.vm;
 

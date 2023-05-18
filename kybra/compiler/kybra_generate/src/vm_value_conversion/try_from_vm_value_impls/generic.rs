@@ -9,7 +9,7 @@ pub fn generate() -> TokenStream {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<(T,), CdkActTryFromVmValueError> {
                 match self.try_from_vm_value(vm) {
                     Ok(value) => Ok((value,)),
-                    Err(_) => Err(CdkActTryFromVmValueError("Could not convert value to tuple".to_string()))
+                    Err(_) => Err(CdkActTryFromVmValueError("TypeError: Could not convert value to tuple".to_string()))
                 }
             }
         }

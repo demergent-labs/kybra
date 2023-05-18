@@ -67,7 +67,7 @@ fn generate_return_expression(
     }
 
     Ok(quote! {
-        final_return_value.try_from_vm_value(vm).unwrap()
+        final_return_value.try_from_vm_value(vm).unwrap_or_trap()
     })
 }
 

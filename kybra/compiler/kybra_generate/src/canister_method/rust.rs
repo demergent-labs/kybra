@@ -31,8 +31,12 @@ impl SourceMapped<&Located<StmtKind>> {
                 let params = tuple::generate_tuple(&param_conversions);
 
                 Ok(quote! {
-                    let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
-                    let scope = SCOPE_OPTION.as_mut().unwrap();
+                    let interpreter = INTERPRETER_OPTION
+                        .as_mut()
+                        .unwrap_or_trap("Unable to mutate interpreter");
+                    let scope = SCOPE_OPTION
+                        .as_mut()
+                        .unwrap_or_trap("Unable to mutate scope");
 
                     interpreter.enter(|vm| {
                         let method_py_object_ref = scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm);
