@@ -13,6 +13,7 @@ pub fn generate() -> TokenStream {
                 candid_encoded_py_object_ref
                     .try_from_vm_value(vm)
                     .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+
             let candid_args = candid::IDLArgs::from_bytes(&candid_encoded)
                 // TODO: We need to create a new CandidError exception class
                 // (and likely subclasses) so that the python code can "except" them
