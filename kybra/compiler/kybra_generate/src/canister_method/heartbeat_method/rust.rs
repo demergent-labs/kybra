@@ -23,16 +23,9 @@ pub fn generate(
 
                 let method_py_object_ref = scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm);
 
-                let result_py_object_ref = vm.invoke(&method_py_object_ref, ());
+                let py_object_ref = vm.invoke(&method_py_object_ref, ()).unwrap_or_trap(vm);
 
-                match result_py_object_ref {
-                    Ok(py_object_ref) => async_result_handler(vm, &py_object_ref, vm.ctx.none()).await,
-                    Err(err) => {
-                        let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                        panic!("{}", err_string);
-                    }
-                };
+                async_result_handler(vm, &py_object_ref, vm.ctx.none()).await
             });
         }
     })
