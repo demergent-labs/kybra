@@ -16,7 +16,7 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::candid::Empty {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                panic!("Empty cannot be converted into PyObjectRef");
+                Err(CdkActTryIntoVmValueError("type \"empty\" cannot be represented in python".to_string()))
             }
         }
 
