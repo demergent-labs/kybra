@@ -41,7 +41,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     interpreter.enter(|vm| {
                         let method_py_object_ref = scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm);
 
-                        let result_py_object_ref = vm.invoke(&method_py_object_ref, #params);
+                        let result_py_object_ref = method_py_object_ref.call(#params, vm);
 
                         match result_py_object_ref {
                             Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap_or_trap(),

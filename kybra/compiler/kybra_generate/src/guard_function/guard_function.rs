@@ -18,7 +18,7 @@ pub fn generate(function_name: &String) -> TokenStream {
             interpreter.enter(|vm| {
                 let method_py_object_ref =
                     scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm);
-                let py_object_ref = vm.invoke(&method_py_object_ref, ()).unwrap_or_trap(vm);
+                let py_object_ref = method_py_object_ref.call((), vm).unwrap_or_trap(vm);
 
                 py_object_ref.try_from_vm_value(vm).unwrap_or_trap()
             })

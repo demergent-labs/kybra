@@ -40,7 +40,7 @@ pub fn from_vm_value(name: String) -> TokenStream {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<#service_name, CdkActTryFromVmValueError> {
                 let canister_id = self.get_attr("canister_id", vm).unwrap_or_trap(vm);
                 let to_str = canister_id.get_attr("to_str", vm).unwrap_or_trap(vm);
-                let result = vm.invoke(&to_str, ()).unwrap_or_trap(vm);
+                let result = to_str.call((), vm).unwrap_or_trap(vm);
                 let result_string: String = result.try_into_value(vm).unwrap_or_trap(vm);
                 let principal = match ic_cdk::export::Principal::from_text(result_string) {
                     Ok(principal) => principal,

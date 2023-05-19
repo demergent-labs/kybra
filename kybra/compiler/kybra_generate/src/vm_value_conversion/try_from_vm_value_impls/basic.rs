@@ -45,7 +45,7 @@ pub fn generate() -> TokenStream {
         impl CdkActTryFromVmValue<ic_cdk::export::Principal, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::Principal, CdkActTryFromVmValueError> {
                 let to_str = self.get_attr("to_str", vm).unwrap_or_trap(vm);
-                let result = vm.invoke(&to_str, ()).unwrap_or_trap(vm);
+                let result = to_str.call((), vm).unwrap_or_trap(vm);
                 let result_string: String = result.try_into_value(vm).unwrap_or_trap(vm);
                 match ic_cdk::export::Principal::from_text(result_string) {
                     Ok(principal) => Ok(principal),

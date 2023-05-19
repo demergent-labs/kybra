@@ -177,7 +177,7 @@ CallResult
 
             match call_result {
                 Ok(ok) => {
-                    let method_result = vm.invoke(&call_result_class, (ok.try_into_vm_value(vm).unwrap_or_trap(), vm.ctx.none()));
+                    let method_result = call_result_class.call((ok.try_into_vm_value(vm).unwrap_or_trap(), vm.ctx.none()), vm);
 
                     method_result.unwrap_or_trap(vm)
 
@@ -191,7 +191,7 @@ CallResult
                 Err(err) => {
                     let err_string = format!("Rejection code {rejection_code}, {error_message}", rejection_code = (err.0 as i32).to_string(), error_message = err.1);
 
-                    let method_result = vm.invoke(&call_result_class, (vm.ctx.none(), err_string.try_into_vm_value(vm).unwrap_or_trap()));
+                    let method_result = call_result_class.call((vm.ctx.none(), err_string.try_into_vm_value(vm).unwrap_or_trap()), vm);
 
                     method_result.unwrap_or_trap(vm)
 

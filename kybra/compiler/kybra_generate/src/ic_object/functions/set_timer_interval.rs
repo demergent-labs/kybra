@@ -24,7 +24,7 @@ pub fn generate() -> TokenStream {
 
                     let vm = &interpreter.vm;
 
-                    let result_py_object_ref = vm.invoke(&func_py_object_ref, ());
+                    let result_py_object_ref = func_py_object_ref.call((), vm);
 
                     match result_py_object_ref {
                         Ok(py_object_ref) => {
