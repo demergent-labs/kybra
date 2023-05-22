@@ -33,11 +33,7 @@ pub fn generate() -> TokenStream {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
                 let principal_class = vm.run_block_expr(
                     vm.new_scope_with_builtins(),
-                    r#"
-from kybra import Principal
-
-Principal
-                    "#
+                    "from kybra import Principal; Principal"
                 ).map_err(|err| err.to_cdk_act_try_into_vm_value_error(vm))?;
 
                 let from_str = principal_class.get_attr("from_str", vm).map_err(|err| err.to_cdk_act_try_into_vm_value_error(vm))?;
