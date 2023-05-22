@@ -27,6 +27,9 @@ pub fn generate() -> TokenStream {
         }
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::Principal {
+            // TODO: In the future CdkActTryIntoVmValue needs to return rustpython_vm::object::PyResult
+            // When it does all these map_err calls will be unnecessary and should be replaced with
+            // question mark syntax.
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
                 let principal_class = vm.run_block_expr(
                     vm.new_scope_with_builtins(),
@@ -35,10 +38,10 @@ from kybra import Principal
 
 Principal
                     "#
-                ).unwrap_or_trap(vm);
+                ).map_err(|err| err.to_cdk_act_try_into_vm_value_error(vm))?;
 
-                let from_str = principal_class.get_attr("from_str", vm).unwrap_or_trap(vm);
-                let principal_instance = from_str.call((self.to_text(),), vm).unwrap_or_trap(vm);
+                let from_str = principal_class.get_attr("from_str", vm).map_err(|err| err.to_cdk_act_try_into_vm_value_error(vm))?;
+                let principal_instance = from_str.call((self.to_text(),), vm).map_err(|err| err.to_cdk_act_try_into_vm_value_error(vm))?;
 
                 Ok(principal_instance)
             }
