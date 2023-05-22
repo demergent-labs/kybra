@@ -48,15 +48,12 @@ pub fn generate() -> TokenStream {
                 match self {
                     Ok(ok) => return ok,
                     Err(err) => {
-                        let type_name = err.clone().to_pyobject(vm).class().name().to_string();
-                        let err_message = match &err.to_pyobject(vm).str(vm) {
-                            Ok(string) => string.to_string(),
+                        let py_object = err.to_pyobject(vm);
+                        let type_name = py_object.class().name().to_string();
+                        let err_message = match py_object.str(vm) {
+                            Ok(str) => str,
                             Err(_) => ic_cdk::trap(
-                                format!(
-                                    "Attribute Error: '{}' object has no attribute '__str__'",
-                                    type_name
-                                )
-                                .as_str(),
+                                format!("Attribute Error: '{type_name}' object has no attribute '__str__'").as_str()
                             ),
                         };
                         ic_cdk::trap(format!("{type_name}: {err_message}").as_str())
