@@ -12,18 +12,18 @@ pub fn generate() -> TokenStream {
         ) -> rustpython_vm::PyResult {
             let offset: u32 = offset_py_object_ref
                 .try_from_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
 
             let length: u32 = length_py_object_ref
                 .try_from_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
 
             let mut buf: Vec<u8> = vec![0; length as usize];
 
             ic_cdk::api::stable::stable_read(offset, &mut buf);
 
             buf.try_into_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
         }
     }
 }

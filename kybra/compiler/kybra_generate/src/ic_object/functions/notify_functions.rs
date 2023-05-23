@@ -43,7 +43,7 @@ pub fn generate(services: &Vec<Service>) -> Vec<TokenStream> {
                             let canister_id_principal: ic_cdk::export::Principal = args_py_object_refs[0]
                                 .clone()
                                 .try_from_vm_value(vm)
-                                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+                                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
 
                             #(#param_variable_definitions)*
 
@@ -54,7 +54,7 @@ pub fn generate(services: &Vec<Service>) -> Vec<TokenStream> {
 
                             notify_result
                                 .try_into_vm_value(vm)
-                                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))
+                                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
                         }
                     }
                 })
@@ -83,7 +83,7 @@ fn generate_param_variables(method: &Method, canister_name: &String) -> Vec<Toke
                 let #variable_name: #variable_type = args_py_object_refs[#actual_index]
                     .clone()
                     .try_from_vm_value(vm)
-                    .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+                    .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
             }
         })
         .collect()

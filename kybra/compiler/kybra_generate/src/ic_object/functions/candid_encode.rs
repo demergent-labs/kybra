@@ -11,7 +11,7 @@ pub fn generate() -> TokenStream {
         ) -> rustpython_vm::PyResult {
             let candid_string: String = candid_string_py_object_ref
                 .try_from_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
 
             let candid_args: candid::IDLArgs = candid_string
                 .parse::<candid::IDLArgs>()
@@ -23,7 +23,7 @@ pub fn generate() -> TokenStream {
 
             candid_encoded
                 .try_into_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
         }
     }
 }

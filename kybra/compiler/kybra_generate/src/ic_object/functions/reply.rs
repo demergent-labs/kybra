@@ -25,7 +25,7 @@ pub fn generate(
         ) -> rustpython_vm::PyResult {
             let first_called_function_name: String = first_called_function_name_py_object_ref
                 .try_from_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
 
             match &first_called_function_name[..] {
                 #(#match_arms)*
@@ -67,10 +67,10 @@ fn generate_update_match_arm(update_method: &UpdateMethod) -> TokenStream {
         #name => {
             let reply_value: #return_type = reply_value_py_object_ref
                 .try_from_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
             ic_cdk::api::call::reply((reply_value,))
                 .try_into_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
         }
     )
 }
@@ -88,10 +88,10 @@ fn generate_query_match_arm(query_method: &QueryMethod) -> TokenStream {
         #name => {
             let reply_value: #return_type = reply_value_py_object_ref
                 .try_from_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
             ic_cdk::api::call::reply((reply_value,))
                 .try_into_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
         }
     )
 }

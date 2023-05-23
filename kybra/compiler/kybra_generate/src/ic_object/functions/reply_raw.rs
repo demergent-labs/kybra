@@ -11,11 +11,11 @@ pub fn generate() -> TokenStream {
         ) -> rustpython_vm::PyResult {
             let buf_vector: Vec<u8> = buf_vector_py_object_ref
                 .try_from_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
 
             ic_cdk::api::call::reply_raw(&buf_vector)
                 .try_into_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
         }
     }
 }

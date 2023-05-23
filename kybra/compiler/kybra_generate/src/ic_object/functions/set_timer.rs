@@ -12,7 +12,7 @@ pub fn generate() -> TokenStream {
         ) -> rustpython_vm::PyResult {
             let delay_as_u64: u64 = delay_py_object_ref
                 .try_from_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
 
             let delay = core::time::Duration::new(delay_as_u64, 0);
 
@@ -35,7 +35,7 @@ pub fn generate() -> TokenStream {
 
             ic_cdk_timers::set_timer(delay, closure)
                 .try_into_vm_value(vm)
-                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
         }
     }
 }
