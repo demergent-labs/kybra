@@ -8,14 +8,22 @@ pub fn generate() -> TokenStream {
             &self,
             offset_py_object_ref: rustpython_vm::PyObjectRef,
             length_py_object_ref: rustpython_vm::PyObjectRef,
-            vm: &rustpython_vm::VirtualMachine
-        ) -> rustpython_vm::PyObjectRef {
-            let offset: u32 = offset_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
-            let length: u32 = length_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
+            vm: &rustpython_vm::VirtualMachine,
+        ) -> rustpython_vm::PyResult {
+            let offset: u32 = offset_py_object_ref
+                .try_from_vm_value(vm)
+                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
+
+            let length: u32 = length_py_object_ref
+                .try_from_vm_value(vm)
+                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))?;
 
             let mut buf: Vec<u8> = vec![0; length as usize];
+
             ic_cdk::api::stable::stable_read(offset, &mut buf);
-            buf.try_into_vm_value(vm).unwrap_or_trap()
+
+            buf.try_into_vm_value(vm)
+                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))
         }
     }
 }

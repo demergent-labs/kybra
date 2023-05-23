@@ -6,8 +6,8 @@ pub fn generate() -> TokenStream {
         #[pymethod]
         fn id(&self, vm: &rustpython_vm::VirtualMachine) -> rustpython_vm::PyResult {
             ic_cdk::api::id()
-            .try_into_vm_value(vm)
-            .map_err(|try_from_err| vm.new_type_error(try_from_err.0))
+                .try_into_vm_value(vm)
+                .map_err(|try_from_err| vm.new_type_error(try_from_err.0))
         }
     }
 }
