@@ -29,7 +29,11 @@ pub fn generate(
 
             match &first_called_function_name[..] {
                 #(#match_arms)*
-                _ => panic!("This cannot happen")
+                // TODO: Consider creating a custom error
+                _ => Err(vm.new_system_error(format!(
+                    "attempted to reply from \"{}\", but it does not appear to be a canister method",
+                    first_called_function_name
+                )))
             }
         }
     }
