@@ -4,7 +4,13 @@ pub fn generate() -> TokenStream {
     quote::quote! {
         impl CdkActTryFromVmValue<(), &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<(), CdkActTryFromVmValueError> {
-                Ok(())
+                if self.is(&vm.ctx.none()) {
+                    Ok(())
+                } else {
+                    let type_name = self.to_pyobject(vm).class().name().to_string();
+
+                    Err(CdkActTryFromVmValueError(format!("TypeError: Expected NoneType but received {type_name}")))
+                }
             }
         }
 
