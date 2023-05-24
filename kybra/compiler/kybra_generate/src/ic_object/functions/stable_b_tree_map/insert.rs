@@ -21,7 +21,12 @@ pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStrea
 
             match memory_id {
                 #(#match_arms),*
-                _ => panic!("memory_id {} does not have an associated StableBTreeMap", memory_id)
+                // TODO: Consider creating a custom error or using
+                // IndexError, KeyError, or ValueError
+                _ => Err(vm.new_lookup_error(format!(
+                    "memory_id {} does not have an associated StableBTreeMap",
+                    memory_id
+                )))
             }
         }
     }
