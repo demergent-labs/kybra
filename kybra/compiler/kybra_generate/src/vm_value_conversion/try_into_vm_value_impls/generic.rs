@@ -26,7 +26,7 @@ pub fn generate() -> TokenStream {
         {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
                 match self {
-                    Some(value) => Ok(value.try_into_vm_value(vm).unwrap_or_trap()),
+                    Some(value) => value.try_into_vm_value(vm),
                     None => Ok(().to_pyobject(vm))
                 }
             }

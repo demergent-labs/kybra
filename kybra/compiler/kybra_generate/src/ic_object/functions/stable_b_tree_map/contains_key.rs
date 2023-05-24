@@ -36,7 +36,8 @@ fn generate_match_arms(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> Vec
         .iter()
         .map(|stable_b_tree_map_node| {
             let memory_id = stable_b_tree_map_node.memory_id;
-            let map_name_ident = rust::ref_cell_ident::generate(stable_b_tree_map_node.memory_id);
+            let stable_b_tree_map_ref_cell =
+                rust::ref_cell_ident::generate(stable_b_tree_map_node.memory_id);
 
             let (key_wrapper_type_name, _) =
                 rust::wrapper_type::generate(&stable_b_tree_map_node.key_type, memory_id, "Key");
@@ -49,7 +50,7 @@ fn generate_match_arms(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> Vec
                             .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?,
                     );
 
-                    #map_name_ident
+                    #stable_b_tree_map_ref_cell
                         .with(|map_ref_cell| map_ref_cell.borrow().contains_key(&key))
                         .try_into_vm_value(vm)
                         .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
