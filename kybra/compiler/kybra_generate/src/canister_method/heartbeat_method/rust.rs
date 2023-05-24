@@ -25,7 +25,7 @@ pub fn generate(
 
                 let py_object_ref = method_py_object_ref.call((), vm).unwrap_or_trap(vm);
 
-                async_result_handler(vm, &py_object_ref, vm.ctx.none()).await
+                async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
             });
         }
     })
