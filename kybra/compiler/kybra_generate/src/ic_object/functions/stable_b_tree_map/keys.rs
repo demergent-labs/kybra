@@ -45,17 +45,14 @@ fn generate_match_arms(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> Vec
                             let (keys, type_errors) = map_ref_cell
                                 .borrow()
                                 .iter()
-                                .map(|(key_wrapper_type, _)| -> Result<
-                                    rustpython_vm::PyObjectRef,
-                                    rustpython_vm::builtins::PyBaseExceptionRef
-                                > {
+                                .map(|(key_wrapper_type, _)| {
                                     key_wrapper_type.0
                                         .try_into_vm_value(vm)
                                         .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
                                 })
                                 .fold((vec![], vec![]), |mut acc, result| {
                                     match result {
-                                        Ok(key_value_pair) => acc.0.push(key_value_pair),
+                                        Ok(key) => acc.0.push(key),
                                         Err(type_error) => acc.1.push(type_error),
                                     }
                                     acc
