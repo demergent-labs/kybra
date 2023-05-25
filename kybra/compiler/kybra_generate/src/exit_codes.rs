@@ -1,0 +1,5 @@
+pub const USAGE_ERROR: i32 = 1;
+pub const PY_FILE_NAMES_READ_ERROR: i32 = 2;
+pub const CANISTER_COMPILATION_ERROR: i32 = 3;
+pub const LIB_FILE_CREATE_ERROR: i32 = 4;
+pub const LIB_FILE_WRITE_ERROR: i32 = 5;
