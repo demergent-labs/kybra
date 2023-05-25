@@ -39,18 +39,11 @@ impl SourceMapped<&Located<StmtKind>> {
                         .unwrap_or_trap("SystemError: missing python scope");
 
                     interpreter.enter(|vm| {
-                        let method_py_object_ref = scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm);
-
-                        let result_py_object_ref = method_py_object_ref.call(#params, vm);
-
-                        match result_py_object_ref {
-                            Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap_or_trap(),
-                            Err(err) => {
-                                let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                                panic!("{}", err_string);
-                            }
-                        }
+                        scope
+                            .globals
+                            .get_item(#function_name, vm).unwrap_or_trap(vm)
+                            .call(#params, vm).unwrap_or_trap(vm)
+                            .try_from_vm_value(vm).unwrap_or_trap()
                     });
                 })
             }
