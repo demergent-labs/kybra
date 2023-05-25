@@ -18,14 +18,20 @@ pub fn generate() -> proc_macro2::TokenStream {
                 subtype: &str,
                 message: String,
             ) -> rustpython_vm::builtins::PyBaseExceptionRef {
-                let kybra_error_class = vm
+                let kybra_error_class = match vm
                     .run_block_expr(
                         vm.new_scope_with_builtins(),
                         format!("from kybra import {subtype}; {subtype}").as_str(),
-                    )
-                    .unwrap();
+                    ) {
+                        Ok(kybra_error_class) => kybra_error_class,
+                        Err(py_base_exception) => return py_base_exception
+                    };
                 let py_type_ref =
-                    rustpython_vm::builtins::PyTypeRef::try_from_object(vm, kybra_error_class).unwrap();
+                    match rustpython_vm::builtins::PyTypeRef::try_from_object(vm, kybra_error_class)
+                    {
+                        Ok(py_type_ref) => py_type_ref,
+                        Err(py_base_exception) => return py_base_exception
+                    };
 
                 vm.new_exception_msg(py_type_ref, message)
             }
