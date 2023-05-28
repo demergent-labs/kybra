@@ -69,7 +69,10 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
                         "call_raw128" => {
                             async_result_handler_call_raw128(vm, py_object_ref, &args).await
                         }
-                        _ => panic!("async operation not supported"),
+                        // TODO: Consider making a custom exception type for this.
+                        _ => return Err(vm.new_system_error(
+                            format!("async operation '{}' not supported", name)
+                        )),
                     }
                 }
                 rustpython_vm::protocol::PyIterReturn::StopIteration(
@@ -117,7 +120,14 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
 
             let call_result_instance = match &cross_canister_call_function_name[..] {
                 #(#call_match_arms),*
-                _ => panic!("cross canister function does not exist")
+                // TODO: Consider making a custom exception type for this.
+                _ => return Err(vm.new_attribute_error(
+                    format!(
+                        "canister '{}' has no attribute '{}'",
+                        canister_id_principal,
+                        qual_name
+                    )
+                ))
             };
 
             async_result_handler(vm, py_object_ref, call_result_instance).await
@@ -142,7 +152,14 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
 
             let call_result_instance = match &cross_canister_call_with_payment_function_name[..] {
                 #(#call_with_payment_match_arms),*
-                _ => panic!("cross canister function does not exist")
+                // TODO: Consider making a custom exception type for this.
+                _ => return Err(vm.new_attribute_error(
+                    format!(
+                        "canister '{}' has no attribute '{}'",
+                        canister_id_principal,
+                        qual_name
+                    )
+                ))
             };
 
             async_result_handler(vm, py_object_ref, call_result_instance).await
@@ -168,7 +185,14 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             let call_result_instance =
                 match &cross_canister_call_with_payment128_function_name[..] {
                     #(#call_with_payment128_match_arms),*
-                    _ => panic!("cross canister function does not exist")
+                    // TODO: Consider making a custom exception type for this.
+                    _ => return Err(vm.new_attribute_error(
+                        format!(
+                            "canister '{}' has no attribute '{}'",
+                            canister_id_principal,
+                            qual_name
+                        )
+                    ))
                 };
 
             async_result_handler(vm, py_object_ref, call_result_instance).await
