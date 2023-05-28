@@ -47,7 +47,9 @@ pub fn generate_body(
                 .get_item(#name, vm).unwrap_or_trap(vm)
                 .call(#params, vm).unwrap_or_trap(vm);
 
-            let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
+            let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none())
+                .await
+                .unwrap_or_trap(vm);
 
             #return_expression
         }
