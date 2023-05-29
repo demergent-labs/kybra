@@ -55,7 +55,7 @@ fn derive_item_initializers_for_unnamed_fields(
         let get_item_result = self.get_item(stringify!(#restored_variant_name), vm);
 
         if let Ok(item) = get_item_result {
-            return Ok(#enum_name::#variant_name(item.try_from_vm_value(vm).unwrap()));
+            return Ok(#enum_name::#variant_name(item.try_from_vm_value(vm)?));
         }
     }
 }

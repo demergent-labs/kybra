@@ -63,7 +63,7 @@ fn derive_struct_fields_variable_definitions(data_struct: &DataStruct) -> Vec<To
                 let variable_name = format_ident!("{}_js_value", field_name);
 
                 quote! {
-                    let #variable_name = self.#field_name.try_into_vm_value(vm).unwrap();
+                    let #variable_name = self.#field_name.try_into_vm_value(vm)?;
                 }
             })
             .collect(),
@@ -76,7 +76,7 @@ fn derive_struct_fields_variable_definitions(data_struct: &DataStruct) -> Vec<To
                 let syn_index = Index::from(index);
 
                 quote! {
-                    let #variable_name = self.#syn_index.try_into_vm_value(vm).unwrap();
+                    let #variable_name = self.#syn_index.try_into_vm_value(vm)?;
                 }
             })
             .collect(),

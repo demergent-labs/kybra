@@ -8,36 +8,34 @@ pub fn generate() -> TokenStream {
             &self,
             delay_py_object_ref: rustpython_vm::PyObjectRef,
             func_py_object_ref: rustpython_vm::PyObjectRef,
-            vm: &rustpython_vm::VirtualMachine
-        ) -> rustpython_vm::PyObjectRef {
-            let delay_as_u64: u64 = delay_py_object_ref.try_from_vm_value(vm).unwrap();
+            vm: &rustpython_vm::VirtualMachine,
+        ) -> rustpython_vm::PyResult {
+            let delay_as_u64: u64 = delay_py_object_ref
+                .try_from_vm_value(vm)
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+
             let delay = core::time::Duration::new(delay_as_u64, 0);
 
-            let closure = move || {
-                unsafe {
-                    let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
-                    let scope = SCOPE_OPTION.as_mut().unwrap();
+            let closure = move || unsafe {
+                let interpreter = INTERPRETER_OPTION
+                    .as_mut()
+                    .unwrap_or_trap("SystemError: missing python interpreter");
+                let scope = SCOPE_OPTION
+                    .as_mut()
+                    .unwrap_or_trap("SystemError: missing python scope");
 
-                    let vm = &interpreter.vm;
+                let vm = &interpreter.vm;
 
-                    let result_py_object_ref = vm.invoke(&func_py_object_ref, ());
+                let py_object_ref = func_py_object_ref.call((), vm).unwrap_or_trap(vm);
 
-                    match result_py_object_ref {
-                        Ok(py_object_ref) => {
-                            ic_cdk::spawn(async move {
-                                async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
-                            });
-                        },
-                        Err(err) => {
-                            let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                            panic!("{}", err_string);
-                        }
-                    };
-                }
+                ic_cdk::spawn(async move {
+                    async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
+                });
             };
 
-            ic_cdk_timers::set_timer(delay, closure).try_into_vm_value(vm).unwrap()
+            ic_cdk_timers::set_timer(delay, closure)
+                .try_into_vm_value(vm)
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
         }
     }
 }

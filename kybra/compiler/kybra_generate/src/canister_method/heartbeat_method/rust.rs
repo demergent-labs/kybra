@@ -12,23 +12,21 @@ pub fn generate(
     Ok(quote! {
         unsafe {
             ic_cdk::spawn(async {
-                let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
-                let scope = SCOPE_OPTION.as_mut().unwrap();
+                let interpreter = INTERPRETER_OPTION
+                    .as_mut()
+                    .unwrap_or_trap("SystemError: missing python interpreter");
+                let scope = SCOPE_OPTION
+                    .as_mut()
+                    .unwrap_or_trap("SystemError: missing python scope");
 
                 let vm = &interpreter.vm;
 
-                let method_py_object_ref = unwrap_rust_python_result(scope.globals.get_item(#function_name, vm), vm);
+                let py_object_ref = scope
+                    .globals
+                    .get_item(#function_name, vm).unwrap_or_trap(vm)
+                    .call((), vm).unwrap_or_trap(vm);
 
-                let result_py_object_ref = vm.invoke(&method_py_object_ref, ());
-
-                match result_py_object_ref {
-                    Ok(py_object_ref) => async_result_handler(vm, &py_object_ref, vm.ctx.none()).await,
-                    Err(err) => {
-                        let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                        panic!("{}", err_string);
-                    }
-                };
+                async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
             });
         }
     })

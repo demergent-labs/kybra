@@ -37,14 +37,24 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
             .iter()
             .map(|field| {
                 let field_name = &field.ident;
-                let variable_name = format_ident!("user_defined_{}", field.ident.as_ref().expect("Named field must have a name"));
+                let variable_name = format_ident!(
+                    "user_defined_{}",
+                    field.ident.as_ref().expect("Named field must have a name")
+                );
                 let restored_field_name = match field_name {
-                    Some(field_name) => Some(cdk_framework::keyword::restore_for_vm(&field_name.to_string(), &crate::get_python_keywords()).to_ident()),
+                    Some(field_name) => Some(
+                        cdk_framework::keyword::restore_for_vm(
+                            &field_name.to_string(),
+                            &crate::get_python_keywords(),
+                        )
+                        .to_ident(),
+                    ),
                     None => field_name.clone(),
                 };
 
                 quote! {
-                    let #variable_name = unwrap_rust_python_result(self.get_item(stringify!(#restored_field_name), vm), vm);
+                    let #variable_name = self.get_item(stringify!(#restored_field_name), vm)
+                        .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
                 }
             })
             .collect(),
@@ -58,8 +68,14 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
 
                 quote! {
                     // TODO tuple_self is being repeated more times than necessary
-                    let tuple_self: rustpython_vm::builtins::PyTupleRef = unwrap_rust_python_result(self.clone().try_into_value(vm), vm);
-                    let #variable_name = tuple_self.get(#syn_index).unwrap();
+                    let tuple_self: rustpython_vm::builtins::PyTupleRef = self
+                        .clone()
+                        .try_into_value(vm)
+                        .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
+                    let #variable_name = match tuple_self.get(#syn_index) {
+                        Some(element) => element,
+                        None => return Err(CdkActTryFromVmValueError(format!("IndexError: tuple index out of range"))),
+                    };
                 }
             })
             .collect(),
@@ -80,7 +96,7 @@ fn generate_field_initializers(data_struct: &DataStruct) -> Vec<TokenStream> {
                 );
 
                 quote! {
-                    #field_name: #variable_name.try_from_vm_value(vm).unwrap()
+                    #field_name: #variable_name.try_from_vm_value(vm)?
                 }
             })
             .collect(),
@@ -93,7 +109,7 @@ fn generate_field_initializers(data_struct: &DataStruct) -> Vec<TokenStream> {
                 let syn_index = Index::from(index);
 
                 quote! {
-                    #syn_index: #variable_name.clone().try_from_vm_value(vm).unwrap()
+                    #syn_index: #variable_name.clone().try_from_vm_value(vm)?
                 }
             })
             .collect(),
