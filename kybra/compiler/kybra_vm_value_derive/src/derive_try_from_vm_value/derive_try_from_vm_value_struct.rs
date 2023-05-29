@@ -72,9 +72,10 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
                         .clone()
                         .try_into_value(vm)
                         .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
-                    let #variable_name = tuple_self
-                        .get(#syn_index)
-                        .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
+                    let #variable_name = match tuple_self.get(#syn_index) {
+                        Some(element) => element,
+                        None => return Err(CdkActTryFromVmValueError(format!("IndexError: tuple index out of range"))),
+                    };
                 }
             })
             .collect(),
