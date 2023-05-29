@@ -52,7 +52,10 @@ def main():
     shutil.copytree(paths["compiler"], paths["canister"], dirs_exist_ok=True)
     create_file(f"{paths['canister']}/Cargo.toml", generate_cargo_toml(canister_name))
     create_file(f"{paths['canister']}/Cargo.lock", generate_cargo_lock())
-    create_file(f"{paths['canister']}/post_install.sh", generate_post_install_script(canister_name, kybra.__rust_version__))
+    create_file(
+        f"{paths['canister']}/post_install.sh",
+        generate_post_install_script(canister_name, kybra.__rust_version__),
+    )
     os.system(f"chmod +x {paths['canister']}/post_install.sh")
 
     # Add CARGO_TARGET_DIR to env for all cargo commands
@@ -106,6 +109,7 @@ touch .kybra/{canister_name}/kybra_modules_init/src/main.rs
 cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name} &> "$global_kybra_logs_dir"/kybra_modules_init
     """
 
+
 def parse_args_or_exit(args: list[str]) -> Args:
     args = args[1:]  # Discard the path to kybra
 
@@ -149,7 +153,7 @@ def create_paths(args: Args) -> Paths:
     # py_freeze! will compile all of the Python code in the directory recursively (modules must have an __init__.py to be included)
     python_source_path = f"{canister_path}/python_source"
 
-    py_file_names_file_path = f"{canister_path}/file_names.txt"
+    py_file_names_file_path = f"{canister_path}/py_file_names.csv"
 
     # This is the path to the developer's Candid file passed into python -m kybra from the dfx.json build command
     did_path = args["did_path"]

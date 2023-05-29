@@ -33,24 +33,17 @@ impl SourceMapped<&Located<StmtKind>> {
                 Ok(quote! {
                     let interpreter = INTERPRETER_OPTION
                         .as_mut()
-                        .unwrap_or_trap("Unable to mutate interpreter");
+                        .unwrap_or_trap("SystemError: missing python interpreter");
                     let scope = SCOPE_OPTION
                         .as_mut()
-                        .unwrap_or_trap("Unable to mutate scope");
+                        .unwrap_or_trap("SystemError: missing python scope");
 
                     interpreter.enter(|vm| {
-                        let method_py_object_ref = scope.globals.get_item(#function_name, vm).unwrap_or_trap(vm);
-
-                        let result_py_object_ref = vm.invoke(&method_py_object_ref, #params);
-
-                        match result_py_object_ref {
-                            Ok(py_object_ref) => py_object_ref.try_from_vm_value(vm).unwrap_or_trap(),
-                            Err(err) => {
-                                let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                                panic!("{}", err_string);
-                            }
-                        }
+                        let result_py_object_ref: () = scope
+                            .globals
+                            .get_item(#function_name, vm).unwrap_or_trap(vm)
+                            .call(#params, vm).unwrap_or_trap(vm)
+                            .try_from_vm_value(vm).unwrap_or_trap();
                     });
                 })
             }

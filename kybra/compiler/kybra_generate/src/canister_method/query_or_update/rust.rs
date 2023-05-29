@@ -33,18 +33,23 @@ pub fn generate_body(
 
     Ok(quote! {
         unsafe {
-            let interpreter = INTERPRETER_OPTION.as_mut().unwrap_or_trap("Unable to mutate interpreter");
-            let scope = SCOPE_OPTION.as_mut().unwrap_or_trap("Unable to mutate scope");
+            let interpreter = INTERPRETER_OPTION
+                .as_mut()
+                .unwrap_or_trap("SystemError: missing python interpreter");
+            let scope = SCOPE_OPTION
+                .as_mut()
+                .unwrap_or_trap("SystemError: missing python scope");
 
             let vm = &interpreter.vm;
 
-            let method_py_object_ref = scope.globals.get_item(#name, vm).unwrap_or_trap(vm);
+            let py_object_ref = scope
+                .globals
+                .get_item(#name, vm).unwrap_or_trap(vm)
+                .call(#params, vm).unwrap_or_trap(vm);
 
-            let invoke_result = vm.invoke(&method_py_object_ref, #params);
-
-            let py_object_ref = invoke_result.unwrap_or_trap(vm);
-
-            let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
+            let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none())
+                .await
+                .unwrap_or_trap(vm);
 
             #return_expression
         }

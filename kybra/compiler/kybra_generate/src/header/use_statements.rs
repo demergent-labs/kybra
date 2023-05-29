@@ -10,6 +10,7 @@ pub fn generate() -> TokenStream {
             convert::ToPyObject as _KybraTraitToPyObject,
             function::IntoFuncArgs as _KybraTraitIntoFuncArgs,
             AsObject as _KybraTraitAsObject,
+            TryFromObject as _KybraTraitTryFromObject
         };
         use serde::{
             de::{

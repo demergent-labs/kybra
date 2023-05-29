@@ -22,12 +22,18 @@ pub fn generate(
             first_called_function_name_py_object_ref: rustpython_vm::PyObjectRef,
             reply_value_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine
-        ) -> rustpython_vm::PyObjectRef {
-            let first_called_function_name: String = first_called_function_name_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
+        ) -> rustpython_vm::PyResult {
+            let first_called_function_name: String = first_called_function_name_py_object_ref
+                .try_from_vm_value(vm)
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
 
             match &first_called_function_name[..] {
                 #(#match_arms)*
-                _ => panic!("This cannot happen")
+                // TODO: Consider creating a custom error
+                _ => Err(vm.new_system_error(format!(
+                    "attempted to reply from \"{}\", but it does not appear to be a canister method",
+                    first_called_function_name
+                )))
             }
         }
     }
@@ -63,8 +69,12 @@ fn generate_update_match_arm(update_method: &UpdateMethod) -> TokenStream {
         .to_type_annotation(&context, update_method.name.clone());
     quote!(
         #name => {
-            let reply_value: #return_type = reply_value_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
-            ic_cdk::api::call::reply((reply_value,)).try_into_vm_value(vm).unwrap_or_trap()
+            let reply_value: #return_type = reply_value_py_object_ref
+                .try_from_vm_value(vm)
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+            ic_cdk::api::call::reply((reply_value,))
+                .try_into_vm_value(vm)
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
         }
     )
 }
@@ -80,8 +90,12 @@ fn generate_query_match_arm(query_method: &QueryMethod) -> TokenStream {
         .to_type_annotation(&context, query_method.name.clone());
     quote!(
         #name => {
-            let reply_value: #return_type = reply_value_py_object_ref.try_from_vm_value(vm).unwrap_or_trap();
-            ic_cdk::api::call::reply((reply_value,)).try_into_vm_value(vm).unwrap_or_trap()
+            let reply_value: #return_type = reply_value_py_object_ref
+                .try_from_vm_value(vm)
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+            ic_cdk::api::call::reply((reply_value,))
+                .try_into_vm_value(vm)
+                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
         }
     )
 }

@@ -23,6 +23,7 @@ use crate::{
         IteratorUnpackingOperatorNotSupported, ParamTypeAnnotationRequired,
         ReturnTypeAnnotationRequired, TooManyParams,
     },
+    py_ast,
     stable_b_tree_map_nodes::errors::{
         InvalidMemoryId, MaxKeySizeMissing, MaxSizeMustBeInteger, MaxSizeMustBeNonNegative,
         MaxSizeTooBig, MaxValueSizeMissing, MemoryIdMustBeAnInteger, MemoryIdMustBeInteger,
@@ -83,6 +84,8 @@ pub enum Error {
     WrongDecorator(WrongDecorator),
     Unreachable(Unreachable),
     UnsupportedType(UnsupportedType),
+    IoError(String),
+    ParseError(String),
 }
 
 impl std::fmt::Display for Error {
@@ -132,6 +135,8 @@ impl std::fmt::Display for Error {
             Error::SbtmMissingMemoryId(error) => error,
             Error::SbtmStableBTreeMapNodeFormat(error) => error,
             Error::TooManyParams(error) => error,
+            Error::IoError(error) => error,
+            Error::ParseError(error) => error,
         };
 
         write!(f, "{}", compiler_output)
@@ -144,18 +149,18 @@ impl From<Error> for Vec<Error> {
     }
 }
 
-impl From<cdk_framework::act::abstract_canister_tree::Error> for crate::Error {
+impl From<cdk_framework::act::abstract_canister_tree::Error> for Error {
     fn from(value: cdk_framework::act::abstract_canister_tree::Error) -> Self {
         match value {
             cdk_framework::act::abstract_canister_tree::Error::TypeNotFound(type_ref_name) => {
-                crate::Error::TypeNotFound(format!(
+                Error::TypeNotFound(format!(
                     "The type {} is used, but never defined. Make sure all candid types are defined correctly",
                     type_ref_name
                 ))
             }
             cdk_framework::act::abstract_canister_tree::Error::GuardFunctionNotFound(
                 guard_function_name,
-            ) => crate::Error::GuardFunctionNotFound(format!(
+            ) => Error::GuardFunctionNotFound(format!(
                 "The guard function {} is used, but never defined. Make sure all guard functions return kybra.GuardResult",
                 guard_function_name
             )),
@@ -177,6 +182,15 @@ impl From<cdk_framework::act::abstract_canister_tree::Error> for crate::Error {
                 "The canister method {} is defined multiple times",
                 canister_method_name
             )),
+        }
+    }
+}
+
+impl From<py_ast::Error> for Error {
+    fn from(value: py_ast::Error) -> Self {
+        match value {
+            py_ast::Error::IoError(io_error) => Self::IoError(io_error.to_string()),
+            py_ast::Error::ParseError(parse_error) => Self::ParseError(parse_error.to_string()),
         }
     }
 }

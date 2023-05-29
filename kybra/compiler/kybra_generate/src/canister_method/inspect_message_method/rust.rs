@@ -19,10 +19,10 @@ pub fn generate(
 
             let interpreter = INTERPRETER_OPTION
                 .as_mut()
-                .unwrap_or_trap("Unable to mutate interpreter");
+                .unwrap_or_trap("SystemError: missing python interpreter");
             let scope = SCOPE_OPTION
                 .as_mut()
-                .unwrap_or_trap("Unable to mutate scope");
+                .unwrap_or_trap("SystemError: missing python scope");
 
             interpreter.enter(|vm| {
                 #call_to_inspect_message_py_function

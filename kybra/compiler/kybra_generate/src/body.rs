@@ -7,7 +7,7 @@ use proc_macro2::TokenStream;
 
 use crate::{
     async_result_handler, ic_object, kybra_modules_init, stable_b_tree_map_nodes::rust,
-    unwrap_rust_python_result, StableBTreeMapNode,
+    unwrap_rust_python_result, utils, StableBTreeMapNode,
 };
 
 pub fn generate(
@@ -35,6 +35,7 @@ pub fn generate(
         call_init_py_function,
         call_post_upgrade_py_function,
     );
+    let utils = utils::generate();
 
     quote::quote! {
         #ic_object
@@ -42,5 +43,6 @@ pub fn generate(
         #async_result_handler
         #stable_b_tree_map
         #kybra_modules_init
+        #utils
     }
 }

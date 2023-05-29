@@ -31,14 +31,10 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'TypeError: Could not convert PyObjectRef to Result<(), String>'
+                        'TypeError: Expected NoneType but received str'
                     )
                 };
             }
-
-            return {
-                Ok: true
-            };
         }
     },
     {
@@ -54,10 +50,6 @@ let tests: Test[] = [
                     )
                 };
             }
-
-            return {
-                Ok: true
-            };
         }
     },
     {
@@ -75,9 +67,6 @@ let tests: Test[] = [
                     )
                 };
             }
-            return {
-                Ok: true
-            };
         }
     },
     {
@@ -95,9 +84,6 @@ let tests: Test[] = [
                     )
                 };
             }
-            return {
-                Ok: true
-            };
         }
     }
 ];
