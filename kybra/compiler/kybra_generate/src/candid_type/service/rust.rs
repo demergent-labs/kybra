@@ -21,10 +21,7 @@ pub fn to_vm_value(name: String) -> TokenStream {
                         vm.run_block_expr(
                             scope,
                             format!(
-r#"
-from kybra import Principal
-{}(Principal.from_str('{}'))
-"#,
+                                "from kybra import Principal; {}(Principal.from_str('{}'))",
                                 stringify!(#service_name),
                                 self.0.principal.to_string()
                             )
