@@ -71,7 +71,7 @@ fn derive_variant_branches_unnamed_fields(
             #enum_name::#variant_name(value) => {
                 let dict = vm.ctx.new_dict();
 
-                dict.set_item(stringify!(#restored_variant_name), value.try_into_vm_value(vm).unwrap_or_trap(), vm);
+                dict.set_item(stringify!(#restored_variant_name), value.try_into_vm_value(vm)?, vm);
 
                 Ok(dict.into())
             }
