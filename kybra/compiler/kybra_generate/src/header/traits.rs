@@ -26,5 +26,32 @@ pub fn generate() -> proc_macro2::TokenStream {
                 CdkActTryIntoVmValueError(format!("{}: {}", type_name, err_message))
             }
         }
+
+        trait ToCdkActTryFromVmValueError {
+            fn to_cdk_act_try_from_vm_value_error(
+                self,
+                vm: &rustpython::vm::VirtualMachine,
+            ) -> CdkActTryFromVmValueError;
+        }
+        impl ToCdkActTryFromVmValueError for rustpython_vm::builtins::PyBaseExceptionRef {
+            fn to_cdk_act_try_from_vm_value_error(
+                self,
+                vm: &rustpython::vm::VirtualMachine,
+            ) -> CdkActTryFromVmValueError {
+                let py_object = self.to_pyobject(vm);
+                let type_name = py_object.class().name().to_string();
+                let err_message = match py_object.str(vm) {
+                    Ok(str) => str,
+                    Err(_) => {
+                        return CdkActTryFromVmValueError(format!(
+                            "Attribute Error: '{}' object has no attribute '__str__'",
+                            type_name
+                        ));
+                    }
+                };
+
+                CdkActTryFromVmValueError(format!("{}: {}", type_name, err_message))
+            }
+        }
     }
 }
