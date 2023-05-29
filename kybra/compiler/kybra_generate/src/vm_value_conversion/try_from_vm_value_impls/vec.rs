@@ -170,7 +170,8 @@ pub fn generate() -> TokenStream {
         where
             rustpython::vm::PyObjectRef: for<'a> CdkActTryFromVmValue<T, &'a rustpython::vm::VirtualMachine>
         {
-            let py_list: rustpython_vm::builtins::PyListRef = py_object_ref.try_into_value(vm).unwrap_or_trap(vm);
+            let py_list: rustpython_vm::builtins::PyListRef = py_object_ref.try_into_value(vm)
+                .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
             let vec = py_list.borrow_vec();
 
             vec.iter().map(|item| {

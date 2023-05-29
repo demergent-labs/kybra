@@ -80,7 +80,7 @@ fn generate_field_initializers(data_struct: &DataStruct) -> Vec<TokenStream> {
                 );
 
                 quote! {
-                    #field_name: #variable_name.try_from_vm_value(vm).unwrap_or_trap()
+                    #field_name: #variable_name.try_from_vm_value(vm)?
                 }
             })
             .collect(),
@@ -93,7 +93,7 @@ fn generate_field_initializers(data_struct: &DataStruct) -> Vec<TokenStream> {
                 let syn_index = Index::from(index);
 
                 quote! {
-                    #syn_index: #variable_name.clone().try_from_vm_value(vm).unwrap_or_trap()
+                    #syn_index: #variable_name.clone().try_from_vm_value(vm)?
                 }
             })
             .collect(),

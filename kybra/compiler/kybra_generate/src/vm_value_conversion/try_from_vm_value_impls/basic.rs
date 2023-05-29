@@ -31,7 +31,9 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<ic_cdk::export::candid::Func, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::candid::Func, CdkActTryFromVmValueError> {
-                let tuple_self: rustpython_vm::builtins::PyTupleRef = self.try_into_value(vm).unwrap_or_trap(vm);
+                let tuple_self: rustpython_vm::builtins::PyTupleRef = self
+                    .try_into_value(vm)
+                    .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
                 let principal = match tuple_self.get(0) {
                     Some(principal) => principal,
                     None => return Err(CdkActTryFromVmValueError("TypeError: Could not convert value to Func. Missing Principal".to_string()))
@@ -50,9 +52,12 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<ic_cdk::export::Principal, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::export::Principal, CdkActTryFromVmValueError> {
-                let to_str = self.get_attr("to_str", vm).unwrap_or_trap(vm);
-                let result = to_str.call((), vm).unwrap_or_trap(vm);
-                let result_string: String = result.try_into_value(vm).unwrap_or_trap(vm);
+                let to_str = self.get_attr("to_str", vm)
+                    .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
+                let result = to_str.call((), vm)
+                    .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
+                let result_string: String = result.try_into_value(vm)
+                    .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
                 match ic_cdk::export::Principal::from_text(result_string) {
                     Ok(principal) => Ok(principal),
                     Err(err) => Err(CdkActTryFromVmValueError(format!("TypeError: Could not convert value to Principal: {}", err.to_string()))),
@@ -68,7 +73,8 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<ic_cdk_timers::TimerId, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk_timers::TimerId, CdkActTryFromVmValueError> {
-                let vm_value_as_u64: u64 = self.try_into_value(vm).unwrap_or_trap(vm);
+                let vm_value_as_u64: u64 = self.try_into_value(vm)
+                    .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
                 Ok(ic_cdk_timers::TimerId::from(slotmap::KeyData::from_ffi(vm_value_as_u64)))
             }
         }
