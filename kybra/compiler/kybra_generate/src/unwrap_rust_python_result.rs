@@ -46,7 +46,7 @@ pub fn generate() -> TokenStream {
         impl<T> UnwrapOrTrapWithVm<T> for Result<T, rustpython::vm::PyRef<rustpython_vm::builtins::PyBaseException>> {
             fn unwrap_or_trap(self, vm: &rustpython::vm::VirtualMachine) -> T {
                 match self {
-                    Ok(ok) => return ok,
+                    Ok(ok) => ok,
                     Err(err) => {
                         let py_object = err.to_pyobject(vm);
                         let type_name = py_object.class().name().to_string();
