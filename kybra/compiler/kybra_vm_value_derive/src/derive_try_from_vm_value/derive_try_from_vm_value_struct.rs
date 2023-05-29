@@ -37,14 +37,24 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
             .iter()
             .map(|field| {
                 let field_name = &field.ident;
-                let variable_name = format_ident!("user_defined_{}", field.ident.as_ref().expect("Named field must have a name"));
+                let variable_name = format_ident!(
+                    "user_defined_{}",
+                    field.ident.as_ref().expect("Named field must have a name")
+                );
                 let restored_field_name = match field_name {
-                    Some(field_name) => Some(cdk_framework::keyword::restore_for_vm(&field_name.to_string(), &crate::get_python_keywords()).to_ident()),
+                    Some(field_name) => Some(
+                        cdk_framework::keyword::restore_for_vm(
+                            &field_name.to_string(),
+                            &crate::get_python_keywords(),
+                        )
+                        .to_ident(),
+                    ),
                     None => field_name.clone(),
                 };
 
                 quote! {
-                    let #variable_name = self.get_item(stringify!(#restored_field_name), vm).unwrap_or_trap(vm);
+                    let #variable_name = self.get_item(stringify!(#restored_field_name), vm)
+                        .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
                 }
             })
             .collect(),
@@ -58,8 +68,13 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
 
                 quote! {
                     // TODO tuple_self is being repeated more times than necessary
-                    let tuple_self: rustpython_vm::builtins::PyTupleRef = self.clone().try_into_value(vm).unwrap_or_trap(vm);
-                    let #variable_name = tuple_self.get(#syn_index).unwrap();
+                    let tuple_self: rustpython_vm::builtins::PyTupleRef = self
+                        .clone()
+                        .try_into_value(vm)
+                        .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
+                    let #variable_name = tuple_self
+                        .get(#syn_index)
+                        .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
                 }
             })
             .collect(),
