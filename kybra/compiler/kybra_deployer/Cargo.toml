@@ -1,0 +1,11 @@
+[package]
+name = "kybra_deployer"
+version = "0.0.0"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ic-cdk = "0.8.0-beta"
+ic-cdk-macros = "0.6.10"

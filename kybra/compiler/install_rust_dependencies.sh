@@ -9,17 +9,17 @@ rust_version="$2"
 
 global_kybra_config_dir=~/.config/kybra
 global_kybra_rust_dir="$global_kybra_config_dir"/"$rust_version"
-global_kybra_bin_dir="$global_kybra_rust_dir"/bin
+global_kybra_rust_bin_dir="$global_kybra_rust_dir"/bin
 global_kybra_logs_dir="$global_kybra_rust_dir"/logs
-global_kybra_cargo_bin="$global_kybra_bin_dir"/cargo
-global_kybra_rustup_bin="$global_kybra_bin_dir"/rustup
+global_kybra_cargo_bin="$global_kybra_rust_bin_dir"/cargo
+global_kybra_rustup_bin="$global_kybra_rust_bin_dir"/rustup
 
 export CARGO_TARGET_DIR="$global_kybra_config_dir"/target
 export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
 function run() {
-    ic_wasm_already_installed=$(test -e "$global_kybra_bin_dir"/ic-wasm; echo $?)
+    ic_wasm_already_installed=$(test -e "$global_kybra_rust_bin_dir"/ic-wasm; echo $?)
 
     if [ "$ic_wasm_already_installed" -eq 1 ]; then
         echo -e "\nKybra "$kybra_version" prerequisite installation (this may take a few minutes)\n"
@@ -28,7 +28,7 @@ function run() {
         mkdir -p "$global_kybra_logs_dir"
 
         install_rustup
-        install_wasm32_wasi
+        install_wasm32
         install_wasi2ic
         install_ic_wasm "$ic_wasm_already_installed"
     else
@@ -46,16 +46,17 @@ function update_rustup() {
     "$global_kybra_rustup_bin" update "$rust_version" &> "$global_kybra_logs_dir"/rustup_update
 }
 
-function install_wasm32_wasi() {
-    echo -e "2/4) Installing wasm32-wasi"
+function install_wasm32() {
+    echo -e "2/4) Installing wasm32"
 
     "$global_kybra_rustup_bin" target add wasm32-wasi &> "$global_kybra_logs_dir"/install_wasm32_wasi
+    "$global_kybra_rustup_bin" target add wasm32-unknown-unknown &> "$global_kybra_logs_dir"/install_wasm32_unknown_unknown
 }
 
 function install_wasi2ic() {
     echo -e "3/4) Installing wasi2ic"
 
-    "$global_kybra_cargo_bin" install --git https://github.com/wasm-forge/wasi2ic &> "$global_kybra_logs_dir"/install_wasi2ic
+    "$global_kybra_cargo_bin" install --git https://github.com/wasm-forge/wasi2ic --rev 7418e0bd1a7810c8e9c55cc0155c921503a793b8 &> "$global_kybra_logs_dir"/install_wasi2ic
 }
 
 function install_ic_wasm() {

@@ -66,6 +66,9 @@ def main():
         "RUSTUP_HOME": paths["global_kybra_rust_dir"],
     }
 
+    if not os.path.exists(paths["global_kybra_bin_dir"]):
+        os.makedirs(paths["global_kybra_bin_dir"])
+
     compile_python_or_exit(
         paths, cargo_env, verbose=is_verbose, label="[1/3] 🔨 Compiling Python..."
     )
@@ -96,10 +99,10 @@ rust_version="{rust_version}"
 
 global_kybra_config_dir=~/.config/kybra
 global_kybra_rust_dir="$global_kybra_config_dir"/"$rust_version"
-global_kybra_bin_dir="$global_kybra_rust_dir"/bin
+global_kybra_rust_bin_dir="$global_kybra_rust_dir"/bin
 global_kybra_logs_dir="$global_kybra_rust_dir"/logs
-global_kybra_cargo_bin="$global_kybra_bin_dir"/cargo
-global_kybra_rustup_bin="$global_kybra_bin_dir"/rustup
+global_kybra_cargo_bin="$global_kybra_rust_bin_dir"/cargo
+global_kybra_rustup_bin="$global_kybra_rust_bin_dir"/rustup
 
 export CARGO_TARGET_DIR="$global_kybra_config_dir"/target
 export CARGO_HOME="$global_kybra_rust_dir"
@@ -180,8 +183,9 @@ def create_paths(args: Args) -> Paths:
     home_dir = os.path.expanduser("~")
     global_kybra_config_dir = f"{home_dir}/.config/kybra"
     global_kybra_rust_dir = f"{global_kybra_config_dir}/{kybra.__rust_version__}"
-    global_kybra_bin_dir = f"{global_kybra_rust_dir}/bin"
+    global_kybra_rust_bin_dir = f"{global_kybra_rust_dir}/bin"
     global_kybra_target_dir = f"{global_kybra_config_dir}/target"
+    global_kybra_bin_dir = f"{global_kybra_config_dir}/bin/{kybra.__version__}"
 
     return {
         "py_entry_file": py_entry_file_path,
@@ -198,8 +202,9 @@ def create_paths(args: Args) -> Paths:
         "custom_modules": custom_modules_path,
         "global_kybra_config_dir": global_kybra_config_dir,
         "global_kybra_rust_dir": global_kybra_rust_dir,
-        "global_kybra_bin_dir": global_kybra_bin_dir,
+        "global_kybra_rust_bin_dir": global_kybra_rust_bin_dir,
         "global_kybra_target_dir": global_kybra_target_dir,
+        "global_kybra_bin_dir": global_kybra_bin_dir
     }
 
 
@@ -291,7 +296,7 @@ def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose:
     # Generate the Rust code
     kybra_generate_result = subprocess.run(
         [
-            f"{paths['global_kybra_bin_dir']}/cargo",
+            f"{paths['global_kybra_rust_bin_dir']}/cargo",
             "run",
             f"--manifest-path={paths['canister']}/kybra_generate/Cargo.toml",
             paths["py_file_names_file"],
@@ -345,7 +350,7 @@ def parse_kybra_generate_error(stdout: bytes) -> str:
 
 def run_rustfmt_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool = False):
     rustfmt_result = subprocess.run(
-        [f"{paths['global_kybra_bin_dir']}/rustfmt", "--edition=2018", paths["lib"]],
+        [f"{paths['global_kybra_rust_bin_dir']}/rustfmt", "--edition=2018", paths["lib"]],
         capture_output=not verbose,
         env=cargo_env,
     )
@@ -370,7 +375,7 @@ def build_wasm_binary_or_exit(
     # Compile the generated Rust code
     cargo_build_result = subprocess.run(
         [
-            f"{paths['global_kybra_bin_dir']}/cargo",
+            f"{paths['global_kybra_rust_bin_dir']}/cargo",
             "build",
             f"--manifest-path={paths['canister']}/Cargo.toml",
             "--target=wasm32-wasi",
@@ -389,14 +394,18 @@ def build_wasm_binary_or_exit(
 
     shutil.copy(
         f"{paths['global_kybra_target_dir']}/wasm32-wasi/release/{canister_name}.wasm",
-        paths["wasm"],
+        f"{paths['canister']}/{canister_name}_app.wasm",
     )
 
-    candid_file = generate_candid_file(paths)
+    candid_file = generate_candid_file(paths, canister_name)
     create_file(paths["did"], candid_file)
 
     wasi2ic_result = subprocess.run(
-        [f"{paths['global_kybra_bin_dir']}/wasi2ic", paths["wasm"], paths["wasm"]],
+        [
+            f"{paths['global_kybra_rust_bin_dir']}/wasi2ic",
+            f"{paths['canister']}/{canister_name}_app.wasm",
+            f"{paths['canister']}/{canister_name}_app.wasm",
+        ],
         capture_output=not verbose,
         env=cargo_env,
     )
@@ -407,6 +416,41 @@ def build_wasm_binary_or_exit(
         print("💀 Build failed")
         sys.exit(1)
 
+    if os.environ.get('KYBRA_REBUILD') != 'true' and os.path.exists(f"{paths['global_kybra_bin_dir']}/deployer.wasm"):
+        shutil.copy(
+            f"{paths['global_kybra_bin_dir']}/deployer.wasm",
+            f"{paths['canister']}/{canister_name}.wasm"
+        )
+    else:
+        kybra_deployer_build_result = subprocess.run(
+            [
+                f"{paths['global_kybra_rust_bin_dir']}/cargo",
+                "build",
+                f"--manifest-path={paths['canister']}/kybra_deployer/Cargo.toml",
+                "--target=wasm32-unknown-unknown",
+                f"--package=kybra_deployer",
+                "--release",
+            ],
+            capture_output=not verbose,
+            env=cargo_env,
+        )
+
+        if kybra_deployer_build_result.returncode != 0:
+            print(red("\n💣 Error building Wasm binary:"))
+            print(kybra_deployer_build_result.stderr.decode("utf-8"))
+            print("💀 Build failed")
+            sys.exit(1)
+
+        shutil.copy(
+            f"{paths['global_kybra_target_dir']}/wasm32-unknown-unknown/release/kybra_deployer.wasm",
+            f"{paths['canister']}/{canister_name}.wasm"
+        )
+
+        shutil.copy(
+            f"{paths['canister']}/{canister_name}.wasm",
+            f"{paths['global_kybra_bin_dir']}/deployer.wasm"
+        )
+
 
 @timed_inline
 def optimize_wasm_binary_or_exit(
@@ -414,7 +458,7 @@ def optimize_wasm_binary_or_exit(
 ):
     optimization_result = subprocess.run(
         [
-            f"{paths['global_kybra_bin_dir']}/ic-wasm",
+            f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
             paths["wasm"],
             "-o",
             paths["wasm"],
@@ -440,7 +484,7 @@ def optimize_wasm_binary_or_exit(
 def add_metadata_to_wasm_or_exit(paths: Paths, verbose: bool = False):
     add_candid_to_wasm_result = subprocess.run(
         [
-            f"{paths['global_kybra_bin_dir']}/ic-wasm",
+            f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
             paths["wasm"],
             "-o",
             paths["wasm"],
@@ -462,7 +506,7 @@ def add_metadata_to_wasm_or_exit(paths: Paths, verbose: bool = False):
 
     add_cdk_info_to_wasm_result = subprocess.run(
         [
-            f"{paths['global_kybra_bin_dir']}/ic-wasm",
+            f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
             paths["wasm"],
             "-o",
             paths["wasm"],

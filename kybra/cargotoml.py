@@ -14,13 +14,11 @@ lto = "fat"
 crate-type = ["cdylib"]
 
 [dependencies]
-ic-cdk = "0.8.0-beta"
+ic-cdk = "0.8.0-beta.0"
 ic-cdk-macros = "0.6.10"
 ic-cdk-timers = "0.1.2"
 candid = {{ version = "0.9.0-beta.2", features = ["parser"] }}
 kybra-vm-value-derive = {{ path = "./kybra_vm_value_derive" }}
-# TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
-# rustpython = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["stdlib", "freeze-stdlib"] }}
 
 rustpython = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["stdlib", "encodings"] }}
 rustpython-vm = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["ic"] }}
@@ -41,13 +39,12 @@ rustpython-compiler-core = {{ git = "https://github.com/demergent-labs/RustPytho
 # TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
 # rustpython-pylib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["freeze-stdlib"] }}
 # rustpython = {{ path = "../../../../../../RustPython", default-features = false, features = [] }}
-getrandom = {{ version = "0.2.3", features = ["custom"] }}
-serde = "1.0.137"
+serde = {{ version = "1.0.137", default-features = false, features = [] }}
 async-recursion = "1.0.0"
 ic-stable-structures = "0.5.2"
 slotmap = "1.0.6"
-rand = "0.8.5"
-ic-wasi-polyfill = {{ git = "https://github.com/wasm-forge/ic-wasi-polyfill", rev = "01dc79c84dc1de37bba104ac0a87f4faf7308937" }}
+ic-wasi-polyfill = {{ git = "https://github.com/demergent-labs/ic-wasi-polyfill", rev = "40f3ab7818a36f6a8e9ee551dd9d87d0f7b5e2db" }}
+# ic-wasi-polyfill = {{ git = "https://github.com/wasm-forge/ic-wasi-polyfill", rev = "2395f9e0fd3935d94ae986f92bef1f98186e69cc" }}
 
 [patch.crates-io]
 num-bigint = {{ git = "https://github.com/rust-num/num-bigint" }}

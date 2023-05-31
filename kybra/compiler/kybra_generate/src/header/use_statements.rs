@@ -4,7 +4,6 @@ pub fn generate() -> TokenStream {
     quote::quote! {
         use candid::{Decode, Encode};
         use kybra_vm_value_derive::{CdkActTryIntoVmValue, CdkActTryFromVmValue};
-        use rand::Rng as _KybraTraitRng;
         use rustpython_vm::{
             class::PyClassImpl as _KybraTraitPyClassImpl,
             convert::ToPyObject as _KybraTraitToPyObject,

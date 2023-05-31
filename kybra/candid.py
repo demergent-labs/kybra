@@ -11,8 +11,8 @@ from wasmer import (
 )
 
 
-def generate_candid_file(paths) -> str:
-    file = open(paths["wasm"], "rb")
+def generate_candid_file(paths, canister_name) -> str:
+    file = open(f"{paths['canister']}/{canister_name}_app.wasm", "rb")
     wasm_buffer = file.read()
     file.close()
 

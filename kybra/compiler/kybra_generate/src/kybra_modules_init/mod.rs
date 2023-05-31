@@ -68,16 +68,19 @@ pub fn generate(
             static INSTALLER_PRINCIPAL_REF_CELL: std::cell::RefCell<Option<ic_cdk::export::Principal>> = std::cell::RefCell::new(None);
         }
 
+        // TODO I think I can just check who the controllers are here, that's probably better actually
         // TODO make sure to actually manually test this authorization
         // TODO we might want an automated test for this as well
+        // TODO this just got more difficult, as we need to figure out the installing identity
+        // TODO as separate from the calling identity now, since the canister itself now installs
         fn authorize_python_module_init() {
-            INSTALLER_PRINCIPAL_REF_CELL.with(|installer_principal_ref_cell| {
-                let installer_principal = installer_principal_ref_cell.borrow().expect("Installer Principal must be set");
+            // INSTALLER_PRINCIPAL_REF_CELL.with(|installer_principal_ref_cell| {
+            //     let installer_principal = installer_principal_ref_cell.borrow().expect("Installer Principal must be set");
 
-                if ic_cdk::api::caller().to_text() != installer_principal.to_text() {
-                    panic!("Not authorized to initialize Python modules");
-                }
-            });
+            //     if ic_cdk::api::caller().to_text() != installer_principal.to_text() {
+            //         panic!("Not authorized to initialize Python modules");
+            //     }
+            // });
         }
 
         #[ic_cdk_macros::update]
