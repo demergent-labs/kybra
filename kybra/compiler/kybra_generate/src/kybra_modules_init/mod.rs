@@ -62,7 +62,6 @@ pub fn generate(
 
             #(#params_ref_cells)*
 
-            static PYTHON_SOURCE_BYTECODE_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
             static PYTHON_STDLIB_BYTECODE_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
 
             static INSTALLER_PRINCIPAL_REF_CELL: std::cell::RefCell<Option<ic_cdk::export::Principal>> = std::cell::RefCell::new(None);
@@ -87,11 +86,6 @@ pub fn generate(
         pub fn clear_python_bytecode_chunks() {
             authorize_python_module_init();
 
-            PYTHON_SOURCE_BYTECODE_REF_CELL.with(|bytecode_ref_cell| {
-                let mut bytecode_ref_mut = bytecode_ref_cell.borrow_mut();
-                bytecode_ref_mut.clear();
-            });
-
             PYTHON_STDLIB_BYTECODE_REF_CELL.with(|bytecode_ref_cell| {
                 let mut bytecode_ref_mut = bytecode_ref_cell.borrow_mut();
                 bytecode_ref_mut.clear();
@@ -100,16 +94,6 @@ pub fn generate(
 
         // TODO think about what happens if this process is interrupted
         // TODO we should probably be able to clear the chunks
-        #[ic_cdk_macros::update]
-        pub fn upload_python_source_bytecode_chunk(bytes: Vec<u8>) {
-            authorize_python_module_init();
-
-            PYTHON_SOURCE_BYTECODE_REF_CELL.with(|bytecode_ref_cell| {
-                let mut bytecode_ref_mut = bytecode_ref_cell.borrow_mut();
-                bytecode_ref_mut.extend(bytes);
-            });
-        }
-
         #[ic_cdk_macros::update]
         pub fn upload_python_stdlib_bytecode_chunk(bytes: Vec<u8>) {
             authorize_python_module_init();
@@ -129,12 +113,11 @@ pub fn generate(
             unsafe {
                 #(#params_initializations)*
 
-                let python_source_bytes_reference: &'static [u8] = PYTHON_SOURCE_BYTECODE_REF_CELL.with(|x| x.borrow().clone()).leak(); // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
                 let python_stdlib_bytes_reference: &'static [u8] = PYTHON_STDLIB_BYTECODE_REF_CELL.with(|x| x.borrow().clone()).leak(); // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
 
                 let interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
                     vm.add_native_modules(rustpython_stdlib::get_module_inits());
-                    vm.add_frozen(rustpython_compiler_core::frozen_lib::FrozenLib::from_ref(python_source_bytes_reference));
+                    vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
                     vm.add_frozen(rustpython_compiler_core::frozen_lib::FrozenLib::from_ref(python_stdlib_bytes_reference));
                 });
 

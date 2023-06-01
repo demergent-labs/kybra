@@ -2,6 +2,7 @@
 name = "kybra_modules_init"
 version = "0.0.0"
 edition = "2018"
+build = "build.rs"
 
 [profile.dev]
 opt-level = 0               # Minimal optimization, prioritize compilation speed
@@ -13,5 +14,9 @@ panic = 'unwind'            # Unwind the stack upon a panic (default, you may al
 
 [dependencies]
 tempfile = "3.5.0"
+dirs = "5.0.1"
 rustpython = { git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }
 rustpython-vm = { git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }
+
+[build-dependencies]
+dirs = "5.0.1"

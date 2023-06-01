@@ -110,7 +110,7 @@ export RUSTUP_HOME="$global_kybra_rust_dir"
 
 touch .kybra/{canister_name}/kybra_modules_init/src/main.rs
 # cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name} &> "$global_kybra_logs_dir"/kybra_modules_init
-cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name}
+KYBRA_VERSION={kybra.__version__} cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name}
     """
 
 
@@ -266,6 +266,7 @@ def bundle_python_code(paths: Paths):
                 node.packagepath[0],  # type: ignore
                 f"{python_source_path}/{node.identifier}",  # type: ignore
                 dirs_exist_ok=True,
+                ignore=ignore_specific_dir
             )
 
         if type(node) == modulegraph.modulegraph.NamespacePackage:  # type: ignore
@@ -273,6 +274,7 @@ def bundle_python_code(paths: Paths):
                 node.packagepath[0],  # type: ignore
                 f"{python_source_path}/{node.identifier}",  # type: ignore
                 dirs_exist_ok=True,
+                ignore=ignore_specific_dir
             )
 
     py_file_names = list(  # type: ignore
@@ -291,6 +293,11 @@ def bundle_python_code(paths: Paths):
 
     create_file(paths["py_file_names_file"], ",".join(py_file_names))  # type: ignore
 
+def ignore_specific_dir(dirname: str, filenames: list[str]) -> list[str]:
+    if 'kybra_modules_init/src/Lib' in dirname:
+        return filenames
+    else:
+        return []
 
 def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool):
     # Generate the Rust code
@@ -459,9 +466,9 @@ def optimize_wasm_binary_or_exit(
     optimization_result = subprocess.run(
         [
             f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
-            paths["wasm"],
+            f"{paths['canister']}/{canister_name}_app.wasm",
             "-o",
-            paths["wasm"],
+            f"{paths['canister']}/{canister_name}_app.wasm",
             "shrink",
             "--optimize",
             "Oz",

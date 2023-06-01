@@ -15,6 +15,7 @@ fn main() {
         Err(e) => println!("Error getting current directory: {}", e),
     };
 
+    // TODO a future version of dfx should take care of this chunk uploading for us
     let wasm = std::fs::read(format!(".kybra/{canister_name}/{canister_name}_app.wasm")).unwrap();
     let wasm_chunks = split_into_chunks(wasm, max_chunk_size);
 
@@ -78,12 +79,30 @@ fn main() {
         );
     }
 
-    let python_source_modules = rustpython_vm::py_freeze!(dir = "../python_source");
-    let python_source_bytecode = python_source_modules.bytes.to_vec();
-    let python_source_bytecode_chunks = split_into_chunks(python_source_bytecode, max_chunk_size);
+    let kybra_version = std::env::var("KYBRA_VERSION").unwrap();
 
+    let python_stdlib_path = dirs::home_dir()
+        .unwrap()
+        .join(format!(".config/kybra/bin/{kybra_version}/python_stdlib"));
+
+    #[cfg(not(python_stdlib_exists))]
+    println!("not(python_stdlib_exists)");
+
+    #[cfg(not(python_stdlib_exists))]
     let python_stdlib_modules = rustpython_vm::py_freeze!(dir = "src/Lib");
+
+    #[cfg(not(python_stdlib_exists))]
     let python_stdlib_bytecode = python_stdlib_modules.bytes.to_vec();
+
+    #[cfg(not(python_stdlib_exists))]
+    std::fs::write(python_stdlib_path, &python_stdlib_bytecode).unwrap();
+
+    #[cfg(python_stdlib_exists)]
+    println!("python_stdlib_exists");
+
+    #[cfg(python_stdlib_exists)]
+    let python_stdlib_bytecode = std::fs::read(python_stdlib_path).unwrap();
+
     let python_stdlib_bytecode_chunks = split_into_chunks(python_stdlib_bytecode, max_chunk_size);
 
     let clear_output = Command::new("dfx")
@@ -101,15 +120,6 @@ fn main() {
         );
     } else {
         eprintln!("Error: {:?}", String::from_utf8_lossy(&clear_output.stderr));
-    }
-
-    // Upload Python source bytecode
-    for python_source_bytecode_chunk in python_source_bytecode_chunks {
-        upload_chunk(
-            canister_name,
-            python_source_bytecode_chunk,
-            "upload_python_source_bytecode_chunk",
-        );
     }
 
     // Upload Python stdlib bytecode
