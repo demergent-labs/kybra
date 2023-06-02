@@ -13,41 +13,32 @@ fn main() {
 
     let max_chunk_size = 2 * 1_000 * 1_000; // 2 MB
 
+    upload_app_canister(canister_name, max_chunk_size);
+    upload_python_stdlib(canister_name, max_chunk_size);
+    set_permissions(canister_name);
+    install_app_canister(canister_name);
+}
+
+fn upload_app_canister(canister_name: &str, max_chunk_size: usize) {
     let wasm = std::fs::read(format!(
         ".kybra/{canister_name}/{canister_name}_app.wasm.gz"
     ))
     .unwrap();
+
     let wasm_chunks = split_into_chunks(wasm, max_chunk_size);
 
     for wasm_chunk in wasm_chunks {
         upload_chunk(canister_name, wasm_chunk, "upload_wasm_chunk");
     }
+}
 
-    let kybra_version = std::env::var("KYBRA_VERSION").unwrap();
-
-    let python_stdlib_path = dirs::home_dir()
-        .unwrap()
-        .join(format!(".config/kybra/bin/{kybra_version}/python_stdlib"));
-
-    #[cfg(not(python_stdlib_exists))]
-    let python_stdlib_modules = rustpython_vm::py_freeze!(dir = "src/Lib");
-
-    #[cfg(not(python_stdlib_exists))]
-    let python_stdlib_bytecode = python_stdlib_modules.bytes.to_vec();
-
-    #[cfg(not(python_stdlib_exists))]
-    std::fs::write(python_stdlib_path, &python_stdlib_bytecode).unwrap();
-
-    #[cfg(python_stdlib_exists)]
-    let python_stdlib_bytecode = std::fs::read(python_stdlib_path).unwrap();
+fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize) {
+    let python_stdlib_bytecode = get_python_stdlib_bytecode();
 
     let mut hasher = Sha256::new();
-
     hasher.update(&python_stdlib_bytecode);
-
     let result = hasher.finalize();
-
-    let hash_hex = hex::encode(result);
+    let local_python_stdlib_bytecode_hash = hex::encode(result);
 
     let python_stdlib_hash_output = Command::new("dfx")
         .arg("canister")
@@ -72,9 +63,15 @@ fn main() {
         );
     }
 
-    if format!("(\"{hash_hex}\")")
-        != String::from_utf8_lossy(&python_stdlib_hash_output.stdout).trim()
-    {
+    let remote_python_stdlib_bytecode_hash =
+        String::from_utf8_lossy(&python_stdlib_hash_output.stdout)
+            .trim()
+            .to_string();
+
+    let hashes_do_not_match =
+        format!("(\"{local_python_stdlib_bytecode_hash}\")") != remote_python_stdlib_bytecode_hash;
+
+    if hashes_do_not_match {
         let python_stdlib_bytecode_chunks =
             split_into_chunks(python_stdlib_bytecode, max_chunk_size);
 
@@ -87,7 +84,31 @@ fn main() {
             );
         }
     }
+}
 
+fn get_python_stdlib_bytecode() -> Vec<u8> {
+    let kybra_version = std::env::var("KYBRA_VERSION").unwrap();
+
+    let python_stdlib_path = dirs::home_dir()
+        .unwrap()
+        .join(format!(".config/kybra/bin/{kybra_version}/python_stdlib"));
+
+    #[cfg(not(python_stdlib_exists))]
+    let python_stdlib_modules = rustpython_vm::py_freeze!(dir = "src/Lib");
+
+    #[cfg(not(python_stdlib_exists))]
+    let python_stdlib_bytecode = python_stdlib_modules.bytes.to_vec();
+
+    #[cfg(not(python_stdlib_exists))]
+    std::fs::write(python_stdlib_path, &python_stdlib_bytecode).unwrap();
+
+    #[cfg(python_stdlib_exists)]
+    let python_stdlib_bytecode = std::fs::read(python_stdlib_path).unwrap();
+
+    python_stdlib_bytecode
+}
+
+fn set_permissions(canister_name: &str) {
     let canister_id_output = Command::new("dfx")
         .arg("canister")
         .arg("id")
@@ -122,7 +143,9 @@ fn main() {
             String::from_utf8_lossy(&add_controller_output.stderr)
         );
     }
+}
 
+fn install_app_canister(canister_name: &str) {
     let install_output = Command::new("dfx")
         .arg("canister")
         .arg("call")

@@ -129,15 +129,18 @@ pub async fn install_wasm() {
 
     let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
 
-    let result = ic_cdk::api::management_canister::main::install_code(
-        ic_cdk::api::management_canister::main::InstallCodeArgument {
-            mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
-            canister_id: ic_cdk::api::id(),
-            wasm_module,
-            arg: vec![], // TODO I think we need to get the args from init, store them globally, and retrieve them here
-        },
-    )
-    .await;
+    let result = ic_cdk::api::call::notify(
+        ic_cdk::api::management_canister::main::CanisterId::management_canister(),
+        "install_code",
+        (
+            ic_cdk::api::management_canister::main::InstallCodeArgument {
+                mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
+                canister_id: ic_cdk::api::id(),
+                wasm_module,
+                arg: vec![], // TODO I think we need to get the args from init, store them globally, and retrieve them here
+            },
+        ),
+    );
 
     match result {
         Ok(_) => {}
