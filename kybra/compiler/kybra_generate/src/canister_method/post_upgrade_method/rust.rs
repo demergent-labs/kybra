@@ -66,6 +66,8 @@ pub fn generate(
                 #call_to_post_upgrade_py_function
             }
 
+            INITIALIZED_MAP_REF_CELL.with(|initialized_map_ref_cell| initialized_map_ref_cell.borrow_mut().set(1));
+
             ic_cdk_timers::set_timer(core::time::Duration::new(0, 0), rng_seed);
         }
     }
