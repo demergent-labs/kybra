@@ -3,6 +3,8 @@ use sha2::{Digest, Sha256};
 thread_local! {
     static WASM_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
 
+    static INSTALLER_REF_CELL: std::cell::RefCell<String> = std::cell::RefCell::new("".to_string());
+
     static PYTHON_STDLIB_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
 
     static PYTHON_STDLIB_STABLE_REF_CELL: std::cell::RefCell<
@@ -29,7 +31,23 @@ thread_local! {
     );
 }
 
-#[ic_cdk_macros::update]
+#[ic_cdk_macros::init]
+pub fn init() {
+    INSTALLER_REF_CELL.with(|installer_ref_cell| {
+        let mut installer_ref_mut = installer_ref_cell.borrow_mut();
+        *installer_ref_mut = ic_cdk::caller().to_string();
+    });
+}
+
+#[ic_cdk_macros::post_upgrade]
+pub fn post_upgrade() {
+    INSTALLER_REF_CELL.with(|installer_ref_cell| {
+        let mut installer_ref_mut = installer_ref_cell.borrow_mut();
+        *installer_ref_mut = ic_cdk::caller().to_string();
+    });
+}
+
+#[ic_cdk_macros::update(guard = "installer_guard")]
 pub fn upload_wasm_chunk(bytes: Vec<u8>) {
     WASM_REF_CELL.with(|wasm_ref_cell| {
         let mut wasm_ref_mut = wasm_ref_cell.borrow_mut();
@@ -37,7 +55,7 @@ pub fn upload_wasm_chunk(bytes: Vec<u8>) {
     });
 }
 
-#[ic_cdk_macros::update]
+#[ic_cdk_macros::update(guard = "installer_guard")]
 pub fn upload_python_stdlib_chunk(bytes: Vec<u8>) {
     PYTHON_STDLIB_REF_CELL.with(|python_stdlib_ref_cell| {
         let mut python_stdlib_ref_mut = python_stdlib_ref_cell.borrow_mut();
@@ -45,7 +63,7 @@ pub fn upload_python_stdlib_chunk(bytes: Vec<u8>) {
     });
 }
 
-#[ic_cdk_macros::query]
+#[ic_cdk_macros::query(guard = "installer_guard")]
 pub fn python_stdlib_hash() -> String {
     PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
         let python_stdlib_stable_ref = python_stdlib_stable_ref_cell.borrow();
@@ -69,7 +87,7 @@ pub fn python_stdlib_hash() -> String {
 // TODO figure out args
 // TODO it will probably be similar to kybra_modules_init
 // TODO I think for the init stuff...I wonder if I can just store the args as binary
-#[ic_cdk_macros::update]
+#[ic_cdk_macros::update(guard = "installer_guard")]
 pub async fn install_wasm() {
     PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
         let mut python_stdlib_stable_ref_mut = python_stdlib_stable_ref_cell.borrow_mut();
@@ -105,4 +123,22 @@ pub async fn install_wasm() {
             panic!("{:#?}", err);
         }
     }
+}
+
+fn installer_guard() -> Result<(), String> {
+    let installer =
+        INSTALLER_REF_CELL.with(|installer_ref_cell| installer_ref_cell.borrow().clone());
+
+    ic_cdk::println!("installer: {}", installer);
+
+    ic_cdk::println!(
+        "ic_cdk::caller().to_string(): {}",
+        ic_cdk::caller().to_string(),
+    );
+
+    if installer == ic_cdk::caller().to_string() {
+        return Ok(());
+    }
+
+    Err("Not authorized".to_string())
 }
