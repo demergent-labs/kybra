@@ -24,9 +24,9 @@ impl PyAst {
 
         let (
             canister_methods,
-            init_params,
-            call_to_init_py_function,
-            call_to_post_upgrade_py_function,
+            _init_params,
+            _call_to_init_py_function,
+            _call_to_post_upgrade_py_function,
         ) = canister_methods_tuple;
 
         let vm_value_conversion = VmValueConversion {
@@ -42,10 +42,6 @@ impl PyAst {
                 &canister_methods.query_methods,
                 &candid_types.services,
                 &stable_b_tree_map_nodes,
-                &self.entry_module_name,
-                &init_params,
-                call_to_init_py_function,
-                call_to_post_upgrade_py_function,
             ),
             candid_types,
             canister_methods,

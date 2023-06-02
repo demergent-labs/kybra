@@ -64,7 +64,7 @@ impl PyAst {
         Ok((
             InitMethod {
                 params: params.clone(),
-                body: rust::generate(&params),
+                body: rust::generate(),
                 guard_function_name,
             },
             params,
