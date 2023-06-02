@@ -8,9 +8,7 @@ use tempfile::NamedTempFile;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-
     let canister_name = &args[1];
-
     let max_chunk_size = 2 * 1_000 * 1_000; // 2 MB
 
     upload_app_canister(canister_name, max_chunk_size);
@@ -40,7 +38,7 @@ fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize) {
     let result = hasher.finalize();
     let local_python_stdlib_bytecode_hash = hex::encode(result);
 
-    let python_stdlib_hash_output = Command::new("dfx")
+    let remote_python_stdlib_hash_output = Command::new("dfx")
         .arg("canister")
         .arg("call")
         .arg(canister_name)
@@ -48,23 +46,23 @@ fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize) {
         .output()
         .expect("Failed to execute the dfx canister id command");
 
-    if python_stdlib_hash_output.status.success() {
+    if remote_python_stdlib_hash_output.status.success() {
         println!(
             "{}",
             format!(
                 "Output from {canister_name}/python_stdlib_hash: {:?}",
-                String::from_utf8_lossy(&python_stdlib_hash_output.stdout)
+                String::from_utf8_lossy(&remote_python_stdlib_hash_output.stdout)
             )
         );
     } else {
         panic!(
             "Error: {:?}",
-            String::from_utf8_lossy(&python_stdlib_hash_output.stderr)
+            String::from_utf8_lossy(&remote_python_stdlib_hash_output.stderr)
         );
     }
 
     let remote_python_stdlib_bytecode_hash =
-        String::from_utf8_lossy(&python_stdlib_hash_output.stdout)
+        String::from_utf8_lossy(&remote_python_stdlib_hash_output.stdout)
             .trim()
             .to_string();
 
@@ -120,9 +118,6 @@ fn set_permissions(canister_name: &str) {
         .trim()
         .to_string();
 
-    // TODO we shouldn't just leave this...
-    // TODO we should check if it is already the controller
-    // TODO if it is, don't remove it. If it isn't add it and then remove it
     let add_controller_output = Command::new("dfx")
         .arg("canister")
         .arg("update-settings")
