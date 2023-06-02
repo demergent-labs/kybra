@@ -17,6 +17,8 @@ tempfile = "3.5.0"
 dirs = "5.0.1"
 rustpython = { git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }
 rustpython-vm = { git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }
+sha2 = "0.10.6"
+hex = "0.4.3"
 
 [build-dependencies]
 dirs = "5.0.1"

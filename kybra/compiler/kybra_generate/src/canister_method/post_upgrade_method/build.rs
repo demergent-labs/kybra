@@ -67,7 +67,7 @@ impl PyAst {
         Ok((
             PostUpgradeMethod {
                 params: params.clone(),
-                body: rust::generate(&params),
+                body: rust::generate(post_upgrade_function_def_option, &self.entry_module_name),
                 guard_function_name,
             },
             call_to_post_upgrade_py_function,

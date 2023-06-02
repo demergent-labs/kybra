@@ -482,19 +482,20 @@ def optimize_wasm_binary_or_exit(
         print("💀 Build failed")
         sys.exit(1)
 
-    add_metadata_to_wasm_or_exit(paths, verbose=verbose)
+    add_metadata_to_wasm_or_exit(paths, canister_name, verbose=verbose)
 
     # gzip the Wasm binary
     os.system(f"gzip -9 -f -k {paths['wasm']}")
+    os.system(f"gzip -9 -f -k {paths['canister']}/{canister_name}_app.wasm")
 
 
-def add_metadata_to_wasm_or_exit(paths: Paths, verbose: bool = False):
+def add_metadata_to_wasm_or_exit(paths: Paths, canister_name: str, verbose: bool = False):
     add_candid_to_wasm_result = subprocess.run(
         [
             f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
-            paths["wasm"],
+            f"{paths['canister']}/{canister_name}_app.wasm",
             "-o",
-            paths["wasm"],
+            f"{paths['canister']}/{canister_name}_app.wasm",
             "metadata",
             "candid:service",
             "-f",
@@ -514,9 +515,9 @@ def add_metadata_to_wasm_or_exit(paths: Paths, verbose: bool = False):
     add_cdk_info_to_wasm_result = subprocess.run(
         [
             f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
-            paths["wasm"],
+            f"{paths['canister']}/{canister_name}_app.wasm",
             "-o",
-            paths["wasm"],
+            f"{paths['canister']}/{canister_name}_app.wasm",
             "metadata",
             "cdk",
             "-d",

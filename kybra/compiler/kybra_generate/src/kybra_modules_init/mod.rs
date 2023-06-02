@@ -47,6 +47,19 @@ pub fn generate(
 
     quote::quote! {
         thread_local! {
+            static PYTHON_STDLIB_STABLE_REF_CELL: std::cell::RefCell<
+                ic_stable_structures::cell::Cell<
+                    Vec<u8>,
+                    ic_stable_structures::memory_manager::VirtualMemory<
+                        ic_stable_structures::DefaultMemoryImpl
+                    >
+                >
+            > = std::cell::RefCell::new(
+                ic_stable_structures::cell::Cell::init(
+                    MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(253))), vec![]
+                ).unwrap()
+            );
+
             static INITIALIZED_MAP_REF_CELL: std::cell::RefCell<
                 ic_stable_structures::cell::Cell<
                     u8,
@@ -113,7 +126,8 @@ pub fn generate(
             unsafe {
                 #(#params_initializations)*
 
-                let python_stdlib_bytes_reference: &'static [u8] = PYTHON_STDLIB_BYTECODE_REF_CELL.with(|x| x.borrow().clone()).leak(); // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
+                // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
+                let python_stdlib_bytes_reference: &'static [u8] = PYTHON_STDLIB_BYTECODE_REF_CELL.with(|x| x.borrow().clone()).leak();
 
                 let interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
                     vm.add_native_modules(rustpython_stdlib::get_module_inits());

@@ -719,6 +719,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "ic-stable-structures"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4e026318236de13568edafd85534ad29910908bf08cdcf177d4403fd4a5f6c4"
+
+[[package]]
 name = "ic0"
 version = "0.18.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -802,8 +808,11 @@ dependencies = [
 name = "kybra_deployer"
 version = "0.0.0"
 dependencies = [
+ "hex",
  "ic-cdk",
  "ic-cdk-macros 0.6.10",
+ "ic-stable-structures",
+ "sha2",
 ]
 
 [[package]]
@@ -826,8 +835,10 @@ name = "kybra_modules_init"
 version = "0.0.0"
 dependencies = [
  "dirs",
+ "hex",
  "rustpython",
  "rustpython-vm",
+ "sha2",
  "tempfile",
 ]
 
