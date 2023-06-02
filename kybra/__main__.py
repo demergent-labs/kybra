@@ -54,7 +54,7 @@ def main():
     create_file(f"{paths['canister']}/Cargo.lock", generate_cargo_lock())
     create_file(
         f"{paths['canister']}/post_install.sh",
-        generate_post_install_script(canister_name, kybra.__rust_version__),
+        generate_post_install_script(canister_name, kybra.__rust_version__, is_verbose),
     )
     os.system(f"chmod +x {paths['canister']}/post_install.sh")
 
@@ -92,7 +92,11 @@ def main():
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
 
 
-def generate_post_install_script(canister_name: str, rust_version: str) -> str:
+def generate_post_install_script(canister_name: str, rust_version: str, is_verbose: bool) -> str:
+
+    main_command = f"KYBRA_VERSION={kybra.__version__} cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name}"
+    main_command_not_verbose = f"output=$({main_command} 2>&1 >/dev/null) || {{ echo \"$output\"; exit 1; }}"
+
     return f"""#!/bin/bash
 
 rust_version="{rust_version}"
@@ -108,9 +112,7 @@ export CARGO_TARGET_DIR="$global_kybra_config_dir"/target
 export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
-touch .kybra/{canister_name}/kybra_modules_init/src/main.rs
-# cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name} &> "$global_kybra_logs_dir"/kybra_modules_init
-KYBRA_VERSION={kybra.__version__} cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name}
+{main_command if is_verbose else main_command_not_verbose}
     """
 
 

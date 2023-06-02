@@ -1,18 +1,11 @@
+// TODO share with DFINITY how I'm doing this, maybe they can build that into dfx to overcome some of the Wasm binary limitations temporarily
+// TODO a future version of dfx should take care of all of this chunk uploading for us
+
 use sha2::{Digest, Sha256};
 use std::io::Write;
 use std::process::Command;
 use tempfile::NamedTempFile;
 
-// TODO now just query canister_initialized to know...wait...maybe we should check the length of the stored stdlib and make sure it matches instead...or a hash!
-// TODO yes I think we should maybe hash the stdlib instead, and make sure the hashes match. That seems more robust and future-proof
-
-// TODO now how do we know if we need to upload the stdlib? We need to know if we are on init or post_upgrade
-// TODO perhaps we can query the canister to know
-
-// TODO now we need to make sure to only chunk-upload the stdlib one time
-// TODO we want to save it in stable memory in the deployer, then on post_upgrade fix it on the other side
-
-// TODO share with DFINITY how I'm doing this, maybe they can build that into dfx to overcome some of the Wasm binary limitations temporarily
 fn main() {
     let args: Vec<String> = std::env::args().collect();
 
@@ -20,12 +13,6 @@ fn main() {
 
     let max_chunk_size = 2 * 1_000 * 1_000; // 2 MB
 
-    match std::env::current_dir() {
-        Ok(current_dir) => println!("Current working directory: {}", current_dir.display()),
-        Err(e) => println!("Error getting current directory: {}", e),
-    };
-
-    // TODO a future version of dfx should take care of this chunk uploading for us
     let wasm = std::fs::read(format!(
         ".kybra/{canister_name}/{canister_name}_app.wasm.gz"
     ))
@@ -72,21 +59,18 @@ fn main() {
 
     if python_stdlib_hash_output.status.success() {
         println!(
-            "Output: {:?}",
-            String::from_utf8_lossy(&python_stdlib_hash_output.stdout)
+            "{}",
+            format!(
+                "Output from {canister_name}/python_stdlib_hash: {:?}",
+                String::from_utf8_lossy(&python_stdlib_hash_output.stdout)
+            )
         );
     } else {
-        eprintln!(
+        panic!(
             "Error: {:?}",
             String::from_utf8_lossy(&python_stdlib_hash_output.stderr)
         );
     }
-
-    println!("{}", format!("(\"{hash_hex}\")"));
-    println!(
-        "{}",
-        String::from_utf8_lossy(&python_stdlib_hash_output.stdout)
-    );
 
     if format!("(\"{hash_hex}\")")
         != String::from_utf8_lossy(&python_stdlib_hash_output.stdout).trim()
@@ -129,11 +113,11 @@ fn main() {
 
     if add_controller_output.status.success() {
         println!(
-            "Output: {:?}",
+            "Output from canister update-settings: {:?}",
             String::from_utf8_lossy(&add_controller_output.stdout)
         );
     } else {
-        eprintln!(
+        panic!(
             "Error: {:?}",
             String::from_utf8_lossy(&add_controller_output.stderr)
         );
@@ -150,52 +134,18 @@ fn main() {
     // TODO this will error out until we use notify
     if install_output.status.success() {
         println!(
-            "Output: {:?}",
-            String::from_utf8_lossy(&install_output.stdout)
+            "{}",
+            format!(
+                "Output from {canister_name}/install_wasm: {:?}",
+                String::from_utf8_lossy(&install_output.stdout)
+            )
         );
     } else {
-        eprintln!(
+        panic!(
             "Error: {:?}",
             String::from_utf8_lossy(&install_output.stderr)
         );
     }
-
-    // let clear_output = Command::new("dfx")
-    //     .arg("canister")
-    //     .arg("call")
-    //     .arg(canister_name)
-    //     .arg("clear_python_bytecode_chunks")
-    //     .output()
-    //     .expect("Failed to execute the dfx command");
-
-    // if clear_output.status.success() {
-    //     println!(
-    //         "Output: {:?}",
-    //         String::from_utf8_lossy(&clear_output.stdout)
-    //     );
-    // } else {
-    //     eprintln!("Error: {:?}", String::from_utf8_lossy(&clear_output.stderr));
-    // }
-
-    // let initialize_output = Command::new("dfx")
-    //     .arg("canister")
-    //     .arg("call")
-    //     .arg(canister_name)
-    //     .arg("initialize_python_modules")
-    //     .output()
-    //     .expect("Failed to execute the dfx command");
-
-    // if initialize_output.status.success() {
-    //     println!(
-    //         "Output: {:?}",
-    //         String::from_utf8_lossy(&initialize_output.stdout)
-    //     );
-    // } else {
-    //     eprintln!(
-    //         "Error: {:?}",
-    //         String::from_utf8_lossy(&initialize_output.stderr)
-    //     );
-    // }
 }
 
 fn upload_chunk(canister_name: &str, bytecode_chunk: Vec<u8>, canister_method_name: &str) {
@@ -217,9 +167,15 @@ fn upload_chunk(canister_name: &str, bytecode_chunk: Vec<u8>, canister_method_na
         .expect("Failed to execute the dfx command");
 
     if output.status.success() {
-        println!("Output: {:?}", String::from_utf8_lossy(&output.stdout));
+        println!(
+            "{}",
+            format!(
+                "Output from {canister_name}/{canister_method_name}: {:?}",
+                String::from_utf8_lossy(&output.stdout)
+            )
+        );
     } else {
-        eprintln!("Error: {:?}", String::from_utf8_lossy(&output.stderr));
+        panic!("Error: {:?}", String::from_utf8_lossy(&output.stderr));
     }
 }
 
