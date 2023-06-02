@@ -20,6 +20,18 @@ impl PyAst {
     pub fn build_post_upgrade_method(
         &self,
     ) -> Result<(PostUpgradeMethod, TokenStream), Vec<Error>> {
+        let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
+
+        if init_function_defs.len() > 1 {
+            return Err(MultipleSystemMethods::err_from_stmt(
+                &init_function_defs,
+                CanisterMethodType::Init,
+            )
+            .into());
+        }
+
+        let init_function_def_option = init_function_defs.get(0);
+
         let post_upgrade_function_defs =
             self.get_canister_stmt_of_type(CanisterMethodType::PostUpgrade);
 
@@ -67,7 +79,11 @@ impl PyAst {
         Ok((
             PostUpgradeMethod {
                 params: params.clone(),
-                body: rust::generate(post_upgrade_function_def_option, &self.entry_module_name),
+                body: rust::generate(
+                    init_function_def_option,
+                    post_upgrade_function_def_option,
+                    &self.entry_module_name,
+                ),
                 guard_function_name,
             },
             call_to_post_upgrade_py_function,
