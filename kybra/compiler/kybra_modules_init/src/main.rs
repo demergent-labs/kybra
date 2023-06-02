@@ -10,14 +10,15 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let canister_name = &args[1];
     let max_chunk_size = 2 * 1_000 * 1_000; // 2 MB
+    let dfx_network = std::env::var("DFX_NETWORK").unwrap();
 
-    upload_app_canister(canister_name, max_chunk_size);
-    upload_python_stdlib(canister_name, max_chunk_size);
-    set_permissions(canister_name);
-    install_app_canister(canister_name);
+    upload_app_canister(canister_name, max_chunk_size, &dfx_network);
+    upload_python_stdlib(canister_name, max_chunk_size, &dfx_network);
+    set_permissions(canister_name, &dfx_network);
+    install_app_canister(canister_name, &dfx_network);
 }
 
-fn upload_app_canister(canister_name: &str, max_chunk_size: usize) {
+fn upload_app_canister(canister_name: &str, max_chunk_size: usize, dfx_network: &str) {
     let wasm = std::fs::read(format!(
         ".kybra/{canister_name}/{canister_name}_app.wasm.gz"
     ))
@@ -26,11 +27,11 @@ fn upload_app_canister(canister_name: &str, max_chunk_size: usize) {
     let wasm_chunks = split_into_chunks(wasm, max_chunk_size);
 
     for wasm_chunk in wasm_chunks {
-        upload_chunk(canister_name, wasm_chunk, "upload_wasm_chunk");
+        upload_chunk(canister_name, wasm_chunk, "upload_wasm_chunk", dfx_network);
     }
 }
 
-fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize) {
+fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize, dfx_network: &str) {
     let python_stdlib_bytecode = get_python_stdlib_bytecode();
 
     let mut hasher = Sha256::new();
@@ -41,6 +42,8 @@ fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize) {
     let remote_python_stdlib_hash_output = Command::new("dfx")
         .arg("canister")
         .arg("call")
+        .arg("--network")
+        .arg(dfx_network)
         .arg(canister_name)
         .arg("python_stdlib_hash")
         .output()
@@ -79,6 +82,7 @@ fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize) {
                 canister_name,
                 python_stdlib_bytecode_chunk,
                 "upload_python_stdlib_chunk",
+                dfx_network,
             );
         }
     }
@@ -106,10 +110,12 @@ fn get_python_stdlib_bytecode() -> Vec<u8> {
     python_stdlib_bytecode
 }
 
-fn set_permissions(canister_name: &str) {
+fn set_permissions(canister_name: &str, dfx_network: &str) {
     let canister_id_output = Command::new("dfx")
         .arg("canister")
         .arg("id")
+        .arg("--network")
+        .arg(dfx_network)
         .arg(canister_name)
         .output()
         .expect("Failed to execute the dfx canister id command");
@@ -121,6 +127,8 @@ fn set_permissions(canister_name: &str) {
     let add_controller_output = Command::new("dfx")
         .arg("canister")
         .arg("update-settings")
+        .arg("--network")
+        .arg(dfx_network)
         .arg("--add-controller")
         .arg(canister_id)
         .arg(canister_name)
@@ -140,10 +148,12 @@ fn set_permissions(canister_name: &str) {
     }
 }
 
-fn install_app_canister(canister_name: &str) {
+fn install_app_canister(canister_name: &str, dfx_network: &str) {
     let install_output = Command::new("dfx")
         .arg("canister")
         .arg("call")
+        .arg("--network")
+        .arg(dfx_network)
         .arg(canister_name)
         .arg("install_wasm")
         .output()
@@ -166,7 +176,12 @@ fn install_app_canister(canister_name: &str) {
     }
 }
 
-fn upload_chunk(canister_name: &str, bytecode_chunk: Vec<u8>, canister_method_name: &str) {
+fn upload_chunk(
+    canister_name: &str,
+    bytecode_chunk: Vec<u8>,
+    canister_method_name: &str,
+    dfx_network: &str,
+) {
     let blob_string = vec_u8_to_blob_string(&bytecode_chunk);
 
     let mut temp_file = NamedTempFile::new().expect("Failed to create temporary file");
@@ -177,6 +192,8 @@ fn upload_chunk(canister_name: &str, bytecode_chunk: Vec<u8>, canister_method_na
     let output = Command::new("dfx")
         .arg("canister")
         .arg("call")
+        .arg("--network")
+        .arg(dfx_network)
         .arg(canister_name)
         .arg(canister_method_name)
         .arg("--argument-file")
