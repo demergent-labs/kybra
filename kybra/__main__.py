@@ -159,7 +159,7 @@ def create_paths(args: Args) -> Paths:
     # py_freeze! will compile all of the Python code in the directory recursively (modules must have an __init__.py to be included)
     python_source_path = f"{canister_path}/python_source"
 
-    py_file_names_file_path = f"{canister_path}/file_names.txt"
+    py_file_names_file_path = f"{canister_path}/py_file_names.csv"
 
     # This is the path to the developer's Candid file passed into python -m kybra from the dfx.json build command
     did_path = args["did_path"]

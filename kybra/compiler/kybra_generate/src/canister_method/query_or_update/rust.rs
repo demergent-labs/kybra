@@ -24,7 +24,7 @@ pub fn generate_body(
         .map(|param| {
             let name = format_ident!("{}", param.get_prefixed_name());
             quote! {
-                #name.try_into_vm_value(vm).unwrap()
+                #name.try_into_vm_value(vm).unwrap_or_trap()
             }
         })
         .collect();
@@ -33,27 +33,25 @@ pub fn generate_body(
 
     Ok(quote! {
         unsafe {
-            let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
-            let scope = SCOPE_OPTION.as_mut().unwrap();
+            let interpreter = INTERPRETER_OPTION
+                .as_mut()
+                .unwrap_or_trap("SystemError: missing python interpreter");
+            let scope = SCOPE_OPTION
+                .as_mut()
+                .unwrap_or_trap("SystemError: missing python scope");
 
             let vm = &interpreter.vm;
 
-            let method_py_object_ref = unwrap_rust_python_result(scope.globals.get_item(#name, vm), vm);
+            let py_object_ref = scope
+                .globals
+                .get_item(#name, vm).unwrap_or_trap(vm)
+                .call(#params, vm).unwrap_or_trap(vm);
 
-            let invoke_result = vm.invoke(&method_py_object_ref, #params);
+            let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none())
+                .await
+                .unwrap_or_trap(vm);
 
-            match invoke_result {
-                Ok(py_object_ref) => {
-                    let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
-
-                    #return_expression
-                },
-                Err(err) => {
-                    let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
-
-                    panic!("{}", err_string);
-                }
-            }
+            #return_expression
         }
     })
 }
@@ -74,7 +72,7 @@ fn generate_return_expression(
     }
 
     Ok(quote! {
-        final_return_value.try_from_vm_value(vm).unwrap()
+        final_return_value.try_from_vm_value(vm).unwrap_or_trap()
     })
 }
 

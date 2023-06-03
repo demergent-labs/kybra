@@ -12,8 +12,12 @@ pub fn generate(
 
     Ok(quote! {
         unsafe {
-            let interpreter = INTERPRETER_OPTION.as_mut().unwrap();
-            let scope = SCOPE_OPTION.as_mut().unwrap();
+            let interpreter = INTERPRETER_OPTION
+                .as_mut()
+                .unwrap_or_trap("SystemError: missing python interpreter");
+            let scope = SCOPE_OPTION
+                .as_mut()
+                .unwrap_or_trap("SystemError: missing python scope");
 
             interpreter.enter(|vm| {
                 #call_to_pre_upgrade_py_function

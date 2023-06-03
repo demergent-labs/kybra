@@ -99,13 +99,12 @@ pub fn generate() -> TokenStream {
                 rustpython::vm::PyObjectRef,
             >,
         {
-            let py_object_refs = generic_array
+            let py_object_refs_result: Result<Vec<rustpython_vm::PyObjectRef>, CdkActTryIntoVmValueError> = generic_array
                 .into_iter()
-                .map(|item| item.try_into_vm_value(vm).unwrap())
-                .collect::<Vec<rustpython_vm::PyObjectRef>>();
+                .map(|item| item.try_into_vm_value(vm))
+                .collect();
 
-            Ok(vm.ctx.new_list(py_object_refs).into())
+            Ok(vm.ctx.new_list(py_object_refs_result?).into())
         }
-
     }
 }

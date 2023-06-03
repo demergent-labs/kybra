@@ -258,14 +258,45 @@ class ic(Generic[T]):
 
     @staticmethod
     def caller() -> Principal:
+        """Returns the caller of the current call.
+
+        Returns:
+            (Principal): the caller of the current call.
+        Raises:
+            TypeError: the caller could not be converted to a Principal.
+        """
         return _kybra_ic.caller()  # type: ignore
 
     @staticmethod
     def candid_encode(candid_string: str) -> blob:
+        """Converts the provided string into a Candid value.
+
+        Args:
+            candid_string (str): a string representation of a Candid value
+
+        Returns:
+            (blob): a Candid value
+
+        Raises:
+            CandidError: an error occurred while processing the input.
+            TypeError: the provided value was not of the correct type.
+        """
         return _kybra_ic.candid_encode(candid_string)  # type: ignore
 
     @staticmethod
     def candid_decode(candid_encoded: blob) -> str:
+        """Converts the provided Candid bytes into a string representation.
+
+        Args:
+            candid_encode (blob): a blob representing a Candid value.
+
+        Returns:
+            (blob): a string representation of the value.
+
+        Raises:
+            CandidError: an error occurred while processing the input.
+            TypeError: the provided value was not of the correct type.
+        """
         return _kybra_ic.candid_decode(candid_encoded)  # type: ignore
 
     @staticmethod
@@ -603,3 +634,19 @@ def match(
         return matcher["Ok"](getattr(variant, "Ok"))
 
     raise Exception("No matching case found")
+
+
+# region Exceptions
+class Error(Exception):
+    """Base exception for all errors raised by Kybra"""
+
+    pass
+
+
+class CandidError(Error):
+    """Raised when converting to/from Candid values."""
+
+    pass
+
+
+# endregion Exceptions

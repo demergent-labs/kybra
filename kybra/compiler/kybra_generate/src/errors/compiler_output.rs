@@ -124,8 +124,8 @@ where
         return Location {
             origin: self.get_origin(),
             line_number: self.get_line_number(),
-            source: self.get_source(),
-            range: self.get_range(),
+            source: "".to_string(),
+            range: (0, 0),
         };
     }
 }
