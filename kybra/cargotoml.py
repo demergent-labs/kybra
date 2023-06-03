@@ -43,7 +43,7 @@ serde = {{ version = "1.0.137", default-features = false, features = [] }}
 async-recursion = "1.0.0"
 ic-stable-structures = "0.5.2"
 slotmap = "1.0.6"
-ic-wasi-polyfill = {{ git = "https://github.com/demergent-labs/ic-wasi-polyfill", rev = "40f3ab7818a36f6a8e9ee551dd9d87d0f7b5e2db" }}
+ic-wasi-polyfill = {{ git = "https://github.com/demergent-labs/ic-wasi-polyfill", rev = "bb548c13ed5bae88366d14cd2e94edaa0d4dcc3e" }}
 # ic-wasi-polyfill = {{ git = "https://github.com/wasm-forge/ic-wasi-polyfill", rev = "2395f9e0fd3935d94ae986f92bef1f98186e69cc" }}
 
 [patch.crates-io]

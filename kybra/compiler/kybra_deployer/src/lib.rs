@@ -5,6 +5,8 @@ thread_local! {
 
     static INSTALLER_REF_CELL: std::cell::RefCell<String> = std::cell::RefCell::new("".to_string());
 
+    static ARG_DATA_RAW_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
+
     static PYTHON_STDLIB_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
 
     static PYTHON_STDLIB_STABLE_REF_CELL: std::cell::RefCell<
@@ -37,6 +39,11 @@ pub fn init() {
         let mut installer_ref_mut = installer_ref_cell.borrow_mut();
         *installer_ref_mut = ic_cdk::caller().to_string();
     });
+
+    ARG_DATA_RAW_REF_CELL.with(|arg_data_raw_ref_cell| {
+        let mut arg_data_ref_mut = arg_data_raw_ref_cell.borrow_mut();
+        *arg_data_ref_mut = ic_cdk::api::call::arg_data_raw();
+    });
 }
 
 #[ic_cdk_macros::post_upgrade]
@@ -44,6 +51,11 @@ pub fn post_upgrade() {
     INSTALLER_REF_CELL.with(|installer_ref_cell| {
         let mut installer_ref_mut = installer_ref_cell.borrow_mut();
         *installer_ref_mut = ic_cdk::caller().to_string();
+    });
+
+    ARG_DATA_RAW_REF_CELL.with(|arg_data_raw_ref_cell| {
+        let mut arg_data_ref_mut = arg_data_raw_ref_cell.borrow_mut();
+        *arg_data_ref_mut = ic_cdk::api::call::arg_data_raw();
     });
 }
 
@@ -84,9 +96,6 @@ pub fn python_stdlib_hash() -> String {
     })
 }
 
-// TODO figure out args
-// TODO it will probably be similar to kybra_modules_init
-// TODO I think for the init stuff...I wonder if I can just store the args as binary
 #[ic_cdk_macros::update(guard = "installer_guard")]
 pub async fn install_wasm() {
     PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
@@ -112,7 +121,8 @@ pub async fn install_wasm() {
                 mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
                 canister_id: ic_cdk::api::id(),
                 wasm_module,
-                arg: vec![], // TODO I think we need to get the args from init, store them globally, and retrieve them here
+                arg: ARG_DATA_RAW_REF_CELL
+                    .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
             },
         ),
     );
@@ -128,13 +138,6 @@ pub async fn install_wasm() {
 fn installer_guard() -> Result<(), String> {
     let installer =
         INSTALLER_REF_CELL.with(|installer_ref_cell| installer_ref_cell.borrow().clone());
-
-    ic_cdk::println!("installer: {}", installer);
-
-    ic_cdk::println!(
-        "ic_cdk::caller().to_string(): {}",
-        ic_cdk::caller().to_string(),
-    );
 
     if installer == ic_cdk::caller().to_string() {
         return Ok(());
