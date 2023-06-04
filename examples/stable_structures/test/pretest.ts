@@ -19,6 +19,8 @@ async function pretest() {
         stdio: 'inherit'
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 10_000));
+
     execSync(`dfx generate`, {
         stdio: 'inherit'
     });

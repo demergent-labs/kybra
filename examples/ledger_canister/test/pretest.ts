@@ -51,6 +51,8 @@ async function pretest(icp_ledger_path: string) {
         }
     );
 
+    await new Promise((resolve) => setTimeout(resolve, 10_000));
+
     execSync(`dfx generate ledger_canister`, {
         stdio: 'inherit'
     });
