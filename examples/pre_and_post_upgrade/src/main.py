@@ -24,7 +24,7 @@ class Entry(Record):
 
 
 stable_storage = StableBTreeMap[str, Vec[Entry]](
-    memory_id=0, max_key_size=100, max_value_size=100
+    memory_id=3, max_key_size=100, max_value_size=100
 )
 
 entries: dict[str, nat64] = {}
