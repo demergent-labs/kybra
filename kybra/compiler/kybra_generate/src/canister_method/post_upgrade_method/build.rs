@@ -32,6 +32,11 @@ impl PyAst {
 
         let init_function_def_option = init_function_defs.get(0);
 
+        let init_params = match init_function_def_option {
+            Some(init_function_def) => init_function_def.build_params(InternalOrExternal::Internal),
+            None => Ok(vec![]),
+        }?;
+
         let post_upgrade_function_defs =
             self.get_canister_stmt_of_type(CanisterMethodType::PostUpgrade);
 
@@ -45,18 +50,12 @@ impl PyAst {
 
         let post_upgrade_function_def_option = post_upgrade_function_defs.get(0);
 
-        let (init_params, post_upgrade_params, guard_function_name) =
+        let (post_upgrade_params, guard_function_name) =
             if let Some(post_upgrade_function_def) = post_upgrade_function_def_option {
-                let (guard_function_name, init_params, post_upgrade_params, return_type) = (
+                let (guard_function_name, post_upgrade_params, return_type) = (
                     post_upgrade_function_def
                         .get_guard_function_name()
                         .map_err(Error::into),
-                    match init_function_def_option {
-                        Some(init_function_def) => {
-                            init_function_def.build_params(InternalOrExternal::Internal)
-                        }
-                        None => Ok(vec![]),
-                    },
                     post_upgrade_function_def.build_params(InternalOrExternal::Internal),
                     post_upgrade_function_def.build_return_type(),
                 )
@@ -70,9 +69,9 @@ impl PyAst {
                     .into());
                 }
 
-                (init_params, post_upgrade_params, guard_function_name)
+                (post_upgrade_params, guard_function_name)
             } else {
-                (vec![], vec![], None)
+                (vec![], None)
             };
 
         let call_to_post_upgrade_py_function = match &post_upgrade_function_def_option {
