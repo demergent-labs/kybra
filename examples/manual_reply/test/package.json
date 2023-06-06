@@ -1,7 +1,7 @@
 {
     "scripts": {
-        "pretest": "cd .. && ts-node --transpile-only --ignore=false test/pretest.ts",
-        "test": "cd .. && ts-node --transpile-only --ignore=false test/test.ts"
+        "pretest": "cd .. && KYBRA_REBUILD=true ts-node --transpile-only --ignore=false test/pretest.ts",
+        "test": "cd .. && KYBRA_REBUILD=true ts-node --transpile-only --ignore=false test/test.ts"
     },
     "devDependencies": {
         "ts-node": "10.7.0",
