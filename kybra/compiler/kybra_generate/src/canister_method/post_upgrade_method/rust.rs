@@ -22,7 +22,9 @@ pub fn generate(
     };
 
     quote! {
-        ic_wasi_polyfill::init(0);
+        let randomness = RANDOMNESS_STABLE_REF_CELL.with(|randomness_stable_ref_cell| randomness_stable_ref_cell.borrow().get().clone());
+
+        ic_wasi_polyfill::init(u64::from_be_bytes(randomness[..8].try_into().unwrap()));
 
         unsafe {
             let _kybra_interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
@@ -67,8 +69,6 @@ pub fn generate(
             }
 
             INITIALIZED_MAP_REF_CELL.with(|initialized_map_ref_cell| initialized_map_ref_cell.borrow_mut().set(1));
-
-            ic_cdk_timers::set_timer(core::time::Duration::new(0, 0), rng_seed);
         }
     }
 }

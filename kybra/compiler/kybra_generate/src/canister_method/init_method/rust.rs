@@ -8,7 +8,5 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 pub fn generate() -> TokenStream {
-    quote! {
-        ic_wasi_polyfill::init(0);
-    }
+    quote! {}
 }

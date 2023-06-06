@@ -1,3 +1,5 @@
+// TODO installer guard not necessary, we should be able to use is_controller in that guard
+
 use sha2::{Digest, Sha256};
 
 thread_local! {
@@ -8,6 +10,19 @@ thread_local! {
     static ARG_DATA_RAW_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
 
     static PYTHON_STDLIB_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
+
+    static RANDOMNESS_STABLE_REF_CELL: std::cell::RefCell<
+        ic_stable_structures::cell::Cell<
+            Vec<u8>,
+            ic_stable_structures::memory_manager::VirtualMemory<
+                ic_stable_structures::DefaultMemoryImpl
+            >
+        >
+    > = std::cell::RefCell::new(
+        ic_stable_structures::cell::Cell::init(
+            MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(252))), vec![]
+        ).unwrap()
+    );
 
     static PYTHON_STDLIB_STABLE_REF_CELL: std::cell::RefCell<
         ic_stable_structures::cell::Cell<
@@ -98,6 +113,21 @@ pub fn python_stdlib_hash() -> String {
 
 #[ic_cdk_macros::update(guard = "installer_guard")]
 pub async fn install_wasm() {
+    let randomness_result: ic_cdk::api::call::CallResult<(Vec<u8>,)> = ic_cdk::api::call::call(
+        ic_cdk::export::Principal::from_text("aaaaa-aa").unwrap(),
+        "raw_rand",
+        (),
+    )
+    .await;
+
+    RANDOMNESS_STABLE_REF_CELL.with(|randomness_stable_ref_cell| {
+        let mut randomness_stable_ref_mut = randomness_stable_ref_cell.borrow_mut();
+
+        let randomness = randomness_result.unwrap().0;
+
+        randomness_stable_ref_mut.set(randomness).unwrap();
+    });
+
     PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
         let mut python_stdlib_stable_ref_mut = python_stdlib_stable_ref_cell.borrow_mut();
 
