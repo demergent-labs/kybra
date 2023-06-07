@@ -145,25 +145,21 @@ pub async fn install_wasm() {
 
     let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
 
-    let result = ic_cdk::api::call::notify(
-        ic_cdk::api::management_canister::main::CanisterId::management_canister(),
-        "install_code",
-        (
-            ic_cdk::api::management_canister::main::InstallCodeArgument {
-                mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
-                canister_id: ic_cdk::api::id(),
-                wasm_module,
-                arg: ARG_DATA_RAW_REF_CELL
-                    .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
-            },
-        ),
-    );
+    let result = ic_cdk::api::management_canister::main::install_code(
+        ic_cdk::api::management_canister::main::InstallCodeArgument {
+            mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
+            canister_id: ic_cdk::api::id(),
+            wasm_module,
+            arg: ARG_DATA_RAW_REF_CELL
+                .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
+        },
+    )
+    .await;
 
+    // This will never be reached because the install_code call returns to a different Wasm binary
+    // and the callback no longer exists
     match result {
-        Ok(_) => {}
-        Err(err) => {
-            panic!("{:#?}", err);
-        }
+        _ => (),
     }
 }
 
