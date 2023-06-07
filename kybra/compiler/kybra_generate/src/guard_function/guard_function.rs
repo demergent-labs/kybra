@@ -17,7 +17,7 @@ pub fn generate(function_name: &String) -> TokenStream {
                 .ok_or_else(|| "SystemError: missing python scope".to_string())?;
 
             interpreter.enter(|vm| {
-                let method_py_object_ref = scope
+                scope
                     .globals
                     .get_item(#function_name, vm)
                     .map_err(|err| {
@@ -27,9 +27,7 @@ pub fn generate(function_name: &String) -> TokenStream {
                             Ok(err_message) => format!("{type_name}: {}", err_message.to_string()),
                             Err(_) => format!("Attribute Error: '{type_name}' object has no attribute '__str__'"),
                         }
-                    })?;
-
-                let py_object_ref = method_py_object_ref
+                    })?
                     .call((), vm)
                     .map_err(|err| {
                         let py_object = err.to_pyobject(vm);
@@ -38,9 +36,9 @@ pub fn generate(function_name: &String) -> TokenStream {
                             Ok(err_message) => format!("{type_name}: {}", err_message.to_string()),
                             Err(_) => format!("Attribute Error: '{type_name}' object has no attribute '__str__'"),
                         }
-                    })?;
-
-                py_object_ref.try_from_vm_value(vm).map_err(|err| err.0)
+                    })?
+                    .try_from_vm_value(vm)
+                    .map_err(|vmc_err| format!("TypeError: {}", vmc_err.0))?
             })
         }
     }
