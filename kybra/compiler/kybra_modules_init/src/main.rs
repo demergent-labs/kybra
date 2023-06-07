@@ -159,7 +159,6 @@ fn install_app_canister(canister_name: &str, dfx_network: &str) {
         .output()
         .expect("Failed to execute the dfx command");
 
-    // TODO this will error out until we use notify
     if install_output.status.success() {
         println!(
             "{}",
@@ -169,10 +168,18 @@ fn install_app_canister(canister_name: &str, dfx_network: &str) {
             )
         );
     } else {
-        panic!(
-            "Error: {:?}",
-            String::from_utf8_lossy(&install_output.stderr)
-        );
+        let error_message = String::from_utf8_lossy(&install_output.stderr);
+
+        if error_message.contains("did not reply to the call")
+            || error_message.contains("function invocation does not match its signature")
+        {
+            println!("Finished installing canister");
+        } else {
+            panic!(
+                "Error: {:?}",
+                String::from_utf8_lossy(&install_output.stderr)
+            );
+        }
     }
 }
 
