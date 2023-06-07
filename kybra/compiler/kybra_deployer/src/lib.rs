@@ -1,4 +1,6 @@
-// TODO installer guard not necessary, we should be able to use is_controller in that guard
+// TODO Once we upgrade to ic-cdk 0.8.1 and dfx >= 14 something
+// TODO then I think we can use the new ic_cdk::api::is_controller check
+// TODO and get rid of INSTALLER_REF_CELL
 
 use sha2::{Digest, Sha256};
 
