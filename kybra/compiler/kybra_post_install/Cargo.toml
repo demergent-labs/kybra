@@ -1,5 +1,5 @@
 [package]
-name = "kybra_modules_init"
+name = "kybra_post_install"
 version = "0.0.0"
 edition = "2018"
 build = "build.rs"

@@ -94,7 +94,7 @@ def main():
 
 def generate_post_install_script(canister_name: str, rust_version: str, is_verbose: bool) -> str:
 
-    main_command = f"KYBRA_VERSION={kybra.__version__} cargo run --manifest-path=.kybra/{canister_name}/kybra_modules_init/Cargo.toml {canister_name}"
+    main_command = f"KYBRA_VERSION={kybra.__version__} cargo run --manifest-path=.kybra/{canister_name}/kybra_post_install/Cargo.toml {canister_name}"
     main_command_not_verbose = f"output=$({main_command} 2>&1 >/dev/null) || {{ echo \"$output\"; exit 1; }}"
 
     return f"""#!/bin/bash
@@ -296,7 +296,7 @@ def bundle_python_code(paths: Paths):
     create_file(paths["py_file_names_file"], ",".join(py_file_names))  # type: ignore
 
 def ignore_specific_dir(dirname: str, filenames: list[str]) -> list[str]:
-    if 'kybra_modules_init/src/Lib' in dirname:
+    if 'kybra_post_install/src/Lib' in dirname:
         return filenames
     else:
         return []
