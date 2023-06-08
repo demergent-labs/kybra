@@ -33,7 +33,6 @@ pub fn generate(function_name: &String) -> TokenStream {
                         }
                     })?
                     .try_from_vm_value(vm)
-                    // .map_err(|vmc_err| "TypeError: value is not a GuardResult".to_string())?
                     .map_err(|vmc_err| vmc_err.0)?
             })
         }
