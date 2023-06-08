@@ -22,36 +22,12 @@ pub fn generate() -> TokenStream {
                 let py_object_ref = scope
                     .globals
                     .get_item(function_name, vm)
-                    // TODO: Abstract this error conversion logic
-                    .map_err(|py_base_exception| {
-                        let py_object = py_base_exception.to_pyobject(vm);
-                        let type_name = py_object.class().name().to_string();
-                        match py_object.str(vm) {
-                            Ok(err_message) => format!("{type_name}: {}", err_message.to_string()),
-                            Err(_) => format!("Attribute Error: '{type_name}' object has no attribute '__str__'"),
-                        }
-                    })?
+                    .map_err(|py_base_exception| py_base_exception.to_rust_err_string(vm))?
                     .call(args, vm)
-                    // TODO: Abstract this error conversion logic
-                    .map_err(|py_base_exception| {
-                        let py_object = py_base_exception.to_pyobject(vm);
-                        let type_name = py_object.class().name().to_string();
-                        match py_object.str(vm) {
-                            Ok(err_message) => format!("{type_name}: {}", err_message.to_string()),
-                            Err(_) => format!("Attribute Error: '{type_name}' object has no attribute '__str__'"),
-                        }
-                    })?;
+                    .map_err(|py_base_exception| py_base_exception.to_rust_err_string(vm))?;
                 let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none())
                     .await
-                    // TODO: Abstract this error conversion logic
-                    .map_err(|py_base_exception| {
-                        let py_object = py_base_exception.to_pyobject(vm);
-                        let type_name = py_object.class().name().to_string();
-                        match py_object.str(vm) {
-                            Ok(err_message) => format!("{type_name}: {}", err_message.to_string()),
-                            Err(_) => format!("Attribute Error: '{type_name}' object has no attribute '__str__'"),
-                        }
-                    })?;
+                    .map_err(|py_base_exception| py_base_exception.to_rust_err_string(vm))?;
 
                 final_return_value
                     .try_from_vm_value(vm)
