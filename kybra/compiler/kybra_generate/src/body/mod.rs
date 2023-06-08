@@ -10,6 +10,8 @@ use crate::{
     unwrap_rust_python_result, utils, StableBTreeMapNode,
 };
 
+mod call_global_python_function;
+
 pub fn generate(
     update_methods: &Vec<UpdateMethod>,
     query_methods: &Vec<QueryMethod>,
@@ -36,6 +38,7 @@ pub fn generate(
         call_post_upgrade_py_function,
     );
     let utils = utils::generate();
+    let call_global_python_function = call_global_python_function::generate();
 
     quote::quote! {
         #ic_object
@@ -44,5 +47,6 @@ pub fn generate(
         #stable_b_tree_map
         #kybra_modules_init
         #utils
+        #call_global_python_function
     }
 }
