@@ -12,6 +12,7 @@ const functionGuardCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 let tests: Test[] = [
     ...getTests(createSnakeCaseProxy(functionGuardCanister)).filter((value) => {
         return (
+            value.name !== 'callExpressionWithEmptyOptionsObject' &&
             value.name !== 'looselyGuardedWithGuardOptionKeyAsString' &&
             value.name !== 'invalidReturnTypeGuarded' &&
             value.name !== 'badObjectGuarded' &&
@@ -19,7 +20,6 @@ let tests: Test[] = [
             value.name !== 'nonStringErrValueGuarded'
         );
     }),
-    // TODO we should make these errors more presentable
     {
         name: 'invalid_return_type_guarded',
         test: async () => {
@@ -31,7 +31,7 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'TypeError: Expected NoneType but received str'
+                        'TypeError: expected Result but received str'
                     )
                 };
             }
@@ -46,7 +46,7 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'NameError(\\"name \'badProp\' is not defined\\")'
+                        'TypeError: expected Result but received dict'
                     )
                 };
             }
@@ -63,7 +63,7 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'NameError(\\"name \'Ok\' is not defined\\")'
+                        'TypeError: expected NoneType but received str'
                     )
                 };
             }
@@ -80,7 +80,24 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'NameError(\\"name \'Err\' is not defined\\")'
+                        'TypeError: expected str but received dict'
+                    )
+                };
+            }
+        }
+    },
+    {
+        name: 'name_error_guarded',
+        test: async () => {
+            try {
+                await functionGuardCanister.name_error_guarded();
+                return {
+                    Err: 'name_error_guarded should have had an error'
+                };
+            } catch (err) {
+                return {
+                    Ok: (err as AgentError).message.includes(
+                        "NameError: name 'Ok' is not defined"
                     )
                 };
             }

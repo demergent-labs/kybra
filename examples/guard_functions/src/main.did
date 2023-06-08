@@ -1,7 +1,6 @@
 type State = record { counter : int32; heartbeat_tick : int32 };
 service : () -> {
   bad_object_guarded : () -> (bool) query;
-  call_expression_with_empty_options_object : () -> (bool) query;
   call_expression_without_options_object : () -> (bool) query;
   custom_error_guarded : () -> (bool) query;
   error_string_guarded : () -> (bool) query;
@@ -11,6 +10,7 @@ service : () -> {
   loosely_guarded : () -> (bool) query;
   loosely_guarded_manual : () -> (bool) query;
   modify_state_guarded : () -> (bool);
+  name_error_guarded : () -> (bool) query;
   non_null_ok_value_guarded : () -> (bool) query;
   non_string_err_value_guarded : () -> (bool) query;
   tightly_guarded : () -> (bool) query;
