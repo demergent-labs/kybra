@@ -12,12 +12,7 @@ from kybra import (
     void,
 )
 
-
-def adelante() -> GuardResult:
-    ic.print("We are in the adelante")
-    return {
-        "Ok": None,
-    }
+# region Types
 
 
 class State(Record):
@@ -25,7 +20,16 @@ class State(Record):
     heartbeat_tick: int32
 
 
+class CustomError(Exception):
+    def __init__(self, message: str):
+        self.message = message
+
+
+# endregion Types
+
 state: State = {"counter": 0, "heartbeat_tick": 0}
+
+# region GuardFunctions
 
 
 def allow_modify_state_guarded() -> GuardResult:
@@ -75,43 +79,46 @@ def unpassable() -> GuardResult:
 
 
 def throw_string() -> GuardResult:
-    ic.print("throwString called")
+    ic.print("throw_string called")
     raise Exception('Execution halted by "throw string" guard function')
 
 
-class CustomError(Exception):
-    def __init__(self, message: str):
-        self.message = message
-
-
 def throw_custom_error() -> GuardResult:
-    ic.print("throwCustomError called")
+    ic.print("throw_custom_error called")
     raise CustomError('Execution halted by "throw custom error" guard function')
 
 
 def prevent_upgrades() -> GuardResult:
-    ic.print("preventUpgrades called")
+    ic.print("prevent_upgrades called")
     return {"Err": "Upgrades to this canister are disabled"}
 
 
 def return_invalid_type() -> GuardResult:
     ic.print("return_invalid_type called")
-    return "Something other than a guard result" # type: ignore
+    return "Something other than a guard result"  # type: ignore
 
 
 def return_non_guard_result_object() -> GuardResult:
     ic.print("return_non_guard_result_object called")
-    return {badProp: "Something other than a guard result"} # type: ignore
+    return {"badProp": "Something other than a guard result"}  # type: ignore
 
 
 def return_non_null_ok_value() -> GuardResult:
     ic.print("non_null_ok_value called")
-    return {Ok: "Something other than null"} # type: ignore
+    return {"Ok": "Something other than null"}  # type: ignore
 
 
 def return_non_string_err_value() -> GuardResult:
     ic.print("non_string_err_value called")
-    return {Err: {badProp: "Something other than a string"}} # type: ignore
+    return {"Err": {"badProp": "Something other than a string"}}  # type: ignore
+
+
+def name_error() -> GuardResult:
+    ic.print("name_error called")
+    return {Ok: "'Ok' key should be string, not symbol"}  # type: ignore
+
+
+# endregion GuardFunctions
 
 
 @query
@@ -119,7 +126,6 @@ def get_state() -> State:
     return state
 
 
-# Guarded functions are called
 @inspect_message(guard=allow_modify_state_guarded)
 def inspect_message_() -> void:
     ic.print("inspect message called")
@@ -157,12 +163,6 @@ def call_expression_without_options_object() -> bool:
     return True
 
 
-@query
-def call_expression_with_empty_options_object() -> bool:
-    ic.print("call_expression_with_empty_option_object called")
-    return True
-
-
 @query(guard=allow_all)
 def loosely_guarded() -> bool:
     ic.print("loosely_guarded called")
@@ -171,6 +171,7 @@ def loosely_guarded() -> bool:
 
 @query(guard=allow_all)
 def loosely_guarded_manual() -> Manual[bool]:
+    ic.print("loosely_guarded_manual called")
     ic.reply(True)
 
 
@@ -208,23 +209,29 @@ def custom_error_guarded() -> bool:
 # Execution halted by runtime error
 @query(guard=return_invalid_type)
 def invalid_return_type_guarded() -> bool:
-    ic.print("invalidReturnTypeGuarded called")
+    ic.print("invalid_return_type_guarded called")
     return True
 
 
 @query(guard=return_non_guard_result_object)
 def bad_object_guarded() -> bool:
-    ic.print("badObjectGuarded called")
+    ic.print("bad_object_guarded called")
     return True
 
 
 @query(guard=return_non_null_ok_value)
 def non_null_ok_value_guarded() -> bool:
-    ic.print("nonNullOkValueGuarded called")
+    ic.print("non_null_ok_value_guarded called")
     return True
 
 
 @query(guard=return_non_string_err_value)
 def non_string_err_value_guarded() -> bool:
-    ic.print("nonStringErrValueGuarded called")
+    ic.print("non_string_err_value_guarded called")
+    return True
+
+
+@query(guard=name_error)
+def name_error_guarded() -> bool:
+    ic.print("name_error_guarded called")
     return True
