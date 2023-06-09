@@ -31,7 +31,9 @@ impl SourceMapped<&Located<StmtKind>> {
                 let params = tuple::generate_tuple(&param_conversions);
 
                 Ok(quote! {
-                    call_global_python_function_sync(#function_name, #params)
+                    let params = #params;
+
+                    call_global_python_function_sync(#function_name, params)
                         .unwrap_or_else(|err| ic_cdk::trap(err.as_str()))
                 })
             }
