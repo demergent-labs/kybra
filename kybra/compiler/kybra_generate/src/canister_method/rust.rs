@@ -31,20 +31,8 @@ impl SourceMapped<&Located<StmtKind>> {
                 let params = tuple::generate_tuple(&param_conversions);
 
                 Ok(quote! {
-                    let interpreter = INTERPRETER_OPTION
-                        .as_mut()
-                        .unwrap_or_trap("SystemError: missing python interpreter");
-                    let scope = SCOPE_OPTION
-                        .as_mut()
-                        .unwrap_or_trap("SystemError: missing python scope");
-
-                    interpreter.enter(|vm| {
-                        let result_py_object_ref: () = scope
-                            .globals
-                            .get_item(#function_name, vm).unwrap_or_trap(vm)
-                            .call(#params, vm).unwrap_or_trap(vm)
-                            .try_from_vm_value(vm).unwrap_or_trap();
-                    });
+                    call_global_python_function_sync(#function_name, #params)
+                        .unwrap_or_else(|err| ic_cdk::trap(err.as_str()))
                 })
             }
             _ => kybra_unreachable!(),

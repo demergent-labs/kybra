@@ -11,17 +11,6 @@ pub fn generate(
         pre_upgrade_function_def.generate_call_to_py_function()?;
 
     Ok(quote! {
-        unsafe {
-            let interpreter = INTERPRETER_OPTION
-                .as_mut()
-                .unwrap_or_trap("SystemError: missing python interpreter");
-            let scope = SCOPE_OPTION
-                .as_mut()
-                .unwrap_or_trap("SystemError: missing python scope");
-
-            interpreter.enter(|vm| {
-                #call_to_pre_upgrade_py_function
-            });
-        }
+        #call_to_pre_upgrade_py_function
     })
 }
