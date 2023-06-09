@@ -25,11 +25,10 @@ pub fn generate() -> TokenStream {
                     .map_err(|py_base_exception| py_base_exception.to_rust_err_string(vm))?
                     .call(args, vm)
                     .map_err(|py_base_exception| py_base_exception.to_rust_err_string(vm))?;
-                let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none())
-                    .await
-                    .map_err(|py_base_exception| py_base_exception.to_rust_err_string(vm))?;
 
-                final_return_value
+                async_result_handler(vm, &py_object_ref, vm.ctx.none())
+                    .await
+                    .map_err(|py_base_exception| py_base_exception.to_rust_err_string(vm))?
                     .try_from_vm_value(vm)
                     .map_err(|vmc_err| vmc_err.0)
             }
