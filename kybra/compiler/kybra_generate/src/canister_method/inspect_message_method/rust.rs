@@ -10,14 +10,12 @@ pub fn generate(
         inspect_method_function_def.generate_call_to_py_function()?;
 
     Ok(quote::quote! {
-        unsafe {
-            // TODO is this a security vulnerability?
-            if INTERPRETER_OPTION.is_none() {
-                ic_cdk::api::call::accept_message();
-                return;
-            }
-
-            #call_to_inspect_message_py_function
+        // TODO is this a security vulnerability?
+        if unsafe { INTERPRETER_OPTION.is_none() } {
+            ic_cdk::api::call::accept_message();
+            return;
         }
+
+        #call_to_inspect_message_py_function
     })
 }

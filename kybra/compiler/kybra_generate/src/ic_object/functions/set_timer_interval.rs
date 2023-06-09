@@ -16,12 +16,10 @@ pub fn generate() -> TokenStream {
 
             let interval = core::time::Duration::new(interval_as_u64, 0);
 
-            let closure = move || unsafe {
-                let interpreter = INTERPRETER_OPTION
-                    .as_mut()
+            let closure = move || {
+                let interpreter = unsafe { INTERPRETER_OPTION.as_mut() }
                     .unwrap_or_trap("SystemError: missing python interpreter");
-                let scope = SCOPE_OPTION
-                    .as_mut()
+                let scope = unsafe { SCOPE_OPTION.as_mut() }
                     .unwrap_or_trap("SystemError: missing python scope");
 
                 let vm = &interpreter.vm;
