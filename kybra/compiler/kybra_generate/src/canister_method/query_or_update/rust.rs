@@ -32,7 +32,15 @@ pub fn generate_body(
     let params = tuple::generate_tuple(&param_conversions);
 
     Ok(quote! {
-        let final_return_value = call_global_python_function(#name, #params)
+        let interpreter = unsafe {
+            INTERPRETER_OPTION
+                .as_mut()
+                .unwrap_or_trap("SystemError: missing python interpreter")
+        };
+        let vm = &interpreter.vm;
+        let params = #params;
+
+        let final_return_value = call_global_python_function(#name, params)
             .await
             .unwrap_or_else(|err| ic_cdk::trap(err.as_str()));
 
