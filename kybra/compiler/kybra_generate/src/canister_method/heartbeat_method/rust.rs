@@ -10,24 +10,10 @@ pub fn generate(
     let function_name = heartbeat_function_def.get_name_or_err()?;
 
     Ok(quote! {
-        unsafe {
-            ic_cdk::spawn(async {
-                let interpreter = INTERPRETER_OPTION
-                    .as_mut()
-                    .unwrap_or_trap("SystemError: missing python interpreter");
-                let scope = SCOPE_OPTION
-                    .as_mut()
-                    .unwrap_or_trap("SystemError: missing python scope");
-
-                let vm = &interpreter.vm;
-
-                let py_object_ref = scope
-                    .globals
-                    .get_item(#function_name, vm).unwrap_or_trap(vm)
-                    .call((), vm).unwrap_or_trap(vm);
-
-                async_result_handler(vm, &py_object_ref, vm.ctx.none()).await;
-            });
-        }
+        ic_cdk::spawn(async {
+            call_global_python_function(#function_name, ())
+                .await
+                .unwrap_or_else(|err| ic_cdk::trap(err.as_str()));
+        });
     })
 }
