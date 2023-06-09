@@ -125,7 +125,12 @@ pub fn generate(
                     .with(|initialized_map_ref_cell| *initialized_map_ref_cell.borrow().get())
                      == 0
                 {
-                    #call_to_init_py_function
+                    let interpreter = INTERPRETER_OPTION
+                        .as_mut()
+                        .unwrap_or_trap("SystemError: missing python interpreter");
+                    let vm = &interpreter.vm;
+
+                    #call_to_init_py_function;
 
                     INITIALIZED_MAP_REF_CELL
                         .with(|initialized_map_ref_cell| initialized_map_ref_cell
