@@ -96,7 +96,11 @@ fn get_python_stdlib_bytecode() -> Vec<u8> {
         .join(format!(".config/kybra/bin/{kybra_version}/python_stdlib"));
 
     #[cfg(not(python_stdlib_exists))]
-    let python_stdlib_modules = rustpython_vm::py_freeze!(dir = "src/Lib");
+    let python_stdlib_modules = rustpython_vm::py_freeze!(
+        dir = dirs::home_dir()
+            .unwrap()
+            .join(format!(".config/kybra/bin/{kybra_version}/Lib"))
+    );
 
     #[cfg(not(python_stdlib_exists))]
     let python_stdlib_bytecode = python_stdlib_modules.bytes.to_vec();
