@@ -9,18 +9,4 @@ const preAndPostCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(
-    getTests(createSnakeCaseProxy(preAndPostCanister)).map((test) => {
-        if (test.name === 'deploy') {
-            return {
-                name: 'dfx deploy',
-                prep: async () => {
-                    execSync('dfx deploy');
-                    await new Promise((resolve) => setTimeout(resolve, 10_000));
-                }
-            };
-        }
-
-        return test;
-    })
-);
+runTests(getTests(createSnakeCaseProxy(preAndPostCanister)));

@@ -31,16 +31,6 @@ runTests(
             };
         }
 
-        if (test.name === 'redeploy') {
-            return {
-                ...test,
-                prep: async () => {
-                    await test.prep!();
-                    await new Promise((resolve) => setTimeout(resolve, 10_000));
-                }
-            };
-        }
-
         return test;
     })
 );
