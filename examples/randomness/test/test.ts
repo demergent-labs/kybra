@@ -9,18 +9,4 @@ const randomnessCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
     }
 });
 
-runTests(
-    getTests(createSnakeCaseProxy(randomnessCanister)).map((test) => {
-        if (test.name === 'dfx deploy') {
-            return {
-                name: 'dfx deploy',
-                prep: async () => {
-                    execSync('dfx deploy');
-                    await new Promise((resolve) => setTimeout(resolve, 10_000));
-                }
-            };
-        }
-
-        return test;
-    })
-);
+runTests(getTests(createSnakeCaseProxy(randomnessCanister)));
