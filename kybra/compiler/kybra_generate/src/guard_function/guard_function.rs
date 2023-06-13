@@ -4,11 +4,6 @@ use quote::quote;
 pub fn generate(function_name: &String) -> TokenStream {
     quote! {
         unsafe {
-            // TODO is this a security vulnerability?
-            if INTERPRETER_OPTION.is_none() {
-                return Ok(());
-            }
-
             let interpreter = INTERPRETER_OPTION
                 .as_mut()
                 .ok_or_else(|| "SystemError: missing python interpreter".to_string())?;

@@ -11,12 +11,6 @@ pub fn generate(
 
     Ok(quote::quote! {
         unsafe {
-            // TODO is this a security vulnerability?
-            if INTERPRETER_OPTION.is_none() {
-                ic_cdk::api::call::accept_message();
-                return;
-            }
-
             let interpreter = INTERPRETER_OPTION
                 .as_mut()
                 .unwrap_or_trap("SystemError: missing python interpreter");
