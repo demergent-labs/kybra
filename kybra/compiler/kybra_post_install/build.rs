@@ -20,7 +20,6 @@ fn main() {
         .join(format!(".config/kybra/bin/{kybra_version}/Lib"));
 
     if python_stdlib_src_path.exists() {
-        panic!("not going to redownload");
         return;
     }
 
