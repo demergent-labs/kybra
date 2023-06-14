@@ -102,13 +102,13 @@ def generate_post_install_script(canister_name: str, rust_version: str, is_verbo
 rust_version="{rust_version}"
 
 global_kybra_config_dir=~/.config/kybra
-global_kybra_rust_dir="$global_kybra_config_dir"/"$rust_version"
+global_kybra_rust_dir="$global_kybra_config_dir"/rust/"$rust_version"
 global_kybra_rust_bin_dir="$global_kybra_rust_dir"/bin
 global_kybra_logs_dir="$global_kybra_rust_dir"/logs
 global_kybra_cargo_bin="$global_kybra_rust_bin_dir"/cargo
 global_kybra_rustup_bin="$global_kybra_rust_bin_dir"/rustup
 
-export CARGO_TARGET_DIR="$global_kybra_config_dir"/target
+export CARGO_TARGET_DIR="$global_kybra_config_dir"/rust/target
 export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
@@ -186,9 +186,9 @@ def create_paths(args: Args) -> Paths:
 
     home_dir = os.path.expanduser("~")
     global_kybra_config_dir = f"{home_dir}/.config/kybra"
-    global_kybra_rust_dir = f"{global_kybra_config_dir}/{kybra.__rust_version__}"
+    global_kybra_rust_dir = f"{global_kybra_config_dir}/rust/{kybra.__rust_version__}"
     global_kybra_rust_bin_dir = f"{global_kybra_rust_dir}/bin"
-    global_kybra_target_dir = f"{global_kybra_config_dir}/target"
+    global_kybra_target_dir = f"{global_kybra_config_dir}/rust/target"
     global_kybra_bin_dir = f"{global_kybra_config_dir}/{kybra.__version__}/bin"
 
     return {
