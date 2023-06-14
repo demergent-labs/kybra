@@ -20,6 +20,16 @@ fn main() {
         .join(format!(".config/kybra/bin/{kybra_version}/Lib"));
 
     if python_stdlib_src_path.exists() {
+        fs_extra::dir::copy(
+            &python_stdlib_src_path,
+            "src/Lib",
+            &fs_extra::dir::CopyOptions {
+                copy_inside: true,
+                ..Default::default()
+            },
+        )
+        .expect("Failed to copy directory.");
+
         return;
     }
 
