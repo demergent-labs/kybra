@@ -283,7 +283,7 @@ def bundle_python_code(paths: Paths):
 
     py_file_names = list(  # type: ignore
         filter(
-            lambda filename: filename is not None,  # type: ignore
+            lambda filename: filename is not None and filename.endswith(".py"),  # type: ignore
             map(
                 lambda node: node.filename,  # type: ignore
                 filter(

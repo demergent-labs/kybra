@@ -17,7 +17,6 @@ impl PyAst {
         // https://github.com/demergent-labs/cdk_framework/pull/75 is merged.
         let (source_mapped_mods, errors) = py_file_names
             .iter()
-            .filter(|py_file_name| py_file_name.ends_with(".py"))
             .map(|py_file_name| -> Result<SourceMapped<Mod>, Error> {
                 let source = std::fs::read_to_string(py_file_name)?;
 
