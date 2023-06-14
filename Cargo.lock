@@ -819,6 +819,7 @@ dependencies = [
  "ic-cdk-macros 0.6.10",
  "ic-stable-structures",
  "sha2",
+ "shared_utils",
 ]
 
 [[package]]
@@ -833,6 +834,7 @@ dependencies = [
  "quote",
  "regex",
  "rustpython-parser 0.1.2",
+ "shared_utils",
  "syn 1.0.99",
 ]
 
@@ -1896,6 +1898,10 @@ dependencies = [
  "cpufeatures",
  "digest",
 ]
+
+[[package]]
+name = "shared_utils"
+version = "0.0.0"
 
 [[package]]
 name = "siphasher"

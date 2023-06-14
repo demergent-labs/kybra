@@ -1,5 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
+use shared_utils::{CANISTER_INITIALIZED_MEMORY_ID, PYTHON_STDLIB_MEMORY_ID, RANDOMNESS_MEMORY_ID};
 
 pub fn generate() -> TokenStream {
     quote! {
@@ -13,7 +14,7 @@ pub fn generate() -> TokenStream {
                 >
             > = std::cell::RefCell::new(
                 ic_stable_structures::cell::Cell::init(
-                    MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(253))), vec![]
+                    MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(#PYTHON_STDLIB_MEMORY_ID))), vec![]
                 ).unwrap()
             );
 
@@ -26,7 +27,7 @@ pub fn generate() -> TokenStream {
                 >
             > = std::cell::RefCell::new(
                 ic_stable_structures::cell::Cell::init(
-                    MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(254))), 0
+                    MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(#CANISTER_INITIALIZED_MEMORY_ID))), 0
                 ).unwrap()
             );
 
@@ -39,7 +40,7 @@ pub fn generate() -> TokenStream {
                 >
             > = std::cell::RefCell::new(
                 ic_stable_structures::cell::Cell::init(
-                    MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(252))), vec![]
+                    MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(#RANDOMNESS_MEMORY_ID))), vec![]
                 ).unwrap()
             );
         }
