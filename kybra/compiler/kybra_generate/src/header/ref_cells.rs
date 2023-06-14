@@ -17,7 +17,7 @@ pub fn generate() -> TokenStream {
                 ).unwrap()
             );
 
-            static INITIALIZED_MAP_REF_CELL: std::cell::RefCell<
+            static CANISTER_INITIALIZED_REF_CELL: std::cell::RefCell<
                 ic_stable_structures::cell::Cell<
                     u8,
                     ic_stable_structures::memory_manager::VirtualMemory<
