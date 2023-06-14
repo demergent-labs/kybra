@@ -61,14 +61,14 @@ pub fn generate(
             INTERPRETER_OPTION = Some(_kybra_interpreter);
             SCOPE_OPTION = Some(_kybra_scope);
 
-            if INITIALIZED_MAP_REF_CELL.with(|initialized_map_ref_cell| *initialized_map_ref_cell.borrow().get()) == 0 {
+            if CANISTER_INITIALIZED_REF_CELL.with(|canister_initialized_ref_cell| *canister_initialized_ref_cell.borrow().get()) == 0 {
                 #call_to_init_py_function
             }
             else {
                 #call_to_post_upgrade_py_function
             }
 
-            INITIALIZED_MAP_REF_CELL.with(|initialized_map_ref_cell| initialized_map_ref_cell.borrow_mut().set(1));
+            CANISTER_INITIALIZED_REF_CELL.with(|canister_initialized_ref_cell| canister_initialized_ref_cell.borrow_mut().set(1));
         }
     }
 }
