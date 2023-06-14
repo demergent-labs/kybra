@@ -69,6 +69,16 @@ fn main() {
     )
     .expect("Failed to copy directory.");
 
+    fs_extra::dir::copy(
+        &dest_dir,
+        "src/Lib",
+        &fs_extra::dir::CopyOptions {
+            copy_inside: true,
+            ..Default::default()
+        },
+    )
+    .expect("Failed to copy directory.");
+
     // Close (and delete) the temporary directory
     let _ = temp_dir.close();
 }

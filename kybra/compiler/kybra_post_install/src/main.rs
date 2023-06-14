@@ -26,8 +26,16 @@ fn upload_app_canister(canister_name: &str, max_chunk_size: usize, dfx_network: 
 
     let wasm_chunks = split_into_chunks(wasm, max_chunk_size);
 
-    for wasm_chunk in wasm_chunks {
-        upload_chunk(canister_name, wasm_chunk, "upload_wasm_chunk", dfx_network);
+    for (index, wasm_chunk) in wasm_chunks.iter().enumerate() {
+        upload_chunk(
+            &format!("{canister_name} wasm"),
+            canister_name,
+            wasm_chunk,
+            "upload_wasm_chunk",
+            dfx_network,
+            index,
+            wasm_chunks.len(),
+        );
     }
 }
 
@@ -49,15 +57,7 @@ fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize, dfx_network:
         .output()
         .expect("Failed to execute the dfx canister id command");
 
-    if remote_python_stdlib_hash_output.status.success() {
-        println!(
-            "{}",
-            format!(
-                "Output from {canister_name}/python_stdlib_hash: {:?}",
-                String::from_utf8_lossy(&remote_python_stdlib_hash_output.stdout)
-            )
-        );
-    } else {
+    if !remote_python_stdlib_hash_output.status.success() {
         panic!(
             "Error: {:?}",
             String::from_utf8_lossy(&remote_python_stdlib_hash_output.stderr)
@@ -77,12 +77,17 @@ fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize, dfx_network:
             split_into_chunks(python_stdlib_bytecode, max_chunk_size);
 
         // Upload Python stdlib bytecode
-        for python_stdlib_bytecode_chunk in python_stdlib_bytecode_chunks {
+        for (index, python_stdlib_bytecode_chunk) in
+            python_stdlib_bytecode_chunks.iter().enumerate()
+        {
             upload_chunk(
+                "Python stdlib",
                 canister_name,
                 python_stdlib_bytecode_chunk,
                 "upload_python_stdlib_chunk",
                 dfx_network,
+                index,
+                python_stdlib_bytecode_chunks.len(),
             );
         }
     }
@@ -96,11 +101,7 @@ fn get_python_stdlib_bytecode() -> Vec<u8> {
         .join(format!(".config/kybra/bin/{kybra_version}/python_stdlib"));
 
     #[cfg(not(python_stdlib_exists))]
-    let python_stdlib_modules = rustpython_vm::py_freeze!(
-        dir = dirs::home_dir()
-            .unwrap()
-            .join(format!(".config/kybra/bin/{kybra_version}/Lib"))
-    );
+    let python_stdlib_modules = rustpython_vm::py_freeze!(dir = "src/Lib");
 
     #[cfg(not(python_stdlib_exists))]
     let python_stdlib_bytecode = python_stdlib_modules.bytes.to_vec();
@@ -139,12 +140,7 @@ fn set_permissions(canister_name: &str, dfx_network: &str) {
         .output()
         .expect("Failed to execute the dfx command");
 
-    if add_controller_output.status.success() {
-        println!(
-            "Output from canister update-settings: {:?}",
-            String::from_utf8_lossy(&add_controller_output.stdout)
-        );
-    } else {
+    if !add_controller_output.status.success() {
         panic!(
             "Error: {:?}",
             String::from_utf8_lossy(&add_controller_output.stderr)
@@ -163,22 +159,12 @@ fn install_app_canister(canister_name: &str, dfx_network: &str) {
         .output()
         .expect("Failed to execute the dfx command");
 
-    if install_output.status.success() {
-        println!(
-            "{}",
-            format!(
-                "Output from {canister_name}/install_wasm: {:?}",
-                String::from_utf8_lossy(&install_output.stdout)
-            )
-        );
-    } else {
+    if !install_output.status.success() {
         let error_message = String::from_utf8_lossy(&install_output.stderr);
 
-        if error_message.contains("did not reply to the call")
-            || error_message.contains("function invocation does not match its signature")
+        if !error_message.contains("did not reply to the call")
+            && !error_message.contains("function invocation does not match its signature")
         {
-            println!("Finished installing canister");
-        } else {
             panic!(
                 "Error: {:?}",
                 String::from_utf8_lossy(&install_output.stderr)
@@ -188,12 +174,15 @@ fn install_app_canister(canister_name: &str, dfx_network: &str) {
 }
 
 fn upload_chunk(
+    name: &str,
     canister_name: &str,
-    bytecode_chunk: Vec<u8>,
+    bytecode_chunk: &Vec<u8>,
     canister_method_name: &str,
     dfx_network: &str,
+    chunk_number: usize,
+    chunk_total: usize,
 ) {
-    let blob_string = vec_u8_to_blob_string(&bytecode_chunk);
+    let blob_string = vec_u8_to_blob_string(bytecode_chunk);
 
     let mut temp_file = NamedTempFile::new().expect("Failed to create temporary file");
     temp_file
@@ -212,13 +201,12 @@ fn upload_chunk(
         .output()
         .expect("Failed to execute the dfx command");
 
+    let chunk_number = chunk_number + 1;
+
     if output.status.success() {
         println!(
             "{}",
-            format!(
-                "Output from {canister_name}/{canister_method_name}: {:?}",
-                String::from_utf8_lossy(&output.stdout)
-            )
+            format!("Uploading {name} chunk {chunk_number}/{chunk_total}")
         );
     } else {
         panic!("Error: {:?}", String::from_utf8_lossy(&output.stderr));

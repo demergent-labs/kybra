@@ -320,7 +320,7 @@ dependencies = [
 [[package]]
 name = "cdk_framework"
 version = "0.0.0"
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=c25483c026984f29df6f89ff4f524a821d9a06cc#c25483c026984f29df6f89ff4f524a821d9a06cc"
+source = "git+https://github.com/demergent-labs/cdk_framework?rev=c8ed5c58761c9861707f94df0e41c8c62f9b5199#c8ed5c58761c9861707f94df0e41c8c62f9b5199"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -827,7 +827,7 @@ version = "0.0.0"
 dependencies = [
  "annotate-snippets",
  "backtrace",
- "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=c25483c026984f29df6f89ff4f524a821d9a06cc)",
+ "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=c8ed5c58761c9861707f94df0e41c8c62f9b5199)",
  "num-bigint",
  "proc-macro2",
  "quote",
