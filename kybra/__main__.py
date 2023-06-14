@@ -189,7 +189,7 @@ def create_paths(args: Args) -> Paths:
     global_kybra_rust_dir = f"{global_kybra_config_dir}/{kybra.__rust_version__}"
     global_kybra_rust_bin_dir = f"{global_kybra_rust_dir}/bin"
     global_kybra_target_dir = f"{global_kybra_config_dir}/target"
-    global_kybra_bin_dir = f"{global_kybra_config_dir}/bin/{kybra.__version__}"
+    global_kybra_bin_dir = f"{global_kybra_config_dir}/{kybra.__version__}/bin"
 
     return {
         "py_entry_file": py_entry_file_path,

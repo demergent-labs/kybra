@@ -9,7 +9,7 @@ fn main() {
     // TODO we should then conditionally compile the github code in the main.rs I think
     let python_stdlib_binary_path = dirs::home_dir()
         .unwrap()
-        .join(format!(".config/kybra/bin/{kybra_version}/python_stdlib"));
+        .join(format!(".config/kybra/{kybra_version}/bin/python_stdlib"));
 
     if python_stdlib_binary_path.exists() {
         println!("cargo:rustc-cfg=python_stdlib_exists");
@@ -17,7 +17,7 @@ fn main() {
 
     let python_stdlib_src_path = dirs::home_dir()
         .unwrap()
-        .join(format!(".config/kybra/bin/{kybra_version}/Lib"));
+        .join(format!(".config/kybra/{kybra_version}/Lib"));
 
     if python_stdlib_src_path.exists() {
         fs_extra::dir::copy(
