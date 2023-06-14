@@ -95,7 +95,7 @@ def main():
 def generate_post_install_script(canister_name: str, rust_version: str, is_verbose: bool) -> str:
 
     main_command = f"KYBRA_VERSION={kybra.__version__} cargo run --manifest-path=.kybra/{canister_name}/kybra_post_install/Cargo.toml {canister_name}"
-    main_command_not_verbose = f"output=$({main_command} 2>&1 >/dev/null) || {{ echo \"$output\"; exit 1; }}"
+    main_command_not_verbose = f'exec 3>&1; output=$({main_command} 2>&1 1>&3 3>&-); exit_code=$?; exec 3>&-; if [ $exit_code -ne 0 ]; then echo "$output"; exit $exit_code; fi'
 
     return f"""#!/bin/bash
 
