@@ -3,6 +3,7 @@
 // TODO and get rid of INSTALLER_REF_CELL
 
 use sha2::{Digest, Sha256};
+use shared_utils::{PYTHON_STDLIB_MEMORY_ID, RANDOMNESS_MEMORY_ID};
 
 thread_local! {
     static WASM_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
@@ -22,7 +23,7 @@ thread_local! {
         >
     > = std::cell::RefCell::new(
         ic_stable_structures::cell::Cell::init(
-            MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(252))), vec![]
+            MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(RANDOMNESS_MEMORY_ID))), vec![]
         ).unwrap()
     );
 
@@ -35,7 +36,7 @@ thread_local! {
         >
     > = std::cell::RefCell::new(
         ic_stable_structures::cell::Cell::init(
-            MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(253))), vec![]
+            MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(PYTHON_STDLIB_MEMORY_ID))), vec![]
         ).unwrap()
     );
 

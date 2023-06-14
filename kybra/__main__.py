@@ -130,7 +130,7 @@ def parse_args_or_exit(args: list[str]) -> Args:
         sys.exit(0)
 
     if len(args) != 3:
-        print(red("\n💣 wrong number of arguments\n"))
+        print(red("\n💣 Kybra error: wrong number of arguments\n"))
         print("Usage: kybra [-v|--verbose] <canister_name> <entry_point> <did_path>")
         print("\n💀 Build failed!")
         sys.exit(1)
@@ -320,13 +320,12 @@ def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose:
 
     if kybra_generate_result.returncode != 0:
         print(
-            red("\n💣 Something about your Python code violates Kybra's requirements\n")
+            red("\n💣 Kybra error: compilation\n")
         )
         print(parse_kybra_generate_error(kybra_generate_result.stderr))
         print(
-            "\nIf you are unable to decipher the error above, reach out in the #python"
+            "\nFor help reach out in the #python channel of the ICP Developer Community discord:"
         )
-        print("channel of the DFINITY DEV OFFICIAL discord:")
         print("\nhttps://discord.com/channels/748416164832608337/1019372359775440988\n")
         print("💀 Build failed")
         sys.exit(1)
@@ -345,10 +344,7 @@ def parse_kybra_generate_error(stdout: bytes) -> str:
             i for i, v in enumerate(std_err_lines) if "', src/" in v
         )
     except:
-        return (
-            "The underlying cause is likely at the bottom of the following output:\n\n"
-            + err
-        )
+        return err
 
     err_lines = std_err_lines[
         line_where_error_message_starts : line_where_error_message_ends + 1
@@ -369,7 +365,7 @@ def run_rustfmt_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool =
     if rustfmt_result.returncode != 0:
         print(
             red(
-                "\n💣 Kybra has experienced an internal error while trying to\n   format your generated rust canister"
+                "\n💣 Kybra error: internal Rust formatting"
             )
         )
         print(
@@ -398,7 +394,7 @@ def build_wasm_binary_or_exit(
     )
 
     if cargo_build_result.returncode != 0:
-        print(red("\n💣 Error building Wasm binary:"))
+        print(red("\n💣 Kybra error: building Wasm binary"))
         print(cargo_build_result.stderr.decode("utf-8"))
         print("💀 Build failed")
         sys.exit(1)
@@ -422,7 +418,7 @@ def build_wasm_binary_or_exit(
     )
 
     if wasi2ic_result.returncode != 0:
-        print(red("\n💣 Error building Wasm binary:"))
+        print(red("\n💣 Kybra error: building Wasm binary"))
         print(wasi2ic_result.stderr.decode("utf-8"))
         print("💀 Build failed")
         sys.exit(1)
@@ -447,7 +443,7 @@ def build_wasm_binary_or_exit(
         )
 
         if kybra_deployer_build_result.returncode != 0:
-            print(red("\n💣 Error building Wasm binary:"))
+            print(red("\n💣 Kybra error: building Wasm binary"))
             print(kybra_deployer_build_result.stderr.decode("utf-8"))
             print("💀 Build failed")
             sys.exit(1)
@@ -481,7 +477,7 @@ def optimize_wasm_binary_or_exit(
     )
 
     if optimization_result.returncode != 0:
-        print(red("\n💣 Error optimizing generated Wasm:"))
+        print(red("\n💣 Kybra error: optimizing generated Wasm"))
         print(optimization_result.stderr.decode("utf-8"))
         print("💀 Build failed")
         sys.exit(1)
@@ -511,7 +507,7 @@ def add_metadata_to_wasm_or_exit(paths: Paths, canister_name: str, verbose: bool
     )
 
     if add_candid_to_wasm_result.returncode != 0:
-        print(red("\n💣 Error adding candid to Wasm:"))
+        print(red("\n💣 Kybra error: adding candid to Wasm"))
         print(add_candid_to_wasm_result.stderr.decode("utf-8"))
         print("💀 Build failed")
         sys.exit(1)
@@ -533,7 +529,7 @@ def add_metadata_to_wasm_or_exit(paths: Paths, canister_name: str, verbose: bool
     )
 
     if add_cdk_info_to_wasm_result.returncode != 0:
-        print(red("\n💣 Error adding cdk name/version to Wasm:"))
+        print(red("\n💣 Kybra error: adding cdk name/version to Wasm"))
         print(add_cdk_info_to_wasm_result.stderr.decode("utf-8"))
         print("💀 Build failed")
         sys.exit(1)
