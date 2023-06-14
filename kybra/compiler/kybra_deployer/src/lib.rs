@@ -157,11 +157,11 @@ pub async fn install_wasm() {
     )
     .await;
 
-    // This will never be reached because the install_code call returns to a different Wasm binary
+    // If install_code succeeds this will never be reached because
+    // the install_code call returns to a different Wasm binary
     // and the callback no longer exists
-    match result {
-        _ => (),
-    }
+    // If there is an error in the cross-canister call this will be reached
+    result.unwrap()
 }
 
 fn installer_guard() -> Result<(), String> {

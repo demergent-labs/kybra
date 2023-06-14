@@ -14,8 +14,15 @@ fn main() {
 
     upload_app_canister(canister_name, max_chunk_size, &dfx_network);
     upload_python_stdlib(canister_name, max_chunk_size, &dfx_network);
-    set_permissions(canister_name, &dfx_network);
+    let (canister_id, canister_already_its_own_controller) =
+        add_permissions(canister_name, &dfx_network);
     install_app_canister(canister_name, &dfx_network);
+    remove_permissions(
+        canister_name,
+        &dfx_network,
+        &canister_id,
+        canister_already_its_own_controller,
+    );
 }
 
 fn upload_app_canister(canister_name: &str, max_chunk_size: usize, dfx_network: &str) {
@@ -115,7 +122,7 @@ fn get_python_stdlib_bytecode() -> Vec<u8> {
     python_stdlib_bytecode
 }
 
-fn set_permissions(canister_name: &str, dfx_network: &str) {
+fn add_permissions(canister_name: &str, dfx_network: &str) -> (String, bool) {
     let canister_id_output = Command::new("dfx")
         .arg("canister")
         .arg("id")
@@ -129,23 +136,48 @@ fn set_permissions(canister_name: &str, dfx_network: &str) {
         .trim()
         .to_string();
 
-    let add_controller_output = Command::new("dfx")
+    let current_controllers_output = Command::new("dfx")
         .arg("canister")
-        .arg("update-settings")
+        .arg("info")
         .arg("--network")
         .arg(dfx_network)
-        .arg("--add-controller")
-        .arg(canister_id)
         .arg(canister_name)
         .output()
         .expect("Failed to execute the dfx command");
 
-    if !add_controller_output.status.success() {
+    if !current_controllers_output.status.success() {
         panic!(
             "Error: {:?}",
-            String::from_utf8_lossy(&add_controller_output.stderr)
+            String::from_utf8_lossy(&current_controllers_output.stderr)
         );
     }
+
+    let canister_already_its_own_controller =
+        String::from_utf8_lossy(&current_controllers_output.stdout)
+            .to_string()
+            .contains(&canister_id);
+
+    if !canister_already_its_own_controller {
+        let add_controller_output = Command::new("dfx")
+            .arg("canister")
+            .arg("update-settings")
+            .arg("--network")
+            .arg(dfx_network)
+            .arg("--add-controller")
+            .arg(&canister_id)
+            .arg(canister_name)
+            .output()
+            .expect("Failed to execute the dfx command");
+
+        if !add_controller_output.status.success() {
+            panic!(
+                "Error: {:?}",
+                String::from_utf8_lossy(&add_controller_output.stderr)
+            );
+        }
+    }
+
+    (canister_id, canister_already_its_own_controller)
 }
 
 fn install_app_canister(canister_name: &str, dfx_network: &str) {
@@ -172,6 +204,35 @@ fn install_app_canister(canister_name: &str, dfx_network: &str) {
                 String::from_utf8_lossy(&install_output.stderr)
             );
         }
+    }
+}
+
+fn remove_permissions(
+    canister_name: &str,
+    dfx_network: &str,
+    canister_id: &str,
+    canister_already_its_own_controller: bool,
+) {
+    if canister_already_its_own_controller {
+        return;
+    }
+
+    let remove_controller_output = Command::new("dfx")
+        .arg("canister")
+        .arg("update-settings")
+        .arg("--network")
+        .arg(dfx_network)
+        .arg("--remove-controller")
+        .arg(canister_id)
+        .arg(canister_name)
+        .output()
+        .expect("Failed to execute the dfx command");
+
+    if !remove_controller_output.status.success() {
+        panic!(
+            "Error: {:?}",
+            String::from_utf8_lossy(&remove_controller_output.stderr)
+        );
     }
 }
 
