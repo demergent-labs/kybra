@@ -304,7 +304,7 @@ def ignore_specific_dir(dirname: str, filenames: list[str]) -> list[str]:
         return []
 
 def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool):
-    kybra_generate_bin_path = f"{paths['global_kybra_config_dir']}/{kybra.__version__}/bin"
+    kybra_generate_bin_path = f"{paths['global_kybra_config_dir']}/{kybra.__version__}/bin/kybra_generate"
     kybra_generate_bin_path_debug = f"{paths['global_kybra_target_dir']}/debug/kybra_generate"
 
     should_rebuild = not os.path.exists(kybra_generate_bin_path) or os.environ.get('KYBRA_REBUILD') == 'true'
@@ -340,7 +340,7 @@ def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose:
     # Generate the Rust code
     kybra_generate_result = subprocess.run(
         [
-            f"{kybra_generate_bin_path}/kybra_generate",
+            kybra_generate_bin_path,
             paths["py_file_names_file"],
             paths["py_entry_module_name"],
             paths["lib"],
