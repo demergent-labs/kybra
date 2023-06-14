@@ -98,7 +98,7 @@ fn get_python_stdlib_bytecode() -> Vec<u8> {
 
     let python_stdlib_path = dirs::home_dir()
         .unwrap()
-        .join(format!(".config/kybra/bin/{kybra_version}/python_stdlib"));
+        .join(format!(".config/kybra/{kybra_version}/bin/python_stdlib"));
 
     #[cfg(not(python_stdlib_exists))]
     let python_stdlib_modules = rustpython_vm::py_freeze!(dir = "src/Lib");
