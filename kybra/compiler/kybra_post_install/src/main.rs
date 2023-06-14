@@ -149,6 +149,8 @@ fn set_permissions(canister_name: &str, dfx_network: &str) {
 }
 
 fn install_app_canister(canister_name: &str, dfx_network: &str) {
+    println!("\nFinalizing...\n");
+
     let install_output = Command::new("dfx")
         .arg("canister")
         .arg("call")

@@ -112,6 +112,8 @@ export CARGO_TARGET_DIR="$global_kybra_config_dir"/target
 export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
+echo "\nPreparing canister binaries for upload...\n"
+
 {main_command if is_verbose else main_command_not_verbose}
     """
 
