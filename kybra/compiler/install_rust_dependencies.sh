@@ -8,13 +8,13 @@ kybra_version="$1"
 rust_version="$2"
 
 global_kybra_config_dir=~/.config/kybra
-global_kybra_rust_dir="$global_kybra_config_dir"/"$rust_version"
+global_kybra_rust_dir="$global_kybra_config_dir"/rust/"$rust_version"
 global_kybra_rust_bin_dir="$global_kybra_rust_dir"/bin
 global_kybra_logs_dir="$global_kybra_rust_dir"/logs
 global_kybra_cargo_bin="$global_kybra_rust_bin_dir"/cargo
 global_kybra_rustup_bin="$global_kybra_rust_bin_dir"/rustup
 
-export CARGO_TARGET_DIR="$global_kybra_config_dir"/target
+export CARGO_TARGET_DIR="$global_kybra_config_dir"/rust/target
 export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
