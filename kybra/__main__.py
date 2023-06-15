@@ -92,8 +92,9 @@ def main():
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
 
 
-def generate_post_install_script(canister_name: str, rust_version: str, is_verbose: bool) -> str:
-
+def generate_post_install_script(
+    canister_name: str, rust_version: str, is_verbose: bool
+) -> str:
     main_command = f"KYBRA_VERSION={kybra.__version__} cargo run --manifest-path=.kybra/{canister_name}/kybra_post_install/Cargo.toml {canister_name}"
     main_command_not_verbose = f'exec 3>&1; output=$({main_command} 2>&1 1>&3 3>&-); exit_code=$?; exec 3>&-; if [ $exit_code -ne 0 ]; then echo "$output"; exit $exit_code; fi'
 
@@ -208,7 +209,7 @@ def create_paths(args: Args) -> Paths:
         "global_kybra_rust_dir": global_kybra_rust_dir,
         "global_kybra_rust_bin_dir": global_kybra_rust_bin_dir,
         "global_kybra_target_dir": global_kybra_target_dir,
-        "global_kybra_bin_dir": global_kybra_bin_dir
+        "global_kybra_bin_dir": global_kybra_bin_dir,
     }
 
 
@@ -270,7 +271,7 @@ def bundle_python_code(paths: Paths):
                 node.packagepath[0],  # type: ignore
                 f"{python_source_path}/{node.identifier}",  # type: ignore
                 dirs_exist_ok=True,
-                ignore=ignore_specific_dir
+                ignore=ignore_specific_dir,
             )
 
         if type(node) == modulegraph.modulegraph.NamespacePackage:  # type: ignore
@@ -278,7 +279,7 @@ def bundle_python_code(paths: Paths):
                 node.packagepath[0],  # type: ignore
                 f"{python_source_path}/{node.identifier}",  # type: ignore
                 dirs_exist_ok=True,
-                ignore=ignore_specific_dir
+                ignore=ignore_specific_dir,
             )
 
     py_file_names = list(  # type: ignore
@@ -297,45 +298,51 @@ def bundle_python_code(paths: Paths):
 
     create_file(paths["py_file_names_file"], ",".join(py_file_names))  # type: ignore
 
+
 def ignore_specific_dir(dirname: str, filenames: list[str]) -> list[str]:
-    if 'kybra_post_install/src/Lib' in dirname:
+    if "kybra_post_install/src/Lib" in dirname:
         return filenames
     else:
         return []
 
-def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool):
-    kybra_generate_bin_path = f"{paths['global_kybra_config_dir']}/{kybra.__version__}/bin/kybra_generate"
-    kybra_generate_bin_path_debug = f"{paths['global_kybra_target_dir']}/debug/kybra_generate"
 
-    should_rebuild = not os.path.exists(kybra_generate_bin_path) or os.environ.get('KYBRA_REBUILD') == 'true'
+def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool):
+    kybra_generate_bin_path = (
+        f"{paths['global_kybra_config_dir']}/{kybra.__version__}/bin/kybra_generate"
+    )
+    kybra_generate_bin_path_debug = (
+        f"{paths['global_kybra_target_dir']}/debug/kybra_generate"
+    )
+
+    should_rebuild = (
+        not os.path.exists(kybra_generate_bin_path)
+        or os.environ.get("KYBRA_REBUILD") == "true"
+    )
 
     if should_rebuild:
         kybra_generate_build_result = subprocess.run(
             [
                 f"{paths['global_kybra_rust_bin_dir']}/cargo",
                 "build",
-                f"--manifest-path={paths['canister']}/kybra_generate/Cargo.toml"
+                f"--manifest-path={paths['canister']}/kybra_generate/Cargo.toml",
             ],
             capture_output=not verbose,
             env=cargo_env,
         )
 
         if kybra_generate_build_result.returncode != 0:
-            print(
-                red("\n💣 Kybra error: compilation\n")
-            )
+            print(red("\n💣 Kybra error: compilation\n"))
             print(parse_kybra_generate_error(kybra_generate_build_result.stderr))
             print(
                 "\nFor help reach out in the #python channel of the ICP Developer Community discord:"
             )
-            print("\nhttps://discord.com/channels/748416164832608337/1019372359775440988\n")
+            print(
+                "\nhttps://discord.com/channels/748416164832608337/1019372359775440988\n"
+            )
             print("💀 Build failed")
             sys.exit(1)
 
-        shutil.copy(
-            kybra_generate_bin_path_debug,
-            kybra_generate_bin_path
-        )
+        shutil.copy(kybra_generate_bin_path_debug, kybra_generate_bin_path)
 
     # Generate the Rust code
     kybra_generate_result = subprocess.run(
@@ -350,9 +357,7 @@ def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose:
     )
 
     if kybra_generate_result.returncode != 0:
-        print(
-            red("\n💣 Kybra error: compilation\n")
-        )
+        print(red("\n💣 Kybra error: compilation\n"))
         print(parse_kybra_generate_error(kybra_generate_result.stderr))
         print(
             "\nFor help reach out in the #python channel of the ICP Developer Community discord:"
@@ -388,17 +393,17 @@ def parse_kybra_generate_error(stdout: bytes) -> str:
 
 def run_rustfmt_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool = False):
     rustfmt_result = subprocess.run(
-        [f"{paths['global_kybra_rust_bin_dir']}/rustfmt", "--edition=2018", paths["lib"]],
+        [
+            f"{paths['global_kybra_rust_bin_dir']}/rustfmt",
+            "--edition=2018",
+            paths["lib"],
+        ],
         capture_output=not verbose,
         env=cargo_env,
     )
 
     if rustfmt_result.returncode != 0:
-        print(
-            red(
-                "\n💣 Kybra error: internal Rust formatting"
-            )
-        )
+        print(red("\n💣 Kybra error: internal Rust formatting"))
         print(
             f'\nPlease open an issue at https://github.com/demergent-labs/kybra/issues/new\nincluding this message and the following error:\n\n {red(rustfmt_result.stderr.decode("utf-8"))}'
         )
@@ -454,10 +459,12 @@ def build_wasm_binary_or_exit(
         print("💀 Build failed")
         sys.exit(1)
 
-    if os.environ.get('KYBRA_REBUILD') != 'true' and os.path.exists(f"{paths['global_kybra_bin_dir']}/deployer.wasm"):
+    if os.environ.get("KYBRA_REBUILD") != "true" and os.path.exists(
+        f"{paths['global_kybra_bin_dir']}/deployer.wasm"
+    ):
         shutil.copy(
             f"{paths['global_kybra_bin_dir']}/deployer.wasm",
-            f"{paths['canister']}/{canister_name}.wasm"
+            f"{paths['canister']}/{canister_name}.wasm",
         )
     else:
         kybra_deployer_build_result = subprocess.run(
@@ -481,12 +488,12 @@ def build_wasm_binary_or_exit(
 
         shutil.copy(
             f"{paths['global_kybra_target_dir']}/wasm32-unknown-unknown/release/kybra_deployer.wasm",
-            f"{paths['canister']}/{canister_name}.wasm"
+            f"{paths['canister']}/{canister_name}.wasm",
         )
 
         shutil.copy(
             f"{paths['canister']}/{canister_name}.wasm",
-            f"{paths['global_kybra_bin_dir']}/deployer.wasm"
+            f"{paths['global_kybra_bin_dir']}/deployer.wasm",
         )
 
 
@@ -520,7 +527,9 @@ def optimize_wasm_binary_or_exit(
     os.system(f"gzip -9 -f -k {paths['canister']}/{canister_name}_app.wasm")
 
 
-def add_metadata_to_wasm_or_exit(paths: Paths, canister_name: str, verbose: bool = False):
+def add_metadata_to_wasm_or_exit(
+    paths: Paths, canister_name: str, verbose: bool = False
+):
     add_candid_to_wasm_result = subprocess.run(
         [
             f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",

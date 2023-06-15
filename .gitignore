@@ -3,6 +3,7 @@
 .editorconfig
 .vscode/*
 dist
+kybra/compiler/kybra_post_install/src/Lib
 target
 build
 kybra.egg-info

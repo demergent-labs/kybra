@@ -104,7 +104,7 @@ impl SourceMapped<&Located<ExprKind>> {
                         })
                         .collect(),
                     match mode {
-                        Mode::Query => Ok(CandidType::Primitive(Primitive::Void)),
+                        Mode::Oneway => Ok(CandidType::Primitive(Primitive::Void)),
                         _ => SourceMapped::new(func.returns, self.source_map.clone())
                             .to_candid_type(),
                     },
