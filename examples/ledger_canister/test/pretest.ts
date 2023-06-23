@@ -16,7 +16,7 @@ async function pretest(icp_ledger_path: string) {
     });
 
     execSync(
-        `cd ${icp_ledger_path} && curl -o ledger.wasm.gz https://download.dfinity.systems/ic/dfdba729414d3639b2a6c269600bbbd689b35385/canisters/ledger-canister_notify-method.wasm.gz`,
+        `cd ${icp_ledger_path} && curl -o ledger.wasm.gz https://download.dfinity.systems/ic/149b6208cbbb61e8142a069dd7a046d349beaf7a/canisters/ledger-canister_notify-method.wasm.gz`,
         {
             stdio: 'inherit'
         }
