@@ -43,7 +43,7 @@ serde = {{ version = "1.0.137", default-features = false, features = [] }}
 async-recursion = "1.0.0"
 ic-stable-structures = "0.5.2"
 slotmap = "1.0.6"
-ic-wasi-polyfill = {{ git = "https://github.com/demergent-labs/ic-wasi-polyfill", rev = "a918cb9a9d86d0a2e35949d07a3f6548b328866c" }}
+ic-wasi-polyfill = {{ git = "https://github.com/demergent-labs/ic-wasi-polyfill", rev = "9b039919427ccd76bf452f012bdbfe3695e549a6" }}
 # ic-wasi-polyfill = {{ git = "https://github.com/wasm-forge/ic-wasi-polyfill", rev = "5e986cb3b95a58fbbf9386582f5c48847f22dcca" }}
 # ic-wasi-polyfill = {{ path = "/home/lastmjs/development/ic-wasi-polyfill" }}
 
@@ -458,6 +458,27 @@ checksum = "3538270d33cc669650c4b093848450d380def10c331d38c768e34cac80576e6e"
 dependencies = [
  "termcolor",
  "unicode-width",
+]
+
+[[package]]
+name = "complex_init"
+version = "0.0.0"
+dependencies = [
+ "async-recursion",
+ "candid 0.9.0-beta.4",
+ "ic-cdk 0.8.0-beta.0",
+ "ic-cdk-macros 0.6.10",
+ "ic-cdk-timers",
+ "ic-stable-structures",
+ "ic-wasi-polyfill",
+ "kybra-vm-value-derive",
+ "rustpython",
+ "rustpython-compiler-core",
+ "rustpython-derive",
+ "rustpython-stdlib",
+ "rustpython-vm",
+ "serde",
+ "slotmap",
 ]
 
 [[package]]
@@ -964,7 +985,7 @@ checksum = "b4e026318236de13568edafd85534ad29910908bf08cdcf177d4403fd4a5f6c4"
 [[package]]
 name = "ic-wasi-polyfill"
 version = "0.3.9"
-source = "git+https://github.com/demergent-labs/ic-wasi-polyfill?rev=a918cb9a9d86d0a2e35949d07a3f6548b328866c#a918cb9a9d86d0a2e35949d07a3f6548b328866c"
+source = "git+https://github.com/demergent-labs/ic-wasi-polyfill?rev=9b039919427ccd76bf452f012bdbfe3695e549a6#9b039919427ccd76bf452f012bdbfe3695e549a6"
 dependencies = [
  "function_name",
  "ic-cdk 0.8.0-beta.0",
@@ -2248,27 +2269,6 @@ dependencies = [
  "ic-stable-structures",
  "serde",
  "serde_bytes",
-]
-
-[[package]]
-name = "stable_memory"
-version = "0.0.0"
-dependencies = [
- "async-recursion",
- "candid 0.9.0-beta.4",
- "ic-cdk 0.8.0-beta.0",
- "ic-cdk-macros 0.6.10",
- "ic-cdk-timers",
- "ic-stable-structures",
- "ic-wasi-polyfill",
- "kybra-vm-value-derive",
- "rustpython",
- "rustpython-compiler-core",
- "rustpython-derive",
- "rustpython-stdlib",
- "rustpython-vm",
- "serde",
- "slotmap",
 ]
 
 [[package]]
