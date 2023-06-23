@@ -24,9 +24,9 @@ pub fn generate(
     quote! {
         let randomness = RANDOMNESS_STABLE_REF_CELL.with(|randomness_stable_ref_cell| randomness_stable_ref_cell.borrow().get().clone());
 
-        ic_wasi_polyfill::init(u64::from_be_bytes(randomness[..8].try_into().unwrap()));
-
         unsafe {
+            ic_wasi_polyfill::init(&randomness);
+
             let _kybra_interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
                 vm.add_native_modules(rustpython_stdlib::get_module_inits());
                 vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
