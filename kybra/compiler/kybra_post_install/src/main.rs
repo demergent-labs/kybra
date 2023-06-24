@@ -4,6 +4,8 @@
 use sha2::{Digest, Sha256};
 use std::io::Write;
 use std::process::Command;
+use std::thread;
+use std::time::Duration;
 use tempfile::NamedTempFile;
 
 fn main() {
@@ -23,6 +25,11 @@ fn main() {
         &canister_id,
         canister_already_its_own_controller,
     );
+
+    // TODO this is here because of some complications with the install_code self-referential cross-canister call
+    // TODO the call is a notify and thus won't wait for the canister's post_upgrade function to complete
+    // TODO we wait here to make sure that the canister is most likely initialized before ending the post_install script
+    thread::sleep(Duration::from_secs(5));
 }
 
 fn upload_app_canister(canister_name: &str, max_chunk_size: usize, dfx_network: &str) {

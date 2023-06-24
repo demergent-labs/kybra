@@ -146,21 +146,39 @@ pub async fn install_wasm() {
 
     let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
 
-    let result = ic_cdk::api::management_canister::main::install_code(
-        ic_cdk::api::management_canister::main::InstallCodeArgument {
-            mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
-            canister_id: ic_cdk::api::id(),
-            wasm_module,
-            arg: ARG_DATA_RAW_REF_CELL
-                .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
-        },
-    )
-    .await;
+    // TODO we think that the response trying to execute a callback on a different Wasm binary
+    // TODO may be causing problems, thus we are testing out notify
+    // let result = ic_cdk::api::management_canister::main::install_code(
+    //     ic_cdk::api::management_canister::main::InstallCodeArgument {
+    //         mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
+    //         canister_id: ic_cdk::api::id(),
+    //         wasm_module,
+    //         arg: ARG_DATA_RAW_REF_CELL
+    //             .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
+    //     },
+    // )
+    // .await;
 
     // If install_code succeeds this will never be reached because
     // the install_code call returns to a different Wasm binary
     // and the callback no longer exists
     // If there is an error in the cross-canister call this will be reached
+    // result.unwrap()
+
+    let result = ic_cdk::api::call::notify(
+        ic_cdk::export::Principal::from_text("aaaaa-aa").unwrap(),
+        "install_code",
+        (
+            ic_cdk::api::management_canister::main::InstallCodeArgument {
+                mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
+                canister_id: ic_cdk::api::id(),
+                wasm_module,
+                arg: ARG_DATA_RAW_REF_CELL
+                    .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
+            },
+        ),
+    );
+
     result.unwrap()
 }
 
