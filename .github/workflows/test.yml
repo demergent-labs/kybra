@@ -113,6 +113,7 @@ jobs:
                     "examples/simple_user_accounts",
                     "examples/stable_memory",
                     "examples/stable_structures",
+                    "examples/stdlib",
                     "examples/timers",
                     "examples/tuple_types",
                     "examples/update"
