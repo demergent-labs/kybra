@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::process::Command;
 use tempfile::tempdir;
 
@@ -17,10 +18,16 @@ fn main() {
         .unwrap()
         .join(format!(".config/kybra/{kybra_version}/Lib"));
 
+    let kybra_post_install_src_lib_path = Path::new("src/Lib");
+
+    if kybra_post_install_src_lib_path.exists() {
+        fs_extra::dir::remove(kybra_post_install_src_lib_path).unwrap();
+    }
+
     if python_stdlib_src_path.exists() {
         fs_extra::dir::copy(
             &python_stdlib_src_path,
-            "src/Lib",
+            kybra_post_install_src_lib_path,
             &fs_extra::dir::CopyOptions {
                 copy_inside: true,
                 ..Default::default()
@@ -63,13 +70,12 @@ fn main() {
     }
 
     // Define the source directory path (the one to copy) and the destination path
-    let src_dir = temp_dir.path().join("Lib");
-    let dest_dir = python_stdlib_src_path;
+    let git_repo_lib_dir = temp_dir.path().join("Lib");
 
     // Use a crate like fs_extra to copy the directory recursively
     fs_extra::dir::copy(
-        &src_dir,
-        &dest_dir,
+        &git_repo_lib_dir,
+        &python_stdlib_src_path,
         &fs_extra::dir::CopyOptions {
             copy_inside: true,
             ..Default::default()
@@ -78,8 +84,8 @@ fn main() {
     .expect("Failed to copy directory.");
 
     fs_extra::dir::copy(
-        &dest_dir,
-        "src/Lib",
+        &python_stdlib_src_path,
+        kybra_post_install_src_lib_path,
         &fs_extra::dir::CopyOptions {
             copy_inside: true,
             ..Default::default()
