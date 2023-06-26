@@ -115,7 +115,7 @@ def return_non_string_err_value() -> GuardResult:
 
 def name_error() -> GuardResult:
     ic.print("name_error called")
-    return {Ok: "'Ok' key should be string, not symbol"}  # type: ignore
+    return {Ok: "'Ok' key should be a string, not an identifier"}  # type: ignore
 
 
 # endregion GuardFunctions
