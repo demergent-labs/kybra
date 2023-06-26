@@ -9,16 +9,18 @@ pub fn generate() -> TokenStream {
                 } else {
                     let type_name = self.to_pyobject(vm).class().name().to_string();
 
-                    Err(CdkActTryFromVmValueError(format!("TypeError: Expected NoneType but received {type_name}")))
+                    Err(CdkActTryFromVmValueError(format!("TypeError: expected NoneType but received {type_name}")))
                 }
             }
         }
 
         impl CdkActTryFromVmValue<bool, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<bool, CdkActTryFromVmValueError> {
+                let type_name = self.class().name().to_string();
+
                 match self.try_into_value(vm) {
                     Ok(value) => Ok(value),
-                    Err(err) => Err(CdkActTryFromVmValueError("TypeError: Could not convert PyObjectRef to bool".to_string())) // TODO consider using the try_into_value err
+                    Err(err) => Err(CdkActTryFromVmValueError(format!("TypeError: expected bool but received {type_name}"))) // TODO consider using the try_into_value err
                 }
             }
         }
@@ -36,11 +38,11 @@ pub fn generate() -> TokenStream {
                     .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
                 let principal = match tuple_self.get(0) {
                     Some(principal) => principal,
-                    None => return Err(CdkActTryFromVmValueError("TypeError: Could not convert value to Func. Missing Principal".to_string()))
+                    None => return Err(CdkActTryFromVmValueError("TypeError: could not convert value to Func, missing Principal".to_string()))
                 };
                 let method = match tuple_self.get(1) {
                     Some(method) => method,
-                    None => return Err(CdkActTryFromVmValueError("TypeError: Could not convert value to Func. Missing method".to_string()))
+                    None => return Err(CdkActTryFromVmValueError("TypeError: could not convert value to Func, missing method".to_string()))
                 };
 
                 Ok(ic_cdk::export::candid::Func {
@@ -60,7 +62,7 @@ pub fn generate() -> TokenStream {
                     .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
                 match ic_cdk::export::Principal::from_text(result_string) {
                     Ok(principal) => Ok(principal),
-                    Err(err) => Err(CdkActTryFromVmValueError(format!("TypeError: Could not convert value to Principal: {}", err.to_string()))),
+                    Err(err) => Err(CdkActTryFromVmValueError(format!("TypeError: could not convert value to Principal: {}", err.to_string()))),
                 }
             }
         }
@@ -81,9 +83,13 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryFromVmValue<String, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<String, CdkActTryFromVmValueError> {
+                let type_name = self.class().name().to_string();
+
                 match self.try_into_value(vm) {
                     Ok(value) => Ok(value),
-                    Err(err) => Err(CdkActTryFromVmValueError("TypeError: Could not convert PyObjectRef to String".to_string())) // TODO consider using the try_into_value err
+                    Err(err) => {
+                        Err(CdkActTryFromVmValueError(format!("TypeError: expected str but received {type_name}"))) // TODO consider using the try_into_value err
+                    }
                 }
             }
         }
@@ -94,17 +100,15 @@ pub fn generate() -> TokenStream {
                 if let Ok(error_message) = err {
                     return Ok(Err(error_message.try_from_vm_value(vm)?));
                 }
+
                 let ok = self.get_item("Ok", vm);
                 if let Ok(value) = ok {
-                    let result: Result<(), CdkActTryFromVmValueError> = value.try_from_vm_value(vm);
-                    match result {
-                        Ok(_) => Ok(Ok(())),
-                        Err(err) => Err(CdkActTryFromVmValueError(format!("TypeError: Could not convert PyObjectRef to Result<(), String>. Ok value was not (). {:?}", err)))
-                    }
+                    let result: () = value.try_from_vm_value(vm)?;
+                    return Ok(Ok(()))
                 }
-                else {
-                    Err(CdkActTryFromVmValueError("TypeError: Could not convert PyObjectRef to Result<(), String>".to_string()))
-                }
+
+                let type_name = self.to_pyobject(vm).class().name().to_string();
+                Err(CdkActTryFromVmValueError(format!("TypeError: expected Result but received {type_name}")))
             }
         }
     }
