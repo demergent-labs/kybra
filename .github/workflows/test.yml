@@ -162,16 +162,16 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            # - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-            #   uses: actions/cache@v3
-            #   with:
-            #       path: ~/.config/kybra
-            #       key: kybra-cargo-${{ hashFiles('kybra/cargotoml.py') }}
-            # - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-            #   uses: actions/cache@v3
-            #   with:
-            #       path: ~/.cache/dfinity
-            #       key: kybra-dfx-0.13.1
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              uses: actions/cache@v3
+              with:
+                  path: ~/.config/kybra
+                  key: kybra-cargo-${{ hashFiles('kybra/cargotoml.py') }}
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              uses: actions/cache@v3
+              with:
+                  path: ~/.cache/dfinity
+                  key: kybra-dfx-0.13.1
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               run: DFX_VERSION=0.13.1 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)" # Find latest dfx version at https://raw.githubusercontent.com/dfinity/sdk/public-manifest/manifest.json
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
