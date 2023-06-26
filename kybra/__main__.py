@@ -13,6 +13,7 @@ import kybra
 from kybra.build_wasm_binary_or_exit import build_wasm_binary_or_exit
 from kybra.cargotoml import generate_cargo_toml, generate_cargo_lock
 from kybra.colors import red, yellow, green, dim
+from kybra.run_kybra_generate_or_exit import run_kybra_generate_or_exit
 from kybra.timed import timed, timed_inline
 from kybra.types import Args, Paths
 
@@ -304,67 +305,6 @@ def ignore_specific_dir(dirname: str, filenames: list[str]) -> list[str]:
         return filenames
     else:
         return []
-
-
-def run_kybra_generate_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool):
-    kybra_generate_bin_path = (
-        f"{paths['global_kybra_config_dir']}/{kybra.__version__}/bin/kybra_generate"
-    )
-    kybra_generate_bin_path_debug = (
-        f"{paths['global_kybra_target_dir']}/debug/kybra_generate"
-    )
-
-    should_rebuild = (
-        not os.path.exists(kybra_generate_bin_path)
-        or os.environ.get("KYBRA_REBUILD") == "true"
-    )
-
-    if should_rebuild:
-        kybra_generate_build_result = subprocess.run(
-            [
-                f"{paths['global_kybra_rust_bin_dir']}/cargo",
-                "build",
-                f"--manifest-path={paths['canister']}/kybra_generate/Cargo.toml",
-            ],
-            capture_output=not verbose,
-            env=cargo_env,
-        )
-
-        if kybra_generate_build_result.returncode != 0:
-            print(red("\n💣 Kybra error: compilation\n"))
-            print(parse_kybra_generate_error(kybra_generate_build_result.stderr))
-            print(
-                "\nFor help reach out in the #python channel of the ICP Developer Community discord:"
-            )
-            print(
-                "\nhttps://discord.com/channels/748416164832608337/1019372359775440988\n"
-            )
-            print("💀 Build failed")
-            sys.exit(1)
-
-        shutil.copy(kybra_generate_bin_path_debug, kybra_generate_bin_path)
-
-    # Generate the Rust code
-    kybra_generate_result = subprocess.run(
-        [
-            kybra_generate_bin_path,
-            paths["py_file_names_file"],
-            paths["py_entry_module_name"],
-            paths["lib"],
-        ],
-        capture_output=not verbose,
-        env=cargo_env,
-    )
-
-    if kybra_generate_result.returncode != 0:
-        print(red("\n💣 Kybra error: compilation\n"))
-        print(parse_kybra_generate_error(kybra_generate_result.stderr))
-        print(
-            "\nFor help reach out in the #python channel of the ICP Developer Community discord:"
-        )
-        print("\nhttps://discord.com/channels/748416164832608337/1019372359775440988\n")
-        print("💀 Build failed")
-        sys.exit(1)
 
 
 def parse_kybra_generate_error(stdout: bytes) -> str:
