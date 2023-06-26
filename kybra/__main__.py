@@ -10,11 +10,11 @@ import site
 from typing import Any, Callable
 
 import kybra
+from kybra.build_wasm_binary_or_exit import build_wasm_binary_or_exit
+from kybra.cargotoml import generate_cargo_toml, generate_cargo_lock
 from kybra.colors import red, yellow, green, dim
 from kybra.timed import timed, timed_inline
 from kybra.types import Args, Paths
-from kybra.cargotoml import generate_cargo_toml, generate_cargo_lock
-from kybra.candid import generate_candid_file  # type: ignore
 
 
 @timed
@@ -409,92 +409,6 @@ def run_rustfmt_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool =
         )
         print("💀 Build failed")
         sys.exit(1)
-
-
-@timed_inline
-def build_wasm_binary_or_exit(
-    paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
-):
-    # Compile the generated Rust code
-    cargo_build_result = subprocess.run(
-        [
-            f"{paths['global_kybra_rust_bin_dir']}/cargo",
-            "build",
-            f"--manifest-path={paths['canister']}/Cargo.toml",
-            "--target=wasm32-wasi",
-            f"--package={canister_name}",
-            "--release",
-        ],
-        capture_output=not verbose,
-        env=cargo_env,
-    )
-
-    if cargo_build_result.returncode != 0:
-        print(red("\n💣 Kybra error: building Wasm binary"))
-        print(cargo_build_result.stderr.decode("utf-8"))
-        print("💀 Build failed")
-        sys.exit(1)
-
-    shutil.copy(
-        f"{paths['global_kybra_target_dir']}/wasm32-wasi/release/{canister_name}.wasm",
-        f"{paths['canister']}/{canister_name}_app.wasm",
-    )
-
-    candid_file = generate_candid_file(paths, canister_name)
-    create_file(paths["did"], candid_file)
-
-    wasi2ic_result = subprocess.run(
-        [
-            f"{paths['global_kybra_rust_bin_dir']}/wasi2ic",
-            f"{paths['canister']}/{canister_name}_app.wasm",
-            f"{paths['canister']}/{canister_name}_app.wasm",
-        ],
-        capture_output=not verbose,
-        env=cargo_env,
-    )
-
-    if wasi2ic_result.returncode != 0:
-        print(red("\n💣 Kybra error: building Wasm binary"))
-        print(wasi2ic_result.stderr.decode("utf-8"))
-        print("💀 Build failed")
-        sys.exit(1)
-
-    if os.environ.get("KYBRA_REBUILD") != "true" and os.path.exists(
-        f"{paths['global_kybra_bin_dir']}/deployer.wasm"
-    ):
-        shutil.copy(
-            f"{paths['global_kybra_bin_dir']}/deployer.wasm",
-            f"{paths['canister']}/{canister_name}.wasm",
-        )
-    else:
-        kybra_deployer_build_result = subprocess.run(
-            [
-                f"{paths['global_kybra_rust_bin_dir']}/cargo",
-                "build",
-                f"--manifest-path={paths['canister']}/kybra_deployer/Cargo.toml",
-                "--target=wasm32-unknown-unknown",
-                f"--package=kybra_deployer",
-                "--release",
-            ],
-            capture_output=not verbose,
-            env=cargo_env,
-        )
-
-        if kybra_deployer_build_result.returncode != 0:
-            print(red("\n💣 Kybra error: building Wasm binary"))
-            print(kybra_deployer_build_result.stderr.decode("utf-8"))
-            print("💀 Build failed")
-            sys.exit(1)
-
-        shutil.copy(
-            f"{paths['global_kybra_target_dir']}/wasm32-unknown-unknown/release/kybra_deployer.wasm",
-            f"{paths['canister']}/{canister_name}.wasm",
-        )
-
-        shutil.copy(
-            f"{paths['canister']}/{canister_name}.wasm",
-            f"{paths['global_kybra_bin_dir']}/deployer.wasm",
-        )
 
 
 @timed_inline
