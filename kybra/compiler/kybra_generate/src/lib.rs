@@ -1,7 +1,6 @@
 use proc_macro2::TokenStream;
 use py_ast::PyAst;
 
-pub mod async_result_handler;
 pub mod body;
 pub mod candid_type;
 pub mod canister_method;
@@ -21,8 +20,7 @@ pub mod py_ast;
 pub mod source_map;
 pub mod stable_b_tree_map_nodes;
 pub mod tuple;
-pub mod unwrap_rust_python_result;
-pub mod utils;
+
 pub mod vm_value_conversion;
 
 pub use errors::Error;
