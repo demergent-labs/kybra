@@ -53,5 +53,22 @@ pub fn generate() -> proc_macro2::TokenStream {
                 CdkActTryFromVmValueError(format!("{}: {}", type_name, err_message))
             }
         }
+
+        trait ToRustErrString {
+            fn to_rust_err_string(self, vm: &rustpython::vm::VirtualMachine) -> String;
+        }
+
+        impl ToRustErrString for rustpython_vm::builtins::PyBaseExceptionRef {
+            fn to_rust_err_string(self, vm: &rustpython::vm::VirtualMachine) -> String {
+                let py_object = self.to_pyobject(vm);
+                let type_name = py_object.class().name().to_string();
+                match py_object.str(vm) {
+                    Ok(err_message) => format!("{type_name}: {}", err_message.to_string()),
+                    Err(_) => {
+                        format!("Attribute Error: '{type_name}' object has no attribute '__str__'")
+                    }
+                }
+            }
+        }
     }
 }

@@ -32,27 +32,16 @@ pub fn generate_body(
     let params = tuple::generate_tuple(&param_conversions);
 
     Ok(quote! {
-        unsafe {
-            let interpreter = INTERPRETER_OPTION
-                .as_mut()
-                .unwrap_or_trap("SystemError: missing python interpreter");
-            let scope = SCOPE_OPTION
-                .as_mut()
-                .unwrap_or_trap("SystemError: missing python scope");
+        let interpreter = unsafe { INTERPRETER_OPTION.as_mut() }
+            .unwrap_or_trap("SystemError: missing python interpreter");
+        let vm = &interpreter.vm;
+        let params = #params;
 
-            let vm = &interpreter.vm;
+        let final_return_value = call_global_python_function(#name, params)
+            .await
+            .unwrap_or_else(|err| ic_cdk::trap(err.as_str()));
 
-            let py_object_ref = scope
-                .globals
-                .get_item(#name, vm).unwrap_or_trap(vm)
-                .call(#params, vm).unwrap_or_trap(vm);
-
-            let final_return_value = async_result_handler(vm, &py_object_ref, vm.ctx.none())
-                .await
-                .unwrap_or_trap(vm);
-
-            #return_expression
-        }
+        #return_expression
     })
 }
 
@@ -72,7 +61,7 @@ fn generate_return_expression(
     }
 
     Ok(quote! {
-        final_return_value.try_from_vm_value(vm).unwrap_or_trap()
+        final_return_value
     })
 }
 

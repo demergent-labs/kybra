@@ -4,10 +4,12 @@ use cdk_framework::act::node::{
 };
 use proc_macro2::TokenStream;
 
-use crate::{
-    async_result_handler, ic_object, stable_b_tree_map_nodes::rust, unwrap_rust_python_result,
-    utils, StableBTreeMapNode,
-};
+use crate::{ic_object, stable_b_tree_map_nodes::rust, StableBTreeMapNode};
+
+mod async_result_handler;
+mod call_global_python_function;
+mod unwrap_rust_python_result;
+mod utils;
 
 pub fn generate(
     update_methods: &Vec<UpdateMethod>,
@@ -25,6 +27,7 @@ pub fn generate(
     let async_result_handler = async_result_handler::generate(&services);
     let stable_b_tree_map = rust::generate(stable_b_tree_map_nodes);
     let utils = utils::generate();
+    let call_global_python_function = call_global_python_function::generate();
 
     quote::quote! {
         #ic_object
@@ -32,5 +35,6 @@ pub fn generate(
         #async_result_handler
         #stable_b_tree_map
         #utils
+        #call_global_python_function
     }
 }
