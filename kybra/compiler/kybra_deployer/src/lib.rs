@@ -2,21 +2,13 @@
 // TODO then I think we can use the new ic_cdk::api::is_controller check
 // TODO and get rid of INSTALLER_REF_CELL
 
+use errors::{
+    call_result_error_to_string, rejection_code_to_string, value_error_to_string, UnwrapOrTrap,
+};
 use sha2::{Digest, Sha256};
 use shared_utils::{PYTHON_STDLIB_MEMORY_ID, RANDOMNESS_MEMORY_ID};
 
-pub trait UnwrapOrTrap<T> {
-    fn unwrap_or_trap(self) -> T;
-}
-
-impl<T> UnwrapOrTrap<T> for Result<T, ic_stable_structures::cell::InitError> {
-    fn unwrap_or_trap(self) -> T {
-        match self {
-            Ok(ok) => return ok,
-            Err(err) => ic_cdk::trap("Did it work?"), // TODO flesh this out of course
-        }
-    }
-}
+mod errors;
 
 thread_local! {
     static WASM_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
@@ -110,35 +102,40 @@ pub fn upload_python_stdlib_chunk(bytes: Vec<u8>) {
 pub fn python_stdlib_hash() -> String {
     PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
         let python_stdlib_stable_ref = python_stdlib_stable_ref_cell.borrow();
-
         let python_stdlib_bytes = python_stdlib_stable_ref.get();
 
         if python_stdlib_bytes.len() == 0 {
             "".to_string()
         } else {
-            let mut hasher = Sha256::new();
-
-            hasher.update(python_stdlib_bytes);
-
-            let result = hasher.finalize();
-
-            hex::encode(result)
+            hash(python_stdlib_bytes)
         }
     })
 }
 
 #[ic_cdk_macros::update(guard = "installer_guard")]
 pub async fn install_wasm() -> Result<(), String> {
+    stable_store_randomness().await?;
+    stable_store_python_stdlib()?;
+    install_code().map_err(|err| rejection_code_to_string(&err))
+}
+
+async fn stable_store_randomness() -> Result<(), String> {
     let randomness_result = ic_cdk::api::management_canister::main::raw_rand().await;
+    let randomness = randomness_result
+        .map_err(|err| call_result_error_to_string(&err))?
+        .0;
 
     RANDOMNESS_STABLE_REF_CELL.with(|randomness_stable_ref_cell| {
         let mut randomness_stable_ref_mut = randomness_stable_ref_cell.borrow_mut();
+        randomness_stable_ref_mut
+            .set(randomness)
+            .map_err(|err| value_error_to_string(&err))
+    })?;
 
-        let randomness = randomness_result.unwrap().0;
+    Ok(())
+}
 
-        randomness_stable_ref_mut.set(randomness).unwrap();
-    });
-
+fn stable_store_python_stdlib() -> Result<(), String> {
     PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
         let mut python_stdlib_stable_ref_mut = python_stdlib_stable_ref_cell.borrow_mut();
 
@@ -146,13 +143,32 @@ pub async fn install_wasm() -> Result<(), String> {
             .with(|python_stdlib_ref_cell| python_stdlib_ref_cell.borrow().clone());
 
         if python_stdlib_bytes.len() != 0 {
-            python_stdlib_stable_ref_mut
+            return python_stdlib_stable_ref_mut
                 .set(python_stdlib_bytes)
-                .unwrap();
+                .map_err(|err| value_error_to_string(&err));
         }
-    });
 
+        Ok(vec![])
+    })?;
+
+    Ok(())
+}
+
+fn install_code() -> Result<(), ic_cdk::api::call::RejectionCode> {
     let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
+    ic_cdk::api::call::notify(
+        ic_cdk::export::Principal::management_canister(),
+        "install_code",
+        (
+            ic_cdk::api::management_canister::main::InstallCodeArgument {
+                mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
+                canister_id: ic_cdk::api::id(),
+                wasm_module,
+                arg: ARG_DATA_RAW_REF_CELL
+                    .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
+            },
+        ),
+    )
 
     // TODO we think that the response trying to execute a callback on a different Wasm binary
     // TODO may be causing problems, thus we are testing out notify
@@ -171,23 +187,7 @@ pub async fn install_wasm() -> Result<(), String> {
     // the install_code call returns to a different Wasm binary
     // and the callback no longer exists
     // If there is an error in the cross-canister call this will be reached
-    // result.unwrap()
-
-    let result = ic_cdk::api::call::notify(
-        ic_cdk::export::Principal::from_text("aaaaa-aa").map_err(|err| "".to_string())?,
-        "install_code",
-        (
-            ic_cdk::api::management_canister::main::InstallCodeArgument {
-                mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
-                canister_id: ic_cdk::api::id(),
-                wasm_module,
-                arg: ARG_DATA_RAW_REF_CELL
-                    .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
-            },
-        ),
-    );
-
-    result.map_err(|err| "".to_string())
+    // result.map_err(|err| call_result_error_to_string(&err))
 }
 
 fn installer_guard() -> Result<(), String> {
@@ -199,4 +199,14 @@ fn installer_guard() -> Result<(), String> {
     }
 
     Err("Not authorized".to_string())
+}
+
+fn hash(bytes: &Vec<u8>) -> String {
+    let mut hasher = Sha256::new();
+
+    hasher.update(bytes);
+
+    let result = hasher.finalize();
+
+    hex::encode(result)
 }
