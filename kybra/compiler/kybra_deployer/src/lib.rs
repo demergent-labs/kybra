@@ -5,6 +5,19 @@
 use sha2::{Digest, Sha256};
 use shared_utils::{PYTHON_STDLIB_MEMORY_ID, RANDOMNESS_MEMORY_ID};
 
+pub trait UnwrapOrTrap<T> {
+    fn unwrap_or_trap(self) -> T;
+}
+
+impl<T> UnwrapOrTrap<T> for Result<T, ic_stable_structures::cell::InitError> {
+    fn unwrap_or_trap(self) -> T {
+        match self {
+            Ok(ok) => return ok,
+            Err(err) => ic_cdk::trap("Did it work?"), // TODO flesh this out of course
+        }
+    }
+}
+
 thread_local! {
     static WASM_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
 
@@ -24,7 +37,7 @@ thread_local! {
     > = std::cell::RefCell::new(
         ic_stable_structures::cell::Cell::init(
             MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(RANDOMNESS_MEMORY_ID))), vec![]
-        ).unwrap()
+        ).unwrap_or_trap()
     );
 
     static PYTHON_STDLIB_STABLE_REF_CELL: std::cell::RefCell<
@@ -37,7 +50,7 @@ thread_local! {
     > = std::cell::RefCell::new(
         ic_stable_structures::cell::Cell::init(
             MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(PYTHON_STDLIB_MEMORY_ID))), vec![]
-        ).unwrap()
+        ).unwrap_or_trap()
     );
 
     static MEMORY_MANAGER_REF_CELL: std::cell::RefCell<
@@ -115,13 +128,8 @@ pub fn python_stdlib_hash() -> String {
 }
 
 #[ic_cdk_macros::update(guard = "installer_guard")]
-pub async fn install_wasm() {
-    let randomness_result: ic_cdk::api::call::CallResult<(Vec<u8>,)> = ic_cdk::api::call::call(
-        ic_cdk::export::Principal::from_text("aaaaa-aa").unwrap(),
-        "raw_rand",
-        (),
-    )
-    .await;
+pub async fn install_wasm() -> Result<(), String> {
+    let randomness_result = ic_cdk::api::management_canister::main::raw_rand().await;
 
     RANDOMNESS_STABLE_REF_CELL.with(|randomness_stable_ref_cell| {
         let mut randomness_stable_ref_mut = randomness_stable_ref_cell.borrow_mut();
@@ -166,7 +174,7 @@ pub async fn install_wasm() {
     // result.unwrap()
 
     let result = ic_cdk::api::call::notify(
-        ic_cdk::export::Principal::from_text("aaaaa-aa").unwrap(),
+        ic_cdk::export::Principal::from_text("aaaaa-aa").map_err(|err| "".to_string())?,
         "install_code",
         (
             ic_cdk::api::management_canister::main::InstallCodeArgument {
@@ -179,7 +187,7 @@ pub async fn install_wasm() {
         ),
     );
 
-    result.unwrap()
+    result.map_err(|err| "".to_string())
 }
 
 fn installer_guard() -> Result<(), String> {
