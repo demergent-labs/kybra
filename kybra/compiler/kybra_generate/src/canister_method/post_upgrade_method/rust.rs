@@ -40,26 +40,32 @@ pub fn generate(
                 });
             });
             let _kybra_scope = _kybra_interpreter.enter(|vm| vm.new_scope_with_builtins());
+            let vm = &_kybra_interpreter.vm;
 
-            _kybra_interpreter.enter(|vm| {
-                Ic::make_class(&vm.ctx);
-                vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm).unwrap_or_trap(vm);
+            Ic::make_class(&vm.ctx);
+            vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm).unwrap_or_trap(vm);
 
-                let result = vm.run_code_string(
-                    _kybra_scope.clone(),
-                    &format!("from {} import *", #entry_module_name),
-                    "".to_owned(),
-                );
+            let result = vm.run_code_string(
+                _kybra_scope.clone(),
+                &format!("from {} import *", #entry_module_name),
+                "".to_owned(),
+            );
 
-                if let Err(err) = result {
-                    let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
+            if let Err(err) = result {
+                let err_string: String = err.to_pyobject(vm).repr(vm).unwrap().to_string();
 
-                    panic!("{}", err_string);
-                }
-            });
+                panic!("{}", err_string);
+            }
 
             INTERPRETER_OPTION = Some(_kybra_interpreter);
             SCOPE_OPTION = Some(_kybra_scope);
+
+            // This is here so that the py function calls below have access to the vm
+            // The vm ownership is transferred above, thus we do this for now
+            let interpreter = INTERPRETER_OPTION
+                    .as_mut()
+                    .unwrap_or_trap("SystemError: missing python interpreter");
+            let vm = &interpreter.vm;
 
             if CANISTER_INITIALIZED_REF_CELL.with(|canister_initialized_ref_cell| *canister_initialized_ref_cell.borrow().get()) == 0 {
                 #call_to_init_py_function
