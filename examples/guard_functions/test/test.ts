@@ -12,6 +12,7 @@ const functionGuardCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 let tests: Test[] = [
     ...getTests(createSnakeCaseProxy(functionGuardCanister)).filter((value) => {
         return (
+            value.name !== 'heartbeat guard' &&
             value.name !== 'callExpressionWithEmptyOptionsObject' &&
             value.name !== 'looselyGuardedWithGuardOptionKeyAsString' &&
             value.name !== 'invalidReturnTypeGuarded' &&
@@ -20,6 +21,26 @@ let tests: Test[] = [
             value.name !== 'nonStringErrValueGuarded'
         );
     }),
+    {
+        name: 'heartbeat guard',
+        test: async () => {
+            const initialState = await functionGuardCanister.get_state();
+            console.log(
+                `Value at initial check was: ${initialState.heartbeat_tick}`
+            );
+            await sleep(20_000);
+            const stateAfterRest = await functionGuardCanister.get_state();
+            console.log(
+                `Value after 15s delay was: ${stateAfterRest.heartbeat_tick}`
+            );
+
+            return {
+                Ok:
+                    initialState.heartbeat_tick <= 20 &&
+                    stateAfterRest.heartbeat_tick === 20
+            };
+        }
+    },
     {
         name: 'invalid_return_type_guarded',
         test: async () => {
@@ -106,3 +127,7 @@ let tests: Test[] = [
 ];
 
 runTests(tests);
+
+function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
