@@ -1,9 +1,8 @@
 use cdk_framework::{
-    act::{node::Param, CandidTypes, CanisterMethods, VmValueConversion},
+    act::{CandidTypes, CanisterMethods, VmValueConversion},
     traits::CollectResults,
     AbstractCanisterTree,
 };
-use proc_macro2::TokenStream;
 
 use super::PyAst;
 use crate::{
@@ -14,20 +13,13 @@ use crate::{
 
 impl PyAst {
     pub fn to_act(&self) -> Result<AbstractCanisterTree, Vec<Error>> {
-        let (candid_types, canister_methods_tuple, guard_functions, stable_b_tree_map_nodes) = (
+        let (candid_types, canister_methods, guard_functions, stable_b_tree_map_nodes) = (
             self.create_candid_types(),
             self.create_canister_methods(),
             self.build_guard_functions(),
             self.build_stable_b_tree_map_nodes(),
         )
             .collect_results()?;
-
-        let (
-            canister_methods,
-            _init_params,
-            _call_to_init_py_function,
-            _call_to_post_upgrade_py_function,
-        ) = canister_methods_tuple;
 
         let vm_value_conversion = VmValueConversion {
             try_from_vm_value_impls: try_into_vm_value_impls::generate(),
@@ -72,14 +64,12 @@ impl PyAst {
         })
     }
 
-    pub fn create_canister_methods(
-        &self,
-    ) -> Result<(CanisterMethods, Vec<Param>, TokenStream, TokenStream), Vec<Error>> {
+    pub fn create_canister_methods(&self) -> Result<CanisterMethods, Vec<Error>> {
         let (
             heartbeat_method,
-            (init_method, init_params, call_to_init_py_function),
+            init_method,
             inspect_message_method,
-            (post_upgrade_method, call_to_post_upgrade_py_function),
+            post_upgrade_method,
             pre_upgrade_method,
             query_methods,
             update_methods,
@@ -94,19 +84,14 @@ impl PyAst {
         )
             .collect_results()?;
 
-        Ok((
-            CanisterMethods {
-                heartbeat_method,
-                init_method: Some(init_method),
-                inspect_message_method,
-                post_upgrade_method: Some(post_upgrade_method),
-                pre_upgrade_method,
-                query_methods,
-                update_methods,
-            },
-            init_params,
-            call_to_init_py_function,
-            call_to_post_upgrade_py_function,
-        ))
+        Ok(CanisterMethods {
+            heartbeat_method,
+            init_method: Some(init_method),
+            inspect_message_method,
+            post_upgrade_method: Some(post_upgrade_method),
+            pre_upgrade_method,
+            query_methods,
+            update_methods,
+        })
     }
 }

@@ -8,7 +8,7 @@ use cdk_framework::{
 use proc_macro2::TokenStream;
 use rustpython_parser::ast::{Located, StmtKind};
 
-use super::{generate_call, rust};
+use super::rust;
 use crate::{
     canister_method::{
         self,
@@ -21,21 +21,13 @@ use crate::{
 };
 
 impl PyAst {
-    pub fn build_post_upgrade_method(
-        &self,
-    ) -> Result<(PostUpgradeMethod, TokenStream), Vec<Error>> {
+    pub fn build_post_upgrade_method(&self) -> Result<PostUpgradeMethod, Vec<Error>> {
         let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
         let post_upgrade_function_defs =
             self.get_canister_stmt_of_type(CanisterMethodType::PostUpgrade);
-        let (
-            init_params,
-            (post_upgrade_params, guard_function_name),
-            call_to_post_upgrade_py_function,
-            post_upgrade_method_body,
-        ) = (
+        let (init_params, (post_upgrade_params, guard_function_name), post_upgrade_method_body) = (
             extract_init_function(&init_function_defs),
             extract_post_upgrade_function(&post_upgrade_function_defs),
-            generate_call(&post_upgrade_function_defs.get(0)),
             generate_post_upgrade_method_body(
                 &self.entry_module_name,
                 init_function_defs.get(0),
@@ -46,14 +38,11 @@ impl PyAst {
         let post_upgrade_method_params =
             select_post_upgrade_method_params(init_params, post_upgrade_params);
 
-        Ok((
-            PostUpgradeMethod {
-                params: post_upgrade_method_params,
-                body: post_upgrade_method_body,
-                guard_function_name,
-            },
-            call_to_post_upgrade_py_function,
-        ))
+        Ok(PostUpgradeMethod {
+            params: post_upgrade_method_params,
+            body: post_upgrade_method_body,
+            guard_function_name,
+        })
     }
 }
 
