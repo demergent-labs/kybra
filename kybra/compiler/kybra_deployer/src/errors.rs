@@ -5,7 +5,7 @@ pub trait UnwrapOrTrap<T> {
 impl<T> UnwrapOrTrap<T> for Result<T, ic_stable_structures::cell::InitError> {
     fn unwrap_or_trap(self) -> T {
         match self {
-            Ok(ok) => return ok,
+            Ok(ok) => ok,
             Err(err) => ic_cdk::trap(&init_error_to_string(&err)),
         }
     }

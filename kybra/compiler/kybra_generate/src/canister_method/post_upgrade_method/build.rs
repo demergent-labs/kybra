@@ -6,10 +6,9 @@ use cdk_framework::{
     traits::CollectResults,
 };
 use proc_macro2::TokenStream;
-use quote::quote;
 use rustpython_parser::ast::{Located, StmtKind};
 
-use super::rust;
+use super::{generate_call, rust};
 use crate::{
     canister_method::{
         self,
@@ -32,19 +31,20 @@ impl PyAst {
             init_params,
             (post_upgrade_params, guard_function_name),
             call_to_post_upgrade_py_function,
+            post_upgrade_method_body,
         ) = (
             extract_init_function(&init_function_defs),
             extract_post_upgrade_function(&post_upgrade_function_defs),
             generate_call(&post_upgrade_function_defs.get(0)),
+            generate_post_upgrade_method_body(
+                &self.entry_module_name,
+                init_function_defs.get(0),
+                post_upgrade_function_defs.get(0),
+            ),
         )
             .collect_results()?;
         let post_upgrade_method_params =
             select_post_upgrade_method_params(init_params, post_upgrade_params);
-        let post_upgrade_method_body = generate_post_upgrade_method_body(
-            &self.entry_module_name,
-            init_function_defs.get(0),
-            post_upgrade_function_defs.get(0),
-        );
 
         Ok((
             PostUpgradeMethod {
@@ -111,7 +111,7 @@ fn generate_post_upgrade_method_body(
     entry_module_name: &String,
     init_function_def: Option<&SourceMapped<&Located<StmtKind>>>,
     post_upgrade_function_def: Option<&SourceMapped<&Located<StmtKind>>>,
-) -> TokenStream {
+) -> Result<TokenStream, Vec<Error>> {
     rust::generate(
         init_function_def,
         post_upgrade_function_def,
@@ -143,14 +143,5 @@ fn validate_post_upgrade_return_type(
         .into())
     } else {
         Ok(())
-    }
-}
-
-fn generate_call(
-    post_upgrade_function_def_option: &Option<&SourceMapped<&Located<StmtKind>>>,
-) -> Result<TokenStream, Vec<Error>> {
-    match &post_upgrade_function_def_option {
-        Some(post_upgrade_function_def) => post_upgrade_function_def.generate_call_to_py_function(),
-        None => Ok(quote!()),
     }
 }
