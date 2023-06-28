@@ -1,98 +1,120 @@
+use fs_extra::dir::{copy, CopyOptions};
 use std::path::Path;
 use std::process::Command;
 use tempfile::tempdir;
 
-fn main() {
-    // The unwrap_or is so that this doesn't break RustAnalyzer
-    let kybra_version = std::env::var("KYBRA_VERSION").unwrap_or("0.0.0".to_string());
+static ERROR_PREFIX: &str = "Kybra Post Install Build Error";
 
-    let python_stdlib_binary_path = dirs::home_dir()
-        .unwrap()
-        .join(format!(".config/kybra/{kybra_version}/bin/python_stdlib"));
+fn main() -> Result<(), String> {
+    let kybra_version = get_kybra_version()?;
+    let home_dir = dirs::home_dir().ok_or(format!("{ERROR_PREFIX}: Home directory not found"))?;
 
+    let python_stdlib_binary_path =
+        home_dir.join(format!(".config/kybra/{kybra_version}/bin/python_stdlib"));
+    handle_python_stdlib_exists(&python_stdlib_binary_path);
+
+    let python_stdlib_src_path = home_dir.join(format!(".config/kybra/{kybra_version}/Lib"));
+    let kybra_post_install_src_lib_path = Path::new("src/Lib");
+
+    clean_kybra_post_install_src_lib(&kybra_post_install_src_lib_path)?;
+    copy_from_python_stdlib_src_to_kybra_post_install_src(
+        &python_stdlib_src_path,
+        &kybra_post_install_src_lib_path,
+    )?;
+
+    let github_repo = "https://github.com/RustPython/RustPython.git";
+    let commit_hash = "f12875027ce425297c07cbccb9be77514ed46157";
+
+    let temp_dir = tempdir().map_err(|e| error_to_string(&e))?;
+    git_clone(github_repo, &temp_dir)?;
+    git_checkout(commit_hash, &temp_dir)?;
+
+    let git_repo_lib_dir = temp_dir.path().join("Lib");
+    copy_directory(&git_repo_lib_dir, &python_stdlib_src_path)?;
+    copy_directory(&python_stdlib_src_path, &kybra_post_install_src_lib_path)?;
+
+    temp_dir.close().map_err(|e| error_to_string(&e))?;
+
+    Ok(())
+}
+
+fn get_kybra_version() -> Result<String, String> {
+    std::env::var("KYBRA_VERSION")
+        .map_err(|_| format!("{ERROR_PREFIX}: KYBRA_VERSION environment variable not found"))
+}
+
+fn handle_python_stdlib_exists(python_stdlib_binary_path: &Path) {
     if python_stdlib_binary_path.exists() {
         println!("cargo:rustc-cfg=python_stdlib_exists");
     }
+}
 
-    let python_stdlib_src_path = dirs::home_dir()
-        .unwrap()
-        .join(format!(".config/kybra/{kybra_version}/Lib"));
-
-    let kybra_post_install_src_lib_path = Path::new("src/Lib");
-
+fn clean_kybra_post_install_src_lib(kybra_post_install_src_lib_path: &Path) -> Result<(), String> {
     if kybra_post_install_src_lib_path.exists() {
-        fs_extra::dir::remove(kybra_post_install_src_lib_path).unwrap();
+        fs_extra::dir::remove(kybra_post_install_src_lib_path).map_err(|e| error_to_string(&e))?;
     }
+    Ok(())
+}
 
+fn copy_from_python_stdlib_src_to_kybra_post_install_src(
+    python_stdlib_src_path: &Path,
+    kybra_post_install_src_lib_path: &Path,
+) -> Result<(), String> {
     if python_stdlib_src_path.exists() {
-        fs_extra::dir::copy(
-            &python_stdlib_src_path,
+        copy(
+            python_stdlib_src_path,
             kybra_post_install_src_lib_path,
-            &fs_extra::dir::CopyOptions {
+            &CopyOptions {
                 copy_inside: true,
                 ..Default::default()
             },
         )
-        .expect("Failed to copy directory.");
-
-        return;
+        .map_err(|e| error_to_string(&e))?;
     }
+    Ok(())
+}
 
-    // Define the GitHub repository URL
-    let github_repo = "https://github.com/RustPython/RustPython.git";
-
-    // TODO eventually we will want this hash to be our exact RustPython dependency hash
-    // TODO but right now our RustPython fork is behind the live RustPython
-    let commit_hash = "f12875027ce425297c07cbccb9be77514ed46157";
-
-    // Create a temporary directory
-    let temp_dir = tempdir().expect("Failed to create temp dir");
-
-    // Run the git clone command
+fn git_clone(github_repo: &str, temp_dir: &tempfile::TempDir) -> Result<(), String> {
     let status = Command::new("git")
         .args(&["clone", github_repo, temp_dir.path().to_str().unwrap()])
         .status()
-        .expect("Failed to execute git clone.");
+        .map_err(|e| error_to_string(&e))?;
 
-    if !status.success() {
-        panic!("Could not clone the repository.");
+    if status.success() {
+        Ok(())
+    } else {
+        Err(format!("{ERROR_PREFIX}: Failed to clone the repository"))
     }
+}
 
-    // Checkout the specific commit
+fn git_checkout(commit_hash: &str, temp_dir: &tempfile::TempDir) -> Result<(), String> {
     let status = Command::new("git")
         .current_dir(temp_dir.path())
         .args(&["checkout", commit_hash])
         .status()
-        .expect("Failed to checkout the specific commit.");
+        .map_err(|e| error_to_string(&e))?;
 
-    if !status.success() {
-        panic!("Could not checkout the specific commit.");
+    if status.success() {
+        Ok(())
+    } else {
+        Err(format!(
+            "{ERROR_PREFIX}: Could not checkout the specific commit"
+        ))
     }
+}
 
-    // Define the source directory path (the one to copy) and the destination path
-    let git_repo_lib_dir = temp_dir.path().join("Lib");
-
-    // Use a crate like fs_extra to copy the directory recursively
-    fs_extra::dir::copy(
-        &git_repo_lib_dir,
-        &python_stdlib_src_path,
-        &fs_extra::dir::CopyOptions {
+fn copy_directory(src: &Path, dst: &Path) -> Result<u64, String> {
+    copy(
+        src,
+        dst,
+        &CopyOptions {
             copy_inside: true,
             ..Default::default()
         },
     )
-    .expect("Failed to copy directory.");
+    .map_err(|e| error_to_string(&e))
+}
 
-    fs_extra::dir::copy(
-        &python_stdlib_src_path,
-        kybra_post_install_src_lib_path,
-        &fs_extra::dir::CopyOptions {
-            copy_inside: true,
-            ..Default::default()
-        },
-    )
-    .expect("Failed to copy directory.");
-
-    // Close (and delete) the temporary directory
-    let _ = temp_dir.close();
+fn error_to_string(e: &dyn std::error::Error) -> String {
+    format!("{ERROR_PREFIX}: {}", e.to_string())
 }
