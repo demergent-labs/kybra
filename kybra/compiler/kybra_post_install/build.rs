@@ -6,8 +6,8 @@ use tempfile::tempdir;
 static ERROR_PREFIX: &str = "Kybra Post Install Build Error";
 
 fn main() -> Result<(), String> {
-    let kybra_version = get_kybra_version()?;
-    let home_dir = dirs::home_dir().ok_or(format!("{ERROR_PREFIX}: Home directory not found"))?;
+    let kybra_version = get_kybra_version();
+    let home_dir = dirs::home_dir().ok_or(create_error_string("Home directory not found"))?;
 
     let python_stdlib_binary_path =
         home_dir.join(format!(".config/kybra/{kybra_version}/bin/python_stdlib"));
@@ -16,7 +16,11 @@ fn main() -> Result<(), String> {
     let python_stdlib_src_path = home_dir.join(format!(".config/kybra/{kybra_version}/Lib"));
     let kybra_post_install_src_lib_path = Path::new("src/Lib");
 
-    clean_kybra_post_install_src_lib(&kybra_post_install_src_lib_path)?;
+    if kybra_post_install_src_lib_path.exists() {
+        clean_kybra_post_install_src_lib(&kybra_post_install_src_lib_path)?;
+        return Ok(());
+    }
+
     copy_from_python_stdlib_src_to_kybra_post_install_src(
         &python_stdlib_src_path,
         &kybra_post_install_src_lib_path,
@@ -38,9 +42,9 @@ fn main() -> Result<(), String> {
     Ok(())
 }
 
-fn get_kybra_version() -> Result<String, String> {
-    std::env::var("KYBRA_VERSION")
-        .map_err(|_| format!("{ERROR_PREFIX}: KYBRA_VERSION environment variable not found"))
+fn get_kybra_version() -> String {
+    // The unwrap_or is so that this doesn't break RustAnalyzer
+    std::env::var("KYBRA_VERSION").unwrap_or("0.0.0".to_string())
 }
 
 fn handle_python_stdlib_exists(python_stdlib_binary_path: &Path) {
@@ -50,9 +54,7 @@ fn handle_python_stdlib_exists(python_stdlib_binary_path: &Path) {
 }
 
 fn clean_kybra_post_install_src_lib(kybra_post_install_src_lib_path: &Path) -> Result<(), String> {
-    if kybra_post_install_src_lib_path.exists() {
-        fs_extra::dir::remove(kybra_post_install_src_lib_path).map_err(|e| error_to_string(&e))?;
-    }
+    fs_extra::dir::remove(kybra_post_install_src_lib_path).map_err(|e| error_to_string(&e))?;
     Ok(())
 }
 
@@ -76,14 +78,21 @@ fn copy_from_python_stdlib_src_to_kybra_post_install_src(
 
 fn git_clone(github_repo: &str, temp_dir: &tempfile::TempDir) -> Result<(), String> {
     let status = Command::new("git")
-        .args(&["clone", github_repo, temp_dir.path().to_str().unwrap()])
+        .args(&[
+            "clone",
+            github_repo,
+            temp_dir
+                .path()
+                .to_str()
+                .ok_or(create_error_string("Could not convert path to &str"))?,
+        ])
         .status()
         .map_err(|e| error_to_string(&e))?;
 
     if status.success() {
         Ok(())
     } else {
-        Err(format!("{ERROR_PREFIX}: Failed to clone the repository"))
+        Err(create_error_string("Failed to clone the repository"))
     }
 }
 
@@ -97,8 +106,8 @@ fn git_checkout(commit_hash: &str, temp_dir: &tempfile::TempDir) -> Result<(), S
     if status.success() {
         Ok(())
     } else {
-        Err(format!(
-            "{ERROR_PREFIX}: Could not checkout the specific commit"
+        Err(create_error_string(
+            "Could not checkout the specific commit",
         ))
     }
 }
@@ -117,4 +126,8 @@ fn copy_directory(src: &Path, dst: &Path) -> Result<u64, String> {
 
 fn error_to_string(e: &dyn std::error::Error) -> String {
     format!("{ERROR_PREFIX}: {}", e.to_string())
+}
+
+fn create_error_string(message: &str) -> String {
+    format!("{ERROR_PREFIX}: {message}")
 }
