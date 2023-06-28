@@ -5,58 +5,35 @@
 use errors::{
     call_result_error_to_string, rejection_code_to_string, value_error_to_string, UnwrapOrTrap,
 };
+use ic_cdk::api::{call, management_canister};
+use ic_cdk::export::Principal;
+use ic_cdk_macros::{init, post_upgrade, query, update};
+use ic_stable_structures::cell::Cell;
+use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
+use ic_stable_structures::DefaultMemoryImpl;
 use sha2::{Digest, Sha256};
 use shared_utils::{PYTHON_STDLIB_MEMORY_ID, RANDOMNESS_MEMORY_ID};
+use std::cell::RefCell;
 
 mod errors;
 
 thread_local! {
-    static WASM_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
+    static WASM_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
+    static INSTALLER_REF_CELL: RefCell<String> = RefCell::new("".to_string());
+    static ARG_DATA_RAW_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
+    static PYTHON_STDLIB_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
 
-    static INSTALLER_REF_CELL: std::cell::RefCell<String> = std::cell::RefCell::new("".to_string());
+    static RANDOMNESS_STABLE_REF_CELL: RefCell<Cell<Vec<u8>, VirtualMemory<DefaultMemoryImpl>>>
+    = RefCell::new(Cell::init(MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(MemoryId::new(RANDOMNESS_MEMORY_ID))), vec![]).unwrap_or_trap());
 
-    static ARG_DATA_RAW_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
+    static PYTHON_STDLIB_STABLE_REF_CELL: RefCell<Cell<Vec<u8>, VirtualMemory<DefaultMemoryImpl>>>
+    = RefCell::new(Cell::init(MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(MemoryId::new(PYTHON_STDLIB_MEMORY_ID))), vec![]).unwrap_or_trap());
 
-    static PYTHON_STDLIB_REF_CELL: std::cell::RefCell<Vec<u8>> = std::cell::RefCell::new(vec![]);
-
-    static RANDOMNESS_STABLE_REF_CELL: std::cell::RefCell<
-        ic_stable_structures::cell::Cell<
-            Vec<u8>,
-            ic_stable_structures::memory_manager::VirtualMemory<
-                ic_stable_structures::DefaultMemoryImpl
-            >
-        >
-    > = std::cell::RefCell::new(
-        ic_stable_structures::cell::Cell::init(
-            MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(RANDOMNESS_MEMORY_ID))), vec![]
-        ).unwrap_or_trap()
-    );
-
-    static PYTHON_STDLIB_STABLE_REF_CELL: std::cell::RefCell<
-        ic_stable_structures::cell::Cell<
-            Vec<u8>,
-            ic_stable_structures::memory_manager::VirtualMemory<
-                ic_stable_structures::DefaultMemoryImpl
-            >
-        >
-    > = std::cell::RefCell::new(
-        ic_stable_structures::cell::Cell::init(
-            MEMORY_MANAGER_REF_CELL.with(|m| m.borrow().get(ic_stable_structures::memory_manager::MemoryId::new(PYTHON_STDLIB_MEMORY_ID))), vec![]
-        ).unwrap_or_trap()
-    );
-
-    static MEMORY_MANAGER_REF_CELL: std::cell::RefCell<
-        ic_stable_structures::memory_manager::MemoryManager<
-            ic_stable_structures::DefaultMemoryImpl
-        >
-    > = std::cell::RefCell::new(
-        ic_stable_structures::memory_manager::MemoryManager::init(
-            ic_stable_structures::DefaultMemoryImpl::default()
-        )
-    );
+    static MEMORY_MANAGER_REF_CELL: RefCell<MemoryManager<DefaultMemoryImpl>>
+    = RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
 }
 
-#[ic_cdk_macros::init]
+#[init]
 pub fn init() {
     INSTALLER_REF_CELL.with(|installer_ref_cell| {
         let mut installer_ref_mut = installer_ref_cell.borrow_mut();
@@ -69,7 +46,7 @@ pub fn init() {
     });
 }
 
-#[ic_cdk_macros::post_upgrade]
+#[post_upgrade]
 pub fn post_upgrade() {
     INSTALLER_REF_CELL.with(|installer_ref_cell| {
         let mut installer_ref_mut = installer_ref_cell.borrow_mut();
@@ -78,11 +55,11 @@ pub fn post_upgrade() {
 
     ARG_DATA_RAW_REF_CELL.with(|arg_data_raw_ref_cell| {
         let mut arg_data_ref_mut = arg_data_raw_ref_cell.borrow_mut();
-        *arg_data_ref_mut = ic_cdk::api::call::arg_data_raw();
+        *arg_data_ref_mut = call::arg_data_raw();
     });
 }
 
-#[ic_cdk_macros::update(guard = "installer_guard")]
+#[update(guard = "installer_guard")]
 pub fn upload_wasm_chunk(bytes: Vec<u8>) {
     WASM_REF_CELL.with(|wasm_ref_cell| {
         let mut wasm_ref_mut = wasm_ref_cell.borrow_mut();
@@ -90,7 +67,7 @@ pub fn upload_wasm_chunk(bytes: Vec<u8>) {
     });
 }
 
-#[ic_cdk_macros::update(guard = "installer_guard")]
+#[update(guard = "installer_guard")]
 pub fn upload_python_stdlib_chunk(bytes: Vec<u8>) {
     PYTHON_STDLIB_REF_CELL.with(|python_stdlib_ref_cell| {
         let mut python_stdlib_ref_mut = python_stdlib_ref_cell.borrow_mut();
@@ -98,7 +75,7 @@ pub fn upload_python_stdlib_chunk(bytes: Vec<u8>) {
     });
 }
 
-#[ic_cdk_macros::query(guard = "installer_guard")]
+#[query(guard = "installer_guard")]
 pub fn python_stdlib_hash() -> String {
     PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
         let python_stdlib_stable_ref = python_stdlib_stable_ref_cell.borrow();
@@ -112,7 +89,7 @@ pub fn python_stdlib_hash() -> String {
     })
 }
 
-#[ic_cdk_macros::update(guard = "installer_guard")]
+#[update(guard = "installer_guard")]
 pub async fn install_wasm() -> Result<(), String> {
     stable_store_randomness().await?;
     stable_store_python_stdlib()?;
@@ -120,7 +97,7 @@ pub async fn install_wasm() -> Result<(), String> {
 }
 
 async fn stable_store_randomness() -> Result<(), String> {
-    let randomness_result = ic_cdk::api::management_canister::main::raw_rand().await;
+    let randomness_result = management_canister::main::raw_rand().await;
     let randomness = randomness_result
         .map_err(|err| call_result_error_to_string(&err))?
         .0;
@@ -156,18 +133,16 @@ fn stable_store_python_stdlib() -> Result<(), String> {
 
 fn install_code() -> Result<(), ic_cdk::api::call::RejectionCode> {
     let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
-    ic_cdk::api::call::notify(
-        ic_cdk::export::Principal::management_canister(),
+    call::notify(
+        Principal::management_canister(),
         "install_code",
-        (
-            ic_cdk::api::management_canister::main::InstallCodeArgument {
-                mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
-                canister_id: ic_cdk::api::id(),
-                wasm_module,
-                arg: ARG_DATA_RAW_REF_CELL
-                    .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
-            },
-        ),
+        (management_canister::main::InstallCodeArgument {
+            mode: management_canister::main::CanisterInstallMode::Upgrade,
+            canister_id: ic_cdk::api::id(),
+            wasm_module,
+            arg: ARG_DATA_RAW_REF_CELL
+                .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
+        },),
     )
 
     // TODO we think that the response trying to execute a callback on a different Wasm binary
