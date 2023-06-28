@@ -6,7 +6,13 @@ use tempfile::tempdir;
 static ERROR_PREFIX: &str = "Kybra Post Install Build Error";
 
 fn main() -> Result<(), String> {
-    let kybra_version = get_kybra_version();
+    let ic_build = get_and_set_ic_build();
+
+    if ic_build == false {
+        return Ok(());
+    }
+
+    let kybra_version = get_kybra_version()?;
     let home_dir = dirs::home_dir().ok_or(create_error_string("Home directory not found"))?;
 
     let python_stdlib_binary_path =
@@ -42,9 +48,9 @@ fn main() -> Result<(), String> {
     Ok(())
 }
 
-fn get_kybra_version() -> String {
-    // The unwrap_or is so that this doesn't break RustAnalyzer
-    std::env::var("KYBRA_VERSION").unwrap_or("0.0.0".to_string())
+fn get_kybra_version() -> Result<String, String> {
+    std::env::var("KYBRA_VERSION")
+        .map_err(|_| create_error_string("KYBRA_VERSION environment variable is not present"))
 }
 
 fn handle_python_stdlib_exists(python_stdlib_binary_path: &Path) {
@@ -130,4 +136,19 @@ fn error_to_string(e: &dyn std::error::Error) -> String {
 
 fn create_error_string(message: &str) -> String {
     format!("{ERROR_PREFIX}: {message}")
+}
+
+// This attempts to detect when the code is being compiled in a non-ic environment
+// such as Rust Analyzer. The problem is that this build script and the main.rs
+// are run by Rust Analyzer, and because the network requests, file IO, and compilation
+// can be quite heavy, it makes local debugging very slow
+// This is an attempt to allow Rust Analyzer to run quickly
+fn get_and_set_ic_build() -> bool {
+    match (std::env::var("KYBRA_VERSION"), std::env::var("DFX_NETWORK")) {
+        (Ok(_), Ok(_)) => {
+            println!("cargo:rustc-cfg=ic_build");
+            true
+        }
+        _ => false,
+    }
 }

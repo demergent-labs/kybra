@@ -153,25 +153,30 @@ fn handle_python_stdlib_hashes_do_not_match(
 }
 
 fn get_python_stdlib_bytecode() -> Result<Vec<u8>, String> {
+    #[cfg(ic_build)]
     let kybra_version = std::env::var("KYBRA_VERSION")
         .map_err(|_| create_error_string("KYBRA_VERSION environment variable not present"))?;
 
+    #[cfg(ic_build)]
     let python_stdlib_path = dirs::home_dir()
         .ok_or(create_error_string("Home directory not found"))?
         .join(format!(".config/kybra/{kybra_version}/bin/python_stdlib"));
 
-    #[cfg(not(python_stdlib_exists))]
+    #[cfg(all(not(python_stdlib_exists), ic_build))]
     let python_stdlib_modules = rustpython_vm::py_freeze!(dir = "src/Lib");
 
-    #[cfg(not(python_stdlib_exists))]
+    #[cfg(all(not(python_stdlib_exists), ic_build))]
     let python_stdlib_bytecode = python_stdlib_modules.bytes.to_vec();
 
-    #[cfg(not(python_stdlib_exists))]
+    #[cfg(all(not(python_stdlib_exists), ic_build))]
     std::fs::write(python_stdlib_path, &python_stdlib_bytecode).map_err(|e| error_to_string(&e))?;
 
-    #[cfg(python_stdlib_exists)]
+    #[cfg(all(python_stdlib_exists, ic_build))]
     let python_stdlib_bytecode =
         std::fs::read(python_stdlib_path).map_err(|e| error_to_string(&e))?;
+
+    #[cfg(not(ic_build))]
+    let python_stdlib_bytecode = vec![];
 
     Ok(python_stdlib_bytecode)
 }
