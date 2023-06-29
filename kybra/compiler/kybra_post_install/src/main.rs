@@ -16,17 +16,13 @@ fn main() -> Result<(), String> {
         .get(1)
         .ok_or(create_error_string("Canister name argument not present"))?;
     let max_chunk_size = 2 * 1_000 * 1_000; // 2 MB
-    let dfx_network = std::env::var("DFX_NETWORK")
-        .map_err(|_| create_error_string("DFX_NETWORK environment variable not present"))?;
 
-    upload_app_canister(canister_name, max_chunk_size, &dfx_network)?;
-    upload_python_stdlib(canister_name, max_chunk_size, &dfx_network)?;
-    let (canister_id, canister_already_its_own_controller) =
-        add_permissions(canister_name, &dfx_network)?;
-    install_app_canister(canister_name, &dfx_network)?;
+    upload_app_canister(canister_name, max_chunk_size)?;
+    upload_python_stdlib(canister_name, max_chunk_size)?;
+    let (canister_id, canister_already_its_own_controller) = add_permissions(canister_name)?;
+    install_app_canister(canister_name)?;
     remove_permissions(
         canister_name,
-        &dfx_network,
         &canister_id,
         canister_already_its_own_controller,
     )?;
@@ -39,11 +35,7 @@ fn main() -> Result<(), String> {
     Ok(())
 }
 
-fn upload_app_canister(
-    canister_name: &str,
-    max_chunk_size: usize,
-    dfx_network: &str,
-) -> Result<(), String> {
+fn upload_app_canister(canister_name: &str, max_chunk_size: usize) -> Result<(), String> {
     let wasm = std::fs::read(format!(
         ".kybra/{canister_name}/{canister_name}_app.wasm.gz"
     ))
@@ -57,7 +49,6 @@ fn upload_app_canister(
             canister_name,
             wasm_chunk,
             "upload_wasm_chunk",
-            dfx_network,
             index,
             wasm_chunks.len(),
         )?;
@@ -66,18 +57,13 @@ fn upload_app_canister(
     Ok(())
 }
 
-fn upload_python_stdlib(
-    canister_name: &str,
-    max_chunk_size: usize,
-    dfx_network: &str,
-) -> Result<(), String> {
+fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize) -> Result<(), String> {
     let python_stdlib_bytecode = get_python_stdlib_bytecode()?;
 
     let local_python_stdlib_bytecode_hash =
         get_local_python_stdlib_bytecode_hash(&python_stdlib_bytecode);
 
-    let remote_python_stdlib_bytecode_hash =
-        get_remote_python_stdlib_bytecode_hash(canister_name, dfx_network)?;
+    let remote_python_stdlib_bytecode_hash = get_remote_python_stdlib_bytecode_hash(canister_name)?;
 
     let hashes_do_not_match =
         format!("(\"{local_python_stdlib_bytecode_hash}\")") != remote_python_stdlib_bytecode_hash;
@@ -85,7 +71,6 @@ fn upload_python_stdlib(
     if hashes_do_not_match {
         handle_python_stdlib_hashes_do_not_match(
             canister_name,
-            dfx_network,
             python_stdlib_bytecode,
             max_chunk_size,
         )?;
@@ -101,19 +86,12 @@ fn get_local_python_stdlib_bytecode_hash(python_stdlib_bytecode: &Vec<u8>) -> St
     hex::encode(result)
 }
 
-fn get_remote_python_stdlib_bytecode_hash(
-    canister_name: &str,
-    dfx_network: &str,
-) -> Result<String, String> {
-    let remote_python_stdlib_hash_output = Command::new("dfx")
-        .arg("canister")
-        .arg("call")
-        .arg("--network")
-        .arg(dfx_network)
-        .arg(canister_name)
-        .arg("python_stdlib_hash")
-        .output()
-        .map_err(|_| create_error_string("Failed to execute the dfx canister call command"))?;
+fn get_remote_python_stdlib_bytecode_hash(canister_name: &str) -> Result<String, String> {
+    let remote_python_stdlib_hash_output = dfx(
+        "canister",
+        "call",
+        &vec![canister_name, "python_stdlib_hash"],
+    )?;
 
     if !remote_python_stdlib_hash_output.status.success() {
         return Err(create_error_string(&String::from_utf8_lossy(
@@ -131,7 +109,6 @@ fn get_remote_python_stdlib_bytecode_hash(
 
 fn handle_python_stdlib_hashes_do_not_match(
     canister_name: &str,
-    dfx_network: &str,
     python_stdlib_bytecode: Vec<u8>,
     max_chunk_size: usize,
 ) -> Result<(), String> {
@@ -143,7 +120,6 @@ fn handle_python_stdlib_hashes_do_not_match(
             canister_name,
             python_stdlib_bytecode_chunk,
             "upload_python_stdlib_chunk",
-            dfx_network,
             index,
             python_stdlib_bytecode_chunks.len(),
         )?;
@@ -181,27 +157,20 @@ fn get_python_stdlib_bytecode() -> Result<Vec<u8>, String> {
     Ok(python_stdlib_bytecode)
 }
 
-fn add_permissions(canister_name: &str, dfx_network: &str) -> Result<(String, bool), String> {
-    let canister_id = get_canister_id(canister_name, dfx_network)?;
+fn add_permissions(canister_name: &str) -> Result<(String, bool), String> {
+    let canister_id = get_canister_id(canister_name)?;
     let canister_already_its_own_controller =
-        get_canister_already_its_own_controller(canister_name, dfx_network, &canister_id)?;
+        get_canister_already_its_own_controller(canister_name, &canister_id)?;
 
     if !canister_already_its_own_controller {
-        add_controller(canister_name, dfx_network, &canister_id)?;
+        add_controller(canister_name, &canister_id)?;
     }
 
     Ok((canister_id, canister_already_its_own_controller))
 }
 
-fn get_canister_id(canister_name: &str, dfx_network: &str) -> Result<String, String> {
-    let canister_id_output = Command::new("dfx")
-        .arg("canister")
-        .arg("id")
-        .arg("--network")
-        .arg(dfx_network)
-        .arg(canister_name)
-        .output()
-        .map_err(|_| create_error_string("Failed to execute the dfx canister id command"))?;
+fn get_canister_id(canister_name: &str) -> Result<String, String> {
+    let canister_id_output = dfx("canister", "id", &vec![canister_name])?;
 
     let canister_id = String::from_utf8_lossy(&canister_id_output.stdout)
         .trim()
@@ -212,17 +181,9 @@ fn get_canister_id(canister_name: &str, dfx_network: &str) -> Result<String, Str
 
 fn get_canister_already_its_own_controller(
     canister_name: &str,
-    dfx_network: &str,
     canister_id: &str,
 ) -> Result<bool, String> {
-    let current_controllers_output = Command::new("dfx")
-        .arg("canister")
-        .arg("info")
-        .arg("--network")
-        .arg(dfx_network)
-        .arg(canister_name)
-        .output()
-        .map_err(|_| create_error_string("Failed to execute the dfx canister info command"))?;
+    let current_controllers_output = dfx("canister", "info", &vec![canister_name])?;
 
     if !current_controllers_output.status.success() {
         return Err(create_error_string(&String::from_utf8_lossy(
@@ -238,17 +199,12 @@ fn get_canister_already_its_own_controller(
     Ok(canister_already_its_own_controller)
 }
 
-fn add_controller(canister_name: &str, dfx_network: &str, canister_id: &str) -> Result<(), String> {
-    let add_controller_output = Command::new("dfx")
-        .arg("canister")
-        .arg("update-settings")
-        .arg("--network")
-        .arg(dfx_network)
-        .arg("--add-controller")
-        .arg(&canister_id)
-        .arg(canister_name)
-        .output()
-        .map_err(|_| create_error_string("Failed to execute the dfx command"))?;
+fn add_controller(canister_name: &str, canister_id: &str) -> Result<(), String> {
+    let add_controller_output = dfx(
+        "canister",
+        "update-settings",
+        &vec!["--add-controller", canister_id, canister_name],
+    )?;
 
     if !add_controller_output.status.success() {
         return Err(create_error_string(&String::from_utf8_lossy(
@@ -259,18 +215,10 @@ fn add_controller(canister_name: &str, dfx_network: &str, canister_id: &str) -> 
     Ok(())
 }
 
-fn install_app_canister(canister_name: &str, dfx_network: &str) -> Result<(), String> {
+fn install_app_canister(canister_name: &str) -> Result<(), String> {
     println!("\nFinalizing...\n");
 
-    let install_output = Command::new("dfx")
-        .arg("canister")
-        .arg("call")
-        .arg("--network")
-        .arg(dfx_network)
-        .arg(canister_name)
-        .arg("install_wasm")
-        .output()
-        .map_err(|_| create_error_string("Failed to execute the dfx command"))?;
+    let install_output = dfx("canister", "call", &vec![canister_name, "install_wasm"])?;
 
     if !install_output.status.success() {
         handle_install_app_canister_failure(&install_output)?;
@@ -297,7 +245,6 @@ fn handle_install_app_canister_failure(
 
 fn remove_permissions(
     canister_name: &str,
-    dfx_network: &str,
     canister_id: &str,
     canister_already_its_own_controller: bool,
 ) -> Result<(), String> {
@@ -305,16 +252,11 @@ fn remove_permissions(
         return Ok(());
     }
 
-    let remove_controller_output = Command::new("dfx")
-        .arg("canister")
-        .arg("update-settings")
-        .arg("--network")
-        .arg(dfx_network)
-        .arg("--remove-controller")
-        .arg(canister_id)
-        .arg(canister_name)
-        .output()
-        .map_err(|_| create_error_string("Failed to execute the dfx command"))?;
+    let remove_controller_output = dfx(
+        "canister",
+        "update-settings",
+        &vec!["--remove-controller", canister_id, canister_name],
+    )?;
 
     if !remove_controller_output.status.success() {
         return Err(create_error_string(&String::from_utf8_lossy(
@@ -330,7 +272,6 @@ fn upload_chunk(
     canister_name: &str,
     bytecode_chunk: &Vec<u8>,
     canister_method_name: &str,
-    dfx_network: &str,
     chunk_number: usize,
     chunk_total: usize,
 ) -> Result<(), String> {
@@ -342,17 +283,18 @@ fn upload_chunk(
         .write_all(blob_string.as_bytes())
         .map_err(|_| create_error_string("Failed to write data to temporary file"))?;
 
-    let output = Command::new("dfx")
-        .arg("canister")
-        .arg("call")
-        .arg("--network")
-        .arg(dfx_network)
-        .arg(canister_name)
-        .arg(canister_method_name)
-        .arg("--argument-file")
-        .arg(temp_file.path())
-        .output()
-        .map_err(|_| create_error_string("Failed to execute the dfx command"))?;
+    let output = dfx(
+        "canister",
+        "call",
+        &vec![
+            canister_name,
+            canister_method_name,
+            "--argument-file",
+            temp_file.path().to_str().ok_or(create_error_string(
+                "temp_file path could not be converted to &str",
+            ))?,
+        ],
+    )?;
 
     let chunk_number = chunk_number + 1;
 
@@ -399,4 +341,21 @@ fn error_to_string(e: &dyn std::error::Error) -> String {
 
 fn create_error_string(message: &str) -> String {
     format!("{ERROR_PREFIX}: {message}")
+}
+
+fn dfx(command: &str, subcommand: &str, args: &Vec<&str>) -> Result<std::process::Output, String> {
+    let dfx_network = std::env::var("DFX_NETWORK")
+        .map_err(|_| create_error_string("DFX_NETWORK environment variable not present"))?;
+
+    let mut dfx_command = Command::new("dfx");
+    dfx_command.arg(command);
+    dfx_command.arg(subcommand);
+    dfx_command.arg("--network");
+    dfx_command.arg(dfx_network);
+
+    for arg in args {
+        dfx_command.arg(arg);
+    }
+
+    dfx_command.output().map_err(|e| e.to_string())
 }
