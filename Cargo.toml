@@ -2,7 +2,8 @@
 members = [
     "kybra/compiler/kybra_generate",
     "kybra/compiler/kybra_vm_value_derive",
-    "kybra/compiler/kybra_modules_init"
+    "kybra/compiler/kybra_post_install",
+    "kybra/compiler/kybra_deployer"
 ]
 exclude = ["examples"]
 edition = "2018"

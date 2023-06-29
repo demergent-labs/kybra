@@ -10,7 +10,7 @@ from kybra import nat, nat64, nat32
 
 
 stable_map2 = StableBTreeMap[nat32, nat](
-    memory_id=2, max_key_size=100, max_value_size=1_000
+    memory_id=5, max_key_size=100, max_value_size=1_000
 )
 
 

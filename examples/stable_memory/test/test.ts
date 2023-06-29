@@ -15,7 +15,7 @@ runTests([
             const result = await stableMemoryCanister.stable_size();
 
             return {
-                Ok: result === 129
+                Ok: result === 897
             };
         }
     },
@@ -25,7 +25,7 @@ runTests([
             const result = await stableMemoryCanister.stable64_size();
 
             return {
-                Ok: result === 129n
+                Ok: result === 897n
             };
         }
     },
@@ -33,7 +33,7 @@ runTests([
         return (
             test.name !== 'stable size' &&
             test.name !== 'stable64 size' &&
-            test.name !== 'stable bytes' // TODO I believe this test now hits the cycle limit because we store a value at memory id 254 to distinguis between init/post_upgrade
+            test.name !== 'stable bytes' // TODO I believe this test now hits the cycle limit because we store a value at memory id 254 to distinguish between init/post_upgrade
         );
     })
 ]);

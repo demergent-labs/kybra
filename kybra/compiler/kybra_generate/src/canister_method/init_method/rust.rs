@@ -1,19 +1,12 @@
-use cdk_framework::{act::node::Param, traits::ToIdent};
+// TODO currently init is never called because of our deployer infrastructure
+// TODO in the future once dfx can automatically chunk upload any size binary
+// TODO the hope is that we can use the regular init flow again
+// TODO init should look almost identical to post_upgrade
+// TODO but it should call the developer's init function defined in Python
+
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub fn generate(params: &Vec<Param>) -> TokenStream {
-    let params_initializations = params.iter().map(|param| {
-        let param_name = format!("_cdk_user_defined_{}", param.name).to_ident();
-        let init_param_name = format!("INIT_PARAM_{}", param.name).to_ident();
-
-        quote! {
-            #init_param_name.with(|x| *x.borrow_mut() = Some(#param_name));
-        }
-    });
-
-    // TODO I think we will want to put some permissions on this, like the original installer
-    quote! {
-        #(#params_initializations)*
-    }
+pub fn generate() -> TokenStream {
+    quote! {}
 }
