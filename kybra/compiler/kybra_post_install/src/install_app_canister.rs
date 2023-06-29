@@ -1,9 +1,21 @@
-use crate::{dfx::dfx, error::create_error_string};
+use crate::{
+    dfx::dfx,
+    error::create_error_string,
+    permissions::{add_permissions, remove_permissions},
+};
 
 pub fn install_app_canister(canister_name: &str) -> Result<(), String> {
     println!("\nFinalizing...\n");
 
+    let (canister_id, canister_already_its_own_controller) = add_permissions(canister_name)?;
+
     let install_output = dfx("canister", "call", &vec![canister_name, "install_wasm"])?;
+
+    remove_permissions(
+        canister_name,
+        &canister_id,
+        canister_already_its_own_controller,
+    )?;
 
     if !install_output.status.success() {
         handle_install_app_canister_failure(&install_output)?;

@@ -4,7 +4,6 @@ use std::{thread, time::Duration};
 
 use error::create_error_string;
 use install_app_canister::install_app_canister;
-use permissions::{add_permissions, remove_permissions};
 use upload_app_canister::upload_app_canister;
 use upload_python_stdlib::upload_python_stdlib;
 
@@ -27,14 +26,7 @@ fn main() -> Result<(), String> {
 
     upload_app_canister(canister_name, max_chunk_size)?;
     upload_python_stdlib(canister_name, max_chunk_size)?;
-    // TODO move permission logic into install_app_canister
-    let (canister_id, canister_already_its_own_controller) = add_permissions(canister_name)?;
     install_app_canister(canister_name)?;
-    remove_permissions(
-        canister_name,
-        &canister_id,
-        canister_already_its_own_controller,
-    )?;
 
     // TODO this is here because of some complications with the install_code self-referential cross-canister call
     // TODO the call is a notify and thus won't wait for the canister's post_upgrade function to complete
