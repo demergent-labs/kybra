@@ -42,7 +42,7 @@ fn get_remote_python_stdlib_bytecode_hash(canister_name: &str) -> Result<String,
     let remote_python_stdlib_hash_output = dfx(
         "canister",
         "call",
-        &vec![canister_name, "python_stdlib_hash"],
+        &vec![canister_name, "get_python_stdlib_hash"],
     )?;
 
     if !remote_python_stdlib_hash_output.status.success() {
