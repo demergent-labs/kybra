@@ -19,7 +19,7 @@ mod errors;
 
 thread_local! {
     static WASM_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
-    static INSTALLER_REF_CELL: RefCell<String> = RefCell::new("".to_string());
+    static INSTALLER_REF_CELL: RefCell<Option<String>> = RefCell::new(None);
     static ARG_DATA_RAW_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
     static PYTHON_STDLIB_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
 
@@ -35,22 +35,18 @@ thread_local! {
 
 #[init]
 pub fn init() {
-    INSTALLER_REF_CELL.with(|installer_ref_cell| {
-        let mut installer_ref_mut = installer_ref_cell.borrow_mut();
-        *installer_ref_mut = ic_cdk::caller().to_string();
-    });
-
-    ARG_DATA_RAW_REF_CELL.with(|arg_data_raw_ref_cell| {
-        let mut arg_data_ref_mut = arg_data_raw_ref_cell.borrow_mut();
-        *arg_data_ref_mut = ic_cdk::api::call::arg_data_raw();
-    });
+    initialize()
 }
 
 #[post_upgrade]
 pub fn post_upgrade() {
+    initialize()
+}
+
+fn initialize() {
     INSTALLER_REF_CELL.with(|installer_ref_cell| {
         let mut installer_ref_mut = installer_ref_cell.borrow_mut();
-        *installer_ref_mut = ic_cdk::caller().to_string();
+        *installer_ref_mut = Some(ic_cdk::caller().to_string());
     });
 
     ARG_DATA_RAW_REF_CELL.with(|arg_data_raw_ref_cell| {
@@ -76,7 +72,7 @@ pub fn upload_python_stdlib_chunk(bytes: Vec<u8>) {
 }
 
 #[query(guard = "installer_guard")]
-pub fn python_stdlib_hash() -> String {
+pub fn get_python_stdlib_hash() -> String {
     PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
         let python_stdlib_stable_ref = python_stdlib_stable_ref_cell.borrow();
         let python_stdlib_bytes = python_stdlib_stable_ref.get();
@@ -166,11 +162,13 @@ fn install_code() -> Result<(), ic_cdk::api::call::RejectionCode> {
 }
 
 fn installer_guard() -> Result<(), String> {
-    let installer =
+    let installer_option =
         INSTALLER_REF_CELL.with(|installer_ref_cell| installer_ref_cell.borrow().clone());
 
-    if installer == ic_cdk::caller().to_string() {
-        return Ok(());
+    if let Some(installer) = installer_option {
+        if installer == ic_cdk::caller().to_string() {
+            return Ok(());
+        }
     }
 
     Err("Not authorized".to_string())
