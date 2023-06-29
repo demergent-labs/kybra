@@ -21,13 +21,19 @@ use crate::{
 };
 
 impl PyAst {
+    /// To get around the Wasm binary limit we have adopted a deploy system with a chunk
+    /// uploading process. As part of this process we only use `post_upgrade` and do not
+    /// have an `init` that executes in Rust on the application canister. Because of this,
+    /// our `post_upgrade` function must call the developer's `init` function. If the developer
+    /// defines an `init` but does not define a `post_upgrade` function, then we must use
+    /// that `init` function's parameters as our Rust `post_upgrade` function's parameters.
     pub fn build_post_upgrade_method(&self) -> Result<PostUpgradeMethod, Vec<Error>> {
         let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
         let post_upgrade_function_defs =
             self.get_canister_stmt_of_type(CanisterMethodType::PostUpgrade);
         let (init_params, (post_upgrade_params, guard_function_name), post_upgrade_method_body) = (
-            extract_init_function(&init_function_defs),
-            extract_post_upgrade_function(&post_upgrade_function_defs),
+            build_init_params(&init_function_defs),
+            build_post_upgrade_info(&post_upgrade_function_defs),
             generate_post_upgrade_method_body(
                 &self.entry_module_name,
                 init_function_defs.get(0),
@@ -46,10 +52,10 @@ impl PyAst {
     }
 }
 
-fn extract_init_function(
+fn build_init_params(
     init_function_defs: &Vec<SourceMapped<&Located<StmtKind>>>,
 ) -> Result<Vec<Param>, Vec<Error>> {
-    handle_multiple_function_defs(init_function_defs, CanisterMethodType::Init)?;
+    ensure_zero_or_one_function_defs(init_function_defs, CanisterMethodType::Init)?;
 
     match init_function_defs.get(0) {
         Some(init_function_def) => init_function_def.build_params(InternalOrExternal::Internal),
@@ -57,20 +63,20 @@ fn extract_init_function(
     }
 }
 
-fn extract_post_upgrade_function(
+fn build_post_upgrade_info(
     post_upgrade_function_defs: &Vec<SourceMapped<&Located<StmtKind>>>,
 ) -> Result<(Vec<Param>, Option<String>), Vec<Error>> {
-    handle_multiple_function_defs(post_upgrade_function_defs, CanisterMethodType::PostUpgrade)?;
+    ensure_zero_or_one_function_defs(post_upgrade_function_defs, CanisterMethodType::PostUpgrade)?;
 
     match post_upgrade_function_defs.get(0) {
         Some(post_upgrade_function_def) => {
-            extract_post_upgrade_params_and_guard_name(post_upgrade_function_def)
+            build_post_upgrade_params_and_guard_name(post_upgrade_function_def)
         }
         None => Ok((vec![], None)),
     }
 }
 
-fn extract_post_upgrade_params_and_guard_name(
+fn build_post_upgrade_params_and_guard_name(
     post_upgrade_function_def: &SourceMapped<&Located<StmtKind>>,
 ) -> Result<(Vec<Param>, Option<String>), Vec<Error>> {
     let (post_upgrade_params, guard_function_name, _) = (
@@ -108,7 +114,7 @@ fn generate_post_upgrade_method_body(
     )
 }
 
-fn handle_multiple_function_defs(
+fn ensure_zero_or_one_function_defs(
     function_defs: &Vec<SourceMapped<&Located<StmtKind>>>,
     canister_method_type: CanisterMethodType,
 ) -> Result<(), Vec<Error>> {

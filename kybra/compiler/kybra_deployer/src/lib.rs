@@ -5,12 +5,16 @@
 use errors::{
     call_result_error_to_string, rejection_code_to_string, value_error_to_string, UnwrapOrTrap,
 };
-use ic_cdk::api::{call, management_canister};
-use ic_cdk::export::Principal;
+use ic_cdk::{
+    api::{call, management_canister},
+    export::Principal,
+};
 use ic_cdk_macros::{init, post_upgrade, query, update};
-use ic_stable_structures::cell::Cell;
-use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
-use ic_stable_structures::DefaultMemoryImpl;
+use ic_stable_structures::{
+    cell::Cell,
+    memory_manager::{MemoryId, MemoryManager, VirtualMemory},
+    DefaultMemoryImpl,
+};
 use sha2::{Digest, Sha256};
 use shared_utils::{PYTHON_STDLIB_MEMORY_ID, RANDOMNESS_MEMORY_ID};
 use std::cell::RefCell;
