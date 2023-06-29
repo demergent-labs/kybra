@@ -17,6 +17,7 @@ pub fn generate(
     )
         .collect_results()?;
 
+    let randomness = generate_randomness();
     let interpreter_init = generate_interpreter_init();
     let ic_object_init = generate_ic_object_init();
     let code_init = generate_code_init(entry_module_name);
@@ -27,7 +28,7 @@ pub fn generate(
     );
 
     Ok(quote! {
-        let randomness = RANDOMNESS_STABLE_REF_CELL.with(|randomness_stable_ref_cell| randomness_stable_ref_cell.borrow().get().clone());
+        #randomness
 
         unsafe {
             ic_wasi_polyfill::init(&randomness);
@@ -43,6 +44,16 @@ pub fn generate(
             #call_to_user_init_or_post_upgrade
         }
     })
+}
+
+fn generate_randomness() -> TokenStream {
+    quote! {
+        let randomness = RANDOMNESS_STABLE_REF_CELL.with(|randomness_stable_ref_cell| randomness_stable_ref_cell.borrow().get().clone());
+
+        if randomness.len() == 0 {
+            ic_cdk::trap("Post Upgrade Error: randomness cannot have length 0");
+        }
+    }
 }
 
 fn generate_interpreter_init() -> TokenStream {
