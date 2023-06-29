@@ -19,18 +19,22 @@ fn main() -> Result<(), String> {
         home_dir.join(format!(".config/kybra/{kybra_version}/bin/python_stdlib"));
     handle_python_stdlib_exists(&python_stdlib_binary_path);
 
-    let python_stdlib_src_path = home_dir.join(format!(".config/kybra/{kybra_version}/Lib"));
     let kybra_post_install_src_lib_path = Path::new("src/Lib");
 
     if kybra_post_install_src_lib_path.exists() {
         clean_kybra_post_install_src_lib(&kybra_post_install_src_lib_path)?;
-        return Ok(());
     }
 
-    copy_from_python_stdlib_src_to_kybra_post_install_src(
-        &python_stdlib_src_path,
-        &kybra_post_install_src_lib_path,
-    )?;
+    let python_stdlib_src_path = home_dir.join(format!(".config/kybra/{kybra_version}/Lib"));
+
+    if python_stdlib_src_path.exists() {
+        copy_from_python_stdlib_src_to_kybra_post_install_src(
+            &python_stdlib_src_path,
+            &kybra_post_install_src_lib_path,
+        )?;
+
+        return Ok(());
+    }
 
     let github_repo = "https://github.com/RustPython/RustPython.git";
     let commit_hash = "f12875027ce425297c07cbccb9be77514ed46157";
@@ -67,19 +71,16 @@ fn clean_kybra_post_install_src_lib(kybra_post_install_src_lib_path: &Path) -> R
 fn copy_from_python_stdlib_src_to_kybra_post_install_src(
     python_stdlib_src_path: &Path,
     kybra_post_install_src_lib_path: &Path,
-) -> Result<(), String> {
-    if python_stdlib_src_path.exists() {
-        copy(
-            python_stdlib_src_path,
-            kybra_post_install_src_lib_path,
-            &CopyOptions {
-                copy_inside: true,
-                ..Default::default()
-            },
-        )
-        .map_err(|e| error_to_string(&e))?;
-    }
-    Ok(())
+) -> Result<u64, String> {
+    copy(
+        python_stdlib_src_path,
+        kybra_post_install_src_lib_path,
+        &CopyOptions {
+            copy_inside: true,
+            ..Default::default()
+        },
+    )
+    .map_err(|e| error_to_string(&e))
 }
 
 fn git_clone(github_repo: &str, temp_dir: &tempfile::TempDir) -> Result<(), String> {
