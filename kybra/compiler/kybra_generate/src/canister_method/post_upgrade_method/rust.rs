@@ -30,19 +30,17 @@ pub fn generate(
     Ok(quote! {
         #randomness
 
-        unsafe {
-            ic_wasi_polyfill::init(&randomness);
+        unsafe { ic_wasi_polyfill::init(&randomness); };
 
-            #interpreter_init
+        #interpreter_init
 
-            #ic_object_init
+        #ic_object_init
 
-            #code_init
+        #code_init
 
-            #save_global_interpreter
+        #save_global_interpreter
 
-            #call_to_user_init_or_post_upgrade
-        }
+        #call_to_user_init_or_post_upgrade
     })
 }
 
@@ -94,8 +92,10 @@ fn generate_code_init(entry_module_name: &str) -> TokenStream {
 
 fn generate_save_global_interpreter() -> TokenStream {
     quote! {
-        INTERPRETER_OPTION = Some(interpreter);
-        SCOPE_OPTION = Some(scope);
+        unsafe {
+            INTERPRETER_OPTION = Some(interpreter);
+            SCOPE_OPTION = Some(scope);
+        };
     }
 }
 
@@ -106,9 +106,7 @@ fn generate_call_to_user_init_or_post_upgrade(
     quote! {
             // This is here so that the py function calls below have access to the vm
             // The vm ownership is transferred above, thus we do this for now
-            let interpreter = INTERPRETER_OPTION
-                    .as_mut()
-                    .unwrap_or_trap("SystemError: missing python interpreter");
+            let interpreter = unsafe { INTERPRETER_OPTION.as_mut() }.unwrap_or_trap("SystemError: missing python interpreter");
             let vm = &interpreter.vm;
 
             if CANISTER_INITIALIZED_REF_CELL.with(|canister_initialized_ref_cell| *canister_initialized_ref_cell.borrow().get()) == 0 {

@@ -7,14 +7,15 @@ use crate::{
 pub fn install_app_canister(canister_name: &str) -> Result<(), String> {
     println!("\nFinalizing...\n");
 
-    let (canister_id, canister_already_its_own_controller) = add_permissions(canister_name)?;
+    let (canister_id, canister_already_its_own_controller_before_post_install) =
+        add_permissions(canister_name)?;
 
     let install_output = dfx("canister", "call", &vec![canister_name, "install_wasm"])?;
 
     remove_permissions(
         canister_name,
         &canister_id,
-        canister_already_its_own_controller,
+        canister_already_its_own_controller_before_post_install,
     )?;
 
     if !install_output.status.success() {

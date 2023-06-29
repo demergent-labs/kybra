@@ -22,7 +22,7 @@ fn main() -> Result<(), String> {
     let canister_name = args
         .get(1)
         .ok_or(create_error_string("Canister name argument not present"))?;
-    let max_chunk_size = 2 * 1_000 * 1_000; // 2 MB
+    let max_chunk_size = 2 * 1_000 * 1_000; // 2 MB message size limit currently on the Internet Computer
 
     upload_app_canister(canister_name, max_chunk_size)?;
     upload_python_stdlib(canister_name, max_chunk_size)?;
