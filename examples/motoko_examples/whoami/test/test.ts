@@ -1,13 +1,12 @@
-import { createSnakeCaseProxy, runTests } from 'azle/test';
+import { createSnakeCaseProxy, getCanisterId, runTests } from 'azle/test';
 import {
     callingIdentity,
-    canisterId,
     getTests
 } from 'azle/examples/motoko_examples/whoami/test/tests';
 import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/whoami';
 
-const whoamiCanister = createActor(canisterId, {
+const whoamiCanister = createActor(getCanisterId('whoami'), {
     agentOptions: {
         host: 'http://127.0.0.1:8000',
         identity: callingIdentity

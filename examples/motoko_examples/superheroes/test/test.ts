@@ -1,9 +1,9 @@
-import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, getCanisterId, runTests, Test } from 'azle/test';
 import { getTests } from 'azle/examples/motoko_examples/superheroes/test/tests';
 import { createActor } from './dfx_generated/superheroes';
 import { Superhero } from './dfx_generated/superheroes/superheroes.did';
 
-const superheroesCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const superheroesCanister = createActor(getCanisterId('superheroes'), {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }

@@ -1,8 +1,8 @@
-import { createSnakeCaseProxy, runTests } from 'azle/test';
+import { createSnakeCaseProxy, getCanisterId, runTests } from 'azle/test';
 import { getTests } from 'azle/examples/null_example/test/tests';
 import { createActor } from './dfx_generated/null_example';
 
-const nullExampleCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const nullExampleCanister = createActor(getCanisterId('null_example'), {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }

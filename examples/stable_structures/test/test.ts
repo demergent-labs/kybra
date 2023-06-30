@@ -1,4 +1,4 @@
-import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, getCanisterId, runTests, Test } from 'azle/test';
 // import { execSync } from 'child_process';
 import {
     getTests,
@@ -11,17 +11,17 @@ import { createActor as createActorCanister2 } from './dfx_generated/canister2';
 import { createActor as createActorCanister3 } from './dfx_generated/canister3';
 
 const stableStructuresCanister1 = createActorCanister1(
-    'rrkah-fqaaa-aaaaa-aaaaq-cai',
+    getCanisterId('canister1'),
     { agentOptions: { host: 'http://127.0.0.1:8000' } }
 );
 
 const stableStructuresCanister2 = createActorCanister2(
-    'ryjl3-tyaaa-aaaaa-aaaba-cai',
+    getCanisterId('canister2'),
     { agentOptions: { host: 'http://127.0.0.1:8000' } }
 );
 
 const stableStructuresCanister3 = createActorCanister3(
-    'r7inp-6aaaa-aaaaa-aaabq-cai',
+    getCanisterId('canister3'),
     { agentOptions: { host: 'http://127.0.0.1:8000' } }
 );
 
