@@ -351,30 +351,31 @@ def run_rustfmt_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool =
         sys.exit(1)
 
 
+# TODO working on optimization
 @timed_inline
 def optimize_wasm_binary_or_exit(
     paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
 ):
-    optimization_result = subprocess.run(
-        [
-            f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
-            f"{paths['canister']}/{canister_name}_app.wasm",
-            "-o",
-            f"{paths['canister']}/{canister_name}_app.wasm",
-            "shrink",
-            "--optimize",
-            "Oz",
-        ],
-        capture_output=not verbose,
-    )
+    # optimization_result = subprocess.run(
+    #     [
+    #         f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
+    #         f"{paths['canister']}/{canister_name}_app.wasm",
+    #         "-o",
+    #         f"{paths['canister']}/{canister_name}_app.wasm",
+    #         "shrink",
+    #         "--optimize",
+    #         "Oz",
+    #     ],
+    #     capture_output=not verbose,
+    # )
 
-    if optimization_result.returncode != 0:
-        print(red("\n💣 Kybra error: optimizing generated Wasm"))
-        print(optimization_result.stderr.decode("utf-8"))
-        print("💀 Build failed")
-        sys.exit(1)
+    # if optimization_result.returncode != 0:
+    #     print(red("\n💣 Kybra error: optimizing generated Wasm"))
+    #     print(optimization_result.stderr.decode("utf-8"))
+    #     print("💀 Build failed")
+    #     sys.exit(1)
 
-    add_metadata_to_wasm_or_exit(paths, canister_name, verbose=verbose)
+    # add_metadata_to_wasm_or_exit(paths, canister_name, verbose=verbose)
 
     # gzip the Wasm binary
     os.system(f"gzip -9 -f -k {paths['wasm']}")

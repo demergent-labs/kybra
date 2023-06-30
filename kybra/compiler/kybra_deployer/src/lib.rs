@@ -94,6 +94,27 @@ pub async fn install_wasm() -> Result<(), String> {
     stable_store_randomness().await?;
     stable_store_python_stdlib()?;
     install_code().map_err(|err| rejection_code_to_string(&err))
+
+    // let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
+
+    // let result = ic_cdk::api::management_canister::main::install_code(
+    //     ic_cdk::api::management_canister::main::InstallCodeArgument {
+    //         mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
+    //         canister_id: ic_cdk::api::id(),
+    //         wasm_module,
+    //         arg: ARG_DATA_RAW_REF_CELL
+    //             .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
+    //     },
+    // )
+    // .await;
+
+    // // TODO get it so that the post install script prints this error message
+    // match &result {
+    //     Ok(_) => ic_cdk::println!("installed code successfully"),
+    //     Err(err) => ic_cdk::println!("{:#?}", err),
+    // };
+
+    // result.map_err(|err| call_result_error_to_string(&err))
 }
 
 async fn stable_store_randomness() -> Result<(), String> {
