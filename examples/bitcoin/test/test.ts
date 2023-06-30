@@ -1,4 +1,4 @@
-import { ok, runTests, Test } from 'azle/test';
+import { getCanisterId, ok, runTests, Test } from 'azle/test';
 import {
     impureSetup,
     whileRunningBitcoinDaemon
@@ -8,7 +8,7 @@ import { wallets } from 'azle/examples/bitcoin/test/wallets';
 import { State } from 'azle/examples/bitcoin/test/test';
 import { bitcoinCli } from 'azle/examples/bitcoin/test/bitcoin_cli';
 
-const bitcoinCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const bitcoinCanister = createActor(getCanisterId('bitcoin'), {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }

@@ -1,9 +1,9 @@
-import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, getCanisterId, runTests, Test } from 'azle/test';
 import { getTests } from 'azle/examples/guard_functions/test/tests';
 import { createActor } from './dfx_generated/guard_functions';
 import { AgentError } from '@dfinity/agent/lib/cjs/errors';
 
-const functionGuardCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const functionGuardCanister = createActor(getCanisterId('guard_functions'), {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }

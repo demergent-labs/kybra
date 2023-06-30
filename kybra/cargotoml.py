@@ -6,9 +6,10 @@ version = "0.0.0"
 edition = "2018"
 
 [profile.release]
-opt-level = 'z'
-# codegen-units = 1
-# lto = "fat"
+opt-level = 2
+lto = false
+incremental = true
+codegen-units = 256
 
 [lib]
 crate-type = ["cdylib"]

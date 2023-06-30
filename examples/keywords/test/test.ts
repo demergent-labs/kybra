@@ -1,5 +1,5 @@
 import { Principal } from '@dfinity/principal';
-import { runTests, Test } from 'azle/test';
+import { getCanisterId, runTests, Test } from 'azle/test';
 import { createActor } from './dfx_generated/keywords';
 import {
     KeywordRecord,
@@ -7,7 +7,7 @@ import {
     SimpleRecord
 } from './dfx_generated/keywords/keywords.did';
 
-const keywordsCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const keywordsCanister = createActor(getCanisterId('keywords'), {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }

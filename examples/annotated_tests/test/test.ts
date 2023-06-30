@@ -1,9 +1,9 @@
-import { Test, createSnakeCaseProxy, runTests } from 'azle/test';
+import { Test, getCanisterId, runTests } from 'azle/test';
 import { createActor } from './dfx_generated/annotated_tests';
 import { ActorSubclass } from '@dfinity/agent';
 import { _SERVICE } from './dfx_generated/annotated_tests/annotated_tests.did';
 
-const annotatedCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const annotatedCanister = createActor(getCanisterId('annotated_tests'), {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
