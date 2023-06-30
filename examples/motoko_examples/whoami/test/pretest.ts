@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { someonePrincipal } from 'azle/examples/motoko_examples/whoami/test/tests';
+import { someonePrincipal } from './tests';
 
 async function pretest() {
     await new Promise((resolve) => setTimeout(resolve, 5000));
