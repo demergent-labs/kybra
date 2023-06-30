@@ -10,7 +10,7 @@ type RejectionCode = variant {
 };
 type SendCyclesResult = variant { Ok : nat64; Err : text };
 type SendCyclesResult128 = variant { Ok : nat; Err : text };
-service : () -> {
+service : (principal) -> {
   get_canister_balance : () -> (nat64) query;
   get_canister_balance128 : () -> (nat) query;
   send_cycles : () -> (SendCyclesResult);
