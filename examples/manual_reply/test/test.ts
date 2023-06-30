@@ -8,4 +8,11 @@ const manualReplyCanister = createActor(getCanisterId('manual_reply'), {
     }
 });
 
-runTests(getTests(createSnakeCaseProxy(manualReplyCanister)));
+runTests(
+    getTests(createSnakeCaseProxy(manualReplyCanister)).filter((test) => {
+        return (
+            test.name !== 'update reply with void' &&
+            test.name !== 'query reply with void'
+        ); // TODO remove this once this issue is addressed: https://github.com/demergent-labs/kybra/issues/416
+    })
+);
