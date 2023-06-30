@@ -72,7 +72,7 @@ type TransferError_TxDuplicate = record { duplicate_of : nat64 };
 type TransferError_TxTooOld = record { allowed_window_nanos : nat64 };
 type TransferFee = record { transfer_fee : Tokens };
 type TransferResult = variant { Ok : nat64; Err : TransferError };
-service : () -> {
+service : (principal) -> {
   execute_transfer : (text, nat64, nat64, opt nat64) -> (ExecuteTransferResult);
   get_account_balance : (text) -> (GetAccountBalanceResult);
   get_address_from_principal : (principal) -> (text) query;

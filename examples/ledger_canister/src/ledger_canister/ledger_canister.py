@@ -1,6 +1,7 @@
 from kybra import (
     Async,
     CallResult,
+    init,
     match,
     nat32,
     nat64,
@@ -9,6 +10,7 @@ from kybra import (
     query,
     update,
     Variant,
+    void,
 )
 from kybra.canisters.ledger import (
     Address,
@@ -24,12 +26,18 @@ from kybra.canisters.ledger import (
     TransferResult,
 )
 
-icp_canister = Ledger(Principal.from_str("r7inp-6aaaa-aaaaa-aaabq-cai"))
+icp_canister = Ledger(Principal.from_str("aaaaa-aa"))
 
 
 class ExecuteTransferResult(Variant, total=False):
     Ok: TransferResult
     Err: str
+
+
+@init
+def init_(icp_canister_id: Principal) -> void:
+    global icp_canister
+    icp_canister = Ledger(icp_canister_id)
 
 
 @update

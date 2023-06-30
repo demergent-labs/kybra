@@ -1,3 +1,4 @@
+import { getCanisterId } from 'azle/test';
 import { execSync } from 'child_process';
 
 async function pretest(icp_ledger_path: string) {
@@ -40,12 +41,21 @@ async function pretest(icp_ledger_path: string) {
         }
     );
 
-    execSync(`dfx deploy ledger_canister`, {
+    execSync(`dfx canister create ledger_canister`, {
         stdio: 'inherit'
     });
 
     execSync(
         `dfx deploy icp_ledger --argument='(record {minting_account = "'$(dfx ledger account-id)'"; initial_values = vec { record { "'$(dfx ledger account-id --of-canister ledger_canister)'"; record { e8s=100_000_000_000 } }; }; send_whitelist = vec {}})'`,
+        {
+            stdio: 'inherit'
+        }
+    );
+
+    execSync(
+        `dfx deploy ledger_canister --argument '(principal "${getCanisterId(
+            'icp_ledger'
+        )}")'`,
         {
             stdio: 'inherit'
         }
