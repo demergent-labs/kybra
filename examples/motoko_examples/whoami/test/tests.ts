@@ -1,7 +1,7 @@
 import { getCanisterId, Test } from 'azle/test';
+import { execSync } from 'child_process';
 import { _SERVICE } from './dfx_generated/whoami/whoami.did';
 import { ActorSubclass } from '@dfinity/agent';
-import { execSync } from 'child_process';
 import { Ed25519KeyIdentity } from '@dfinity/identity';
 import { SignIdentity } from '@dfinity/agent';
 
@@ -9,8 +9,6 @@ function createIdentity(seed: number): SignIdentity {
     const seed1 = [seed, ...new Array(31).fill(0)];
     return Ed25519KeyIdentity.generate(Uint8Array.from(seed1));
 }
-
-export const canisterId = getCanisterId('whoami');
 
 export const callingIdentity = createIdentity(1);
 const callingPrincipal = callingIdentity.getPrincipal().toString();
@@ -61,7 +59,7 @@ export function getTests(
                 const result = await whoamiCanister.id();
 
                 return {
-                    Ok: result.toString() === canisterId
+                    Ok: result.toString() === getCanisterId('whoami')
                 };
             }
         },
@@ -71,7 +69,7 @@ export function getTests(
                 const result = await whoamiCanister.id_quick();
 
                 return {
-                    Ok: result.toString() === canisterId
+                    Ok: result.toString() === getCanisterId('whoami')
                 };
             }
         },
