@@ -103,7 +103,7 @@ def inc_counter() -> nat:
     return counter
 
 
-# Composite query calling queries on the same canister. SHOULDN'T WORK
+# Composite query calling queries on the same canister
 @query
 def inc_canister1() -> Async[NatQueryResult]:
     global counter

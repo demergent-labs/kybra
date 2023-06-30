@@ -8,4 +8,21 @@ const canister1 = createActor(getCanisterId('canister1'), {
     }
 });
 
-runTests(getTests(createSnakeCaseProxy(canister1)));
+runTests(
+    getTests(createSnakeCaseProxy(canister1)).map((test) => {
+        if (test.name === 'inc_canister1 test') {
+            return {
+                name: 'inc_canister1 test',
+                test: async () => {
+                    const result = await canister1.inc_canister1();
+
+                    return {
+                        Ok: 'Ok' in result && result.Ok === 3n
+                    };
+                }
+            };
+        }
+
+        return test;
+    })
+);
