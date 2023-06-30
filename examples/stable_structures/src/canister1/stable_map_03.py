@@ -17,7 +17,7 @@ class Reaction(Variant):
 
 
 stable_map3 = StableBTreeMap[Reaction, int](
-    memory_id=3, max_key_size=100, max_value_size=1_000
+    memory_id=6, max_key_size=100, max_value_size=1_000
 )
 
 

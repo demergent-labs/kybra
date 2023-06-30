@@ -1,13 +1,8 @@
 use super::rust;
 use cdk_framework::{
-    act::node::{
-        canister_method::{CanisterMethodType, InitMethod},
-        Param,
-    },
+    act::node::canister_method::{CanisterMethodType, InitMethod},
     traits::CollectResults,
 };
-use proc_macro2::TokenStream;
-use quote::quote;
 use rustpython_parser::ast::{Located, StmtKind};
 
 use crate::{
@@ -23,7 +18,7 @@ use crate::{
 };
 
 impl PyAst {
-    pub fn build_init_method(&self) -> Result<(InitMethod, Vec<Param>, TokenStream), Vec<Error>> {
+    pub fn build_init_method(&self) -> Result<InitMethod, Vec<Error>> {
         let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
 
         let init_methods = build_init_methods(&init_function_defs);
@@ -46,16 +41,15 @@ impl PyAst {
 
 fn build_init_method(
     init_function_def: Option<&SourceMapped<&Located<StmtKind>>>,
-) -> Result<(InitMethod, Vec<Param>, TokenStream), Vec<Error>> {
+) -> Result<InitMethod, Vec<Error>> {
     match init_function_def {
         Some(init_function_def) => {
-            let (guard_function_name, params, return_type, call_to_py) = (
+            let (guard_function_name, params, return_type) = (
                 init_function_def
                     .get_guard_function_name()
                     .map_err(Error::into),
                 init_function_def.build_params(InternalOrExternal::Internal),
                 init_function_def.build_return_type(),
-                init_function_def.generate_call_to_py_function(),
             )
                 .collect_results()?;
 
@@ -67,31 +61,23 @@ fn build_init_method(
                 .into());
             }
 
-            Ok((
-                InitMethod {
-                    params: params.clone(),
-                    body: rust::generate(&params),
-                    guard_function_name,
-                },
-                params,
-                call_to_py,
-            ))
+            Ok(InitMethod {
+                params: params.clone(),
+                body: rust::generate(),
+                guard_function_name,
+            })
         }
-        None => Ok((
-            InitMethod {
-                params: vec![],
-                body: rust::generate(&vec![]),
-                guard_function_name: None,
-            },
-            vec![],
-            quote!(),
-        )),
+        None => Ok(InitMethod {
+            params: vec![],
+            body: rust::generate(),
+            guard_function_name: None,
+        }),
     }
 }
 
 fn build_init_methods(
     init_function_defs: &Vec<SourceMapped<&Located<StmtKind>>>,
-) -> Result<Vec<(InitMethod, Vec<Param>, TokenStream)>, Vec<Error>> {
+) -> Result<Vec<InitMethod>, Vec<Error>> {
     init_function_defs
         .iter()
         .map(|init_function_def| build_init_method(Some(init_function_def)))

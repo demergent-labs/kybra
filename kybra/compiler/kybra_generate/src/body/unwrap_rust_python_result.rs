@@ -9,7 +9,7 @@ pub fn generate() -> TokenStream {
         impl<T> UnwrapOrTrapWithMessage<T> for Option<T> {
             fn unwrap_or_trap(self, err_message: &str) -> T {
                 match self {
-                    Some(some) => return some,
+                    Some(some) => some,
                     None => {
                         ic_cdk::trap(err_message)
                     }
@@ -24,7 +24,7 @@ pub fn generate() -> TokenStream {
         impl<T> UnwrapOrTrap<T> for Result<T, CdkActTryIntoVmValueError> {
             fn unwrap_or_trap(self) -> T {
                 match self {
-                    Ok(ok) => return ok,
+                    Ok(ok) => ok,
                     Err(err) => ic_cdk::trap(&err.0)
                 }
             }
@@ -33,8 +33,30 @@ pub fn generate() -> TokenStream {
         impl<T> UnwrapOrTrap<T> for Result<T, CdkActTryFromVmValueError> {
             fn unwrap_or_trap(self) -> T {
                 match self {
-                    Ok(ok) => return ok,
+                    Ok(ok) => ok,
                     Err(err) => ic_cdk::trap(&err.0)
+                }
+            }
+        }
+
+        impl<T> UnwrapOrTrap<T> for Result<T, ic_stable_structures::cell::ValueError> {
+            fn unwrap_or_trap(self) -> T {
+                match self {
+                    Ok(ok) => ok,
+                    Err(err) => ic_cdk::trap(&match err {
+                        ic_stable_structures::cell::ValueError::ValueTooLarge { value_size } => {
+                            format!("ValueError: ValueTooLarge {value_size}")
+                        }
+                    }),
+                }
+            }
+        }
+
+        impl<T> UnwrapOrTrap<T> for Result<T, ic_stable_structures::cell::InitError> {
+            fn unwrap_or_trap(self) -> T {
+                match self {
+                    Ok(ok) => ok,
+                    Err(err) => ic_cdk::trap(&init_error_to_string(&err)),
                 }
             }
         }
@@ -58,6 +80,18 @@ pub fn generate() -> TokenStream {
                         };
                         ic_cdk::trap(format!("{type_name}: {err_message}").as_str())
                     }
+                }
+            }
+        }
+
+        fn init_error_to_string(err: &ic_stable_structures::cell::InitError) -> String {
+            match err {
+                ic_stable_structures::cell::InitError::IncompatibleVersion {
+                    last_supported_version,
+                    decoded_version,
+                } => format!("InitError: IncompatibleVersion, last_supported_version {last_supported_version}, decoded_version {decoded_version}"),
+                ic_stable_structures::cell::InitError::ValueTooLarge { value_size } => {
+                    format!("InitError: ValueTooLarge {value_size}")
                 }
             }
         }

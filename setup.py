@@ -1,6 +1,6 @@
 from kybra import __version__
 from pathlib import Path
-from setuptools import setup
+from setuptools import setup  # type: ignore
 
 setup(
     name="kybra",

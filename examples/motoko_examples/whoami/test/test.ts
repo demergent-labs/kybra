@@ -4,6 +4,7 @@ import {
     canisterId,
     getTests
 } from 'azle/examples/motoko_examples/whoami/test/tests';
+import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/whoami';
 
 const whoamiCanister = createActor(canisterId, {
@@ -13,4 +14,23 @@ const whoamiCanister = createActor(canisterId, {
     }
 });
 
-runTests(getTests(createSnakeCaseProxy(whoamiCanister), 'whoami'));
+runTests(
+    getTests(createSnakeCaseProxy(whoamiCanister), 'whoami').map((test) => {
+        if (test.name === 'installer') {
+            return {
+                name: 'installer',
+                test: async () => {
+                    const result = await whoamiCanister.installer();
+
+                    return {
+                        Ok:
+                            result.toString() ===
+                            execSync(`dfx canister id whoami`).toString().trim()
+                    };
+                }
+            };
+        }
+
+        return test;
+    })
+);

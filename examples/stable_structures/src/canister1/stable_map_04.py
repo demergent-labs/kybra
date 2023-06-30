@@ -21,7 +21,7 @@ class User(Record):
 
 
 stable_map4 = StableBTreeMap[User, float32](
-    memory_id=4, max_key_size=100, max_value_size=1_000
+    memory_id=7, max_key_size=100, max_value_size=1_000
 )
 
 

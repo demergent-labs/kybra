@@ -57,7 +57,7 @@ class HttpRequest(Record):
 
 
 stable_storage = StableBTreeMap[str, nat](
-    memory_id=0, max_key_size=15, max_value_size=1_000
+    memory_id=3, max_key_size=15, max_value_size=1_000
 )
 
 stable_storage.insert("counter", 0)
