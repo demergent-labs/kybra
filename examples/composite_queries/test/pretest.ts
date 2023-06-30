@@ -31,8 +31,8 @@ async function pretest() {
 
     execSync(
         `dfx deploy canister1 --argument '(principal "${getCanisterId(
-            'canister1'
-        )}", principal "${getCanisterId('canister2')}")'`,
+            'canister2'
+        )}")'`,
         {
             stdio: 'inherit'
         }

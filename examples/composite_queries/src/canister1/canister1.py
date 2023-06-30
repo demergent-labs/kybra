@@ -15,18 +15,16 @@ from src.canister1.types import Canister1, NatQueryResult, StringQueryResult
 from src.canister2.types import Canister2
 
 
-canister1 = Canister1(Principal.from_str("aaaaa-aa"))
+canister1 = Canister1(ic.id())
 canister2 = Canister2(Principal.from_str("aaaaa-aa"))
 
 counter: nat = 0
 
 
 @init
-def init_(canister1_id: Principal, canister2_id: Principal) -> void:
-    global canister1
+def init_(canister2_id: Principal) -> void:
     global canister2
 
-    canister1 = Canister1(canister1_id)
     canister2 = Canister2(canister2_id)
 
 
