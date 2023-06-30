@@ -40,7 +40,7 @@ class TrapResult(Variant, total=False):
     Err: str
 
 
-canister2 = Canister2(Principal.from_str(""))
+canister2 = Canister2(Principal.from_str("aaaaa-aa"))
 
 
 @init

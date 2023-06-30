@@ -1,21 +1,33 @@
 from kybra import (
     Async,
     CallResult,
+    ic,
+    init,
+    Manual,
     match,
     nat,
     Principal,
     query,
     update,
-    Manual,
-    ic,
+    void,
 )
 from src.canister1.types import Canister1, NatQueryResult, StringQueryResult
 from src.canister2.types import Canister2
 
 
-canister1 = Canister1(Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"))
-canister2 = Canister2(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
+canister1 = Canister1(Principal.from_str("aaaaa-aa"))
+canister2 = Canister2(Principal.from_str("aaaaa-aa"))
+
 counter: nat = 0
+
+
+@init
+def init_(canister1_id: Principal, canister2_id: Principal) -> void:
+    global canister1
+    global canister2
+
+    canister1 = Canister1(canister1_id)
+    canister2 = Canister2(canister2_id)
 
 
 # Composite query calling a query
@@ -100,7 +112,7 @@ def inc_canister1() -> Async[NatQueryResult]:
     counter += 1
 
     canister1_a_result: CallResult[nat] = yield canister1.inc_counter()
-    canister1_b_result: CallResult[nat] = (yield canister1.inc_counter())
+    canister1_b_result: CallResult[nat] = yield canister1.inc_counter()
 
     return match(
         canister1_a_result,

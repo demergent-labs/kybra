@@ -1,6 +1,6 @@
 type NatQueryResult = variant { Ok : nat; Err : text };
 type StringQueryResult = variant { Ok : text; Err : text };
-service : () -> {
+service : (principal, principal) -> {
   deep_query : () -> (StringQueryResult) query;
   inc_canister1 : () -> (NatQueryResult) query;
   inc_canister2 : () -> (NatQueryResult) query;
