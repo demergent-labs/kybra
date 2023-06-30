@@ -6,7 +6,7 @@ use crate::{
     upload_chunk::{split_into_chunks, upload_chunk},
 };
 
-#[cfg(all(python_stdlib_exists, ic_build))]
+#[cfg(ic_build)]
 use crate::error::error_to_string;
 
 pub fn upload_python_stdlib(canister_name: &str, max_chunk_size: usize) -> Result<(), String> {
