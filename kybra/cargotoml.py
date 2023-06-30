@@ -6,7 +6,7 @@ version = "0.0.0"
 edition = "2018"
 
 [profile.release]
-opt-level = 2
+opt-level = 'z'
 lto = false
 incremental = true
 codegen-units = 256
