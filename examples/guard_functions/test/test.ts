@@ -19,7 +19,8 @@ let tests: Test[] = [
             value.name !== 'badObjectGuarded' &&
             value.name !== 'nonNullOkValueGuarded' &&
             value.name !== 'nonStringErrValueGuarded' &&
-            value.name !== 'unallowedMethod' // TODO this seems to be broken now in dfx 0.14.2-beta.2 needs more research
+            // TODO remove this once this is resolved: https://forum.dfinity.org/t/not-calling-accept-message-in-inspect-message-not-rejecting-immediately-in-dfx-0-14-2-beta-2/21105
+            value.name !== 'unallowedMethod'
         );
     }),
     {
