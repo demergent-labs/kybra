@@ -5,7 +5,8 @@
             "build": "python -m kybra null_example src/main.py src/main.did",
             "post_install": ".kybra/null_example/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/null_example/null_example.wasm.gz",
+            "wasm": ".kybra/null_example/null_example.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/null_example",
                 "node_compatibility": true

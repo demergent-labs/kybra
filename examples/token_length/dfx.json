@@ -5,7 +5,8 @@
             "build": "python -m kybra --verbose works src/works/works.py src/works/works.did",
             "post_install": ".kybra/works/post_install.sh",
             "candid": "src/works/works.did",
-            "wasm": ".kybra/works/works.wasm.gz",
+            "wasm": ".kybra/works/works.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/works",
                 "node_compatibility": true
@@ -16,7 +17,8 @@
             "build": "python -m kybra --verbose wip src/wip/wip.py src/wip/wip.did",
             "post_install": ".kybra/wip/post_install.sh",
             "candid": "src/wip/wip.did",
-            "wasm": ".kybra/wip/wip.wasm.gz",
+            "wasm": ".kybra/wip/wip.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/wip",
                 "node_compatibility": true
@@ -27,7 +29,8 @@
             "build": "python -m kybra --verbose breaks src/breaks/breaks.py src/breaks/breaks.did",
             "post_install": ".kybra/breaks/post_install.sh",
             "candid": "src/breaks/breaks.did",
-            "wasm": ".kybra/breaks/breaks.wasm.gz",
+            "wasm": ".kybra/breaks/breaks.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/breaks",
                 "node_compatibility": true

@@ -5,7 +5,8 @@
             "build": "python -m kybra principal src/main.py src/main.did",
             "post_install": ".kybra/principal/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/principal/principal.wasm.gz",
+            "wasm": ".kybra/principal/principal.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/principal",
                 "node_compatibility": true

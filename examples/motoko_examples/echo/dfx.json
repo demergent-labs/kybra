@@ -5,7 +5,8 @@
             "build": "python -m kybra echo src/main.py src/main.did",
             "post_install": ".kybra/echo/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/echo/echo.wasm.gz",
+            "wasm": ".kybra/echo/echo.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/echo",
                 "node_compatibility": true

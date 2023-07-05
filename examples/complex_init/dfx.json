@@ -5,7 +5,8 @@
             "build": "python -m kybra complex_init src/main.py src/main.did",
             "post_install": ".kybra/complex_init/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/complex_init/complex_init.wasm.gz",
+            "wasm": ".kybra/complex_init/complex_init.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/complex_init",
                 "node_compatibility": true

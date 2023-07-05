@@ -5,7 +5,8 @@
             "build": "python -m kybra cycles src/cycles/cycles.py src/cycles/cycles.did",
             "post_install": ".kybra/cycles/post_install.sh",
             "candid": "src/cycles/cycles.did",
-            "wasm": ".kybra/cycles/cycles.wasm.gz",
+            "wasm": ".kybra/cycles/cycles.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/cycles",
                 "node_compatibility": true
@@ -16,7 +17,8 @@
             "build": "python -m kybra intermediary src/intermediary/intermediary.py src/intermediary/intermediary.did",
             "post_install": ".kybra/intermediary/post_install.sh",
             "candid": "src/intermediary/intermediary.did",
-            "wasm": ".kybra/intermediary/intermediary.wasm.gz",
+            "wasm": ".kybra/intermediary/intermediary.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/intermediary",
                 "node_compatibility": true

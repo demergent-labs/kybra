@@ -90,7 +90,7 @@ def main():
         label=f"[3/3] 🚀 Optimizing Wasm binary...{show_empathy(is_initial_compile)}",
     )
 
-    print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['gzipped_wasm'])}")
+    print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['wasm'])}")
 
 
 def generate_post_install_script(
@@ -180,9 +180,6 @@ def create_paths(args: Args) -> Paths:
     # This is the unzipped generated Wasm that is the canister
     wasm_path = f"{canister_path}/{canister_name}.wasm"
 
-    # This is the final zipped generated Wasm that will actually run on the Internet Computer
-    gzipped_wasm_path = f"{wasm_path}.gz"
-
     # This is where we store custom Python modules, such as stripped-down versions of stdlib modules
     custom_modules_path = f"{compiler_path}/custom_modules"
 
@@ -204,7 +201,6 @@ def create_paths(args: Args) -> Paths:
         "lib": lib_path,
         "generated_did": generated_did_path,
         "wasm": wasm_path,
-        "gzipped_wasm": gzipped_wasm_path,
         "custom_modules": custom_modules_path,
         "global_kybra_config_dir": global_kybra_config_dir,
         "global_kybra_rust_dir": global_kybra_rust_dir,
@@ -378,10 +374,6 @@ def optimize_wasm_binary_or_exit(
     # TODO we should be able to get rid of this now
     add_metadata_to_wasm_or_exit(paths, canister_name, verbose=verbose)
 
-    # gzip the Wasm binary
-    os.system(
-        f"gzip -9 -f -k {paths['wasm']}"
-    )  # TODO we should be able to get rid of this now
     os.system(f"gzip -9 -f -k {paths['canister']}/{canister_name}_app.wasm")
 
 
