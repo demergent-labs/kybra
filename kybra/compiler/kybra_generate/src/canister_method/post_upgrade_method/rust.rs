@@ -28,19 +28,21 @@ pub fn generate(
     );
 
     Ok(quote! {
-        #randomness
+        ic_cdk_timers::set_timer(std::time::Duration::from_secs(0), move || {
+            #randomness
 
-        unsafe { ic_wasi_polyfill::init(&randomness); };
+            unsafe { ic_wasi_polyfill::init(&randomness); };
 
-        #interpreter_init
+            #interpreter_init
 
-        #ic_object_init
+            #ic_object_init
 
-        #code_init
+            #code_init
 
-        #save_global_interpreter
+            #save_global_interpreter
 
-        #call_to_user_init_or_post_upgrade
+            #call_to_user_init_or_post_upgrade
+        });
     })
 }
 

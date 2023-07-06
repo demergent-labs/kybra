@@ -34,7 +34,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     let params = #params;
 
                     call_global_python_function_sync(#function_name, params)
-                        .unwrap_or_else(|err| ic_cdk::trap(err.as_str()))
+                        .unwrap_or_trap()
                 })
             }
             _ => kybra_unreachable!(),

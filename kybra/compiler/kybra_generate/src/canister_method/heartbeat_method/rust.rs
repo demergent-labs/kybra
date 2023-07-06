@@ -13,7 +13,7 @@ pub fn generate(
         ic_cdk::spawn(async {
             call_global_python_function(#function_name, ())
                 .await
-                .unwrap_or_else(|err| ic_cdk::trap(err.as_str()));
+                .unwrap_or_trap();
         });
     })
 }
