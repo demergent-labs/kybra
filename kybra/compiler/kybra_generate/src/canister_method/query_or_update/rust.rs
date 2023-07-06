@@ -1,5 +1,5 @@
 use cdk_framework::{
-    act::node::{candid::Primitive, CandidType, Context},
+    act::node::{candid::Primitive, CandidType, Context, ReturnType},
     traits::{CollectResults, ToTypeAnnotation},
 };
 use proc_macro2::TokenStream;
@@ -33,7 +33,7 @@ pub fn generate_body(
 
     let params = tuple::generate_tuple(&param_conversions);
 
-    let return_candid_type = source_mapped_located_stmtkind.build_return_type()?;
+    let return_candid_type = ReturnType::new(source_mapped_located_stmtkind.build_return_type()?);
     let return_type_annotation = return_candid_type.to_type_annotation(
         &Context {
             keyword_list: keywords::get_python_keywords(),
