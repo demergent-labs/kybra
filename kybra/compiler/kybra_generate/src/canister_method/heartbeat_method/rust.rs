@@ -11,7 +11,7 @@ pub fn generate(
 
     Ok(quote! {
         ic_cdk::spawn(async {
-            call_global_python_function(#function_name, ())
+            call_global_python_function::<()>(#function_name, ())
                 .await
                 .unwrap_or_trap();
         });
