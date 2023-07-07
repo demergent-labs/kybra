@@ -12,7 +12,7 @@ pub fn generate(
 
     Ok(quote! {
         if unsafe { INTERPRETER_OPTION.as_mut() }.is_none() {
-            ic_cdk::println!("Pre Upgrade Warning: The interpreter is not defined. The previous post_upgrade has most likely trapped");
+            ic_cdk::println!("Pre Upgrade Warning: The interpreter is not defined. The previous init or post_upgrade has most likely trapped");
             return;
         }
 

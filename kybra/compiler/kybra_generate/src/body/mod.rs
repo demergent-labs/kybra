@@ -8,6 +8,7 @@ use crate::{ic_object, stable_b_tree_map_nodes::rust, StableBTreeMapNode};
 
 mod async_result_handler;
 mod call_global_python_function;
+mod does_interpreter_exist;
 mod unwrap_rust_python_result;
 mod utils;
 
@@ -28,6 +29,7 @@ pub fn generate(
     let stable_b_tree_map = rust::generate(stable_b_tree_map_nodes);
     let utils = utils::generate();
     let call_global_python_function = call_global_python_function::generate();
+    let does_interpreter_exist = does_interpreter_exist::generate();
 
     quote::quote! {
         #ic_object
@@ -36,5 +38,6 @@ pub fn generate(
         #stable_b_tree_map
         #utils
         #call_global_python_function
+        #does_interpreter_exist
     }
 }

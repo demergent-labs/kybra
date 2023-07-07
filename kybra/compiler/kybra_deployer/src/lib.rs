@@ -87,6 +87,11 @@ pub async fn install_wasm() -> Result<(), String> {
 
     // let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
 
+    // WASM_REF_CELL.with(|wasm_ref_cell| {
+    //     let mut wasm_ref_mut = wasm_ref_cell.borrow_mut();
+    //     wasm_ref_mut.clear();
+    // });
+
     // let result = ic_cdk::api::management_canister::main::install_code(
     //     ic_cdk::api::management_canister::main::InstallCodeArgument {
     //         mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
@@ -97,8 +102,6 @@ pub async fn install_wasm() -> Result<(), String> {
     //     },
     // )
     // .await;
-
-    // ic_cdk::println!("{:#?}", result);
 
     // result.map_err(|err| call_result_error_to_string(&err))
 }
@@ -140,7 +143,13 @@ fn stable_store_python_stdlib() -> Result<(), String> {
 
 fn install_code() -> Result<(), ic_cdk::api::call::RejectionCode> {
     let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
-    call::notify(
+
+    WASM_REF_CELL.with(|wasm_ref_cell| {
+        let mut wasm_ref_mut = wasm_ref_cell.borrow_mut();
+        wasm_ref_mut.clear();
+    });
+
+    let result = call::notify(
         Principal::management_canister(),
         "install_code",
         (management_canister::main::InstallCodeArgument {
@@ -150,7 +159,9 @@ fn install_code() -> Result<(), ic_cdk::api::call::RejectionCode> {
             arg: ARG_DATA_RAW_REF_CELL
                 .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
         },),
-    )
+    );
+
+    result
 
     // TODO we think that the response trying to execute a callback on a different Wasm binary
     // TODO may be causing problems, thus we are testing out notify
