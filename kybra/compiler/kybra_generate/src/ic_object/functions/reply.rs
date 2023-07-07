@@ -69,7 +69,7 @@ fn generate_update_match_arm(update_method: &UpdateMethod) -> TokenStream {
         .to_type_annotation(&context, update_method.name.clone());
     quote!(
         #name => {
-            let reply_value: #return_type = reply_value_py_object_ref
+            let reply_value: (#return_type) = reply_value_py_object_ref
                 .try_from_vm_value(vm)
                 .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
             ic_cdk::api::call::reply((reply_value,))
@@ -90,7 +90,7 @@ fn generate_query_match_arm(query_method: &QueryMethod) -> TokenStream {
         .to_type_annotation(&context, query_method.name.clone());
     quote!(
         #name => {
-            let reply_value: #return_type = reply_value_py_object_ref
+            let reply_value: (#return_type) = reply_value_py_object_ref
                 .try_from_vm_value(vm)
                 .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
             ic_cdk::api::call::reply((reply_value,))

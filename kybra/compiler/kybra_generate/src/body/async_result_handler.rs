@@ -371,7 +371,7 @@ fn generate_call_match_arms(services: &Vec<Service>) -> Vec<TokenStream> {
                             let actual_index = index + 2;
 
                             quote! {
-                                let #variable_name: #variable_type = args[#actual_index]
+                                let #variable_name: (#variable_type) = args[#actual_index]
                                     .clone()
                                     .try_from_vm_value(vm)
                                     .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
@@ -452,7 +452,7 @@ fn generate_call_with_payment_match_arms(services: &Vec<Service>) -> Vec<TokenSt
                             let actual_index = index + 2;
 
                             quote! {
-                                let #variable_name: #variable_type = args[#actual_index]
+                                let #variable_name: (#variable_type) = args[#actual_index]
                                     .clone()
                                     .try_from_vm_value(vm)
                                     .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
@@ -541,7 +541,7 @@ fn generate_call_with_payment128_match_arms(services: &Vec<Service>) -> Vec<Toke
                             let actual_index = index + 2;
 
                             quote! {
-                                let #variable_name: #variable_type = args[#actual_index]
+                                let #variable_name: (#variable_type) = args[#actual_index]
                                     .clone()
                                     .try_from_vm_value(vm)
                                     .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;

@@ -14,6 +14,7 @@ from kybra import (
     update,
     Variant,
     Vec,
+    void,
 )
 
 
@@ -101,6 +102,11 @@ def update_null() -> Manual[null]:
 
 
 @update
+def update_void() -> Manual[void]:
+    ic.reply(None)
+
+
+@update
 def update_record() -> Manual[Element]:
     element: Element = {
         "id": "b0283eb7-9c0e-41e5-8089-3345e6a8fa6a",
@@ -160,6 +166,11 @@ def query_nat() -> Manual[nat]:
 
 @query
 def query_null() -> Manual[null]:
+    ic.reply(None)
+
+
+@query
+def query_void() -> Manual[void]:
     ic.reply(None)
 
 
