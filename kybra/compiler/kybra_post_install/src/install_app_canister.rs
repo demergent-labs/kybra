@@ -25,7 +25,6 @@ pub fn install_app_canister(canister_name: &str) -> Result<(), String> {
     Ok(())
 }
 
-// TODO this should be printing the error out
 fn handle_install_app_canister_failure(
     install_output: &std::process::Output,
 ) -> Result<(), String> {

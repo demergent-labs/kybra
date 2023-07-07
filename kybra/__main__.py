@@ -347,7 +347,6 @@ def run_rustfmt_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool =
         sys.exit(1)
 
 
-# TODO working on optimization
 @timed_inline
 def optimize_wasm_binary_or_exit(
     paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
@@ -359,8 +358,6 @@ def optimize_wasm_binary_or_exit(
             "-o",
             f"{paths['canister']}/{canister_name}_app.wasm",
             "shrink",
-            # "--optimize",
-            # "Oz",
         ],
         capture_output=not verbose,
     )
@@ -371,7 +368,6 @@ def optimize_wasm_binary_or_exit(
         print("💀 Build failed")
         sys.exit(1)
 
-    # TODO we should be able to get rid of this now
     add_metadata_to_wasm_or_exit(paths, canister_name, verbose=verbose)
 
     os.system(f"gzip -9 -f -k {paths['canister']}/{canister_name}_app.wasm")
