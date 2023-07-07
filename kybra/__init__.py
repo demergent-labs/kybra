@@ -364,7 +364,7 @@ class ic(Generic[T]):
         _kybra_ic.print(str(x))  # type: ignore
 
     @staticmethod
-    def reject(x: Any):
+    def reject(x: str):
         _kybra_ic.reject(x)  # type: ignore
 
     @staticmethod

@@ -42,5 +42,14 @@ pub fn generate() -> TokenStream {
                 }
             }
         }
+
+        impl<T> CdkActTryFromVmValue<ic_cdk::api::call::ManualReply<T>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef
+        where
+            rustpython::vm::PyObjectRef: for<'a> CdkActTryFromVmValue<T, &'a rustpython::vm::VirtualMachine>
+        {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::api::call::ManualReply<T>, CdkActTryFromVmValueError> {
+                Ok(ic_cdk::api::call::ManualReply::empty())
+            }
+        }
     }
 }
