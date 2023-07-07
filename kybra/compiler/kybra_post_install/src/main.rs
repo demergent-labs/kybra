@@ -26,7 +26,7 @@ fn main() -> Result<(), String> {
 
     upload_app_canister(canister_name, max_chunk_size)?;
     upload_python_stdlib(canister_name, max_chunk_size)?;
-    // install_app_canister(canister_name)?;
+    install_app_canister(canister_name)?;
 
     // TODO this is here because of some complications with the install_code self-referential cross-canister call
     // TODO the call is a notify and thus won't wait for the canister's post_upgrade function to complete
