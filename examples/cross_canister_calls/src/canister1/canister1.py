@@ -1,6 +1,7 @@
 from kybra import (
     Async,
     CallResult,
+    init,
     match,
     nat64,
     NotifyResult,
@@ -9,6 +10,7 @@ from kybra import (
     update,
     Variant,
     Vec,
+    void,
 )
 from src.canister2.types import Account, AccountArgs, Canister2
 
@@ -38,7 +40,13 @@ class TrapResult(Variant, total=False):
     Err: str
 
 
-canister2 = Canister2(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
+canister2 = Canister2(Principal.from_str("aaaaa-aa"))
+
+
+@init
+def init_(canister2_id: Principal) -> void:
+    global canister2
+    canister2 = Canister2(canister2_id)
 
 
 @update

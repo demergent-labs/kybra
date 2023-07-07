@@ -1,8 +1,8 @@
-import { createSnakeCaseProxy, runTests } from 'azle/test';
+import { createSnakeCaseProxy, getCanisterId, runTests } from 'azle/test';
 import { getTests } from 'azle/examples/tuple_types/test/tests';
 import { createActor } from './dfx_generated/tuple_types';
 
-const tuple_types_canister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const tuple_types_canister = createActor(getCanisterId('tuple_types'), {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }

@@ -5,7 +5,8 @@
             "build": "python -m kybra timers src/main.py src/main.did",
             "post_install": ".kybra/timers/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/timers/timers.wasm.gz",
+            "wasm": ".kybra/timers/timers.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/timers",
                 "node_compatibility": true

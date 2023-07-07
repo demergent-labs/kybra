@@ -1,18 +1,18 @@
 // TODO If we want these tests to be more exact, we can check balances and make sure they are within some margin of error
 
 import { getTests } from 'azle/examples/cycles/test/tests';
-import { createSnakeCaseProxy, runTests } from 'azle/test';
+import { createSnakeCaseProxy, getCanisterId, runTests } from 'azle/test';
 import { createActor as createCyclesActor } from './dfx_generated/cycles';
 import { createActor as createIntermediaryActor } from './dfx_generated/intermediary';
 
-const cyclesCanister = createCyclesActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const cyclesCanister = createCyclesActor(getCanisterId('cycles'), {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
 });
 
 const intermediaryCanister = createIntermediaryActor(
-    'ryjl3-tyaaa-aaaaa-aaaba-cai',
+    getCanisterId('intermediary'),
     {
         agentOptions: {
             host: 'http://127.0.0.1:8000'

@@ -1,7 +1,3 @@
-// TODO Once we upgrade to ic-cdk 0.8.1 and dfx >= 14 something
-// TODO then I think we can use the new ic_cdk::api::is_controller check
-// TODO and get rid of INSTALLER_REF_CELL
-
 use errors::{
     call_result_error_to_string, rejection_code_to_string, value_error_to_string, UnwrapOrTrap,
 };
@@ -23,7 +19,6 @@ mod errors;
 
 thread_local! {
     static WASM_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
-    static INSTALLER_REF_CELL: RefCell<Option<String>> = RefCell::new(None);
     static ARG_DATA_RAW_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
     static PYTHON_STDLIB_REF_CELL: RefCell<Vec<u8>> = RefCell::new(vec![]);
 
@@ -48,18 +43,13 @@ pub fn post_upgrade() {
 }
 
 fn initialize() {
-    INSTALLER_REF_CELL.with(|installer_ref_cell| {
-        let mut installer_ref_mut = installer_ref_cell.borrow_mut();
-        *installer_ref_mut = Some(ic_cdk::caller().to_string());
-    });
-
     ARG_DATA_RAW_REF_CELL.with(|arg_data_raw_ref_cell| {
         let mut arg_data_ref_mut = arg_data_raw_ref_cell.borrow_mut();
         *arg_data_ref_mut = call::arg_data_raw();
     });
 }
 
-#[update(guard = "installer_guard")]
+#[update(guard = "controller_guard")]
 pub fn upload_wasm_chunk(bytes: Vec<u8>) {
     WASM_REF_CELL.with(|wasm_ref_cell| {
         let mut wasm_ref_mut = wasm_ref_cell.borrow_mut();
@@ -67,7 +57,7 @@ pub fn upload_wasm_chunk(bytes: Vec<u8>) {
     });
 }
 
-#[update(guard = "installer_guard")]
+#[update(guard = "controller_guard")]
 pub fn upload_python_stdlib_chunk(bytes: Vec<u8>) {
     PYTHON_STDLIB_REF_CELL.with(|python_stdlib_ref_cell| {
         let mut python_stdlib_ref_mut = python_stdlib_ref_cell.borrow_mut();
@@ -75,7 +65,7 @@ pub fn upload_python_stdlib_chunk(bytes: Vec<u8>) {
     });
 }
 
-#[query(guard = "installer_guard")]
+#[query(guard = "controller_guard")]
 pub fn get_python_stdlib_hash() -> String {
     PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
         let python_stdlib_stable_ref = python_stdlib_stable_ref_cell.borrow();
@@ -89,11 +79,28 @@ pub fn get_python_stdlib_hash() -> String {
     })
 }
 
-#[update(guard = "installer_guard")]
+#[update(guard = "controller_guard")]
 pub async fn install_wasm() -> Result<(), String> {
     stable_store_randomness().await?;
     stable_store_python_stdlib()?;
     install_code().map_err(|err| rejection_code_to_string(&err))
+
+    // let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
+
+    // let result = ic_cdk::api::management_canister::main::install_code(
+    //     ic_cdk::api::management_canister::main::InstallCodeArgument {
+    //         mode: ic_cdk::api::management_canister::main::CanisterInstallMode::Upgrade,
+    //         canister_id: ic_cdk::api::id(),
+    //         wasm_module,
+    //         arg: ARG_DATA_RAW_REF_CELL
+    //             .with(|arg_data_raw_ref_cell| arg_data_raw_ref_cell.borrow().clone()),
+    //     },
+    // )
+    // .await;
+
+    // ic_cdk::println!("{:#?}", result);
+
+    // result.map_err(|err| call_result_error_to_string(&err))
 }
 
 async fn stable_store_randomness() -> Result<(), String> {
@@ -165,14 +172,9 @@ fn install_code() -> Result<(), ic_cdk::api::call::RejectionCode> {
     // result.map_err(|err| call_result_error_to_string(&err))
 }
 
-fn installer_guard() -> Result<(), String> {
-    let installer_option =
-        INSTALLER_REF_CELL.with(|installer_ref_cell| installer_ref_cell.borrow().clone());
-
-    if let Some(installer) = installer_option {
-        if installer == ic_cdk::caller().to_string() {
-            return Ok(());
-        }
+fn controller_guard() -> Result<(), String> {
+    if ic_cdk::api::is_controller(&ic_cdk::caller()) {
+        return Ok(());
     }
 
     Err("Not authorized".to_string())

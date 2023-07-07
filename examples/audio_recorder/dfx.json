@@ -5,7 +5,8 @@
             "build": "python -m kybra audio_recorder src/main.py src/main.did",
             "post_install": ".kybra/audio_recorder/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/audio_recorder/audio_recorder.wasm.gz",
+            "wasm": ".kybra/audio_recorder/audio_recorder.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/audio_recorder",
                 "node_compatibility": true

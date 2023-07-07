@@ -5,7 +5,8 @@
             "build": "python -m kybra hello src/main.py src/main.did",
             "post_install": ".kybra/hello/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/hello/hello.wasm.gz",
+            "wasm": ".kybra/hello/hello.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/hello",
                 "node_compatibility": true

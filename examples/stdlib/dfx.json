@@ -5,7 +5,8 @@
             "build": "python -m kybra stdlib src/main.py src/main.did",
             "post_install": ".kybra/stdlib/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/stdlib/stdlib.wasm.gz",
+            "wasm": ".kybra/stdlib/stdlib.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/stdlib",
                 "node_compatibility": true

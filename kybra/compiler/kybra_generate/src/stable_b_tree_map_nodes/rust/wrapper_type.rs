@@ -28,7 +28,7 @@ pub fn generate(
         wrapper_struct_name_ident.clone(),
         quote! {
             #[derive(candid::CandidType, candid::Deserialize, CdkActTryFromVmValue, Ord, PartialOrd, Eq, PartialEq, Clone)]
-            struct #wrapper_struct_name_ident(#key_type);
+            struct #wrapper_struct_name_ident((#key_type));
         },
     )
 }

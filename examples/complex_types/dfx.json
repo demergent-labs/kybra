@@ -5,7 +5,8 @@
             "build": "python -m kybra complex_types src/complex_types.py src/complex_types.did",
             "post_install": ".kybra/complex_types/post_install.sh",
             "candid": "src/complex_types.did",
-            "wasm": ".kybra/complex_types/complex_types.wasm.gz",
+            "wasm": ".kybra/complex_types/complex_types.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/complex_types",
                 "node_compatibility": true

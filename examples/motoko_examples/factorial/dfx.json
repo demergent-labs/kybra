@@ -5,7 +5,8 @@
             "build": "python -m kybra factorial src/main.py src/main.did",
             "post_install": ".kybra/factorial/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/factorial/factorial.wasm.gz",
+            "wasm": ".kybra/factorial/factorial.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/factorial",
                 "node_compatibility": true

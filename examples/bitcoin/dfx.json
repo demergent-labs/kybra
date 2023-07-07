@@ -5,7 +5,8 @@
             "build": "python -m kybra bitcoin src/main.py src/main.did",
             "post_install": ".kybra/bitcoin/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/bitcoin/bitcoin.wasm.gz",
+            "wasm": ".kybra/bitcoin/bitcoin.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/bitcoin",
                 "node_compatibility": true

@@ -1,3 +1,4 @@
+import { getCanisterId } from 'azle/test';
 import { execSync } from 'child_process';
 
 async function pretest() {
@@ -11,9 +12,18 @@ async function pretest() {
         stdio: 'inherit'
     });
 
-    execSync(`dfx deploy`, {
+    execSync(`dfx deploy some_service`, {
         stdio: 'inherit'
     });
+
+    execSync(
+        `dfx deploy rejections --argument '(principal "${getCanisterId(
+            'some_service'
+        )}")'`,
+        {
+            stdio: 'inherit'
+        }
+    );
 
     execSync(`dfx generate`, {
         stdio: 'inherit'

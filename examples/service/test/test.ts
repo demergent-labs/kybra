@@ -1,4 +1,4 @@
-import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
+import { getCanisterId, runTests, Test } from 'azle/test';
 // import { getTests } from 'azle/examples/service/test/tests';
 import { execSync } from 'child_process';
 import { createActor } from './dfx_generated/service';
@@ -75,7 +75,9 @@ export function getTests(): Test[] {
             name: 'serviceCrossCanisterCall',
             test: async () => {
                 const result = execSync(
-                    `dfx canister call service service_cross_canister_call '(service "ryjl3-tyaaa-aaaaa-aaaba-cai")'`
+                    `dfx canister call service service_cross_canister_call '(service "${getCanisterId(
+                        'some_service'
+                    )}")'`
                 )
                     .toString()
                     .trim();

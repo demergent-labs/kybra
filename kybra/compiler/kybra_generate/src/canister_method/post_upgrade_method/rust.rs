@@ -27,20 +27,32 @@ pub fn generate(
         &call_to_post_upgrade_py_function,
     );
 
+    // TODO the set_timer below is here to allow the developer to see error messages
+    // TODO in their local replica during development. For some reason without
+    // TODO this the error messages can't be seen, I believe because they are part of
+    // TODO the cross-canister call from the kybra_deployer. We can't get that response
+    // TODO currently because the Wasm binary changes before the response returns
+    // TODO and calling the respone callback causes undefined behavior
+    // TODO two possible solutions are coming to these issues, named/default callbacks
+    // TODO and dfx chunk uploading. dfx chunk uploading should allow us to remove the
+    // TODO kybra_deployer entirely, get rid of the post_install process hopefully
+    // TODO and return to regular init/post_upgrade semantics
     Ok(quote! {
-        #randomness
+        ic_cdk_timers::set_timer(std::time::Duration::from_secs(0), move || {
+            #randomness
 
-        unsafe { ic_wasi_polyfill::init(&randomness); };
+            unsafe { ic_wasi_polyfill::init(&randomness); };
 
-        #interpreter_init
+            #interpreter_init
 
-        #ic_object_init
+            #ic_object_init
 
-        #code_init
+            #code_init
 
-        #save_global_interpreter
+            #save_global_interpreter
 
-        #call_to_user_init_or_post_upgrade
+            #call_to_user_init_or_post_upgrade
+        });
     })
 }
 

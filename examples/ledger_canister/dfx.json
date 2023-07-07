@@ -5,7 +5,8 @@
             "build": "python -m kybra ledger_canister src/ledger_canister/ledger_canister.py src/ledger_canister/ledger_canister.did",
             "post_install": ".kybra/ledger_canister/post_install.sh",
             "candid": "src/ledger_canister/ledger_canister.did",
-            "wasm": ".kybra/ledger_canister/ledger_canister.wasm.gz",
+            "wasm": ".kybra/ledger_canister/ledger_canister.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/ledger_canister",
                 "node_compatibility": true
@@ -14,7 +15,8 @@
         "icp_ledger": {
             "type": "custom",
             "candid": "src/icp_ledger/ledger.private.did",
-            "wasm": "src/icp_ledger/ledger.wasm"
+            "wasm": "src/icp_ledger/ledger.wasm",
+            "gzip": true
         }
     }
 }

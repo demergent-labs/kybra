@@ -61,6 +61,24 @@ pub fn generate() -> TokenStream {
             }
         }
 
+        impl<T> UnwrapOrTrap<T> for candid::Result<T> {
+            fn unwrap_or_trap(self) -> T {
+                match self {
+                    Ok(ok) => ok,
+                    Err(err) => ic_cdk::trap(&format!("CandidError: {}", err.to_string())),
+                }
+            }
+        }
+
+        impl<T> UnwrapOrTrap<T> for Result<T, String> {
+            fn unwrap_or_trap(self) -> T {
+                match self {
+                    Ok(ok) => ok,
+                    Err(err) => ic_cdk::trap(&err),
+                }
+            }
+        }
+
         pub trait UnwrapOrTrapWithVm<T> {
             fn unwrap_or_trap(self, vm: &rustpython::vm::VirtualMachine) -> T;
         }

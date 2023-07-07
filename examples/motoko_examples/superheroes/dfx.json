@@ -5,7 +5,8 @@
             "build": "python -m kybra superheroes src/main.py src/main.did",
             "post_install": ".kybra/superheroes/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/superheroes/superheroes.wasm.gz",
+            "wasm": ".kybra/superheroes/superheroes.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/superheroes",
                 "node_compatibility": true

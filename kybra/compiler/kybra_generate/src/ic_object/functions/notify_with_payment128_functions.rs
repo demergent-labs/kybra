@@ -87,7 +87,7 @@ fn generate_param_variables(method: &Method, canister_name: &String) -> Vec<Toke
             let actual_index = index + 2;
 
             quote! {
-                let #variable_name: #variable_type = args_py_object_refs[#actual_index]
+                let #variable_name: (#variable_type) = args_py_object_refs[#actual_index]
                     .clone()
                     .try_from_vm_value(vm)
                     .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;

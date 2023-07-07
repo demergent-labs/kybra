@@ -5,7 +5,8 @@
             "build": "python -m kybra counter src/main.py src/main.did",
             "post_install": ".kybra/counter/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/counter/counter.wasm.gz",
+            "wasm": ".kybra/counter/counter.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/counter",
                 "node_compatibility": true

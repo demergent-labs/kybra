@@ -14,7 +14,7 @@ type RejectionCode = variant {
   CanisterReject;
 };
 type TrapResult = variant { Ok : text; Err : text };
-service : () -> {
+service : (principal) -> {
   account : (AccountArgs) -> (AccountResult);
   accounts : () -> (AccountsResult);
   balance : (text) -> (BalanceResult);

@@ -26,7 +26,7 @@ type User = record {
   basic_func : func (text) -> (text) query;
   complex_func : ComplexFunc;
 };
-service : () -> {
+service : (principal) -> {
   basic_func_param : (func (text) -> (text) query) -> (
       func (text) -> (text) query,
     ) query;

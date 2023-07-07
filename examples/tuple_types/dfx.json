@@ -5,7 +5,8 @@
             "build": "python -m kybra tuple_types src/main.py src/main.did",
             "post_install": ".kybra/tuple_types/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/tuple_types/tuple_types.wasm.gz",
+            "wasm": ".kybra/tuple_types/tuple_types.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/tuple_types",
                 "node_compatibility": true
