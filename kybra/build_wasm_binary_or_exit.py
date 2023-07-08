@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import sys
 
-from kybra.candid import generate_candid_file  # type: ignore
+# from kybra.candid import generate_candid_file  # type: ignore
 from kybra.colors import red
 from kybra.timed import timed_inline
 from kybra.types import Paths
@@ -15,7 +15,7 @@ def build_wasm_binary_or_exit(
 ):
     compile_generated_rust_code(paths, canister_name, cargo_env, verbose)
     copy_wasm_to_dev_location(paths, canister_name)
-    generate_and_create_candid_file(paths, canister_name)
+    # generate_and_create_candid_file(paths, canister_name)
     run_wasi2ic_on_app_wasm(paths, canister_name, cargo_env, verbose)
     handle_deployer_wasm(paths, canister_name, cargo_env, verbose)
 

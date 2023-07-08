@@ -10,8 +10,8 @@ setup(
     packages=["kybra"],
     install_requires=[
         "modulegraph==0.19.3",
-        "wasmer==1.1.0",
-        "wasmer_compiler_cranelift==1.1.0",
+        # "wasmer==1.1.0",
+        # "wasmer_compiler_cranelift==1.1.0",
     ],
     long_description=Path("README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
