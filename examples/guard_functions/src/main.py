@@ -133,6 +133,7 @@ def inspect_message_() -> void:
     if (
         ic.method_name() == "modify_state_guarded"
         or ic.method_name() == "modifyStateGuarded"
+        or ic.method_name() == "does_interpreter_exist"
     ):
         ic.print(f"Method {ic.method_name()} allowed by inspect_message")
         ic.accept_message()
