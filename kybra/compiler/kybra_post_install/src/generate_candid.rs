@@ -43,8 +43,13 @@ pub fn generate_candid(canister_name: &str, candid_path: &str) -> Result<(), Str
     }
 
     println!("{}", candid.replace("\\n", "\n"));
+    println!("{}", candid.replace("\\\"", "\""));
 
-    std::fs::write(candid_path, candid.replace("\\n", "\n")).map_err(|e| error_to_string(&e))?;
+    std::fs::write(
+        candid_path,
+        candid.replace("\\n", "\n").replace("\\\"", "\""),
+    )
+    .map_err(|e| error_to_string(&e))?;
 
     Ok(())
 }

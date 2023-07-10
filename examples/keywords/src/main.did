@@ -1,4 +1,5 @@
-type KeywordRecord = record {
+
+  type KeywordRecord = record {
   as : null;
   if : bool;
   in : bool;
@@ -82,3 +83,4 @@ service : () -> {
   rust_keyword_variant : () -> (RustKeywordVariant) query;
   simple_keyword : (SimpleRecord) -> (SimpleRecord) query;
 }
+
