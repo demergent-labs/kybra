@@ -1,4 +1,5 @@
-type CreateRecordingErr = variant { UserDoesNotExist : principal };
+
+  type CreateRecordingErr = variant { UserDoesNotExist : principal };
 type CreateRecordingResult = variant {
   Ok : Recording;
   Err : CreateRecordingErr;
@@ -36,3 +37,4 @@ service : () -> {
   read_user_by_id : (principal) -> (opt User) query;
   read_users : () -> (vec User) query;
 }
+

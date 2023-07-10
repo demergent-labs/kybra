@@ -39,5 +39,10 @@ pub fn generate(
         #utils
         #call_global_python_function
         #does_interpreter_exist
+
+        #[ic_cdk_macros::query]
+        fn export_candid() -> String {
+            __export_service()
+        }
     }
 }
