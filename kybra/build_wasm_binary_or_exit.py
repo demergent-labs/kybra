@@ -3,7 +3,6 @@ import shutil
 import subprocess
 import sys
 
-from kybra.candid import generate_candid_file  # type: ignore
 from kybra.colors import red
 from kybra.timed import timed_inline
 from kybra.types import Paths
@@ -45,8 +44,8 @@ def copy_wasm_to_dev_location(paths: Paths, canister_name: str):
 
 
 def generate_and_create_candid_file(paths: Paths, canister_name: str):
-    candid_file = generate_candid_file(paths, canister_name)
-    create_file(paths["did"], candid_file)
+    if not os.path.isfile(paths["did"]):
+        create_file(paths["did"], "service : () -> {}")
 
 
 def run_wasi2ic_on_app_wasm(
