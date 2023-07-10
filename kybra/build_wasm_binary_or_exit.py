@@ -3,8 +3,6 @@ import shutil
 import subprocess
 import sys
 
-# TODO make sure to delete the entire candid generation code if it isn't needed anymore
-from kybra.candid import generate_candid_file  # type: ignore
 from kybra.colors import red
 from kybra.timed import timed_inline
 from kybra.types import Paths
