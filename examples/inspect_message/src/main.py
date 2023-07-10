@@ -8,7 +8,7 @@ def inspect_message_() -> void:
     if (
         ic.method_name() == "accessible"
         or ic.method_name() == "does_interpreter_exist"
-        or ic.method_name() == "export_candid"
+        or ic.method_name() == "__get_candid_interface_tmp_hack"
     ):
         ic.accept_message()
         return

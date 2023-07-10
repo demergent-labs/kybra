@@ -134,7 +134,7 @@ def inspect_message_() -> void:
         ic.method_name() == "modify_state_guarded"
         or ic.method_name() == "modifyStateGuarded"
         or ic.method_name() == "does_interpreter_exist"
-        or ic.method_name() == "export_candid"
+        or ic.method_name() == "__get_candid_interface_tmp_hack"
     ):
         ic.print(f"Method {ic.method_name()} allowed by inspect_message")
         ic.accept_message()
