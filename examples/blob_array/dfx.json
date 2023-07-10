@@ -3,8 +3,10 @@
         "blob_array": {
             "type": "custom",
             "build": "python -m kybra blob_array src/main.py src/main.did",
+            "post_install": ".kybra/blob_array/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/blob_array/blob_array.wasm.gz",
+            "wasm": ".kybra/blob_array/blob_array.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/blob_array",
                 "node_compatibility": true

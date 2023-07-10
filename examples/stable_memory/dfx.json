@@ -3,8 +3,10 @@
         "stable_memory": {
             "type": "custom",
             "build": "python -m kybra stable_memory src/main.py src/main.did",
+            "post_install": ".kybra/stable_memory/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/stable_memory/stable_memory.wasm.gz",
+            "wasm": ".kybra/stable_memory/stable_memory.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/stable_memory",
                 "node_compatibility": true

@@ -1,4 +1,4 @@
-from kybra import Async, blob, CallResult, match, update, void
+from kybra import Async, blob, CallResult, match, update, Vec, void
 from kybra.canisters.management import (
     GetUtxosResult,
     management_canister,
@@ -31,7 +31,7 @@ def get_balance(address: str) -> Async[ExecuteGetBalanceResult]:
 @update
 def get_current_fee_percentiles() -> Async[ExecuteGetCurrentFeePercentiles]:
     call_result: CallResult[
-        list[MillisatoshiPerByte]
+        Vec[MillisatoshiPerByte]
     ] = yield management_canister.bitcoin_get_current_fee_percentiles(
         {"network": {"Regtest": None}}
     ).with_cycles(

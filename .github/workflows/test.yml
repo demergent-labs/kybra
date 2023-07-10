@@ -56,6 +56,7 @@ jobs:
               run: |
                   EXAMPLE_DIRECTORIES=$(cat << END
                   [
+                    "examples/annotated_tests",
                     "examples/audio_recorder",
                     "examples/bitcoin",
                     "examples/blob_array",
@@ -76,6 +77,7 @@ jobs:
                     "examples/heartbeat",
                     "examples/ic_api",
                     "examples/imports",
+                    "examples/init_and_post_upgrade_recovery",
                     "examples/init",
                     "examples/inspect_message",
                     "examples/key_value_store",
@@ -113,6 +115,7 @@ jobs:
                     "examples/simple_user_accounts",
                     "examples/stable_memory",
                     "examples/stable_structures",
+                    "examples/stdlib",
                     "examples/timers",
                     "examples/tuple_types",
                     "examples/update"
@@ -162,12 +165,17 @@ jobs:
               with:
                   node-version: 18
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-              run: DFX_VERSION=0.12.1 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
-            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               uses: actions/cache@v3
               with:
                   path: ~/.config/kybra
                   key: kybra-cargo-${{ hashFiles('kybra/cargotoml.py') }}
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              uses: actions/cache@v3
+              with:
+                  path: ~/.cache/dfinity
+                  key: kybra-dfx-0.14.2
+            - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
+              run: DFX_VERSION=0.14.2 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)" # Find latest dfx version at https://raw.githubusercontent.com/dfinity/sdk/public-manifest/manifest.json
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               working-directory: ${{ matrix.example_directories }}
               run: curl https://pyenv.run | bash

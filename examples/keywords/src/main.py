@@ -1,5 +1,5 @@
 from kybra import (
-    alias,
+    Alias,
     blob,
     float32,
     float64,
@@ -14,17 +14,18 @@ from kybra import (
     nat32,
     nat64,
     null,
-    opt,
+    Opt,
     Principal,
     query,
     Record,
-    reserved,
     text,
-    Variant
+    Tuple,
+    Variant,
+    Vec,
 )
 
-MyTypeAlias = alias[opt[blob]]
-MyAlias = alias[list[int16]]
+MyTypeAlias = Alias[Opt[blob]]
+MyAlias = Alias[Vec[int16]]
 
 
 class SimpleRecord(Record):
@@ -46,21 +47,20 @@ class KeywordRecord(Record):
     global_: nat64
     import_: float32
     is_: float64
-    lambda_: opt[str]
+    lambda_: Opt[str]
     nonlocal_: text
     not_: SimpleRecord
-    or_: 'WithRecord'
-    pass_: 'KeywordVariant'
+    or_: "WithRecord"
+    pass_: "KeywordVariant"
     raise_: blob
     with_: Principal
     # # The below python keywords are also
-    None_: tuple[bool, bool]
+    None_: Tuple[bool, bool]
     as_: null
-    async_: reserved
-    await_: list[nat]
+    await_: Vec[nat]
     break_: MyTypeAlias
     continue_: MyAlias
-    else_: opt[bool]
+    else_: Opt[bool]
     for_: bool
     if_: bool
     in_: bool
@@ -108,7 +108,6 @@ class RustKeywordRecord(Record):
     const: int
     crate: nat
     fn: text
-    mut: reserved
     pub: null
     type: blob
 
@@ -134,64 +133,62 @@ def simple_keyword(simple_record: SimpleRecord) -> SimpleRecord:
 @query
 def rust_keyword() -> RustKeywordRecord:
     return {
-        'abstract': False,
-        'become': 'Become',
-        'const': 3,
-        'crate': 7,
-        'fn': 'Function',
-        'mut': False,
-        'pub': None,
-        'type': 'Type'.encode('utf-8')
+        "abstract": False,
+        "become": "Become",
+        "const": 3,
+        "crate": 7,
+        "fn": "Function",
+        "pub": None,
+        "type": "Type".encode("utf-8"),
     }
 
 
 @query
 def rust_keyword_variant() -> RustKeywordVariant:
-    return {'type': None}
+    return {"type": None}
 
 
 @query
 def complex_keyword() -> KeywordRecord:
     return {
-        'False_': False,
-        'True_': 'False',
-        'and_': 1,
-        'assert_': 2,
-        'class_': 3,
-        'def_': 4,
-        'del_': 5,
-        'elif_': 6,
-        'except_': 7,
-        'finally_': 8,
-        'from_': 9,
-        'global_': 10,
-        'import_': 11.12,
-        'is_': 13.14,
-        'lambda_': 'False',
-        'nonlocal_': 'False',
-        'not_': {'from_': 'False'},
-        'or_': {
-            'with__': False,
-            'with___': False,
-            'with____': False,
-            'with________________________________________________________________________': False,
-            'with______1': False
+        "False_": False,
+        "True_": "False",
+        "and_": 1,
+        "assert_": 2,
+        "class_": 3,
+        "def_": 4,
+        "del_": 5,
+        "elif_": 6,
+        "except_": 7,
+        "finally_": 8,
+        "from_": 9,
+        "global_": 10,
+        "import_": 11.12,
+        "is_": 13.14,
+        "lambda_": "False",
+        "nonlocal_": "False",
+        "not_": {"from_": "False"},
+        "or_": {
+            "with__": False,
+            "with___": False,
+            "with____": False,
+            "with________________________________________________________________________": False,
+            "with______1": False,
         },
-        'pass_': {'raise_': None},
-        'raise_': 'false'.encode('utf-8'),
-        'with_': Principal.from_str('aaaaa-aa'),
-        'None_': (False, True),
-        'as_': None,
-        'async_': False,
-        'await_': [18, 19, 20],
-        'break_': None,
-        'continue_': [21, 22, 23],
-        'else_': False,
-        'for_': False,
-        'if_': False,
-        'in_': False,
-        'return_': False,
-        'try_': False,
-        'while_': False,
-        'yield_': False,
+        "pass_": {"raise_": None},
+        "raise_": "false".encode("utf-8"),
+        "with_": Principal.from_str("aaaaa-aa"),
+        "None_": (False, True),
+        "as_": None,
+        "await_": [18, 19, 20],
+        "break_": None,
+        "continue_": [21, 22, 23],
+        "else_": False,
+        "for_": False,
+        "if_": False,
+        "in_": False,
+        "return_": False,
+        "try_": False,
+        "while_": False,
+        "yield_": False,
     }

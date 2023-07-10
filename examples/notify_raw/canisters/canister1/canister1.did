@@ -8,4 +8,4 @@ type RejectionCode = variant {
   CanisterReject;
 };
 type SendNotificationResult = variant { Ok : bool; Err : RejectionCode };
-service : () -> { send_notification : () -> (SendNotificationResult) }
+service : (principal) -> { send_notification : () -> (SendNotificationResult) }

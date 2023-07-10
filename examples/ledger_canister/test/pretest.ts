@@ -1,3 +1,4 @@
+import { getCanisterId } from 'azle/test';
 import { execSync } from 'child_process';
 
 async function pretest(icp_ledger_path: string) {
@@ -16,7 +17,7 @@ async function pretest(icp_ledger_path: string) {
     });
 
     execSync(
-        `cd ${icp_ledger_path} && curl -o ledger.wasm.gz https://download.dfinity.systems/ic/dfdba729414d3639b2a6c269600bbbd689b35385/canisters/ledger-canister_notify-method.wasm.gz`,
+        `cd ${icp_ledger_path} && curl -o ledger.wasm.gz https://download.dfinity.systems/ic/149b6208cbbb61e8142a069dd7a046d349beaf7a/canisters/ledger-canister_notify-method.wasm.gz`,
         {
             stdio: 'inherit'
         }
@@ -40,12 +41,21 @@ async function pretest(icp_ledger_path: string) {
         }
     );
 
-    execSync(`dfx deploy ledger_canister`, {
+    execSync(`dfx canister create ledger_canister`, {
         stdio: 'inherit'
     });
 
     execSync(
         `dfx deploy icp_ledger --argument='(record {minting_account = "'$(dfx ledger account-id)'"; initial_values = vec { record { "'$(dfx ledger account-id --of-canister ledger_canister)'"; record { e8s=100_000_000_000 } }; }; send_whitelist = vec {}})'`,
+        {
+            stdio: 'inherit'
+        }
+    );
+
+    execSync(
+        `dfx deploy ledger_canister --argument '(principal "${getCanisterId(
+            'icp_ledger'
+        )}")'`,
         {
             stdio: 'inherit'
         }

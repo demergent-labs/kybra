@@ -3,8 +3,10 @@
         "generators": {
             "type": "custom",
             "build": "python -m kybra generators src/main.py src/main.did",
+            "post_install": ".kybra/generators/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/generators/generators.wasm.gz",
+            "wasm": ".kybra/generators/generators.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/generators",
                 "node_compatibility": true

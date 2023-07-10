@@ -1,12 +1,11 @@
 from kybra import (
-    InsertError,
-    match,
-    opt,
+    Opt,
     query,
     Record,
     StableBTreeMap,
+    Tuple,
     update,
-    Variant,
+    Vec,
 )
 from kybra import nat, nat64
 
@@ -17,12 +16,7 @@ class BlogPost(Record):
 
 class User(Record):
     username: str
-    posts: list[BlogPost]
-
-
-class StableMap11InsertResult(Variant, total=False):
-    Ok: opt[User]
-    Err: InsertError
+    posts: Vec[BlogPost]
 
 
 stable_map11 = StableBTreeMap[nat, User](
@@ -31,19 +25,17 @@ stable_map11 = StableBTreeMap[nat, User](
 
 
 @query
-def stable_map11_get(key: nat) -> opt[User]:
+def stable_map11_get(key: nat) -> Opt[User]:
     return stable_map11.get(key)
 
 
 @update
-def stable_map11_insert(key: nat, value: User) -> StableMap11InsertResult:
-    result = stable_map11.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map11_insert(key: nat, value: User) -> Opt[User]:
+    return stable_map11.insert(key, value)
 
 
 @update
-def stable_map11_remove(key: nat) -> opt[User]:
+def stable_map11_remove(key: nat) -> Opt[User]:
     return stable_map11.remove(key)
 
 
@@ -58,17 +50,17 @@ def stable_map11_is_empty() -> bool:
 
 
 @query
-def stable_map11_keys() -> list[nat]:
+def stable_map11_keys() -> Vec[nat]:
     return stable_map11.keys()
 
 
 @query
-def stable_map11_values() -> list[User]:
+def stable_map11_values() -> Vec[User]:
     return stable_map11.values()
 
 
 @query
-def stable_map11_items() -> list[tuple[nat, User]]:
+def stable_map11_items() -> Vec[Tuple[nat, User]]:
     return stable_map11.items()
 
 

@@ -3,8 +3,10 @@
         "date": {
             "type": "custom",
             "build": "python -m kybra date src/main.py src/main.did",
+            "post_install": ".kybra/date/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/date/date.wasm.gz",
+            "wasm": ".kybra/date/date.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/date",
                 "node_compatibility": true

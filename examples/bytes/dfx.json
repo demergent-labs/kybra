@@ -3,8 +3,10 @@
         "bytes": {
             "type": "custom",
             "build": "python -m kybra bytes src/main.py src/main.did",
+            "post_install": ".kybra/bytes/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/bytes/bytes.wasm.gz",
+            "wasm": ".kybra/bytes/bytes.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/bytes",
                 "node_compatibility": true

@@ -3,8 +3,10 @@
         "simple_user_accounts": {
             "type": "custom",
             "build": "python -m kybra simple_user_accounts src/main.py src/main.did",
+            "post_install": ".kybra/simple_user_accounts/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/simple_user_accounts/simple_user_accounts.wasm.gz",
+            "wasm": ".kybra/simple_user_accounts/simple_user_accounts.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/simple_user_accounts",
                 "node_compatibility": true

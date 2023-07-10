@@ -16,29 +16,34 @@ pub fn generate() -> TokenStream {
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::candid::Empty {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                panic!("Empty cannot be converted into PyObjectRef");
+                Err(CdkActTryIntoVmValueError("type \"empty\" cannot be represented in python".to_string()))
             }
         }
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::candid::Func {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                Ok(vm.ctx.new_tuple(vec![self.principal.try_into_vm_value(vm).unwrap(), self.method.try_into_vm_value(vm).unwrap()]).into())
+                let principal = self.principal.try_into_vm_value(vm)?;
+                let method = self.method.try_into_vm_value(vm)?;
+                Ok(vm.ctx.new_tuple(vec![principal, method]).into())
             }
         }
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::Principal {
+            // TODO: In the future CdkActTryIntoVmValue needs to return rustpython_vm::object::PyResult
+            // When it does all these map_err calls will be unnecessary and should be replaced with
+            // question mark syntax.
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                let principal_class = _kybra_unwrap_rust_python_result(vm.run_block_expr(
+                let principal_class = vm.run_block_expr(
                     vm.new_scope_with_builtins(),
-                    r#"
-from kybra import Principal
+                    "from kybra import Principal; Principal"
+                ).map_err(|err| err.to_cdk_act_try_into_vm_value_error(vm))?;
 
-Principal
-                    "#
-                ), vm);
-
-                let from_str = _kybra_unwrap_rust_python_result(principal_class.get_attr("from_str", vm), vm);
-                let principal_instance = _kybra_unwrap_rust_python_result(vm.invoke(&from_str, (self.to_text(),)), vm);
+                let from_str = principal_class
+                    .get_attr("from_str", vm)
+                    .map_err(|err| err.to_cdk_act_try_into_vm_value_error(vm))?;
+                let principal_instance = from_str
+                    .call((self.to_text(),), vm)
+                    .map_err(|err| err.to_cdk_act_try_into_vm_value_error(vm))?;
 
                 Ok(principal_instance)
             }
@@ -46,57 +51,19 @@ Principal
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::api::call::RejectionCode {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                match self {
-                    ic_cdk::api::call::RejectionCode::NoError => {
-                        let dict = vm.ctx.new_dict();
+                let attribute = match self {
+                    ic_cdk::api::call::RejectionCode::NoError => "NoError",
+                    ic_cdk::api::call::RejectionCode::SysFatal => "SysFatal",
+                    ic_cdk::api::call::RejectionCode::SysTransient => "SysTransient",
+                    ic_cdk::api::call::RejectionCode::DestinationInvalid => "DestinationInvalid",
+                    ic_cdk::api::call::RejectionCode::CanisterReject => "CanisterReject",
+                    ic_cdk::api::call::RejectionCode::CanisterError => "CanisterError",
+                    ic_cdk::api::call::RejectionCode::Unknown => "Unknown",
+                };
 
-                        dict.set_item("NoError", vm.ctx.none(), vm);
-
-                        Ok(dict.into())
-                    }
-                    ic_cdk::api::call::RejectionCode::SysFatal => {
-                        let dict = vm.ctx.new_dict();
-
-                        dict.set_item("SysFatal", vm.ctx.none(), vm);
-
-                        Ok(dict.into())
-                    }
-                    ic_cdk::api::call::RejectionCode::SysTransient => {
-                        let dict = vm.ctx.new_dict();
-
-                        dict.set_item("SysTransient", vm.ctx.none(), vm);
-
-                        Ok(dict.into())
-                    }
-                    ic_cdk::api::call::RejectionCode::DestinationInvalid => {
-                        let dict = vm.ctx.new_dict();
-
-                        dict.set_item("DestinationInvalid", vm.ctx.none(), vm);
-
-                        Ok(dict.into())
-                    }
-                    ic_cdk::api::call::RejectionCode::CanisterReject => {
-                        let dict = vm.ctx.new_dict();
-
-                        dict.set_item("CanisterReject", vm.ctx.none(), vm);
-
-                        Ok(dict.into())
-                    }
-                    ic_cdk::api::call::RejectionCode::CanisterError => {
-                        let dict = vm.ctx.new_dict();
-
-                        dict.set_item("CanisterError", vm.ctx.none(), vm);
-
-                        Ok(dict.into())
-                    }
-                    ic_cdk::api::call::RejectionCode::Unknown => {
-                        let dict = vm.ctx.new_dict();
-
-                        dict.set_item("Unknown", vm.ctx.none(), vm);
-
-                        Ok(dict.into())
-                    }
-                }
+                let dict = vm.ctx.new_dict();
+                dict.set_item(attribute, vm.ctx.none(), vm);
+                Ok(dict.into())
             }
         }
 
@@ -114,22 +81,14 @@ Principal
 
         impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::api::stable::StableMemoryError {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
-                match self {
-                    ic_cdk::api::stable::StableMemoryError::OutOfMemory => {
-                        let dict = vm.ctx.new_dict();
+                let attribute = match self {
+                    ic_cdk::api::stable::StableMemoryError::OutOfMemory => "OutOfMemory",
+                    ic_cdk::api::stable::StableMemoryError::OutOfBounds => "OutOfBounds",
+                };
 
-                        dict.set_item("OutOfMemory", vm.ctx.none(), vm);
-
-                        Ok(dict.into())
-                    }
-                    ic_cdk::api::stable::StableMemoryError::OutOfBounds => {
-                        let dict = vm.ctx.new_dict();
-
-                        dict.set_item("OutOfBounds", vm.ctx.none(), vm);
-
-                        Ok(dict.into())
-                    }
-                }
+                let dict = vm.ctx.new_dict();
+                dict.set_item(attribute, vm.ctx.none(), vm);
+                Ok(dict.into())
             }
         }
 
@@ -146,8 +105,8 @@ Principal
                         let dict = vm.ctx.new_dict();
 
                         let key_too_large_dict = vm.ctx.new_dict();
-                        key_too_large_dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
-                        key_too_large_dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+                        key_too_large_dict.set_item("given", given.try_into_vm_value(vm)?, vm);
+                        key_too_large_dict.set_item("max", max.try_into_vm_value(vm)?, vm);
 
                         dict.set_item("KeyTooLarge", key_too_large_dict.into(), vm);
 
@@ -157,8 +116,8 @@ Principal
                         let dict = vm.ctx.new_dict();
 
                         let value_too_large_dict = vm.ctx.new_dict();
-                        value_too_large_dict.set_item("given", given.try_into_vm_value(vm).unwrap(), vm);
-                        value_too_large_dict.set_item("max", max.try_into_vm_value(vm).unwrap(), vm);
+                        value_too_large_dict.set_item("given", given.try_into_vm_value(vm)?, vm);
+                        value_too_large_dict.set_item("max", max.try_into_vm_value(vm)?, vm);
 
                         dict.set_item("ValueTooLarge", value_too_large_dict.into(), vm);
 

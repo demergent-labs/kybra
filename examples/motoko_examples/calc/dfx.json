@@ -3,8 +3,10 @@
         "calc": {
             "type": "custom",
             "build": "python -m kybra calc src/main.py src/main.did",
+            "post_install": ".kybra/calc/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/calc/calc.wasm.gz",
+            "wasm": ".kybra/calc/calc.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/calc",
                 "node_compatibility": true

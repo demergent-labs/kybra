@@ -18,7 +18,7 @@ from typing import (
 from .compiler.custom_modules.principal import Principal as PrincipalRenamed
 
 __version__ = "0.4.0"
-__rust_version__ = "1.66.0"
+__rust_version__ = "1.68.2"
 
 Principal = PrincipalRenamed
 
@@ -39,10 +39,12 @@ float32 = float
 text = str
 
 T = TypeVar("T")
-opt = Optional[T]
-manual = Optional[T]
-alias = Annotated[T, None]
+Opt = Optional[T]
+Manual = Optional[T]
+Alias = Annotated[T, None]
 
+Tuple = tuple
+Vec = list
 
 Record = TypedDict
 Variant = TypedDict
@@ -57,8 +59,8 @@ empty: TypeAlias = NoReturn  # TODO in Python 3.11 I believe there is a Never ty
 
 Async = Generator[Any, Any, T]
 
-TimerId = alias[nat64]
-Duration = alias[nat64]
+TimerId = Alias[nat64]
+Duration = Alias[nat64]
 
 
 class GuardResult(Variant, total=False):
@@ -228,15 +230,15 @@ def get_first_frame(current_frame: Any) -> Any:
 class ic(Generic[T]):
     @staticmethod
     def accept_message():
-        _kybra_ic._kybra_accept_message()  # type: ignore
+        _kybra_ic.accept_message()  # type: ignore
 
     @staticmethod
     def arg_data_raw() -> blob:
-        return _kybra_ic._kybra_arg_data_raw()  # type: ignore
+        return _kybra_ic.arg_data_raw()  # type: ignore
 
     @staticmethod
     def arg_data_raw_size() -> nat32:
-        return _kybra_ic._kybra_arg_data_raw_size()  # type: ignore
+        return _kybra_ic.arg_data_raw_size()  # type: ignore
 
     @staticmethod
     def call_raw(
@@ -256,156 +258,187 @@ class ic(Generic[T]):
 
     @staticmethod
     def caller() -> Principal:
-        return _kybra_ic._kybra_caller()  # type: ignore
+        """Returns the caller of the current call.
+
+        Returns:
+            (Principal): the caller of the current call.
+        Raises:
+            TypeError: the caller could not be converted to a Principal.
+        """
+        return _kybra_ic.caller()  # type: ignore
 
     @staticmethod
     def candid_encode(candid_string: str) -> blob:
-        return _kybra_ic._kybra_candid_encode(candid_string)  # type: ignore
+        """Converts the provided string into a Candid value.
+
+        Args:
+            candid_string (str): a string representation of a Candid value
+
+        Returns:
+            (blob): a Candid value
+
+        Raises:
+            CandidError: an error occurred while processing the input.
+            TypeError: the provided value was not of the correct type.
+        """
+        return _kybra_ic.candid_encode(candid_string)  # type: ignore
 
     @staticmethod
     def candid_decode(candid_encoded: blob) -> str:
-        return _kybra_ic._kybra_candid_decode(candid_encoded)  # type: ignore
+        """Converts the provided Candid bytes into a string representation.
+
+        Args:
+            candid_encode (blob): a blob representing a Candid value.
+
+        Returns:
+            (blob): a string representation of the value.
+
+        Raises:
+            CandidError: an error occurred while processing the input.
+            TypeError: the provided value was not of the correct type.
+        """
+        return _kybra_ic.candid_decode(candid_encoded)  # type: ignore
 
     @staticmethod
     def canister_balance() -> nat64:
-        return _kybra_ic._kybra_canister_balance()  # type: ignore
+        return _kybra_ic.canister_balance()  # type: ignore
 
     @staticmethod
     def canister_balance128() -> nat:
-        return _kybra_ic._kybra_canister_balance128()  # type: ignore
+        return _kybra_ic.canister_balance128()  # type: ignore
 
     @staticmethod
     def clear_timer(id: TimerId) -> None:
-        return _kybra_ic._kybra_clear_timer(id)  # type: ignore
+        return _kybra_ic.clear_timer(id)  # type: ignore
 
     @staticmethod
-    def data_certificate() -> opt[blob]:
-        return _kybra_ic._kybra_data_certificate()  # type: ignore
+    def data_certificate() -> Opt[blob]:
+        return _kybra_ic.data_certificate()  # type: ignore
 
     @staticmethod
     def id() -> Principal:
-        return _kybra_ic._kybra_id()  # type:ignore
+        return _kybra_ic.id()  # type:ignore
 
     @staticmethod
     def method_name() -> str:
-        return _kybra_ic._kybra_method_name()  # type:ignore
+        return _kybra_ic.method_name()  # type:ignore
 
     @staticmethod
     def msg_cycles_accept(max_amount: nat64) -> nat64:
-        return _kybra_ic._kybra_msg_cycles_accept(max_amount)  # type: ignore
+        return _kybra_ic.msg_cycles_accept(max_amount)  # type: ignore
 
     @staticmethod
     def msg_cycles_accept128(max_amount: nat) -> nat:
-        return _kybra_ic._kybra_msg_cycles_accept128(max_amount)  # type: ignore
+        return _kybra_ic.msg_cycles_accept128(max_amount)  # type: ignore
 
     @staticmethod
     def msg_cycles_available() -> nat64:
-        return _kybra_ic._kybra_msg_cycles_available()  # type: ignore
+        return _kybra_ic.msg_cycles_available()  # type: ignore
 
     @staticmethod
     def msg_cycles_available128() -> nat:
-        return _kybra_ic._kybra_msg_cycles_available128()  # type: ignore
+        return _kybra_ic.msg_cycles_available128()  # type: ignore
 
     @staticmethod
     def msg_cycles_refunded() -> nat64:
-        return _kybra_ic._kybra_msg_cycles_refunded()  # type: ignore
+        return _kybra_ic.msg_cycles_refunded()  # type: ignore
 
     @staticmethod
     def msg_cycles_refunded128() -> nat:
-        return _kybra_ic._kybra_msg_cycles_refunded128()  # type: ignore
+        return _kybra_ic.msg_cycles_refunded128()  # type: ignore
 
     @staticmethod
     def notify_raw(
         canister_id: Principal, method: str, args_raw: blob, payment: nat
     ) -> NotifyResult:
-        return _kybra_ic._kybra_notify_raw(  # type: ignore
+        return _kybra_ic.notify_raw(  # type: ignore
             canister_id, method, args_raw, payment
         )
 
     @staticmethod
     def performance_counter(counter_type: nat32) -> nat64:
-        return _kybra_ic._kybra_performance_counter(counter_type)  # type: ignore
+        return _kybra_ic.performance_counter(counter_type)  # type: ignore
 
     @staticmethod
     def print(x: Any):
-        _kybra_ic._kybra_print(str(x))  # type: ignore
+        _kybra_ic.print(str(x))  # type: ignore
 
     @staticmethod
-    def reject(x: Any):
-        _kybra_ic._kybra_reject(x)  # type: ignore
+    def reject(x: str):
+        _kybra_ic.reject(x)  # type: ignore
 
     @staticmethod
     def reject_code() -> RejectionCode:
-        return _kybra_ic._kybra_reject_code()  # type: ignore
+        return _kybra_ic.reject_code()  # type: ignore
 
     @staticmethod
     def reject_message() -> str:
-        return _kybra_ic._kybra_reject_message()  # type: ignore
+        return _kybra_ic.reject_message()  # type: ignore
 
     @staticmethod
     def reply(value: Any):
         first_called_function_name = get_first_called_function_name()
-        (_kybra_ic._kybra_reply(first_called_function_name, value))  # type: ignore
+        (_kybra_ic.reply(first_called_function_name, value))  # type: ignore
 
     @staticmethod
     def reply_raw(x: Any):
-        _kybra_ic._kybra_reply_raw(x)  # type: ignore
+        _kybra_ic.reply_raw(x)  # type: ignore
 
     @staticmethod
     def set_certified_data(data: blob):
-        _kybra_ic._kybra_set_certified_data(data)  # type: ignore
+        _kybra_ic.set_certified_data(data)  # type: ignore
 
     @staticmethod
     def set_timer(delay: Duration, func: Callable[[], Any]) -> TimerId:
-        return _kybra_ic._kybra_set_timer(delay, func)  # type: ignore
+        return _kybra_ic.set_timer(delay, func)  # type: ignore
 
     @staticmethod
     def set_timer_interval(interval: Duration, func: Callable[[], Any]) -> TimerId:
-        return _kybra_ic._kybra_set_timer_interval(interval, func)  # type: ignore
+        return _kybra_ic.set_timer_interval(interval, func)  # type: ignore
 
     @staticmethod
     def stable_bytes() -> blob:
-        return _kybra_ic._kybra_stable_bytes()  # type: ignore
+        return _kybra_ic.stable_bytes()  # type: ignore
 
     @staticmethod
     def stable_grow(new_pages: nat32) -> StableGrowResult:
-        return _kybra_ic._kybra_stable_grow(new_pages)  # type: ignore
+        return _kybra_ic.stable_grow(new_pages)  # type: ignore
 
     @staticmethod
     def stable_read(offset: nat32, length: nat32) -> blob:
-        return _kybra_ic._kybra_stable_read(offset, length)  # type: ignore
+        return _kybra_ic.stable_read(offset, length)  # type: ignore
 
     @staticmethod
     def stable_size() -> nat32:
-        return _kybra_ic._kybra_stable_size()  # type: ignore
+        return _kybra_ic.stable_size()  # type: ignore
 
     @staticmethod
     def stable_write(offset: nat32, buf: blob):
-        _kybra_ic._kybra_stable_write(offset, buf)  # type: ignore
+        _kybra_ic.stable_write(offset, buf)  # type: ignore
 
     @staticmethod
     def stable64_grow(new_pages: nat64) -> Stable64GrowResult:
-        return _kybra_ic._kybra_stable64_grow(new_pages)  # type: ignore
+        return _kybra_ic.stable64_grow(new_pages)  # type: ignore
 
     @staticmethod
     def stable64_read(offset: nat64, length: nat64) -> blob:
-        return _kybra_ic._kybra_stable64_read(offset, length)  # type: ignore
+        return _kybra_ic.stable64_read(offset, length)  # type: ignore
 
     @staticmethod
     def stable64_size() -> nat64:
-        return _kybra_ic._kybra_stable64_size()  # type: ignore
+        return _kybra_ic.stable64_size()  # type: ignore
 
     @staticmethod
     def stable64_write(offset: nat64, buf: blob):
-        _kybra_ic._kybra_stable64_write(offset, buf)  # type: ignore
+        _kybra_ic.stable64_write(offset, buf)  # type: ignore
 
     @staticmethod
     def time() -> nat64:
-        return _kybra_ic._kybra_time()  # type: ignore
+        return _kybra_ic.time()  # type: ignore
 
     @staticmethod
     def trap(message: str) -> NoReturn:  # type: ignore
-        _kybra_ic._kybra_trap(message)  # type: ignore
+        _kybra_ic.trap(message)  # type: ignore
 
 
 class Service:
@@ -440,7 +473,7 @@ class AsyncInfo:
             else ""
         )
         notify_function_name = (
-            f'_kybra_notify_{with_payment}{qualname.replace(".", "_")}_wrapper'
+            f'notify_{with_payment}{qualname.replace(".", "_")}_wrapper'
         )
 
         return getattr(_kybra_ic, notify_function_name)(self.args)  # type: ignore
@@ -483,20 +516,6 @@ class ValueTooLarge(Record):
     max: nat32
 
 
-class InsertError(Variant, total=False):
-    KeyTooLarge: KeyTooLarge
-    ValueTooLarge: ValueTooLarge
-
-
-class InsertResult(Generic[V]):
-    Ok: V
-    Err: Optional[InsertError]
-
-    def __init__(self, Ok: V, Err: InsertError):
-        self.Ok = Ok
-        self.Err = Err
-
-
 class StableBTreeMap(Generic[K, V]):
     """
     A map based on a self-balancing tree that persists across canister upgrades.
@@ -519,18 +538,18 @@ class StableBTreeMap(Generic[K, V]):
         :param key: The key to check for in the map.
         :return: True if the key is in the map, False otherwise.
         """
-        return _kybra_ic._kybra_stable_b_tree_map_contains_key(self.memory_id, key)  # type: ignore
+        return _kybra_ic.stable_b_tree_map_contains_key(self.memory_id, key)  # type: ignore
 
-    def get(self, key: K) -> opt[V]:
+    def get(self, key: K) -> Opt[V]:
         """
         Get the value associated with a key in the map.
 
         :param key: The key to get the value for.
         :return: The value associated with the key, or None if the key is not in the map.
         """
-        return _kybra_ic._kybra_stable_b_tree_map_get(self.memory_id, key)  # type: ignore
+        return _kybra_ic.stable_b_tree_map_get(self.memory_id, key)  # type: ignore
 
-    def insert(self, key: K, value: V) -> InsertResult[opt[V]]:
+    def insert(self, key: K, value: V) -> Opt[V]:
         """
         Insert a key-value pair into the map.
 
@@ -542,7 +561,7 @@ class StableBTreeMap(Generic[K, V]):
         the err attribute will contain an instance of InsertError indicating the reason for the
         failure.
         """
-        return _kybra_ic._kybra_stable_b_tree_map_insert(self.memory_id, key, value)  # type: ignore
+        return _kybra_ic.stable_b_tree_map_insert(self.memory_id, key, value)  # type: ignore
 
     def is_empty(self) -> bool:
         """
@@ -550,23 +569,23 @@ class StableBTreeMap(Generic[K, V]):
 
         :return: True if the map is empty, False otherwise.
         """
-        return _kybra_ic._kybra_stable_b_tree_map_is_empty(self.memory_id)  # type: ignore
+        return _kybra_ic.stable_b_tree_map_is_empty(self.memory_id)  # type: ignore
 
-    def items(self) -> list[tuple[K, V]]:
+    def items(self) -> Vec[Tuple[K, V]]:
         """
         Get a list of all key-value pairs in the map.
 
         :return: A list of tuples containing all key-value pairs in the map.
         """
-        return _kybra_ic._kybra_stable_b_tree_map_items(self.memory_id)  # type: ignore
+        return _kybra_ic.stable_b_tree_map_items(self.memory_id)  # type: ignore
 
-    def keys(self) -> list[K]:
+    def keys(self) -> Vec[K]:
         """
         Get a list of all keys in the map.
 
         :return: A list of all keys in the map.
         """
-        return _kybra_ic._kybra_stable_b_tree_map_keys(self.memory_id)  # type: ignore
+        return _kybra_ic.stable_b_tree_map_keys(self.memory_id)  # type: ignore
 
     def len(self) -> nat64:
         """
@@ -574,24 +593,24 @@ class StableBTreeMap(Generic[K, V]):
 
         :return: The number of key-value pairs in the map.
         """
-        return _kybra_ic._kybra_stable_b_tree_map_len(self.memory_id)  # type: ignore
+        return _kybra_ic.stable_b_tree_map_len(self.memory_id)  # type: ignore
 
-    def remove(self, key: K) -> opt[V]:
+    def remove(self, key: K) -> Opt[V]:
         """
         Remove a key-value pair from the map.
 
         :param key: The key of the key-value pair to remove.
         :return: The value associated with the key, or None if the key is not in the map.
         """
-        return _kybra_ic._kybra_stable_b_tree_map_remove(self.memory_id, key)  # type: ignore
+        return _kybra_ic.stable_b_tree_map_remove(self.memory_id, key)  # type: ignore
 
-    def values(self) -> list[V]:
+    def values(self) -> Vec[V]:
         """
         Get a list of all values in the map.
 
         :return: A list of all values in the map.
         """
-        return _kybra_ic._kybra_stable_b_tree_map_values(self.memory_id)  # type: ignore
+        return _kybra_ic.stable_b_tree_map_values(self.memory_id)  # type: ignore
 
 
 def match(
@@ -615,3 +634,19 @@ def match(
         return matcher["Ok"](getattr(variant, "Ok"))
 
     raise Exception("No matching case found")
+
+
+# region Exceptions
+class Error(Exception):
+    """Base exception for all errors raised by Kybra"""
+
+    pass
+
+
+class CandidError(Error):
+    """Raised when converting to/from Candid values."""
+
+    pass
+
+
+# endregion Exceptions

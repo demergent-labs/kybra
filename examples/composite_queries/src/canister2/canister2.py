@@ -1,10 +1,29 @@
-from kybra import Async, CallResult, ic, manual, match, nat, Principal, query, update
+from kybra import (
+    Async,
+    CallResult,
+    ic,
+    init,
+    Manual,
+    match,
+    nat,
+    Principal,
+    query,
+    update,
+    void,
+)
 from src.canister1.types import StringQueryResult
 from src.canister3.types import Canister3
 
-canister3 = Canister3(Principal.from_str("r7inp-6aaaa-aaaaa-aaabq-cai"))
+canister3 = Canister3(Principal.from_str("aaaaa-aa"))
 
 counter: nat = 0
+
+
+@init
+def init_(canister3_id: Principal) -> void:
+    global canister3
+
+    canister3 = Canister3(canister3_id)
 
 
 @query
@@ -25,7 +44,7 @@ def update_query() -> str:
 
 
 @query
-def manual_query() -> manual[str]:
+def manual_query() -> Manual[str]:
     ic.reply("Hello from Canister 2 manual query")
 
 

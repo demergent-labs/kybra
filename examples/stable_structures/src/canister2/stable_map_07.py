@@ -1,10 +1,13 @@
-from kybra import InsertError, match, null, opt, query, StableBTreeMap, update, Variant
+from kybra import (
+    null,
+    Opt,
+    query,
+    StableBTreeMap,
+    Tuple,
+    update,
+    Vec,
+)
 from kybra import nat64
-
-
-class StableMap7InsertResult(Variant, total=False):
-    Ok: opt[null]
-    Err: InsertError
 
 
 stable_map7 = StableBTreeMap[null, null](
@@ -13,19 +16,17 @@ stable_map7 = StableBTreeMap[null, null](
 
 
 @query
-def stable_map7_get(key: null) -> opt[null]:
+def stable_map7_get(key: null) -> Opt[null]:
     return stable_map7.get(key)
 
 
 @update
-def stable_map7_insert(key: null, value: null) -> StableMap7InsertResult:
-    result = stable_map7.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map7_insert(key: null, value: null) -> Opt[null]:
+    return stable_map7.insert(key, value)
 
 
 @update
-def stable_map7_remove(key: null) -> opt[null]:
+def stable_map7_remove(key: null) -> Opt[null]:
     return stable_map7.remove(key)
 
 
@@ -40,17 +41,17 @@ def stable_map7_is_empty() -> bool:
 
 
 @query
-def stable_map7_keys() -> list[null]:
+def stable_map7_keys() -> Vec[null]:
     return stable_map7.keys()
 
 
 @query
-def stable_map7_values() -> list[null]:
+def stable_map7_values() -> Vec[null]:
     return stable_map7.values()
 
 
 @query
-def stable_map7_items() -> list[tuple[null, null]]:
+def stable_map7_items() -> Vec[Tuple[null, null]]:
     return stable_map7.items()
 
 

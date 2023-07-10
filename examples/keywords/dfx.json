@@ -3,8 +3,10 @@
         "keywords": {
             "type": "custom",
             "build": "python -m kybra keywords src/main.py src/main.did",
+            "post_install": ".kybra/keywords/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/keywords/keywords.wasm.gz",
+            "wasm": ".kybra/keywords/keywords.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/keywords",
                 "node_compatibility": true

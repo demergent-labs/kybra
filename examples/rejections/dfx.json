@@ -3,8 +3,10 @@
         "rejections": {
             "type": "custom",
             "build": "python -m kybra rejections src/rejections/rejections.py src/rejections/rejections.did",
+            "post_install": ".kybra/rejections/post_install.sh",
             "candid": "src/rejections/rejections.did",
-            "wasm": ".kybra/rejections/rejections.wasm.gz",
+            "wasm": ".kybra/rejections/rejections.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/rejections",
                 "node_compatibility": true
@@ -13,8 +15,10 @@
         "some_service": {
             "type": "custom",
             "build": "python -m kybra some_service src/some_service/some_service.py src/some_service/some_service.did",
+            "post_install": ".kybra/some_service/post_install.sh",
             "candid": "src/some_service/some_service.did",
-            "wasm": ".kybra/some_service/some_service.wasm.gz",
+            "wasm": ".kybra/some_service/some_service.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/some_service",
                 "node_compatibility": true

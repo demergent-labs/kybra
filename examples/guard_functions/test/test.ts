@@ -1,9 +1,9 @@
-import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
+import { createSnakeCaseProxy, getCanisterId, runTests, Test } from 'azle/test';
 import { getTests } from 'azle/examples/guard_functions/test/tests';
 import { createActor } from './dfx_generated/guard_functions';
 import { AgentError } from '@dfinity/agent/lib/cjs/errors';
 
-const functionGuardCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
+const functionGuardCanister = createActor(getCanisterId('guard_functions'), {
     agentOptions: {
         host: 'http://127.0.0.1:8000'
     }
@@ -12,14 +12,37 @@ const functionGuardCanister = createActor('rrkah-fqaaa-aaaaa-aaaaq-cai', {
 let tests: Test[] = [
     ...getTests(createSnakeCaseProxy(functionGuardCanister)).filter((value) => {
         return (
+            value.name !== 'heartbeat guard' &&
+            value.name !== 'callExpressionWithEmptyOptionsObject' &&
             value.name !== 'looselyGuardedWithGuardOptionKeyAsString' &&
             value.name !== 'invalidReturnTypeGuarded' &&
             value.name !== 'badObjectGuarded' &&
             value.name !== 'nonNullOkValueGuarded' &&
-            value.name !== 'nonStringErrValueGuarded'
+            value.name !== 'nonStringErrValueGuarded' &&
+            // TODO remove this once this is resolved: https://forum.dfinity.org/t/not-calling-accept-message-in-inspect-message-not-rejecting-immediately-in-dfx-0-14-2-beta-2/21105
+            value.name !== 'unallowedMethod'
         );
     }),
-    // TODO we should make these errors more presentable
+    {
+        name: 'heartbeat guard',
+        test: async () => {
+            const initialState = await functionGuardCanister.get_state();
+            console.log(
+                `Value at initial check was: ${initialState.heartbeat_tick}`
+            );
+            await sleep(20_000);
+            const stateAfterRest = await functionGuardCanister.get_state();
+            console.log(
+                `Value after 15s delay was: ${stateAfterRest.heartbeat_tick}`
+            );
+
+            return {
+                Ok:
+                    initialState.heartbeat_tick <= 20 &&
+                    stateAfterRest.heartbeat_tick === 20
+            };
+        }
+    },
     {
         name: 'invalid_return_type_guarded',
         test: async () => {
@@ -31,14 +54,10 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'CdkActTryFromVmValueError(\\"Could not convert PyObjectRef to Result<(), String>\\")'
+                        'TypeError: expected Result but received str'
                     )
                 };
             }
-
-            return {
-                Ok: true
-            };
         }
     },
     {
@@ -50,14 +69,10 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'NameError(\\"name \'badProp\' is not defined\\")'
+                        'TypeError: expected Result but received dict'
                     )
                 };
             }
-
-            return {
-                Ok: true
-            };
         }
     },
     {
@@ -71,13 +86,10 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'NameError(\\"name \'Ok\' is not defined\\")'
+                        'TypeError: expected NoneType but received str'
                     )
                 };
             }
-            return {
-                Ok: true
-            };
         }
     },
     {
@@ -91,15 +103,33 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'NameError(\\"name \'Err\' is not defined\\")'
+                        'TypeError: expected str but received dict'
                     )
                 };
             }
-            return {
-                Ok: true
-            };
+        }
+    },
+    {
+        name: 'name_error_guarded',
+        test: async () => {
+            try {
+                await functionGuardCanister.name_error_guarded();
+                return {
+                    Err: 'name_error_guarded should have had an error'
+                };
+            } catch (err) {
+                return {
+                    Ok: (err as AgentError).message.includes(
+                        "NameError: name 'Ok' is not defined"
+                    )
+                };
+            }
         }
     }
 ];
 
 runTests(tests);
+
+function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}

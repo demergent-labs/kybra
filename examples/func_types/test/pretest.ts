@@ -1,4 +1,6 @@
+import { getCanisterId } from 'azle/test';
 import { execSync } from 'child_process';
+
 async function pretest() {
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -10,9 +12,18 @@ async function pretest() {
         stdio: 'inherit'
     });
 
-    execSync(`dfx deploy`, {
+    execSync(`dfx deploy notifiers`, {
         stdio: 'inherit'
     });
+
+    execSync(
+        `dfx deploy func_types --argument '(principal "${getCanisterId(
+            'notifiers'
+        )}")'`,
+        {
+            stdio: 'inherit'
+        }
+    );
 
     execSync(`dfx generate`, {
         stdio: 'inherit'

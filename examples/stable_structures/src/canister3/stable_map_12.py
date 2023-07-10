@@ -1,12 +1,12 @@
 from kybra import (
-    InsertError,
     blob,
-    match,
     null,
-    opt,
+    Opt,
     query,
     StableBTreeMap,
+    Tuple,
     update,
+    Vec,
     Variant,
 )
 from kybra import nat64
@@ -17,30 +17,23 @@ class Reaction(Variant):
     Sad: null
 
 
-class StableMap12InsertResult(Variant, total=False):
-    Ok: opt[Reaction]
-    Err: InsertError
-
-
 stable_map12 = StableBTreeMap[blob, Reaction](
     memory_id=12, max_key_size=100, max_value_size=1_000
 )
 
 
 @query
-def stable_map12_get(key: blob) -> opt[Reaction]:
+def stable_map12_get(key: blob) -> Opt[Reaction]:
     return stable_map12.get(key)
 
 
 @update
-def stable_map12_insert(key: blob, value: Reaction) -> StableMap12InsertResult:
-    result = stable_map12.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map12_insert(key: blob, value: Reaction) -> Opt[Reaction]:
+    return stable_map12.insert(key, value)
 
 
 @update
-def stable_map12_remove(key: blob) -> opt[Reaction]:
+def stable_map12_remove(key: blob) -> Opt[Reaction]:
     return stable_map12.remove(key)
 
 
@@ -55,17 +48,17 @@ def stable_map12_is_empty() -> bool:
 
 
 @query
-def stable_map12_keys() -> list[blob]:
+def stable_map12_keys() -> Vec[blob]:
     return stable_map12.keys()
 
 
 @query
-def stable_map12_values() -> list[Reaction]:
+def stable_map12_values() -> Vec[Reaction]:
     return stable_map12.values()
 
 
 @query
-def stable_map12_items() -> list[tuple[blob, Reaction]]:
+def stable_map12_items() -> Vec[Tuple[blob, Reaction]]:
     return stable_map12.items()
 
 

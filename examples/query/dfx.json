@@ -3,8 +3,10 @@
         "query": {
             "type": "custom",
             "build": "python -m kybra query src/main.py src/main.did",
+            "post_install": ".kybra/query/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/query/query.wasm.gz",
+            "wasm": ".kybra/query/query.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/query",
                 "node_compatibility": true

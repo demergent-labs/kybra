@@ -64,6 +64,9 @@ def post_upgrade_(somebody: Principal) -> void:
     someone = somebody
 
 
+# Note that the installer in Kybra is the canister itself
+# This is because of Kybra's deployment canister approach
+# to allowing large Wasm binaries
 @query
 def installer() -> Principal:
     return install

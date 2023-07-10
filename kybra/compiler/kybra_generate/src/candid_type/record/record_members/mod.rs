@@ -1,47 +1,53 @@
 use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
-use crate::{errors::KybraResult, source_map::SourceMapped};
-use cdk_framework::act::node::candid::record::Member;
-
-mod errors;
-mod warnings;
+use crate::{
+    candid_type::{errors::InvalidMember, warnings::DefaultValueIgnored},
+    source_map::SourceMapped,
+    Error,
+};
+use cdk_framework::{act::node::candid::record::Member, traits::CollectResults};
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn is_record_member(&self) -> bool {
-        // Ellipses can show up in records but are not record members.
+    // Ellipses can show up in records but are not record members, and should
+    // not be parsed as such.
+    fn is_ellipses_member(&self) -> bool {
         match &self.node {
             StmtKind::Expr { value } => match &value.node {
                 ExprKind::Constant { value, .. } => match value {
-                    Constant::Ellipsis => false,
-                    _ => true,
+                    Constant::Ellipsis => true,
+                    _ => false,
                 },
-                _ => true,
+                _ => false,
             },
-            _ => true,
+            _ => false,
         }
     }
 
-    pub fn to_record_member(&self) -> KybraResult<Member> {
+    pub fn as_record_member(&self) -> Result<Option<Member>, Vec<Error>> {
+        // Ignore ellipses
+        if self.is_ellipses_member() {
+            return Ok(None);
+        }
         match &self.node {
             StmtKind::AnnAssign {
-                target,
-                annotation,
-                value,
-                ..
+                annotation, value, ..
             } => {
                 match value {
-                    Some(_) => eprintln!("{}", self.record_default_value_warning()),
+                    Some(_) => eprintln!("{}", DefaultValueIgnored::new(self)),
                     None => (),
                 }
-                let name = match &target.node {
-                    ExprKind::Name { id, .. } => id.clone(),
-                    _ => return Err(self.record_target_must_be_a_name_error()),
-                };
-                let candid_type = SourceMapped::new(annotation.as_ref(), self.source_map.clone())
-                    .to_candid_type()?;
-                Ok(Member { name, candid_type })
+                let (name, candid_type) = (
+                    self.get_name_or_err().map_err(Error::into),
+                    SourceMapped::new(annotation.as_ref(), self.source_map.clone())
+                        .to_candid_type(),
+                )
+                    .collect_results()?;
+                Ok(Some(Member {
+                    name: name.to_string(),
+                    candid_type,
+                }))
             }
-            _ => Err(self.invalid_record_member_error()),
+            _ => Err(InvalidMember::err_from_stmt(self).into()),
         }
     }
 }

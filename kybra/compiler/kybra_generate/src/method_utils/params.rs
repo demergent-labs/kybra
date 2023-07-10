@@ -1,8 +1,17 @@
-use cdk_framework::act::node::Param;
+use cdk_framework::{act::node::Param, traits::CollectResults};
 use rustpython_parser::ast::{ArgData, Located, StmtKind};
 
-use crate::{errors::KybraResult, source_map::SourceMapped};
+use crate::{
+    errors::CollectResults as OtherCollectResults, kybra_unreachable, source_map::SourceMapped,
+    Error,
+};
 
+use super::errors::{
+    DictionaryUnpackingOperatorNotSupported, FirstParamMustBeSelf, FirstParamMustNotBeSelf,
+    IteratorUnpackingOperatorNotSupported, ParamTypeAnnotationRequired, TooManyParams,
+};
+
+#[derive(Debug, Clone)]
 pub enum InternalOrExternal {
     Internal,
     External,
@@ -12,22 +21,36 @@ impl SourceMapped<&Located<StmtKind>> {
     pub fn build_params(
         &self,
         internal_or_external: InternalOrExternal,
-    ) -> KybraResult<Vec<Param>> {
+    ) -> Result<Vec<Param>, Vec<Error>> {
         match &self.node {
             StmtKind::FunctionDef { args, .. } => {
-                if args.kwarg.is_some() {
-                    return Err(self.dictionary_unpacking_operator_not_supported_error());
-                }
+                (
+                    match args.kwarg {
+                        None => Ok(()),
+                        _ => {
+                            Err(DictionaryUnpackingOperatorNotSupported::err_from_stmt(self).into())
+                        }
+                    },
+                    match args.vararg {
+                        None => Ok(()),
+                        _ => Err(IteratorUnpackingOperatorNotSupported::err_from_stmt(self).into()),
+                    },
+                )
+                    .collect_results()?;
 
-                if args.vararg.is_some() {
-                    return Err(self.iterator_unpacking_operator_not_supported_error());
-                }
-
-                let param_results = match internal_or_external {
+                let param_results: Vec<_> = match internal_or_external {
                     InternalOrExternal::Internal => {
                         if args.args.len() > 0 && args.args[0].node.arg == "self".to_string() {
-                            return Err(self.first_parameter_must_not_be_self_error());
+                            return Err(FirstParamMustNotBeSelf::err_from_stmt(self).into());
                         }
+                        if args.args.len() > 5 {
+                            return Err(TooManyParams::err_from_stmt(
+                                self,
+                                InternalOrExternal::Internal,
+                            )
+                            .into());
+                        }
+
                         args.args
                             .iter()
                             .map(|arg| SourceMapped::new(arg, self.source_map.clone()).to_param())
@@ -35,11 +58,19 @@ impl SourceMapped<&Located<StmtKind>> {
                     }
                     InternalOrExternal::External => {
                         if args.args.len() == 0 {
-                            return Err(self.first_parameter_must_be_self_error());
+                            return Err(FirstParamMustBeSelf::err_from_stmt(self).into());
                         }
 
                         if args.args[0].node.arg != "self".to_string() {
-                            return Err(self.first_parameter_must_be_self_error());
+                            return Err(FirstParamMustBeSelf::err_from_stmt(self).into());
+                        }
+
+                        if args.args.len() > 6 {
+                            return Err(TooManyParams::err_from_stmt(
+                                self,
+                                InternalOrExternal::External,
+                            )
+                            .into());
                         }
 
                         // Ignore the first param, which is always "self"
@@ -50,15 +81,15 @@ impl SourceMapped<&Located<StmtKind>> {
                     }
                 };
 
-                Ok(crate::errors::collect_kybra_results(param_results)?)
+                param_results.into_iter().collect_results()
             }
-            _ => Err(crate::errors::unreachable()),
+            _ => kybra_unreachable!(),
         }
     }
 }
 
 impl SourceMapped<&Located<ArgData>> {
-    pub fn to_param(&self) -> KybraResult<Param> {
+    pub fn to_param(&self) -> Result<Param, Vec<Error>> {
         let param_name = self.node.arg.clone();
         match &self.node.annotation {
             Some(annotation) => {
@@ -70,7 +101,7 @@ impl SourceMapped<&Located<ArgData>> {
                     candid_type,
                 })
             }
-            None => Err(self.param_type_annotation_required_error()),
+            None => Err(ParamTypeAnnotationRequired::err_from_arg_data(self).into()),
         }
     }
 }

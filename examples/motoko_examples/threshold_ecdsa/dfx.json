@@ -3,8 +3,10 @@
         "threshold_ecdsa": {
             "type": "custom",
             "build": "python -m kybra threshold_ecdsa src/main.py src/main.did",
+            "post_install": ".kybra/threshold_ecdsa/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/threshold_ecdsa/threshold_ecdsa.wasm.gz",
+            "wasm": ".kybra/threshold_ecdsa/threshold_ecdsa.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/threshold_ecdsa",
                 "node_compatibility": true

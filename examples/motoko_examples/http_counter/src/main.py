@@ -1,17 +1,19 @@
 from kybra import (
-    alias,
+    Alias,
     blob,
     Func,
     ic,
     nat,
     nat16,
-    opt,
+    Opt,
     Query,
     query,
     Record,
     StableBTreeMap,
+    Tuple,
     update,
     Variant,
+    Vec,
 )
 
 
@@ -21,7 +23,7 @@ class Token(Record):
 
 class StreamingCallbackHttpResponse(Record):
     body: blob
-    token: opt[Token]
+    token: Opt[Token]
 
 
 Callback = Func(Query[[Token], StreamingCallbackHttpResponse])
@@ -36,26 +38,26 @@ class StreamingStrategy(Variant, total=False):
     Callback: CallbackStrategy
 
 
-HeaderField = alias[tuple[str, str]]
+HeaderField = Alias[Tuple[str, str]]
 
 
 class HttpResponse(Record):
     status_code: nat16
-    headers: list[HeaderField]
+    headers: Vec[HeaderField]
     body: blob
-    streaming_strategy: opt[StreamingStrategy]
-    upgrade: opt[bool]
+    streaming_strategy: Opt[StreamingStrategy]
+    upgrade: Opt[bool]
 
 
 class HttpRequest(Record):
     method: str
     url: str
-    headers: list[HeaderField]
+    headers: Vec[HeaderField]
     body: blob
 
 
 stable_storage = StableBTreeMap[str, nat](
-    memory_id=0, max_key_size=15, max_value_size=1_000
+    memory_id=3, max_key_size=15, max_value_size=1_000
 )
 
 stable_storage.insert("counter", 0)

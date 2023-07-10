@@ -1,4 +1,12 @@
-from kybra import InsertError, match, null, opt, query, StableBTreeMap, update, Variant
+from kybra import (
+    null,
+    Opt,
+    query,
+    StableBTreeMap,
+    Tuple,
+    update,
+    Vec,
+)
 from kybra import nat64
 
 stable_map8 = StableBTreeMap[bool, null](
@@ -6,25 +14,18 @@ stable_map8 = StableBTreeMap[bool, null](
 )
 
 
-class StableMap8InsertResult(Variant, total=False):
-    Ok: opt[null]
-    Err: InsertError
-
-
 @query
-def stable_map8_get(key: bool) -> opt[null]:
+def stable_map8_get(key: bool) -> Opt[null]:
     return stable_map8.get(key)
 
 
 @update
-def stable_map8_insert(key: bool, value: null) -> StableMap8InsertResult:
-    result = stable_map8.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map8_insert(key: bool, value: null) -> Opt[null]:
+    return stable_map8.insert(key, value)
 
 
 @update
-def stable_map8_remove(key: bool) -> opt[null]:
+def stable_map8_remove(key: bool) -> Opt[null]:
     return stable_map8.remove(key)
 
 
@@ -39,17 +40,17 @@ def stable_map8_is_empty() -> bool:
 
 
 @query
-def stable_map8_keys() -> list[bool]:
+def stable_map8_keys() -> Vec[bool]:
     return stable_map8.keys()
 
 
 @query
-def stable_map8_values() -> list[null]:
+def stable_map8_values() -> Vec[null]:
     return stable_map8.values()
 
 
 @query
-def stable_map8_items() -> list[tuple[bool, null]]:
+def stable_map8_items() -> Vec[Tuple[bool, null]]:
     return stable_map8.items()
 
 

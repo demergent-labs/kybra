@@ -1,73 +1,93 @@
 pub mod errors;
 mod rust;
 
-use cdk_framework::act::node::{
-    candid::{service::Method, Service},
-    node_parts::mode::Mode,
-    ReturnType,
+use cdk_framework::{
+    act::node::{
+        candid::{self, service::Method},
+        node_parts::mode::Mode,
+        ReturnType,
+    },
+    traits::CollectResults,
 };
 use rustpython_parser::ast::{ExprKind, Located, StmtKind};
 
 use crate::{
-    errors::KybraResult, method_utils::params::InternalOrExternal, py_ast::PyAst,
+    constants::{SERVICE, SERVICE_QUERY, SERVICE_UPDATE},
+    errors::CollectResults as OtherCollectResults,
+    get_name::HasName,
+    method_utils::params::InternalOrExternal,
+    py_ast::PyAst,
     source_map::SourceMapped,
+    Error,
+};
+
+use self::errors::{
+    MissingDecorator, ServiceMustHaveMethods, ServiceWithNonFunctionDefs, TooManyDecorators,
+    WrongDecorator,
 };
 
 impl PyAst {
-    pub fn build_services(&self) -> KybraResult<Vec<Service>> {
-        Ok(crate::errors::collect_kybra_results(
-            self.get_stmt_kinds()
-                .iter()
-                .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_service())
-                .collect(),
-        )?
-        .drain(..)
-        .filter_map(|x| x)
-        .collect())
+    pub fn build_services(&self) -> Result<Vec<candid::Service>, Vec<Error>> {
+        Ok(self
+            .get_stmt_kinds()
+            .iter()
+            .map(|source_mapped_stmt_kind| source_mapped_stmt_kind.as_service())
+            .collect_results()?
+            .drain(..)
+            .filter_map(|x| x)
+            .collect())
     }
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn to_service_method(&self, canister_name: &String) -> KybraResult<Method> {
+    fn to_service_method(&self, canister_name: &String) -> Result<Method, Vec<Error>> {
         match &self.node {
             StmtKind::FunctionDef {
                 name,
                 decorator_list,
                 ..
-            } => Ok(Method {
-                name: name.clone(),
-                params: self.build_params(InternalOrExternal::External)?,
-                return_type: ReturnType::new(self.build_return_type()?),
-                mode: build_mode(self, decorator_list, &canister_name, name)?,
-            }),
-            _ => Err(self.class_with_not_function_defs_error(canister_name)),
+            } => {
+                let (params, return_type) = (
+                    self.build_params(InternalOrExternal::External),
+                    self.build_return_type(),
+                )
+                    .collect_results()?;
+                Ok(Method {
+                    name: name.clone(),
+                    params,
+                    return_type: ReturnType::new(return_type),
+                    mode: match build_mode(self, decorator_list, &canister_name, name) {
+                        Ok(mode) => mode,
+                        Err(err) => return Err(err.into()),
+                    },
+                })
+            }
+            _ => Err(ServiceWithNonFunctionDefs::err_from_stmt(self, &canister_name).into()),
         }
     }
 }
 
 impl SourceMapped<&Located<StmtKind>> {
-    pub fn as_service(&self) -> KybraResult<Option<Service>> {
-        if !self.is_service() {
-            return Ok(None);
-        }
-        match &self.node {
-            StmtKind::ClassDef { name, body, .. } => {
-                let method_results: Vec<_> = body
+    fn as_service(&self) -> Result<Option<candid::Service>, Vec<Error>> {
+        match self.get_child_class_of(SERVICE) {
+            Some(service) => {
+                let method_results: Vec<_> = service
+                    .body
                     .iter()
                     .map(|located_statement| {
                         SourceMapped::new(located_statement, self.source_map.clone())
-                            .to_service_method(&name)
+                            .to_service_method(&service.name)
                     })
                     .collect();
 
-                let methods = crate::errors::collect_kybra_results(method_results)?;
+                let methods = method_results.into_iter().collect_results()?;
 
                 if methods.len() == 0 {
-                    return Err(self.class_must_have_methods_error(name));
+                    return Err(ServiceMustHaveMethods::err_from_stmt(self, service.name).into());
                 }
 
-                Ok(Some(Service {
-                    name: name.clone(),
+                Ok(Some(candid::Service {
+                    name: service.name.clone(),
                     methods,
                     to_vm_value: rust::to_vm_value,
                     list_to_vm_value: rust::list_to_vm_value,
@@ -75,21 +95,7 @@ impl SourceMapped<&Located<StmtKind>> {
                     list_from_vm_value: rust::list_from_vm_value,
                 }))
             }
-            // We filter out any non classDefs in KybraProgram.get_external_canister_declarations
-            _ => Err(crate::errors::unreachable()),
-        }
-    }
-
-    pub fn is_service(&self) -> bool {
-        match &self.node {
-            StmtKind::ClassDef { bases, .. } => bases.iter().fold(false, |acc, base| {
-                let is_external_canister = match &base.node {
-                    ExprKind::Name { id, .. } => id == "Service",
-                    _ => false,
-                };
-                acc || is_external_canister
-            }),
-            _ => false,
+            None => Ok(None),
         }
     }
 }
@@ -99,25 +105,37 @@ fn build_mode(
     decorator_list: &Vec<Located<ExprKind>>,
     canister_name: &String,
     method_name: &String,
-) -> KybraResult<Mode> {
+) -> Result<Mode, Error> {
     if decorator_list.len() == 0 {
-        return Err(method_stmt.missing_decorator_error(canister_name, method_name));
+        return Err(MissingDecorator::err_from_stmt(
+            method_stmt,
+            canister_name,
+            method_name,
+        ));
     }
 
     if decorator_list.len() > 1 {
-        return Err(method_stmt.too_many_decorators_error(canister_name, method_name));
+        return Err(TooManyDecorators::err_from_stmt(
+            method_stmt,
+            canister_name,
+            method_name,
+        ));
     }
 
-    match &decorator_list[0].node {
-        ExprKind::Name { id, ctx: _ } => {
-            if id == "service_update" {
-                Ok(Mode::Update)
-            } else if id == "service_query" {
-                Ok(Mode::Query)
-            } else {
-                Err(method_stmt.wrong_decorator_error(canister_name, method_name, &id.to_string()))
-            }
-        }
-        _ => Err(method_stmt.invalid_decorator_error(canister_name, method_name)),
+    match decorator_list[0].get_name() {
+        Some(SERVICE_QUERY) => Ok(Mode::Query),
+        Some(SERVICE_UPDATE) => Ok(Mode::Update),
+        Some(decorator_name) => Err(WrongDecorator::err_from_stmt(
+            method_stmt,
+            canister_name,
+            method_name,
+            Some(decorator_name),
+        )),
+        None => Err(WrongDecorator::err_from_stmt(
+            method_stmt,
+            canister_name,
+            method_name,
+            None,
+        )),
     }
 }

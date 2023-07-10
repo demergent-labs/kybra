@@ -1,10 +1,10 @@
-from kybra import null, Record, Variant
+from kybra import null, Record, Variant, Vec
 
 
 class Post(Record):
     id: str
     author: "User"
-    reactions: list["Reaction"]
+    reactions: Vec["Reaction"]
     text: str
     thread: "Thread"
 
@@ -25,13 +25,13 @@ class ReactionType(Variant):
 class Thread(Record):
     id: str
     author: "User"
-    posts: list[Post]
+    posts: Vec[Post]
     title: str
 
 
 class User(Record):
     id: str
-    posts: list[Post]
-    reactions: list[Reaction]
-    threads: list[Thread]
+    posts: Vec[Post]
+    reactions: Vec[Reaction]
+    threads: Vec[Thread]
     username: str

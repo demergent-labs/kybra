@@ -3,8 +3,10 @@
         "management_canister": {
             "type": "custom",
             "build": "python -m kybra management_canister src/management_canister.py src/management_canister.did",
+            "post_install": ".kybra/management_canister/post_install.sh",
             "candid": "src/management_canister.did",
-            "wasm": ".kybra/management_canister/management_canister.wasm.gz",
+            "wasm": ".kybra/management_canister/management_canister.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/management_canister",
                 "node_compatibility": true

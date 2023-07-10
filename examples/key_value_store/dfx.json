@@ -3,8 +3,10 @@
         "key_value_store": {
             "type": "custom",
             "build": "python -m kybra key_value_store src/main.py src/main.did",
+            "post_install": ".kybra/key_value_store/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/key_value_store/key_value_store.wasm.gz",
+            "wasm": ".kybra/key_value_store/key_value_store.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/key_value_store",
                 "node_compatibility": true

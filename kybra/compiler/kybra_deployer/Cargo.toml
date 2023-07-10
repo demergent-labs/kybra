@@ -1,0 +1,15 @@
+[package]
+name = "kybra_deployer"
+version = "0.0.0"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ic-cdk = "0.9.2"
+ic-cdk-macros = "0.6.10"
+ic-stable-structures = "0.5.4"
+sha2 = "0.10.6"
+hex = "0.4.3"
+shared_utils = { path = "../shared_utils" }

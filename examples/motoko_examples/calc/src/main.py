@@ -1,4 +1,4 @@
-from kybra import opt, update, void
+from kybra import Opt, update, void
 
 cell: int = 0
 
@@ -31,7 +31,7 @@ def mul(n: int) -> int:
 
 
 @update
-def div(n: int) -> opt[int]:
+def div(n: int) -> Opt[int]:
     global cell
 
     if n == 0:

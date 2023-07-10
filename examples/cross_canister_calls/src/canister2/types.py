@@ -1,4 +1,4 @@
-from kybra import nat64, opt, Record, Service, service_query, service_update, void
+from kybra import nat64, Opt, Record, Service, service_query, service_update, Vec, void
 from typing import TypedDict
 
 
@@ -21,11 +21,11 @@ class Canister2(Service):
         ...
 
     @service_query
-    def account(self, account_args: AccountArgs) -> opt[Account]:
+    def account(self, account_args: AccountArgs) -> Opt[Account]:
         ...
 
     @service_query
-    def accounts(self) -> list[Account]:
+    def accounts(self) -> Vec[Account]:
         ...
 
     @service_query

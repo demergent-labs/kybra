@@ -14,7 +14,6 @@ type KeywordRecord = record {
   return : bool;
   nonlocal : text;
   finally : nat16;
-  async : reserved;
   await : vec nat;
   continue : vec int16;
   None : record { bool; bool };
@@ -60,7 +59,6 @@ type KeywordVariant = variant {
 };
 type RustKeywordRecord = record {
   fn : text;
-  mut : reserved;
   pub : null;
   const : int;
   crate : nat;

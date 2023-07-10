@@ -30,7 +30,7 @@ pub fn generate_func_from_vm_value(name: &String) -> TokenStream {
     quote! {
         impl CdkActTryFromVmValue<#type_alias_name, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<#type_alias_name, CdkActTryFromVmValueError> {
-                let candid_func: ic_cdk::export::candid::Func = self.try_from_vm_value(vm).unwrap();
+                let candid_func: ic_cdk::export::candid::Func = self.try_from_vm_value(vm)?;
                 Ok(#type_alias_name::new(candid_func.principal, candid_func.method))
             }
         }

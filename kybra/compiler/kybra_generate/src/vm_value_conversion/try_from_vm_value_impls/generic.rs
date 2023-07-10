@@ -7,7 +7,10 @@ pub fn generate() -> TokenStream {
             rustpython::vm::PyObjectRef: for<'a> CdkActTryFromVmValue<T, &'a rustpython::vm::VirtualMachine>
         {
             fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<(T,), CdkActTryFromVmValueError> {
-                Ok((self.try_from_vm_value(vm).unwrap(),))
+                match self.try_from_vm_value(vm) {
+                    Ok(value) => Ok((value,)),
+                    Err(_) => Err(CdkActTryFromVmValueError("TypeError: Could not convert value to tuple".to_string()))
+                }
             }
         }
 
@@ -37,6 +40,15 @@ pub fn generate() -> TokenStream {
                         Err(err) => Err(err)
                     }
                 }
+            }
+        }
+
+        impl<T> CdkActTryFromVmValue<ic_cdk::api::call::ManualReply<T>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef
+        where
+            rustpython::vm::PyObjectRef: for<'a> CdkActTryFromVmValue<T, &'a rustpython::vm::VirtualMachine>
+        {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<ic_cdk::api::call::ManualReply<T>, CdkActTryFromVmValueError> {
+                Ok(ic_cdk::api::call::ManualReply::empty())
             }
         }
     }

@@ -1,19 +1,13 @@
 from kybra import (
-    InsertError,
-    match,
-    opt,
+    Opt,
     Principal,
     query,
     StableBTreeMap,
+    Tuple,
     update,
-    Variant,
+    Vec,
 )
 from kybra import nat64
-
-
-class StableMap13InsertResult(Variant, total=False):
-    Ok: opt[Principal]
-    Err: InsertError
 
 
 stable_map13 = StableBTreeMap[str, Principal](
@@ -22,19 +16,17 @@ stable_map13 = StableBTreeMap[str, Principal](
 
 
 @query
-def stable_map13_get(key: str) -> opt[Principal]:
+def stable_map13_get(key: str) -> Opt[Principal]:
     return stable_map13.get(key)
 
 
 @update
-def stable_map13_insert(key: str, value: Principal) -> StableMap13InsertResult:
-    result = stable_map13.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def stable_map13_insert(key: str, value: Principal) -> Opt[Principal]:
+    return stable_map13.insert(key, value)
 
 
 @update
-def stable_map13_remove(key: str) -> opt[Principal]:
+def stable_map13_remove(key: str) -> Opt[Principal]:
     return stable_map13.remove(key)
 
 
@@ -49,17 +41,17 @@ def stable_map13_is_empty() -> bool:
 
 
 @query
-def stable_map13_keys() -> list[str]:
+def stable_map13_keys() -> Vec[str]:
     return stable_map13.keys()
 
 
 @query
-def stable_map13_values() -> list[Principal]:
+def stable_map13_values() -> Vec[Principal]:
     return stable_map13.values()
 
 
 @query
-def stable_map13_items() -> list[tuple[str, Principal]]:
+def stable_map13_items() -> Vec[Tuple[str, Principal]]:
     return stable_map13.items()
 
 

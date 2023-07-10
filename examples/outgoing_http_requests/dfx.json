@@ -3,8 +3,10 @@
         "outgoing_http_requests": {
             "type": "custom",
             "build": "python -m kybra outgoing_http_requests src/main.py src/main.did",
+            "post_install": ".kybra/outgoing_http_requests/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/outgoing_http_requests/outgoing_http_requests.wasm.gz",
+            "wasm": ".kybra/outgoing_http_requests/outgoing_http_requests.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/outgoing_http_requests",
                 "node_compatibility": true

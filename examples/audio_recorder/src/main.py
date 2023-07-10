@@ -4,23 +4,22 @@ import _random
 from kybra import (
     blob,
     ic,
-    InsertError,
-    match,
     nat64,
-    opt,
+    Opt,
     Principal,
     query,
     Record,
     StableBTreeMap,
     update,
     Variant,
+    Vec,
 )
 
 
 class User(Record):
     id: Principal
     created_at: nat64
-    recording_ids: list[Principal]
+    recording_ids: Vec[Principal]
     username: str
 
 
@@ -33,20 +32,15 @@ class Recording(Record):
 
 
 users = StableBTreeMap[Principal, User](
-    memory_id=0, max_key_size=38, max_value_size=100_000
+    memory_id=3, max_key_size=38, max_value_size=100_000
 )
 recordings = StableBTreeMap[Principal, Recording](
-    memory_id=1, max_key_size=38, max_value_size=5_000_000
+    memory_id=4, max_key_size=38, max_value_size=5_000_000
 )
-
-
-class CreateUserResult(Variant, total=False):
-    Ok: User
-    Err: InsertError
 
 
 @update
-def create_user(username: str) -> CreateUserResult:
+def create_user(username: str) -> User:
     id = generate_id()
     user: User = {
         "id": id,
@@ -55,20 +49,18 @@ def create_user(username: str) -> CreateUserResult:
         "username": username,
     }
 
-    result = users.insert(user["id"], user)
+    users.insert(user["id"], user)
 
-    return match(
-        result, {"Ok": lambda _: {"Ok": user}, "Err": lambda err: {"Err": err}}
-    )
+    return user
 
 
 @query
-def read_users() -> list[User]:
+def read_users() -> Vec[User]:
     return users.values()
 
 
 @query
-def read_user_by_id(id: Principal) -> opt[User]:
+def read_user_by_id(id: Principal) -> Opt[User]:
     return users.get(id)
 
 
@@ -102,7 +94,6 @@ class CreateRecordingResult(Variant, total=False):
 
 
 class CreateRecordingErr(Variant, total=False):
-    InsertError: InsertError
     UserDoesNotExist: Principal
 
 
@@ -124,40 +115,27 @@ def create_recording(
         "user_id": user_id,
     }
 
-    create_recording_result = recordings.insert(recording["id"], recording)
+    recordings.insert(recording["id"], recording)
 
-    def handle_recording_result_ok(_) -> CreateRecordingResult:
-        updated_user: User = {
-            **user,
-            "recording_ids": [*user["recording_ids"], recording["id"]],
-        }
+    updated_user: User = {
+        "id": user["id"],
+        "created_at": user["created_at"],
+        "username": user["username"],
+        "recording_ids": [*user["recording_ids"], recording["id"]],
+    }
 
-        update_user_result = users.insert(updated_user["id"], updated_user)
+    users.insert(updated_user["id"], updated_user)
 
-        return match(
-            update_user_result,
-            {
-                "Ok": lambda _: {"Ok": recording},
-                "Err": lambda err: {"Err": {"InsertError": err}},
-            },
-        )
-
-    return match(
-        create_recording_result,
-        {
-            "Ok": handle_recording_result_ok,
-            "Err": lambda err: {"Err": {"InsertError": err}},
-        },
-    )
+    return {"Ok": recording}
 
 
 @query
-def read_recordings() -> list[Recording]:
+def read_recordings() -> Vec[Recording]:
     return recordings.values()
 
 
 @query
-def read_recording_by_id(id: Principal) -> opt[Recording]:
+def read_recording_by_id(id: Principal) -> Opt[Recording]:
     return recordings.get(id)
 
 
@@ -167,7 +145,6 @@ class DeleteRecordingResult(Variant, total=False):
 
 
 class DeleteRecordingError(Variant, total=False):
-    InsertError: InsertError
     RecordingDoesNotExist: Principal
     UserDoesNotExist: Principal
 
@@ -185,7 +162,9 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
         return {"Err": {"UserDoesNotExist": recording["user_id"]}}
 
     updated_user: User = {
-        **user,
+        "id": user["id"],
+        "created_at": user["created_at"],
+        "username": user["username"],
         "recording_ids": list(
             filter(
                 lambda recording_id: recording_id.to_str() != recording["id"].to_str(),
@@ -194,20 +173,11 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
         ),
     }
 
-    update_user_result = users.insert(updated_user["id"], updated_user)
+    users.insert(updated_user["id"], updated_user)
 
-    def handle_update_user_result_ok(_) -> DeleteRecordingResult:
-        recordings.remove(id)
+    recordings.remove(id)
 
-        return {"Ok": recording}
-
-    return match(
-        update_user_result,
-        {
-            "Ok": handle_update_user_result_ok,
-            "Err": lambda err: {"Err": {"InsertError": err}},
-        },
-    )
+    return {"Ok": recording}
 
 
 def generate_id() -> Principal:

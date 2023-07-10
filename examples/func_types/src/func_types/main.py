@@ -6,7 +6,7 @@ from kybra import (
     match,
     nat64,
     null,
-    opt,
+    Opt,
     Principal,
     Query,
     query,
@@ -15,6 +15,7 @@ from kybra import (
     Update,
     update,
     Variant,
+    Vec,
     void,
 )
 
@@ -43,17 +44,22 @@ BasicFunc = Func(Query[[str], str])
 ComplexFunc = Func(Update[[User, Reaction], nat64])
 StableFunc = Func(Query[[nat64, str], void])
 NullFunc = Func(
-    Query[[opt[null], list[null], null, list[list[null]], list[opt[null]]], null]
+    Query[[Opt[null], Vec[null], null, Vec[Vec[null]], Vec[Opt[null]]], null]
 )
 
+notifiers_principal = Principal.from_str("aaaaa-aa")
 
 stable_storage = StableBTreeMap[str, StableFunc](
-    memory_id=0, max_key_size=25, max_value_size=1_000
+    memory_id=3, max_key_size=25, max_value_size=1_000
 )
 
 
 @init
-def init_() -> void:
+def init_(notifiers_id: Principal) -> void:
+    global notifiers_principal
+
+    notifiers_principal = notifiers_id
+
     stable_storage.insert(
         "stable_func", (Principal.from_str("aaaaa-aa"), "start_canister")
     )
@@ -78,7 +84,7 @@ def basic_func_param(basic_func: BasicFunc) -> BasicFunc:
 
 
 @query
-def basic_func_param_array(basic_funcs: list[BasicFunc]) -> list[BasicFunc]:
+def basic_func_param_array(basic_funcs: Vec[BasicFunc]) -> Vec[BasicFunc]:
     return basic_funcs
 
 
@@ -88,7 +94,7 @@ def basic_func_return_type() -> BasicFunc:
 
 
 @query
-def basic_func_return_type_array() -> list[BasicFunc]:
+def basic_func_return_type_array() -> Vec[BasicFunc]:
     return [
         (Principal.from_str("aaaaa-aa"), "create_canister"),
         (Principal.from_str("aaaaa-aa"), "update_settings"),
@@ -110,7 +116,7 @@ def complex_func_return_type() -> ComplexFunc:
 def get_notifier_from_notifiers_canister() -> (
     Async[GetNotifierFromNotifiersCanisterResult]
 ):
-    notifiers_canister = Notifier(Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"))
+    notifiers_canister = Notifier(notifiers_principal)
 
     result: CallResult[NotifierFunc] = yield notifiers_canister.get_notifier()
 

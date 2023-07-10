@@ -3,8 +3,10 @@
         "ic_api": {
             "type": "custom",
             "build": "python -m kybra ic_api src/main.py src/main.did",
+            "post_install": ".kybra/ic_api/post_install.sh",
             "candid": "src/main.did",
-            "wasm": ".kybra/ic_api/ic_api.wasm.gz",
+            "wasm": ".kybra/ic_api/ic_api.wasm",
+            "gzip": true,
             "declarations": {
                 "output": "test/dfx_generated/ic_api",
                 "node_compatibility": true

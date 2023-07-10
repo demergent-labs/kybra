@@ -2,15 +2,20 @@ from kybra import (
     Async,
     CallResult,
     ic,
+    init,
     match,
     nat,
     nat64,
     NotifyResult,
+    Principal,
     query,
     update,
     Variant,
+    void,
 )
-from src.cycles.types import cycles
+from src.cycles.types import Cycles
+
+cycles = Cycles(Principal.from_str("aaaaa-aa"))
 
 
 class SendCyclesResult(Variant, total=False):
@@ -21,6 +26,12 @@ class SendCyclesResult(Variant, total=False):
 class SendCyclesResult128(Variant, total=False):
     Ok: nat
     Err: str
+
+
+@init
+def init_(cycles_id: Principal) -> void:
+    global cycles
+    cycles = Cycles(cycles_id)
 
 
 # Reports the number of cycles returned from the Cycles canister

@@ -1,0 +1,5 @@
+service : () -> {
+  get_func : () -> (func (text) -> (text) query) query;
+  get_type_alias : () -> (bool) query;
+  is_empty : () -> (bool) query;
+}

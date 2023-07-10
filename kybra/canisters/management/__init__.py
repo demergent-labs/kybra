@@ -16,7 +16,7 @@
 
 # Taken in part from: https://github.com/dfinity/interface-spec/blob/master/spec/ic.did
 
-from kybra import blob, Principal, Service, service_update, void
+from kybra import blob, Principal, Service, service_update, Vec, void
 
 # The as expressions are reexporting these variables
 from kybra.canisters.management.basic import (
@@ -54,7 +54,7 @@ from kybra.canisters.management.http import (
     HttpResponse as HttpResponse,
     HttpTransform as HttpTransform,
     HttpTransformArgs as HttpTransformArgs,
-    HttpTransformFunc as HttpTransformFunc
+    HttpTransformFunc as HttpTransformFunc,
 )
 from kybra.canisters.management.bitcoin import (
     BitcoinAddress as BitcoinAddress,
@@ -85,7 +85,7 @@ class ManagementCanister(Service):
     @service_update
     def bitcoin_get_current_fee_percentiles(
         self, args: GetCurrentFeePercentilesArgs
-    ) -> list[MillisatoshiPerByte]:
+    ) -> Vec[MillisatoshiPerByte]:
         ...
 
     @service_update

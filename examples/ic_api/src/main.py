@@ -1,26 +1,30 @@
-from kybra import blob, empty, ic, int8, manual, nat, nat64, nat32, opt, Principal, query, update, void
+from kybra import (
+    blob,
+    empty,
+    ic,
+    int8,
+    Manual,
+    nat,
+    nat64,
+    nat32,
+    Opt,
+    Principal,
+    query,
+    update,
+    void,
+)
 
 # returns the argument data as bytes.
 
 
 @query
-def arg_data_raw(
-    arg1: blob,
-    arg2: int8,
-    arg3: bool,
-    arg4: str
-) -> blob:
+def arg_data_raw(arg1: blob, arg2: int8, arg3: bool, arg4: str) -> blob:
     return ic.arg_data_raw()
 
 
 # returns the length of the argument data in bytes
 @query
-def arg_data_raw_size(
-    arg1: blob,
-    arg2: int8,
-    arg3: bool,
-    arg4: str
-) -> nat32:
+def arg_data_raw_size(arg1: blob, arg2: int8, arg3: bool, arg4: str) -> nat32:
     return ic.arg_data_raw_size()
 
 
@@ -44,13 +48,13 @@ def canister_balance128() -> nat:
 
 # When called from a query call, returns the data certificate authenticating certified_data set by this canister. Returns None if called not from a query call.
 @query
-def data_certificate() -> opt[blob]:
+def data_certificate() -> Opt[blob]:
     return ic.data_certificate()
 
 
 # When called from a query call, returns the data certificate authenticating certified_data set by this canister. Returns None if called not from a query call.
 @update
-def data_certificate_null() -> opt[blob]:
+def data_certificate_null() -> Opt[blob]:
     return ic.data_certificate()
 
 
@@ -74,7 +78,7 @@ def print(message: str) -> bool:
 
 
 @query
-def reject(message: str) -> manual[empty]:
+def reject(message: str) -> Manual[empty]:
     ic.reject(message)
 
 

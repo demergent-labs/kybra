@@ -1,4 +1,4 @@
-from kybra import blob, Func, nat, nat64, null, opt, Query, Record, Variant
+from kybra import blob, Func, nat, nat64, null, Opt, Query, Record, Variant, Vec
 
 
 class HttpMethod(Variant, total=False):
@@ -14,7 +14,7 @@ class HttpHeader(Record):
 
 class HttpResponse(Record):
     status: nat
-    headers: list[HttpHeader]
+    headers: Vec[HttpHeader]
     body: blob
 
 
@@ -33,8 +33,8 @@ class HttpTransform(Record):
 
 class HttpRequestArgs(Record):
     url: str
-    max_response_bytes: opt[nat64]
+    max_response_bytes: Opt[nat64]
     method: HttpMethod
-    headers: list[HttpHeader]
-    body: opt[blob]
-    transform: opt[HttpTransform]
+    headers: Vec[HttpHeader]
+    body: Opt[blob]
+    transform: Opt[HttpTransform]
