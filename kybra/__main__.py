@@ -378,27 +378,31 @@ def optimize_wasm_binary_or_exit(
 def add_metadata_to_wasm_or_exit(
     paths: Paths, canister_name: str, verbose: bool = False
 ):
-    add_candid_to_wasm_result = subprocess.run(
-        [
-            f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
-            f"{paths['canister']}/{canister_name}_app.wasm",
-            "-o",
-            f"{paths['canister']}/{canister_name}_app.wasm",
-            "metadata",
-            "candid:service",
-            "-f",
-            paths["did"],
-            "-v",
-            "public",
-        ],
-        capture_output=not verbose,
-    )
+    # TODO removing this until we solve the Candid issue: https://forum.dfinity.org/t/automatically-generate-candid-from-rust-sources/5924/34
+    # TODO our current solution is to grab the Candid in post_install because of issues with Wasmer
+    # TODO Unfortunately this means that on first deploy the candid:service metadata is incorrect
+    # TODO thus we are relying on __get_candid_interface_tmp_hack for the time being
+    # add_candid_to_wasm_result = subprocess.run(
+    #     [
+    #         f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
+    #         f"{paths['canister']}/{canister_name}_app.wasm",
+    #         "-o",
+    #         f"{paths['canister']}/{canister_name}_app.wasm",
+    #         "metadata",
+    #         "candid:service",
+    #         "-f",
+    #         paths["did"],
+    #         "-v",
+    #         "public",
+    #     ],
+    #     capture_output=not verbose,
+    # )
 
-    if add_candid_to_wasm_result.returncode != 0:
-        print(red("\n💣 Kybra error: adding candid to Wasm"))
-        print(add_candid_to_wasm_result.stderr.decode("utf-8"))
-        print("💀 Build failed")
-        sys.exit(1)
+    # if add_candid_to_wasm_result.returncode != 0:
+    #     print(red("\n💣 Kybra error: adding candid to Wasm"))
+    #     print(add_candid_to_wasm_result.stderr.decode("utf-8"))
+    #     print("💀 Build failed")
+    #     sys.exit(1)
 
     add_cdk_info_to_wasm_result = subprocess.run(
         [
