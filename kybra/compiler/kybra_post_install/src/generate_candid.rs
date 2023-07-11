@@ -16,34 +16,23 @@ pub fn generate_candid(canister_name: &str, candid_path: &str) -> Result<(), Str
         )));
     }
 
-    let mut candid = String::from_utf8_lossy(&candid_output.stdout)
-        .to_string()
-        .replace("\\n", "\n")
-        .replace("\\\"", "\"");
+    let raw_candid = String::from_utf8_lossy(&candid_output.stdout).to_string();
+    let escaped_candid = raw_candid.replace("\\n", "\n").replace("\\\"", "\"");
 
-    if let Some(index) = candid.find("(") {
-        candid.drain(index..index + 1);
-    }
+    let left_index = escaped_candid
+        .find("\"")
+        .ok_or("Generate Candid Error: could not find starting quote")?
+        + 1;
+    let right_index = escaped_candid
+        .rfind("\"")
+        .ok_or("Generate Candid Error: could not find ending quote")?;
 
-    if let Some(index) = candid.find("\"") {
-        candid.drain(index..index + 1);
-    }
+    let clean_candid = format!(
+        "{}\n",
+        escaped_candid[left_index..right_index].to_string().trim()
+    );
 
-    if let Some(index) = candid.rfind(")") {
-        candid.drain(index..index + 1);
-    }
-
-    if let Some(index) = candid.rfind(",") {
-        candid.drain(index..index + 1);
-    }
-
-    if let Some(index) = candid.rfind("\"") {
-        candid.drain(index..index + 1);
-    }
-
-    let candid_with_newline = format!("{}\n", candid.trim());
-
-    std::fs::write(candid_path, candid_with_newline).map_err(|e| error_to_string(&e))?;
+    std::fs::write(candid_path, clean_candid).map_err(|e| error_to_string(&e))?;
 
     Ok(())
 }
