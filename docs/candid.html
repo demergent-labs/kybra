@@ -198,7 +198,11 @@
     query,
     Query,
     Record,
+    Service,
+    service_query,
+    service_update,
     Variant,
+    Vec,
 )
 
 
@@ -218,10 +222,13 @@ class Candid(Record):
     float64: float64
     float32: float32
     bool: bool
+    null: null
+    vec: Vec[str]
     opt: Opt[&quot;nat&quot;]
     record: &quot;CandidRecord&quot;
     variant: &quot;CandidVariant&quot;
     func: &quot;CandidFunc&quot;
+    service: &quot;MyService&quot;
     principal: Principal
 
 
@@ -235,6 +242,16 @@ class CandidVariant(Variant, total=False):
     Tag1: null
     Tag2: null
     Tag3: int
+
+
+class MyService(Service):
+    @service_query
+    def query1(self) -&gt; bool:
+        ...
+
+    @service_update
+    def update1(self) -&gt; str:
+        ...
 
 
 CandidFunc = Func(Query[[], Candid])
@@ -258,10 +275,13 @@ def candid_types() -&gt; Candid:
         &quot;float64&quot;: 0.0,
         &quot;float32&quot;: 0.0,
         &quot;bool&quot;: True,
+        &quot;null&quot;: None,
+        &quot;vec&quot;: [&quot;has one element&quot;],
         &quot;opt&quot;: None,
         &quot;record&quot;: {&quot;first_name&quot;: &quot;John&quot;, &quot;last_name&quot;: &quot;Doe&quot;, &quot;age&quot;: 35},
         &quot;variant&quot;: {&quot;Tag1&quot;: None},
         &quot;func&quot;: (Principal.from_str(&quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;), &quot;candid_types&quot;),
+        &quot;service&quot;: MyService(Principal.from_str(&quot;aaaaa-aa&quot;)),
         &quot;principal&quot;: Principal.from_str(&quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;),
     }
 </code></pre>
@@ -271,12 +291,15 @@ def candid_types() -&gt; Candid:
     &quot;int&quot; = 170_141_183_460_469_231_731_687_303_715_884_105_727 : int;
     &quot;nat&quot; = 340_282_366_920_938_463_463_374_607_431_768_211_455 : nat;
     &quot;opt&quot; = null;
+    &quot;vec&quot; = vec { &quot;has one element&quot; };
+    &quot;service&quot; = service &quot;aaaaa-aa&quot;;
     &quot;principal&quot; = principal &quot;ryjl3-tyaaa-aaaaa-aaaba-cai&quot;;
     &quot;blob&quot; = vec {};
     &quot;bool&quot; = true;
     &quot;func&quot; = func &quot;rrkah-fqaaa-aaaaa-aaaaq-cai&quot;.candid_types;
     &quot;int8&quot; = 127 : int8;
     &quot;nat8&quot; = 255 : nat8;
+    &quot;null&quot; = null : null;
     &quot;text&quot; = &quot;text&quot;;
     &quot;nat16&quot; = 65_535 : nat16;
     &quot;nat32&quot; = 4_294_967_295 : nat32;
@@ -630,18 +653,18 @@ def print_bool(bool: bool) -&gt; bool:
 }
 </code></pre>
 <h4 id="null"><a class="header" href="#null">null</a></h4>
-<p>The Python type <code>None</code> and the Kybra type <code>null</code> both correspond to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-null">Candid type null</a> and will become the <a href="https://docs.python.org/3/library/stdtypes.html#the-null-object">Python Null Object</a> at runtime.</p>
+<p>The Kybra type <code>null</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-null">Candid type null</a> and will become the <a href="https://docs.python.org/3/library/stdtypes.html#the-null-object">Python Null Object</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import ic, query
+<pre><code class="language-python">from kybra import ic, null, query
 
 
 @query
-def get_null() -&gt; None:
+def get_null() -&gt; null:
     return None
 
 
 @query
-def print_null(none: None) -&gt; None:
+def print_null(none: null) -&gt; null:
     ic.print(type(none))
     return none
 </code></pre>
@@ -738,20 +761,20 @@ type User = record {
 <h4 id="variant"><a class="header" href="#variant">variant</a></h4>
 <p>Python classes that inherit from the Kybra type <code>Variant</code> correspond to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-variant--n--t--">Candid variant type</a> and will become <a href="https://docs.python.org/3/library/typing.html#typing.TypedDict">Python TypedDicts</a> at runtime.</p>
 <p>Python:</p>
-<pre><code class="language-python">from kybra import nat32, Variant
+<pre><code class="language-python">from kybra import nat32, null, Variant
 
 
 class ReactionType(Variant, total=False):
-    Fire: None
-    ThumbsUp: None
-    ThumbsDown: None
+    Fire: null
+    ThumbsUp: null
+    ThumbsDown: null
     Emotion: &quot;Emotion&quot;
     Firework: &quot;Firework&quot;
 
 
 class Emotion(Variant, total=False):
-    Happy: None
-    Sad: None
+    Happy: null
+    Sad: null
 
 
 class Firework(Variant, total=False):
@@ -827,7 +850,43 @@ service: () -&gt; {
 
 </code></pre>
 <h4 id="service"><a class="header" href="#service">service</a></h4>
-<p><a href="https://github.com/demergent-labs/kybra/issues/124">Not yet implemented.</a></p>
+<p>Python classes that inherit from the Kybra type <code>Service</code> correspond to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-service-">Candid service type</a> and will become child classes capable of creating instances that can perform cross-canister calls at runtime.</p>
+<pre><code class="language-python">from kybra import (
+    Async,
+    CallResult,
+    Principal,
+    query,
+    Service,
+    service_query,
+    service_update,
+    update,
+)
+
+
+class SomeService(Service):
+    @service_query
+    def query1(self) -&gt; bool:
+        ...
+
+    @service_update
+    def update1(self) -&gt; str:
+        ...
+
+
+@query
+def get_service() -&gt; SomeService:
+    return SomeService(Principal.from_str(&quot;aaaaa-aa&quot;))
+
+
+@update
+def call_service(service: SomeService) -&gt; Async[str]:
+    result: CallResult[str] = yield service.update1()
+
+    if result.Err is not None:
+        raise Exception(f&quot;call to service.update1 failed with: {result.Err}&quot;)
+
+    return result.Ok
+</code></pre>
 <h4 id="principal"><a class="header" href="#principal">principal</a></h4>
 <p>The Kybra type <code>Principal</code> corresponds to the <a href="https://internetcomputer.org/docs/current/references/candid-ref#type-principal">Candid type principal</a> and will become an <a href="https://github.com/rocklabs-io/ic-py">ic-py Principal</a> at runtime.</p>
 <p>Python:</p>
@@ -878,6 +937,7 @@ def print_reserved(reserved: reserved) -&gt; reserved:
 <pre><code class="language-python">from kybra import empty, ic, query
 
 
+@query
 def get_empty() -&gt; empty:
     raise Exception(&quot;Anything you want&quot;)
 

@@ -59,7 +59,11 @@ from kybra import (
     query,
     Query,
     Record,
+    Service,
+    service_query,
+    service_update,
     Variant,
+    Vec,
 )
 
 
@@ -79,10 +83,13 @@ class Candid(Record):
     float64: float64
     float32: float32
     bool: bool
+    null: null
+    vec: Vec[str]
     opt: Opt["nat"]
     record: "CandidRecord"
     variant: "CandidVariant"
     func: "CandidFunc"
+    service: "MyService"
     principal: Principal
 
 
@@ -96,6 +103,16 @@ class CandidVariant(Variant, total=False):
     Tag1: null
     Tag2: null
     Tag3: int
+
+
+class MyService(Service):
+    @service_query
+    def query1(self) -> bool:
+        ...
+
+    @service_update
+    def update1(self) -> str:
+        ...
 
 
 CandidFunc = Func(Query[[], Candid])
@@ -119,10 +136,13 @@ def candid_types() -> Candid:
         "float64": 0.0,
         "float32": 0.0,
         "bool": True,
+        "null": None,
+        "vec": ["has one element"],
         "opt": None,
         "record": {"first_name": "John", "last_name": "Doe", "age": 35},
         "variant": {"Tag1": None},
         "func": (Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"), "candid_types"),
+        "service": MyService(Principal.from_str("aaaaa-aa")),
         "principal": Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"),
     }
 ```
@@ -135,12 +155,15 @@ Calling `candid_types` with `dfx` will return:
     "int" = 170_141_183_460_469_231_731_687_303_715_884_105_727 : int;
     "nat" = 340_282_366_920_938_463_463_374_607_431_768_211_455 : nat;
     "opt" = null;
+    "vec" = vec { "has one element" };
+    "service" = service "aaaaa-aa";
     "principal" = principal "ryjl3-tyaaa-aaaaa-aaaba-cai";
     "blob" = vec {};
     "bool" = true;
     "func" = func "rrkah-fqaaa-aaaaa-aaaaq-cai".candid_types;
     "int8" = 127 : int8;
     "nat8" = 255 : nat8;
+    "null" = null : null;
     "text" = "text";
     "nat16" = 65_535 : nat16;
     "nat32" = 4_294_967_295 : nat32;
@@ -616,21 +639,21 @@ service: {
 
 #### null
 
-The Python type `None` and the Kybra type `null` both correspond to the [Candid type null](https://internetcomputer.org/docs/current/references/candid-ref#type-null) and will become the [Python Null Object](https://docs.python.org/3/library/stdtypes.html#the-null-object) at runtime.
+The Kybra type `null` corresponds to the [Candid type null](https://internetcomputer.org/docs/current/references/candid-ref#type-null) and will become the [Python Null Object](https://docs.python.org/3/library/stdtypes.html#the-null-object) at runtime.
 
 Python:
 
 ```python
-from kybra import ic, query
+from kybra import ic, null, query
 
 
 @query
-def get_null() -> None:
+def get_null() -> null:
     return None
 
 
 @query
-def print_null(none: None) -> None:
+def print_null(none: null) -> null:
     ic.print(type(none))
     return none
 ```
@@ -759,20 +782,20 @@ Python classes that inherit from the Kybra type `Variant` correspond to the [Can
 Python:
 
 ```python
-from kybra import nat32, Variant
+from kybra import nat32, null, Variant
 
 
 class ReactionType(Variant, total=False):
-    Fire: None
-    ThumbsUp: None
-    ThumbsDown: None
+    Fire: null
+    ThumbsUp: null
+    ThumbsDown: null
     Emotion: "Emotion"
     Firework: "Firework"
 
 
 class Emotion(Variant, total=False):
-    Happy: None
-    Sad: None
+    Happy: null
+    Sad: null
 
 
 class Firework(Variant, total=False):
@@ -861,7 +884,45 @@ service: () -> {
 
 #### service
 
-[Not yet implemented.](https://github.com/demergent-labs/kybra/issues/124)
+Python classes that inherit from the Kybra type `Service` correspond to the [Candid service type](https://internetcomputer.org/docs/current/references/candid-ref#type-service-) and will become child classes capable of creating instances that can perform cross-canister calls at runtime.
+
+```python
+from kybra import (
+    Async,
+    CallResult,
+    Principal,
+    query,
+    Service,
+    service_query,
+    service_update,
+    update,
+)
+
+
+class SomeService(Service):
+    @service_query
+    def query1(self) -> bool:
+        ...
+
+    @service_update
+    def update1(self) -> str:
+        ...
+
+
+@query
+def get_service() -> SomeService:
+    return SomeService(Principal.from_str("aaaaa-aa"))
+
+
+@update
+def call_service(service: SomeService) -> Async[str]:
+    result: CallResult[str] = yield service.update1()
+
+    if result.Err is not None:
+        raise Exception(f"call to service.update1 failed with: {result.Err}")
+
+    return result.Ok
+```
 
 #### principal
 
@@ -933,6 +994,7 @@ Python:
 from kybra import empty, ic, query
 
 
+@query
 def get_empty() -> empty:
     raise Exception("Anything you want")
 
