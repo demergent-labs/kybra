@@ -76,7 +76,7 @@ If you need more than 4 GiB of storage, consider taking advantage of the 48 GiB 
 ```python
 from kybra import Opt, query, StableBTreeMap, update, void
 
-db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
+db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
 
 
 @query
@@ -96,7 +96,7 @@ Traps can be useful for ensuring that multiple operations are either all complet
 Here's an example of how to trap and ensure atomic changes to your database:
 
 ```python
-from kybra import ic, match, Opt, query, Record, StableBTreeMap, update, Vec, void
+from kybra import ic, Opt, query, Record, StableBTreeMap, update, Vec, void
 
 
 class Entry(Record):
@@ -104,7 +104,7 @@ class Entry(Record):
     value: str
 
 
-db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
+db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
 
 
 @query
@@ -120,22 +120,18 @@ def set(key: str, value: str) -> void:
 @update
 def set_many(entries: Vec[Entry]) -> void:
     for entry in entries:
-        result = db.insert(entry["key"], entry["value"])
-        match(
-            result,
-            {
-                "Ok": lambda _: ...,
-                "Err": lambda err: ic.trap(err),
-            },
-        )
+        if entry["key"] == "trap":
+            ic.trap("explicit trap")
+
+        db.insert(entry["key"], entry["value"])
 ```
 
 In addition to `ic.trap`, an explicit Python `raise` or any unhandled exception will also trap.
 
-There is a limit to how much computation can be done in a single call to an update method. The current update call limit is [20 billion Wasm instructions](https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits). If we modify our database example, we can introduce an update method that runs the risk reaching the limit:
+There is a limit to how much computation can be done in a single call to an update method. The current update call limit is [20 billion Wasm instructions](https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits). If we modify our database example, we can introduce an update method that runs the risk of reaching the limit:
 
 ```python
-from kybra import ic, match, nat64, Opt, query, Record, StableBTreeMap, update, void
+from kybra import nat64, Opt, query, Record, StableBTreeMap, update, void
 
 
 class Entry(Record):
@@ -143,7 +139,7 @@ class Entry(Record):
     value: str
 
 
-db = StableBTreeMap[str, str](memory_id=0, max_key_size=1_000, max_value_size=1_000)
+db = StableBTreeMap[str, str](memory_id=3, max_key_size=1_000, max_value_size=1_000)
 
 
 @query
@@ -159,15 +155,7 @@ def set(key: str, value: str) -> void:
 @update
 def set_many(num_entries: nat64) -> void:
     for i in range(num_entries):
-        result = db.insert(str(i), str(i))
-
-        match(
-            result,
-            {
-                "Ok": lambda _: ...,
-                "Err": lambda err: ic.trap(err),
-            },
-        )
+        db.insert(str(i), str(i))
 ```
 
 From the `dfx command line` you can call `set_many` like this:

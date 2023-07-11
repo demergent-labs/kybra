@@ -207,7 +207,7 @@ def set(key: str, value: str) -&gt; void:
 <p>If you need more than 4 GiB of storage, consider taking advantage of the 48 GiB of stable memory. Stable structures like <code>StableBTreeMap</code> give you a nice API for interacting with stable memory. These data structures will be <a href="./stable_structures.html">covered in more detail later</a>. Here's a simple example:</p>
 <pre><code class="language-python">from kybra import Opt, query, StableBTreeMap, update, void
 
-db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
+db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
 
 
 @query
@@ -222,7 +222,7 @@ def set(key: str, value: str) -&gt; void:
 <p>So far we have only seen how state changes can be persisted. State changes can also be discarded by implicit or explicit traps. A trap is an immediate stop to execution with the ability to provide a message to the execution environment.</p>
 <p>Traps can be useful for ensuring that multiple operations are either all completed or all disregarded, or in other words atomic. Keep in mind that these guarantees do not hold once cross-canister calls are introduced, but that's a more advanced topic <a href="./cross_canister.html">covered later</a>.</p>
 <p>Here's an example of how to trap and ensure atomic changes to your database:</p>
-<pre><code class="language-python">from kybra import ic, match, Opt, query, Record, StableBTreeMap, update, Vec, void
+<pre><code class="language-python">from kybra import ic, Opt, query, Record, StableBTreeMap, update, Vec, void
 
 
 class Entry(Record):
@@ -230,7 +230,7 @@ class Entry(Record):
     value: str
 
 
-db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
+db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
 
 
 @query
@@ -246,18 +246,14 @@ def set(key: str, value: str) -&gt; void:
 @update
 def set_many(entries: Vec[Entry]) -&gt; void:
     for entry in entries:
-        result = db.insert(entry[&quot;key&quot;], entry[&quot;value&quot;])
-        match(
-            result,
-            {
-                &quot;Ok&quot;: lambda _: ...,
-                &quot;Err&quot;: lambda err: ic.trap(err),
-            },
-        )
+        if entry[&quot;key&quot;] == &quot;trap&quot;:
+            ic.trap(&quot;explicit trap&quot;)
+
+        db.insert(entry[&quot;key&quot;], entry[&quot;value&quot;])
 </code></pre>
 <p>In addition to <code>ic.trap</code>, an explicit Python <code>raise</code> or any unhandled exception will also trap.</p>
-<p>There is a limit to how much computation can be done in a single call to an update method. The current update call limit is <a href="https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits">20 billion Wasm instructions</a>. If we modify our database example, we can introduce an update method that runs the risk reaching the limit:</p>
-<pre><code class="language-python">from kybra import ic, match, nat64, Opt, query, Record, StableBTreeMap, update, void
+<p>There is a limit to how much computation can be done in a single call to an update method. The current update call limit is <a href="https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits">20 billion Wasm instructions</a>. If we modify our database example, we can introduce an update method that runs the risk of reaching the limit:</p>
+<pre><code class="language-python">from kybra import nat64, Opt, query, Record, StableBTreeMap, update, void
 
 
 class Entry(Record):
@@ -265,7 +261,7 @@ class Entry(Record):
     value: str
 
 
-db = StableBTreeMap[str, str](memory_id=0, max_key_size=1_000, max_value_size=1_000)
+db = StableBTreeMap[str, str](memory_id=3, max_key_size=1_000, max_value_size=1_000)
 
 
 @query
@@ -281,15 +277,7 @@ def set(key: str, value: str) -&gt; void:
 @update
 def set_many(num_entries: nat64) -&gt; void:
     for i in range(num_entries):
-        result = db.insert(str(i), str(i))
-
-        match(
-            result,
-            {
-                &quot;Ok&quot;: lambda _: ...,
-                &quot;Err&quot;: lambda err: ic.trap(err),
-            },
-        )
+        db.insert(str(i), str(i))
 </code></pre>
 <p>From the <code>dfx command line</code> you can call <code>set_many</code> like this:</p>
 <pre><code class="language-bash">dfx canister call my_canister set_many '(100_000)'
