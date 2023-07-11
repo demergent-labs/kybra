@@ -1,4 +1,4 @@
-# Gotchas and Caveats
+# Caveats
 
 This chapter is a work in progress.
 

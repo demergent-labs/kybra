@@ -43,7 +43,7 @@ def set(key: str, value: str) -> void:
     db[key] = value
 ```
 
-Calling `set` will perform the operation of setting the `key` property on the `db` object to `value`, but after the call finishes that change will be discarded.
+Calling `set` will perform the operation of setting the `key` item on the `db` dictionary to `value`, but after the call finishes that change will be discarded.
 
 This is because query methods are executed on a single node machine and do not go through [consensus](https://internetcomputer.org/how-it-works/consensus/). This results in lower latencies, perhaps on the order of 100 milliseconds.
 

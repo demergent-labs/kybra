@@ -125,7 +125,7 @@ There are other agents for other languages as well:
 
 ## Deploying to mainnet
 
-Assuming you have [created a cycles wallet](https://internetcomputer.org/docs/current/developer-docs/quickstart/network-quickstart) and funded it with cycles, then you are ready to deploy to mainnet.
+Assuming you are [setup with cycles](https://internetcomputer.org/docs/current/developer-docs/setup/cycles/), then you are ready to deploy to mainnet.
 
 To deploy all canisters defined in your dfx.json:
 
@@ -137,46 +137,4 @@ To deploy an individual canister:
 
 ```bash
 dfx deploy --network ic canister_name
-```
-
-## Common deployment issues
-
-### Ubuntu
-
-Error:
-
-```bash
-linker cc not found
-```
-
-Resolution:
-
-```bash
-sudo apt install build-essential
-```
-
-Error:
-
-```bash
-is cmake not installed?
-```
-
-Resolution:
-
-```bash
-sudo apt install cmake
-```
-
-Error:
-
-```bash
-ERROR: The Python ssl extension was not compiled. Missing the OpenSSL lib
-```
-
-Resolution:
-
-You may have the right version of open ssl but you might be missing libssl-dev
-
-```bash
-sudo apt-get install libssl-dev
 ```
