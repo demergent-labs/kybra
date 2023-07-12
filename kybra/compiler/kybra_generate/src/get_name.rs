@@ -1,4 +1,4 @@
-use rustpython_parser::ast::{ExprKind, Located, StmtKind};
+use rustpython_parser::ast::{Constant, ExprKind, Located, StmtKind};
 
 use crate::{
     candid_type::errors::{InvalidName, NotExactlyOneTarget},
@@ -39,6 +39,10 @@ impl HasName for Located<ExprKind> {
     fn get_name(&self) -> Option<&str> {
         match &self.node {
             ExprKind::Name { id, .. } => Some(id),
+            ExprKind::Constant { value, .. } => match value {
+                Constant::Str(string) => Some(string),
+                _ => None,
+            },
             _ => None,
         }
     }

@@ -34,10 +34,5 @@ fn main() -> Result<(), String> {
     install_app_canister(canister_name)?;
     generate_candid(canister_name, candid_path)?;
 
-    // TODO this is here because of some complications with the install_code self-referential cross-canister call
-    // TODO the call is a notify and thus won't wait for the canister's post_upgrade function to complete
-    // TODO we wait here to make sure that the canister is most likely initialized before ending the post_install script
-    thread::sleep(Duration::from_secs(5));
-
     Ok(())
 }
