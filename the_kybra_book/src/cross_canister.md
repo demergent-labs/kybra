@@ -8,10 +8,12 @@ Examples:
 -   [cycles](https://github.com/demergent-labs/kybra/tree/main/examples/cycles)
 -   [ethereum_json_rpc](https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc)
 -   [func_types](https://github.com/demergent-labs/kybra/tree/main/examples/func_types)
+-   [heartbeat](https://github.com/demergent-labs/kybra/tree/main/examples/heartbeat)
 -   [generators](https://github.com/demergent-labs/kybra/tree/main/examples/generators)
 -   [ledger_canister](https://github.com/demergent-labs/kybra/tree/main/examples/ledger_canister)
 -   [management_canister](https://github.com/demergent-labs/kybra/tree/main/examples/management_canister)
 -   [outgoing_http_requests](https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests)
+-   [threshold_ecdsa](https://github.com/demergent-labs/kybra/tree/main/examples/threshold_ecdsa)
 -   [rejections](https://github.com/demergent-labs/kybra/tree/main/examples/rejections)
 -   [timers](https://github.com/demergent-labs/kybra/tree/main/examples/timers)
 -   [whoami](https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/whoami)
@@ -26,7 +28,7 @@ Imagine a simple service called `token_canister`:
 from kybra import ic, nat64, Principal, StableBTreeMap, update
 
 accounts = StableBTreeMap[Principal, nat64](
-    memory_id=0, max_key_size=38, max_value_size=15
+    memory_id=3, max_key_size=38, max_value_size=15
 )
 
 
@@ -104,7 +106,7 @@ def payout(to: Principal, amount: nat64) -> Async[PayoutResult]:
 
 Notice that the `token_canister.transfer` method, because it is a cross-canister method, returns a `CallResult`. All cross-canister calls return `CallResult`, which has an `Ok` or `Err` property depending on if the cross-canister call was successful or not.
 
-The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a `CallResult`. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a `try...except` most likely won't do anything useful.
+The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a `CallResult`. Kybra does not raise on cross-canister calls. Wrapping your cross-canister call in a `try...except` most likely won't do anything useful.
 
 Let's add to our example code and explore adding some practical result-based error-handling to stop people from stealing tokens.
 
@@ -114,7 +116,7 @@ Let's add to our example code and explore adding some practical result-based err
 from kybra import ic, nat64, Principal, StableBTreeMap, update, Variant
 
 accounts = StableBTreeMap[Principal, nat64](
-    memory_id=0, max_key_size=38, max_value_size=15
+    memory_id=3, max_key_size=38, max_value_size=15
 )
 
 
@@ -207,7 +209,7 @@ def payout(to: Principal, amount: nat64) -> Async[PayoutResult]:
 
 So far we have only shown a cross-canister call from an update method. Update methods can call other update methods or query methods (but not composite query methods as discussed below). If an update method calls a query method, that query method will be called in replicated mode. Replicated mode engages the consensus process, but for queries the state will still be discarded.
 
-Cross-canister calls can also be initiated from query methods (not yet live on IC mainnet but this works locally). These are known as composite queries, and in Kybra they are simply query methods that return a generator using the `Async` type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.
+Cross-canister calls can also be initiated from query methods. These are known as composite queries, and in Kybra they are simply query methods that return a generator using the `Async` type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.
 
 Here's an example of a composite query method:
 
