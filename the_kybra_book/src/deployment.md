@@ -24,6 +24,18 @@ Alternatively you can start the local replica as a background process:
 dfx start --background
 ```
 
+If you want extra speedy deploys:
+
+```bash
+dfx start --artificial-delay 0
+```
+
+or
+
+```bash
+dfx start --background --artificial-delay 0
+```
+
 If you want to stop a local replica running in the background:
 
 ```bash
@@ -62,6 +74,15 @@ To deploy an individual canister:
 
 ```bash
 dfx deploy canister_name
+```
+
+If you are asked for a password, you'll need to create a new unencrypted dfx identity:
+
+```bash
+dfx identity new test_unencrypted --storage-mode plaintext
+dfx identity use test_unencrypted
+
+dfx deploy
 ```
 
 ## Interacting with your canister
@@ -125,7 +146,7 @@ There are other agents for other languages as well:
 
 ## Deploying to mainnet
 
-Assuming you have [created a cycles wallet](https://internetcomputer.org/docs/current/developer-docs/quickstart/network-quickstart) and funded it with cycles, then you are ready to deploy to mainnet.
+Assuming you are [setup with cycles](https://internetcomputer.org/docs/current/developer-docs/setup/cycles/), then you are ready to deploy to mainnet.
 
 To deploy all canisters defined in your dfx.json:
 
@@ -139,44 +160,11 @@ To deploy an individual canister:
 dfx deploy --network ic canister_name
 ```
 
-## Common deployment issues
-
-### Ubuntu
-
-Error:
+If you are asked for a password, you'll need to create a new unencrypted dfx identity:
 
 ```bash
-linker cc not found
-```
+dfx identity new test_unencrypted --storage-mode plaintext
+dfx identity use test_unencrypted
 
-Resolution:
-
-```bash
-sudo apt install build-essential
-```
-
-Error:
-
-```bash
-is cmake not installed?
-```
-
-Resolution:
-
-```bash
-sudo apt install cmake
-```
-
-Error:
-
-```bash
-ERROR: The Python ssl extension was not compiled. Missing the OpenSSL lib
-```
-
-Resolution:
-
-You may have the right version of open ssl but you might be missing libssl-dev
-
-```bash
-sudo apt-get install libssl-dev
+dfx deploy --network ic
 ```

@@ -65,4 +65,8 @@ def xkcd_raw() -> Async[Manual[HttpResponse]]:
 
 @query
 def xkcd_transform(args: HttpTransformArgs) -> HttpResponse:
-    return {**args["response"], "headers": []}
+    http_response = args["response"]
+
+    http_response["headers"] = []
+
+    return http_response

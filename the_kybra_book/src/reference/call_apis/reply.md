@@ -8,10 +8,10 @@ Examples:
 -   [manual_reply](https://github.com/demergent-labs/kybra/tree/main/examples/manual_reply)
 
 ```python
-from kybra import blob, ic, manual, update
+from kybra import blob, ic, Manual, update
 
 
 @update
-def update_blob() -> manual[blob]:
+def update_blob() -> Manual[blob]:
     ic.reply(bytes([83, 117, 114, 112, 114, 105, 115, 101, 33]))
 ```

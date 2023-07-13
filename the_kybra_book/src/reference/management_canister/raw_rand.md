@@ -10,7 +10,7 @@ Examples:
 -   [timers](https://github.com/demergent-labs/kybra/tree/main/examples/timers)
 
 ```python
-from kybra import Async, blob, CallResult, update
+from kybra import Async, blob, CallResult, match, update
 from kybra.canisters.management import management_canister
 
 
@@ -18,8 +18,5 @@ from kybra.canisters.management import management_canister
 def get_randomness_directly() -> Async[blob]:
     randomness_result: CallResult[blob] = yield management_canister.raw_rand()
 
-    if randomness_result.err is not None:
-        return bytes()
-
-    return randomness_result.ok
+    return match(randomness_result, {"Ok": lambda ok: ok, "Err": lambda err: err})
 ```

@@ -74,4 +74,8 @@ def eth_get_block_by_number(number: nat32) -> Async[JSON]:
 
 @query
 def eth_transform(args: HttpTransformArgs) -> HttpResponse:
-    return {**args["response"], "headers": []}
+    http_response = args["response"]
+
+    http_response["headers"] = []
+
+    return http_response

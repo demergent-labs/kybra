@@ -17,11 +17,21 @@ Python CDK for the [Internet Computer](https://internetcomputer.org/).
 
 ## Disclaimer
 
-Things to keep in mind:
+Kybra may have unknown security vulnerabilities due to the following:
 
 -   Kybra does not yet have many live, successful, continuously operating applications deployed to the IC
 -   Kybra does not yet have extensive automated property tests
 -   Kybra does not yet have multiple independent security reviews/audits
+-   Kybra uses a new Python interpreter that is less mature than CPython
+
+## Roadmap
+
+We hope to get to a production-ready 1.0 in 2024. The following are the major blockers to 1.0:
+
+-   CPython integration for performance, security, and stability
+-   Broad PyPI package support (C API/extensions)
+-   Extensive automated property testing
+-   Multiple independent security reviews/audits
 
 ## Documentation
 
@@ -30,15 +40,6 @@ See [The Kybra Book](https://demergent-labs.github.io/kybra/).
 ## Discussion
 
 Feel free to open issues or join us in the [Discord channel](https://discord.gg/ux2Jc7psjd).
-
-## Roadmap
-
-The following are the major blockers to 1.0:
-
--   Majority stdlib support (~Q2/Q3 2023)
--   Extensive automated property testing (~Q1/Q2 2023)
--   Multiple independent security reviews/audits (~Q3 2023)
--   Performance improvements if necessary (~2023)
 
 ## Contributing
 

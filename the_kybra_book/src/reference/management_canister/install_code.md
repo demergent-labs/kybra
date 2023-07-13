@@ -11,6 +11,7 @@ from kybra import (
     Async,
     blob,
     CallResult,
+    match,
     Principal,
     update,
     Variant,
@@ -20,8 +21,8 @@ from kybra.canisters.management import management_canister
 
 
 class DefaultResult(Variant, total=False):
-    ok: bool
-    err: str
+    Ok: bool
+    Err: str
 
 
 @update
@@ -37,8 +38,7 @@ def execute_install_code(
         }
     ).with_cycles(100_000_000_000)
 
-    if call_result.err is not None:
-        return {"err": call_result.err}
-
-    return {"ok": True}
+    return match(
+        call_result, {"Ok": lambda _: {"Ok": True}, "Err": lambda err: {"Err": err}}
+    )
 ```

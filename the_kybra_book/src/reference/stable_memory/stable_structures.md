@@ -14,67 +14,65 @@ Examples:
 
 ```python
 from kybra import (
-    InsertError,
+    Alias,
     nat64,
     nat8,
-    opt,
+    Opt,
     query,
     StableBTreeMap,
+    Tuple,
     update,
-    Variant
+    Vec,
 )
 
-Key = nat8
-Value = str
+Key = Alias[nat8]
+Value = Alias[str]
 
-class InsertResult(Variant, total=False):
-    ok: opt[Value]
-    err: InsertError
 
-map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[Key, Value](memory_id=3, max_key_size=100, max_value_size=1_000)
+
 
 @query
 def contains_key(key: Key) -> bool:
     return map.contains_key(key)
 
+
 @query
-def get(key: Key) -> opt[Value]:
+def get(key: Key) -> Opt[Value]:
     return map.get(key)
 
+
 @update
-def insert(key: Key, value: Value) -> InsertResult:
-    result = map.insert(key, value)
+def insert(key: Key, value: Value) -> Opt[Value]:
+    return map.insert(key, value)
 
-    if result.err is not None:
-        return {
-            'err': result.err
-        }
-
-    return {
-        'ok': result.ok
-    }
 
 @query
 def is_empty() -> bool:
     return map.is_empty()
 
-@query
-def items() -> list[tuple[Key, Value]]:
-    return map.items()
 
 @query
-def keys() -> list[Key]:
+def items() -> Vec[Tuple[Key, Value]]:
+    return map.items()
+
+
+@query
+def keys() -> Vec[Key]:
     return map.keys()
+
 
 @query
 def len() -> nat64:
     return map.len()
 
+
 @update
-def remove(key: Key) -> opt[Value]:
+def remove(key: Key) -> Opt[Value]:
     return map.remove(key)
 
+
 @query
-def values() -> list[Value]:
+def values() -> Vec[Value]:
     return map.values()
 ```

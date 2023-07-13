@@ -112,27 +112,23 @@ def update_capture_status(value: str):
     status["capture"] = value
 
 
-# TODO It would probably be better for this to have a return type of Async[void] once we have void types working
-def single_cross_canister_timer_callback() -> Async[blob]:
+def single_cross_canister_timer_callback() -> Async[void]:
     ic.print("single_cross_canister_timer_callback")
 
     result: CallResult[blob] = yield management_canister.raw_rand()
 
-    def handle_ok(ok: blob) -> blob:
+    def handle_ok(ok: blob):
         status["single_cross_canister"] = ok
-        return ok
 
-    return match(result, {"Ok": handle_ok, "Err": lambda _: bytes()})
+    match(result, {"Ok": handle_ok, "Err": lambda err: ic.print(err)})
 
 
-# TODO It would probably be better for this to have a return type of Async[void] once we have void types working
-def repeat_cross_canister_timer_callback() -> Async[blob]:
+def repeat_cross_canister_timer_callback() -> Async[void]:
     ic.print("repeat_cross_canister_timer_callback")
 
     result: CallResult[blob] = yield management_canister.raw_rand()
 
-    def handle_ok(ok: blob) -> blob:
+    def handle_ok(ok: blob):
         status["repeat_cross_canister"] += ok
-        return ok
 
-    return match(result, {"Ok": handle_ok, "Err": lambda _: bytes()})
+    match(result, {"Ok": handle_ok, "Err": lambda err: ic.print(err)})

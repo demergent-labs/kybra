@@ -7,6 +7,8 @@ Examples:
 -   [ic_api](https://github.com/demergent-labs/kybra/tree/main/examples/ic_api)
 -   [null_example](https://github.com/demergent-labs/kybra/tree/main/examples/null_example)
 
+You should always use `ic.print` instead of `print`.
+
 ```python
 from kybra import ic, query
 

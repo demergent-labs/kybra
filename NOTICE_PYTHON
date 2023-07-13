@@ -1,0 +1,6 @@
+In case any of Kybra or Demergent Labs' [fork of RustPython](https://github.com/demergent-labs/RustPython) is considered [a derivative work that is based on
+or incorporates Python or any part thereof](https://github.com/python/cpython/blob/main/LICENSE), here is a brief summary of potential changes made to Python.
+
+Kybra attempts to provide a Python environment for executing applications on the [Internet Computer](https://internetcomputer.org/). It leverages [RustPython](https://github.com/RustPython/RustPython) and compiles it to Wasm to provide the Python runtime. RustPython is a Rust implementation of Python.
+
+Kybra attempts to replicate a Python environment that is as close to [CPython](https://github.com/python/cpython) as possible, but may need to adapt certain Python functionality for use on the Internet Computer.

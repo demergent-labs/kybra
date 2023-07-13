@@ -4,14 +4,25 @@ Kybra is a [Python](https://www.python.org/) [Canister Development Kit](https://
 
 -   [GitHub repo](https://github.com/demergent-labs/kybra)
 -   [PyPI package](https://pypi.org/project/kybra/)
+-   [Discord channel](https://discord.gg/ux2Jc7psjd)
 
 ## Disclaimer
 
-Things to keep in mind:
+Kybra may have unknown security vulnerabilities due to the following:
 
 -   Kybra does not yet have many live, successful, continuously operating applications deployed to the IC
 -   Kybra does not yet have extensive automated property tests
 -   Kybra does not yet have multiple independent security reviews/audits
+-   Kybra uses a new Python interpreter that is less mature than CPython
+
+## Roadmap
+
+We hope to get to a production-ready 1.0 in 2024. The following are the major blockers to 1.0:
+
+-   CPython integration for performance, security, and stability
+-   Broad PyPI package support (C API/extensions)
+-   Extensive automated property testing
+-   Multiple independent security reviews/audits
 
 ## Demergent Labs
 
@@ -65,7 +76,7 @@ Because the IC allows for group and autonomous ownership of cloud software, the 
 
 ##### Credible neutrality
 
-Group and autonomous ownership makes it is possible to build neutral cloud software on the IC. This type of software would allow independent parties to coordinate with reduced trust in each other or a single third-party coordinator.
+Group and autonomous ownership makes it possible to build neutral cloud software on the IC. This type of software would allow independent parties to coordinate with reduced trust in each other or a single third-party coordinator.
 
 This removes the risk of the third-party coordinator acting in its own self-interest against the interests of the coordinating participants. The coordinating participants would also find it difficult to implement changes that would benefit themselves to the detriment of other participants.
 
@@ -73,7 +84,7 @@ Examples could include mobile app stores, ecommerce marketplaces, and podcast di
 
 ##### Reduced platform risk
 
-Because the IC is not owned or controlled by any one entity or individual, the risk of being deplatformed is reduced. This is in opposition to most cloud platforms, where the cloud provider itself generally has the power to arbitrarily remove users from its platform. While deplatforming can still occur on the IC, the only endongenous means of forcefully taking down an application is through an NNS vote.
+Because the IC is not owned or controlled by any one entity or individual, the risk of being deplatformed is reduced. This is in opposition to most cloud platforms, where the cloud provider itself generally has the power to arbitrarily remove users from its platform. While deplatforming can still occur on the IC, the only endogenous means of forcefully taking down an application is through an NNS vote.
 
 #### Security
 
@@ -112,6 +123,8 @@ The IC provides a number of threshold protocols that allow groups of independent
 ##### Verifiable source code
 
 IC applications (canisters) are compiled into Wasm and deployed to the IC as Wasm modules. The IC hashes each canister's Wasm binary and stores it for public retrieval. The Wasm binary hash can be retrieved and compared with the hash of an independently compiled Wasm binary derived from available source code. If the hashes match, then one can know with a high degree of certainty that the application is executing the Wasm binary that was compiled from that source code.
+
+For the time being, Kybra source code is not verifiable for reasons explained in the [caveats section](./caveats.md#wasm-module-hash-now-less-useful).
 
 ##### Blockchain integration
 
@@ -153,12 +166,12 @@ Some of Kybra's main drawbacks can be summarized as follows:
 
 ##### Beta
 
-Kybra reached beta in December of 2022. It's an immature project that may have unforeseen bugs and other issues. We're working constantly to improve it. We hope to get to a production-ready 1.0 in 2023. The following are the major blockers to 1.0:
+Kybra reached beta in December of 2022. It's an immature project that may have unforeseen bugs and other issues. We're working constantly to improve it. We hope to get to a production-ready 1.0 in 2024. The following are the major blockers to 1.0:
 
--   Majority stdlib support (~Q2/Q3 2023)
--   Extensive automated property testing (~Q1/Q2 2023)
--   Multiple independent security reviews/audits (~Q3 2023)
--   Performance improvements if necessary (~2023)
+-   CPython integration for performance, security, and stability
+-   Broad PyPI package support (C API/extensions)
+-   Extensive automated property testing
+-   Multiple independent security reviews/audits
 
 ##### Security risks
 
@@ -167,16 +180,17 @@ As discussed earlier, these are some things to keep in mind:
 -   Kybra does not yet have many live, successful, continuously operating applications deployed to the IC
 -   Kybra does not yet have extensive automated property tests
 -   Kybra does not yet have multiple independent security reviews/audits
+-   Kybra uses a new Python interpreter that is less mature than CPython
 
 ##### High cycle usage
 
-We haven't done extensive benchmarking yet, but based on some preliminary evidence Kybra is likely much more performant than [Azle](https://github.com/demergent-labs/azle). We have done some preliminary benchmarking for Azle, and based on that our rough heuristic is that Azle will cost 2-4x more cycles than the equivalent project in Motoko or Rust. The performance of your application depends on many factors, and this should just be a rough estimate.
+We haven't done extensive benchmarking yet, but based on some preliminary evidence Kybra is likely much more performant than [Azle](https://demergent-labs.github.io/azle/azle.html#high-cycle-usage). We have done some preliminary benchmarking for Azle, and based on that our rough heuristic is that Azle will cost 2-4x more cycles than the equivalent project in Motoko or Rust. The performance of your application depends on many factors, and this should just be a rough estimate.
 
-There is evidence to suggest that a 7-20x improvement in performance is possible in our [underlying Python interpreter](https://github.com/RustPython/RustPython).
+There is evidence to suggest that a 7-20x improvement in performance is possible in our [underlying Python interpreter](https://github.com/RustPython/RustPython). We also plan to migrate to CPython which would improve performance.
 
 ##### Missing APIs
 
-Kybra does not yet have full `stdlib` support or C extension support. It is using a new Python interpreter running in a very new and very different environment. Our goal is to support as many libraries and APIs as possible over time.
+Kybra is limited to what the IC is capable of (i.e. no sockets, no threads, etc) and does not yet have C extension support. Our goal is to support as many libraries and APIs as possible over time.
 
 #### IC
 
@@ -207,7 +221,7 @@ The IC might not be able to scale to the needs of your application. It is consta
 
 ##### Lack of privacy
 
-You should assume that all of your application data is accessible to multiple third-parties with no direct relationship and limited commitment to you. Currently all canister state sits unencrypted on node operator's machines. Application-layer access controls for data are possible, but motivated node operators will have an easy time getting access to your data.
+You should assume that all of your application data (unless it is end-to-end encrypted) is accessible to multiple third-parties with no direct relationship and limited commitment to you. Currently all canister state sits unencrypted on node operator's machines. Application-layer access controls for data are possible, but motivated node operators will have an easy time getting access to your data.
 
 ##### NNS risk
 

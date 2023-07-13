@@ -7,9 +7,13 @@ Examples:
 -   [cycles](https://github.com/demergent-labs/kybra/tree/main/examples/cycles)
 
 ```python
-from kybra import Async, blob, CallResult, Principal, update, void
+from kybra import Async, blob, CallResult, match, Principal, update, Variant, void
 from kybra.canisters.management import management_canister
-from src.types import DefaultResult
+
+
+class DefaultResult(Variant, total=False):
+    Ok: bool
+    Err: str
 
 
 @update
@@ -25,8 +29,7 @@ def execute_install_code(
         }
     ).with_cycles128(100_000_000_000)
 
-    if call_result.err is not None:
-        return {"err": call_result.err}
-
-    return {"ok": True}
+    return match(
+        call_result, {"Ok": lambda _: {"Ok": True}, "Err": lambda err: {"Err": err}}
+    )
 ```

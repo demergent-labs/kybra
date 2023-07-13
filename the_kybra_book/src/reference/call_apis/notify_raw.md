@@ -7,12 +7,12 @@ Examples:
 -   [notify_raw](https://github.com/demergent-labs/kybra/tree/main/examples/notify_raw)
 
 ```python
-from kybra import ic, Principal, RejectionCode, update, Variant
+from kybra import ic, match, Principal, RejectionCode, update, Variant
 
 
 class SendNotificationResult(Variant, total=False):
-    ok: bool
-    err: RejectionCode
+    Ok: bool
+    Err: RejectionCode
 
 
 @update
@@ -24,8 +24,7 @@ def send_notification() -> SendNotificationResult:
         0,
     )
 
-    if "err" in result:
-        return {"err": result["err"]}
-
-    return {"ok": True}
+    return match(
+        result, {"Ok": lambda _: {"Ok": True}, "Err": lambda err: {"Err": err}}
+    )
 ```

@@ -9,9 +9,11 @@ Python:
 ```python
 from kybra import ic, Principal, query
 
+
 @query
 def get_principal() -> Principal:
-    return Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai')
+    return Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai")
+
 
 @query
 def print_principal(principal: Principal) -> Principal:
@@ -21,7 +23,7 @@ def print_principal(principal: Principal) -> Principal:
 
 Candid:
 
-```python
+```
 service: {
     "get_principal": () -> (principal) query;
     "print_principal": (principal) -> (principal) query;

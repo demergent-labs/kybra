@@ -9,9 +9,11 @@ Python:
 ```python
 from kybra import ic, int8, query
 
+
 @query
 def get_int8() -> int8:
     return 127
+
 
 @query
 def print_int8(int8: int8) -> int8:
@@ -21,7 +23,7 @@ def print_int8(int8: int8) -> int8:
 
 Candid:
 
-```python
+```
 service: {
     "get_int8": () -> (int8) query;
     "print_int8": (int8) -> (int8) query;

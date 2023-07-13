@@ -30,7 +30,7 @@ class Firework(Variant, total=False):
 
 Candid:
 
-```python
+```
 type ReactionType = variant {
     "Fire": null;
     "ThumbsUp": null;

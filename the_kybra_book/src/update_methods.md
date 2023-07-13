@@ -19,6 +19,7 @@ from kybra import nat64, update
 
 counter = 0
 
+
 @update
 def increment() -> nat64:
     global counter
@@ -35,11 +36,13 @@ Due to the latency and other expenses involved with update methods, it is best t
 ```python
 from kybra import query, update, void
 
-message = ''
+message = ""
+
 
 @query
 def get_message() -> str:
     return message
+
 
 @update
 def set_message(new_message: str) -> void:
@@ -52,29 +55,34 @@ You'll notice that we use an update method, `set_message`, only to perform the c
 Keep in mind that the heap is limited to 4 GiB, and thus there is an upper bound to global variable storage capacity. You can imagine how a simple database like the following would eventually run out of memory with too many entries:
 
 ```python
-from kybra import opt, query, update, void
+from kybra import Opt, query, update, void
 
 db: dict[str, str] = {}
 
+
 @query
-def get(key: str) -> opt[str]:
+def get(key: str) -> Opt[str]:
     return db.get(key)
+
 
 @update
 def set(key: str, value: str) -> void:
     db[key] = value
+
 ```
 
 If you need more than 4 GiB of storage, consider taking advantage of the 48 GiB of stable memory. Stable structures like `StableBTreeMap` give you a nice API for interacting with stable memory. These data structures will be [covered in more detail later](./stable_structures.md). Here's a simple example:
 
 ```python
-from kybra import opt, query, StableBTreeMap, update, void
+from kybra import Opt, query, StableBTreeMap, update, void
 
-db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
+db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
+
 
 @query
-def get(key: str) -> opt[str]:
+def get(key: str) -> Opt[str]:
     return db.get(key)
+
 
 @update
 def set(key: str, value: str) -> void:
@@ -88,59 +96,66 @@ Traps can be useful for ensuring that multiple operations are either all complet
 Here's an example of how to trap and ensure atomic changes to your database:
 
 ```python
-from kybra import ic, opt, query, Record, StableBTreeMap, update, void
+from kybra import ic, Opt, query, Record, StableBTreeMap, update, Vec, void
+
 
 class Entry(Record):
     key: str
     value: str
 
-db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
+
+db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
+
 
 @query
-def get(key: str) -> opt[str]:
+def get(key: str) -> Opt[str]:
     return db.get(key)
+
 
 @update
 def set(key: str, value: str) -> void:
     db.insert(key, value)
 
-@update
-def set_many(entries: list[Entry]) -> void:
-    for entry in entries:
-        result = db.insert(entry['key'], entry['value'])
 
-        if result.err is not None:
-            ic.trap(str(result.err))
+@update
+def set_many(entries: Vec[Entry]) -> void:
+    for entry in entries:
+        if entry["key"] == "trap":
+            ic.trap("explicit trap")
+
+        db.insert(entry["key"], entry["value"])
 ```
 
 In addition to `ic.trap`, an explicit Python `raise` or any unhandled exception will also trap.
 
-There is a limit to how much computation can be done in a single call to an update method. The current update call limit is [20 billion Wasm instructions](https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits). If we modify our database example, we can introduce an update method that runs the risk reaching the limit:
+There is a limit to how much computation can be done in a single call to an update method. The current update call limit is [20 billion Wasm instructions](https://internetcomputer.org/docs/current/developer-docs/production/instruction-limits). If we modify our database example, we can introduce an update method that runs the risk of reaching the limit:
 
 ```python
-from kybra import ic, nat64, opt, query, Record, StableBTreeMap, update, void
+from kybra import nat64, Opt, query, Record, StableBTreeMap, update, void
+
 
 class Entry(Record):
     key: str
     value: str
 
-db = StableBTreeMap[str, str](memory_id=0, max_key_size=1_000, max_value_size=1_000)
+
+db = StableBTreeMap[str, str](memory_id=3, max_key_size=1_000, max_value_size=1_000)
+
 
 @query
-def get(key: str) -> opt[str]:
+def get(key: str) -> Opt[str]:
     return db.get(key)
+
 
 @update
 def set(key: str, value: str) -> void:
     db.insert(key, value)
 
+
 @update
 def set_many(num_entries: nat64) -> void:
     for i in range(num_entries):
-        result = db.insert(str(i), str(i))
-
-        if result.err is not None:
-            ic.trap(str(result.err))
+        db.insert(str(i), str(i))
 ```
 
 From the `dfx command line` you can call `set_many` like this:

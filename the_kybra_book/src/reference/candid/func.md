@@ -2,11 +2,7 @@
 
 This section is a work in progress.
 
-WARNING: `Func` currently [causes type errors in VS Code](https://github.com/demergent-labs/kybra/issues/229). Get around this by ending your `Func` type declaration with the following comment: `# type: ignore`
-
 The Kybra type `Func` corresponds to the [Candid type func](https://internetcomputer.org/docs/current/references/candid-ref#type-func---) and at runtime will become a Python tuple with two elements, the first being an [ic-py Principal](https://github.com/rocklabs-io/ic-py) and the second being a [Python str](https://docs.python.org/3/library/stdtypes.html#textseq). The `ic-py Principal` represents the `principal` of the canister/service where the function exists, and the `str` represents the function's name.
-
-Note that an explicit `TypeAlias` must be used when defining a `func`.
 
 Python:
 
@@ -43,7 +39,7 @@ def get_complex_func() -> ComplexFunc:
 
 Candid:
 
-```python
+```
 type User = record {
     "id": text;
     "basic_func": BasicFunc;

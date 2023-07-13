@@ -9,9 +9,11 @@ Python:
 ```python
 from kybra import ic, query
 
+
 @query
 def get_null() -> None:
     return None
+
 
 @query
 def print_null(none: None) -> None:
@@ -21,7 +23,7 @@ def print_null(none: None) -> None:
 
 Candid:
 
-```python
+```
 service: {
     "get_null": () -> (null) query;
     "print_null": (null) -> (null) query;

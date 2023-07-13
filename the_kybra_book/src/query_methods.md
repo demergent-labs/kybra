@@ -16,9 +16,10 @@ The most basic way to expose your canister's functionality publicly is through a
 ```python
 from kybra import query
 
+
 @query
 def get_string() -> str:
-    return 'This is a query method!'
+    return "This is a query method!"
 ```
 
 `get_string` can be called from the outside world through the IC's HTTP API. You'll usually invoke this API from the [`dfx command line`, `dfx web UI`, or an agent](./deployment.md#interacting-with-your-canister).
@@ -36,12 +37,13 @@ from kybra import query, void
 
 db = {}
 
+
 @query
 def set(key: str, value: str) -> void:
     db[key] = value
 ```
 
-Calling `set` will perform the operation of setting the `key` property on the `db` object to `value`, but after the call finishes that change will be discarded.
+Calling `set` will perform the operation of setting the `key` item on the `db` dictionary to `value`, but after the call finishes that change will be discarded.
 
 This is because query methods are executed on a single node machine and do not go through [consensus](https://internetcomputer.org/how-it-works/consensus/). This results in lower latencies, perhaps on the order of 100 milliseconds.
 
@@ -50,13 +52,17 @@ There is a limit to how much computation can be done in a single call to a query
 ```python
 from kybra import nat32, query
 
+
 @query
 def pyramid(levels: nat32) -> str:
     levels_array = [0 for _ in range(levels)]
-    asterisk_array = [ ['*' for _ in range(i + 1)] + ['\n'] for i in range(len(levels_array)) ]
+    asterisk_array = [
+        ["*" for _ in range(i + 1)] + ["\n"] for i in range(len(levels_array))
+    ]
     flattened_array = [element for subarray in asterisk_array for element in subarray]
 
-    return ''.join(flattened_array)
+    return "".join(flattened_array)
+
 ```
 
 From the `dfx command line` you can call `pyramid` like this:

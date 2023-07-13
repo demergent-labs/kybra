@@ -7,8 +7,16 @@ Examples:
 -   [rejections](https://github.com/demergent-labs/kybra/tree/main/examples/rejections)
 
 ```python
-from kybra import Async, ic, update
-from src.some_service.types import some_service
+from kybra import Async, ic, Principal, Service, service_update, update, void
+
+
+class SomeService(Service):
+    @service_update
+    def reject(self, message: str) -> void:
+        ...
+
+
+some_service = SomeService(Principal.from_str("rkp4c-7iaaa-aaaaa-aaaca-cai"))
 
 
 @update

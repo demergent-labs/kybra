@@ -41,26 +41,31 @@ The following is a simple example showing how to import and use most of the Cand
 ```python
 from kybra import (
     blob,
-    nat,
-    nat64,
-    nat32,
-    nat16,
-    nat8,
-    int64,
-    int32,
-    int16,
-    int8,
     float64,
     float32,
-    null,
-    opt,
-    Principal,
-    Variant,
     Func,
+    int8,
+    int16,
+    int32,
+    int64,
+    nat,
+    nat8,
+    nat16,
+    nat32,
+    nat64,
+    null,
+    Opt,
+    Principal,
     query,
     Query,
-    Record
+    Record,
+    Service,
+    service_query,
+    service_update,
+    Variant,
+    Vec,
 )
+
 
 class Candid(Record):
     text: str
@@ -78,56 +83,67 @@ class Candid(Record):
     float64: float64
     float32: float32
     bool: bool
-    opt: opt['nat']
-    record: 'CandidRecord'
-    variant: 'CandidVariant'
-    func: 'CandidFunc'
+    null: null
+    vec: Vec[str]
+    opt: Opt["nat"]
+    record: "CandidRecord"
+    variant: "CandidVariant"
+    func: "CandidFunc"
+    service: "MyService"
     principal: Principal
+
 
 class CandidRecord(Record):
     first_name: str
     last_name: str
     age: nat8
 
+
 class CandidVariant(Variant, total=False):
     Tag1: null
     Tag2: null
     Tag3: int
 
+
+class MyService(Service):
+    @service_query
+    def query1(self) -> bool:
+        ...
+
+    @service_update
+    def update1(self) -> str:
+        ...
+
+
 CandidFunc = Func(Query[[], Candid])
+
 
 @query
 def candid_types() -> Candid:
     return {
-        'text': 'text',
-        'blob': bytes(),
-        'nat': 340_282_366_920_938_463_463_374_607_431_768_211_455,
-        'nat64': 18_446_744_073_709_551_615,
-        'nat32': 4_294_967_295,
-        'nat16': 65_535,
-        'nat8': 255,
-        'int': 170_141_183_460_469_231_731_687_303_715_884_105_727,
-        'int64': 9_223_372_036_854_775_807,
-        'int32': 2_147_483_647,
-        'int16': 32_767,
-        'int8': 127,
-        'float64': 0.0,
-        'float32': 0.0,
-        'bool': True,
-        'opt': None,
-        'record': {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'age': 35
-        },
-        'variant': {
-            'Tag1': None
-        },
-        'func': (
-            Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai'),
-            'candid_types'
-        ),
-        'principal': Principal.from_str('ryjl3-tyaaa-aaaaa-aaaba-cai')
+        "text": "text",
+        "blob": bytes(),
+        "nat": 340_282_366_920_938_463_463_374_607_431_768_211_455,
+        "nat64": 18_446_744_073_709_551_615,
+        "nat32": 4_294_967_295,
+        "nat16": 65_535,
+        "nat8": 255,
+        "int": 170_141_183_460_469_231_731_687_303_715_884_105_727,
+        "int64": 9_223_372_036_854_775_807,
+        "int32": 2_147_483_647,
+        "int16": 32_767,
+        "int8": 127,
+        "float64": 0.0,
+        "float32": 0.0,
+        "bool": True,
+        "null": None,
+        "vec": ["has one element"],
+        "opt": None,
+        "record": {"first_name": "John", "last_name": "Doe", "age": 35},
+        "variant": {"Tag1": None},
+        "func": (Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai"), "candid_types"),
+        "service": MyService(Principal.from_str("aaaaa-aa")),
+        "principal": Principal.from_str("ryjl3-tyaaa-aaaaa-aaaba-cai"),
     }
 ```
 
@@ -139,12 +155,15 @@ Calling `candid_types` with `dfx` will return:
     "int" = 170_141_183_460_469_231_731_687_303_715_884_105_727 : int;
     "nat" = 340_282_366_920_938_463_463_374_607_431_768_211_455 : nat;
     "opt" = null;
+    "vec" = vec { "has one element" };
+    "service" = service "aaaaa-aa";
     "principal" = principal "ryjl3-tyaaa-aaaaa-aaaba-cai";
     "blob" = vec {};
     "bool" = true;
     "func" = func "rrkah-fqaaa-aaaaa-aaaaq-cai".candid_types;
     "int8" = 127 : int8;
     "nat8" = 255 : nat8;
+    "null" = null : null;
     "text" = "text";
     "nat16" = 65_535 : nat16;
     "nat32" = 4_294_967_295 : nat32;
@@ -173,9 +192,11 @@ Python:
 ```python
 from kybra import ic, query
 
+
 @query
 def get_string() -> str:
-    return 'Hello world!'
+    return "Hello world!"
+
 
 @query
 def print_string(string: str) -> str:
@@ -201,9 +222,11 @@ Python:
 ```Python
 from kybra import blob, ic, query
 
+
 @query
 def get_blob() -> blob:
     return bytes([68, 73, 68, 76, 0, 0])
+
 
 @query
 def print_blob(blob: blob) -> blob:
@@ -213,7 +236,7 @@ def print_blob(blob: blob) -> blob:
 
 Candid:
 
-```python
+```
 service: {
     "get_blob": () -> (blob) query;
     "print_blob": (blob) -> (blob) query;
@@ -229,9 +252,11 @@ Python:
 ```python
 from kybra import ic, nat, query
 
+
 @query
 def get_nat() -> nat:
     return 340_282_366_920_938_463_463_374_607_431_768_211_455
+
 
 @query
 def print_nat(nat: nat) -> nat:
@@ -241,7 +266,7 @@ def print_nat(nat: nat) -> nat:
 
 Candid:
 
-```python
+```
 service: {
     "get_nat": () -> (nat) query;
     "print_nat": (nat) -> (nat) query;
@@ -257,9 +282,11 @@ Python:
 ```python
 from kybra import ic, nat64, query
 
+
 @query
 def get_nat64() -> nat64:
     return 18_446_744_073_709_551_615
+
 
 @query
 def print_nat64(nat64: nat64) -> nat64:
@@ -269,7 +296,7 @@ def print_nat64(nat64: nat64) -> nat64:
 
 Candid:
 
-```python
+```
 service: {
     "get_nat64": () -> (nat64) query;
     "print_nat64": (nat64) -> (nat64) query;
@@ -285,9 +312,11 @@ Python:
 ```python
 from kybra import ic, nat32, query
 
+
 @query
 def get_nat32() -> nat32:
     return 4_294_967_295
+
 
 @query
 def print_nat32(nat32: nat32) -> nat32:
@@ -297,7 +326,7 @@ def print_nat32(nat32: nat32) -> nat32:
 
 Candid:
 
-```python
+```
 service: {
     "get_nat32": () -> (nat32) query;
     "print_nat32": (nat32) -> (nat32) query;
@@ -313,9 +342,11 @@ Python:
 ```python
 from kybra import ic, nat16, query
 
+
 @query
 def get_nat16() -> nat16:
     return 65_535
+
 
 @query
 def print_nat16(nat16: nat16) -> nat16:
@@ -325,7 +356,7 @@ def print_nat16(nat16: nat16) -> nat16:
 
 Candid:
 
-```python
+```
 service: {
     "get_nat16": () -> (nat16) query;
     "print_nat16": (nat16) -> (nat16) query;
@@ -341,9 +372,11 @@ Python:
 ```python
 from kybra import ic, nat8, query
 
+
 @query
 def get_nat8() -> nat8:
     return 255
+
 
 @query
 def print_nat8(nat8: nat8) -> nat8:
@@ -353,7 +386,7 @@ def print_nat8(nat8: nat8) -> nat8:
 
 Candid:
 
-```python
+```
 service: {
     "get_nat8": () -> (nat8) query;
     "print_nat8": (nat8) -> (nat8) query;
@@ -383,7 +416,7 @@ def print_int(int: int) -> int:
 
 Candid:
 
-```python
+```
 service: {
     "get_int": () -> (int) query;
     "print_int": (int) -> (int) query;
@@ -413,7 +446,7 @@ def print_int64(int64: int64) -> int64:
 
 Candid:
 
-```python
+```
 service: {
     "get_int64": () -> (int64) query;
     "print_int64": (int64) -> (int64) query;
@@ -429,9 +462,11 @@ Python:
 ```python
 from kybra import ic, int32, query
 
+
 @query
 def get_int32() -> int32:
     return 2_147_483_647
+
 
 @query
 def print_int32(int32: int32) -> int32:
@@ -441,7 +476,7 @@ def print_int32(int32: int32) -> int32:
 
 Candid:
 
-```python
+```
 service: {
     "get_int32": () -> (int32) query;
     "print_int32": (int32) -> (int32) query;
@@ -457,9 +492,11 @@ Python:
 ```python
 from kybra import ic, int16, query
 
+
 @query
 def get_int16() -> int16:
     return 32_767
+
 
 @query
 def print_int16(int16: int16) -> int16:
@@ -469,7 +506,7 @@ def print_int16(int16: int16) -> int16:
 
 Candid:
 
-```python
+```
 service: {
     "get_int16": () -> (int16) query;
     "print_int16": (int16) -> (int16) query;
@@ -485,9 +522,11 @@ Python:
 ```python
 from kybra import ic, int8, query
 
+
 @query
 def get_int8() -> int8:
     return 127
+
 
 @query
 def print_int8(int8: int8) -> int8:
@@ -497,7 +536,7 @@ def print_int8(int8: int8) -> int8:
 
 Candid:
 
-```python
+```
 service: {
     "get_int8": () -> (int8) query;
     "print_int8": (int8) -> (int8) query;
@@ -520,6 +559,7 @@ from kybra import float64, ic, query
 def get_float64() -> float64:
     return math.e
 
+
 @query
 def print_float64(float64: float64) -> float64:
     ic.print(type(float64))
@@ -528,7 +568,7 @@ def print_float64(float64: float64) -> float64:
 
 Candid:
 
-```python
+```
 service: {
     "get_float64": () -> (float64) query;
     "print_float64": (float64) -> (float64) query;
@@ -560,7 +600,7 @@ def print_float32(float32: float32) -> float32:
 
 Candid:
 
-```python
+```
 service: {
     "get_float32": () -> (float32) query;
     "print_float32": (float32) -> (float32) query;
@@ -576,9 +616,11 @@ Python:
 ```Python
 from kybra import ic, query
 
+
 @query
 def get_bool() -> bool:
     return True
+
 
 @query
 def print_bool(bool: bool) -> bool:
@@ -588,7 +630,7 @@ def print_bool(bool: bool) -> bool:
 
 Candid:
 
-```python
+```
 service: {
     "get_bool": () -> (bool) query;
     "print_bool": (bool) -> (bool) query;
@@ -597,26 +639,28 @@ service: {
 
 #### null
 
-The Python type `None` and the Kybra type `null` both correspond to the [Candid type null](https://internetcomputer.org/docs/current/references/candid-ref#type-null) and will become the [Python Null Object](https://docs.python.org/3/library/stdtypes.html#the-null-object) at runtime.
+The Kybra type `null` corresponds to the [Candid type null](https://internetcomputer.org/docs/current/references/candid-ref#type-null) and will become the [Python Null Object](https://docs.python.org/3/library/stdtypes.html#the-null-object) at runtime.
 
 Python:
 
 ```python
-from kybra import ic, query
+from kybra import ic, null, query
+
 
 @query
-def get_null() -> None:
+def get_null() -> null:
     return None
 
+
 @query
-def print_null(none: None) -> None:
+def print_null(none: null) -> null:
     ic.print(type(none))
     return none
 ```
 
 Candid:
 
-```python
+```
 service: {
     "get_null": () -> (null) query;
     "print_null": (null) -> (null) query;
@@ -625,47 +669,50 @@ service: {
 
 #### vec
 
-The Python type `list` corresponds to the [Candid type vec](https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t) and will become an array of the specified type at runtime.
+The Kybra type `Vec` corresponds to the [Candid type vec](https://internetcomputer.org/docs/current/references/candid-ref#type-vec-t) and will become an array of the specified type at runtime.
 
 Python:
 
 ```python
-from kybra import int32, query
+from kybra import int32, query, Vec
+
 
 @query
-def get_numbers() -> list[int32]:
+def get_numbers() -> Vec[int32]:
     return [0, 1, 2, 3]
 ```
 
 Candid:
 
-```python
+```
 service: {
     "get_numbers": () -> (vec int32) query;
 }
 ```
 
-#### opt
+#### Opt
 
-The Kybra type `opt` corresponds to the [Candid type opt](https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t) and will become the enclosed Python type or None at runtime.
+The Kybra type `Opt` corresponds to the [Candid type opt](https://internetcomputer.org/docs/current/references/candid-ref#type-opt-t) and will become the enclosed Python type or None at runtime.
 
 Python:
 
 ```python
-from kybra import opt, query
+from kybra import Opt, query
+
 
 @query
-def get_opt_some() -> opt[bool]:
+def get_opt_some() -> Opt[bool]:
     return True
 
+
 @query
-def get_opt_none() -> opt[bool]:
+def get_opt_none() -> Opt[bool]:
     return None
 ```
 
 Candid:
 
-```python
+```
 service: {
     "get_opt_some": () -> (opt bool) query;
     "get_opt_none": () -> (opt bool) query;
@@ -679,7 +726,7 @@ Python classes that inherit from the Kybra type `Record` correspond to the [Cand
 Python:
 
 ```python
-from kybra import Record
+from kybra import Record, Vec
 
 
 class Post(Record):
@@ -692,20 +739,20 @@ class Post(Record):
 class Thread(Record):
     id: str
     author: "User"
-    posts: list[Post]
+    posts: Vec[Post]
     title: str
 
 
 class User(Record):
     id: str
-    posts: list[Post]
-    thread: list[Thread]
+    posts: Vec[Post]
+    thread: Vec[Thread]
     username: str
 ```
 
 Candid:
 
-```python
+```
 type Post = record {
     "id": text;
     "author": User;
@@ -735,20 +782,20 @@ Python classes that inherit from the Kybra type `Variant` correspond to the [Can
 Python:
 
 ```python
-from kybra import nat32, Variant
+from kybra import nat32, null, Variant
 
 
 class ReactionType(Variant, total=False):
-    Fire: None
-    ThumbsUp: None
-    ThumbsDown: None
+    Fire: null
+    ThumbsUp: null
+    ThumbsDown: null
     Emotion: "Emotion"
     Firework: "Firework"
 
 
 class Emotion(Variant, total=False):
-    Happy: None
-    Sad: None
+    Happy: null
+    Sad: null
 
 
 class Firework(Variant, total=False):
@@ -758,7 +805,7 @@ class Firework(Variant, total=False):
 
 Candid:
 
-```python
+```
 type ReactionType = variant {
     "Fire": null;
     "ThumbsUp": null;
@@ -817,7 +864,7 @@ def get_complex_func() -> ComplexFunc:
 
 Candid:
 
-```python
+```
 type User = record {
     "id": text;
     "basic_func": BasicFunc;
@@ -837,7 +884,53 @@ service: () -> {
 
 #### service
 
-[Not yet implemented.](https://github.com/demergent-labs/kybra/issues/124)
+Python classes that inherit from the Kybra type `Service` correspond to the [Candid service type](https://internetcomputer.org/docs/current/references/candid-ref#type-service-) and will become child classes capable of creating instances that can perform cross-canister calls at runtime.
+
+Python:
+
+```python
+from kybra import (
+    Async,
+    CallResult,
+    Principal,
+    query,
+    Service,
+    service_query,
+    service_update,
+    update,
+)
+
+
+class SomeService(Service):
+    @service_query
+    def query1(self) -> bool:
+        ...
+
+    @service_update
+    def update1(self) -> str:
+        ...
+
+
+@query
+def get_service() -> SomeService:
+    return SomeService(Principal.from_str("aaaaa-aa"))
+
+
+@update
+def call_service(service: SomeService) -> Async[str]:
+    result: CallResult[str] = yield service.update1()
+
+    if result.Err is not None:
+        raise Exception(f"call to service.update1 failed with: {result.Err}")
+
+    return result.Ok
+```
+
+Candid:
+
+```
+service { query1 : () -> (bool) query; update1 : () -> (text) }
+```
 
 #### principal
 
@@ -848,9 +941,11 @@ Python:
 ```python
 from kybra import ic, Principal, query
 
+
 @query
 def get_principal() -> Principal:
-    return Principal.from_str('rrkah-fqaaa-aaaaa-aaaaq-cai')
+    return Principal.from_str("rrkah-fqaaa-aaaaa-aaaaq-cai")
+
 
 @query
 def print_principal(principal: Principal) -> Principal:
@@ -860,7 +955,7 @@ def print_principal(principal: Principal) -> Principal:
 
 Candid:
 
-```python
+```
 service: {
     "get_principal": () -> (principal) query;
     "print_principal": (principal) -> (principal) query;
@@ -876,9 +971,11 @@ Python:
 ```python
 from kybra import ic, query, reserved
 
+
 @query
 def get_reserved() -> reserved:
-    return 'anything'
+    return "anything"
+
 
 @query
 def print_reserved(reserved: reserved) -> reserved:
@@ -888,7 +985,7 @@ def print_reserved(reserved: reserved) -> reserved:
 
 Candid:
 
-```python
+```
 service: {
     "get_reserved": () -> (reserved) query;
     "print_reserved": (reserved) -> (reserved) query;
@@ -904,20 +1001,23 @@ Python:
 ```python
 from kybra import empty, ic, query
 
+
+@query
 def get_empty() -> empty:
-    raise Exception('Anything you want')
+    raise Exception("Anything you want")
+
 
 # Note: It is impossible to call this function because it requires an argument
 # but there is no way to pass an "empty" value as an argument.
 @query
 def print_empty(empty: empty) -> empty:
     ic.print(type(empty))
-    raise Exception('Anything you want')
+    raise Exception("Anything you want")
 ```
 
 Candid:
 
-```python
+```
 service: {
     "get_empty": () -> (empty) query;
     "print_empty": (empty) -> (empty) query;
