@@ -1,5 +1,4 @@
-import math
-import _random
+import secrets
 
 from kybra import (
     blob,
@@ -181,8 +180,6 @@ def delete_recording(id: Principal) -> DeleteRecordingResult:
 
 
 def generate_id() -> Principal:
-    random_bytes = bytes(
-        [math.floor(_random.Random().random() * 256) for _ in range(29)]
-    )
+    random_bytes = secrets.token_bytes(29)
 
     return Principal.from_hex(random_bytes.hex())

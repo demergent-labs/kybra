@@ -1,13 +1,11 @@
-// TODO share with DFINITY how I'm doing this, maybe they can build that into dfx to overcome some of the Wasm binary limitations temporarily
-// TODO a future version of dfx should take care of all of this chunk uploading for us
-use std::{thread, time::Duration};
-
+use clear_chunks::clear_chunks;
 use error::create_error_string;
 use generate_candid::generate_candid;
 use install_app_canister::install_app_canister;
 use upload_app_canister::upload_app_canister;
 use upload_python_stdlib::upload_python_stdlib;
 
+mod clear_chunks;
 mod dfx;
 mod error;
 mod generate_candid;
@@ -29,6 +27,7 @@ fn main() -> Result<(), String> {
         .ok_or(create_error_string("Candid path argument not present"))?;
     let max_chunk_size = 2 * 1_000 * 1_000; // 2 MB message size limit currently on the Internet Computer
 
+    clear_chunks(canister_name)?;
     upload_app_canister(canister_name, max_chunk_size)?;
     upload_python_stdlib(canister_name, max_chunk_size)?;
     install_app_canister(canister_name)?;
