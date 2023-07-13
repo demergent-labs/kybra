@@ -50,6 +50,19 @@ fn initialize() {
 }
 
 #[update(guard = "controller_guard")]
+pub fn clear_chunks() {
+    WASM_REF_CELL.with(|wasm_ref_cell| {
+        let mut wasm_ref_mut = wasm_ref_cell.borrow_mut();
+        wasm_ref_mut.clear();
+    });
+
+    PYTHON_STDLIB_REF_CELL.with(|python_stdlib_ref_cell| {
+        let mut python_stdlib_ref_mut = python_stdlib_ref_cell.borrow_mut();
+        python_stdlib_ref_mut.clear();
+    });
+}
+
+#[update(guard = "controller_guard")]
 pub fn upload_wasm_chunk(bytes: Vec<u8>) {
     WASM_REF_CELL.with(|wasm_ref_cell| {
         let mut wasm_ref_mut = wasm_ref_cell.borrow_mut();
@@ -86,11 +99,6 @@ pub async fn install_wasm() -> Result<(), String> {
     install_code().map_err(|err| rejection_code_to_string(&err))
 
     // let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
-
-    // WASM_REF_CELL.with(|wasm_ref_cell| {
-    //     let mut wasm_ref_mut = wasm_ref_cell.borrow_mut();
-    //     wasm_ref_mut.clear();
-    // });
 
     // let result = ic_cdk::api::management_canister::main::install_code(
     //     ic_cdk::api::management_canister::main::InstallCodeArgument {
@@ -143,11 +151,6 @@ fn stable_store_python_stdlib() -> Result<(), String> {
 
 fn install_code() -> Result<(), ic_cdk::api::call::RejectionCode> {
     let wasm_module = WASM_REF_CELL.with(|wasm_ref_cell| wasm_ref_cell.borrow().clone());
-
-    WASM_REF_CELL.with(|wasm_ref_cell| {
-        let mut wasm_ref_mut = wasm_ref_cell.borrow_mut();
-        wasm_ref_mut.clear();
-    });
 
     let result = call::notify(
         Principal::management_canister(),
