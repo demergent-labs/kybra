@@ -4,14 +4,25 @@ Kybra is a [Python](https://www.python.org/) [Canister Development Kit](https://
 
 -   [GitHub repo](https://github.com/demergent-labs/kybra)
 -   [PyPI package](https://pypi.org/project/kybra/)
+-   [Discord channel](https://discord.gg/ux2Jc7psjd)
 
 ## Disclaimer
 
-Things to keep in mind (see the [caveats](./caveats.md) section for more):
+Kybra may have unknown security vulnerabilities due to the following:
 
 -   Kybra does not yet have many live, successful, continuously operating applications deployed to the IC
 -   Kybra does not yet have extensive automated property tests
 -   Kybra does not yet have multiple independent security reviews/audits
+-   Kybra uses a new Python interpreter that is less mature than CPython
+
+## Roadmap
+
+We hope to get to a production-ready 1.0 in 2024. The following are the major blockers to 1.0:
+
+-   CPython integration for performance, security, and stability
+-   Broad PyPI package support (C API/extensions)
+-   Extensive automated property testing
+-   Multiple independent security reviews/audits
 
 ## Demergent Labs
 
@@ -113,7 +124,7 @@ The IC provides a number of threshold protocols that allow groups of independent
 
 IC applications (canisters) are compiled into Wasm and deployed to the IC as Wasm modules. The IC hashes each canister's Wasm binary and stores it for public retrieval. The Wasm binary hash can be retrieved and compared with the hash of an independently compiled Wasm binary derived from available source code. If the hashes match, then one can know with a high degree of certainty that the application is executing the Wasm binary that was compiled from that source code.
 
-For the time being, Kybra source code is not verifiable for reasons explained in the [caveats section](./caveats.md). TODO add proper link
+For the time being, Kybra source code is not verifiable for reasons explained in the [caveats section](./caveats.md#wasm-module-hash-now-less-useful).
 
 ##### Blockchain integration
 
@@ -169,6 +180,7 @@ As discussed earlier, these are some things to keep in mind:
 -   Kybra does not yet have many live, successful, continuously operating applications deployed to the IC
 -   Kybra does not yet have extensive automated property tests
 -   Kybra does not yet have multiple independent security reviews/audits
+-   Kybra uses a new Python interpreter that is less mature than CPython
 
 ##### High cycle usage
 

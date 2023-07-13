@@ -162,15 +162,15 @@
 <p>Here's how to define a simple <code>StableBTreeMap</code>. Each <code>StableBTreeMap</code> must be defined in the global scope (not within any functions or objects etc):</p>
 <pre><code class="language-python">from kybra import nat8, StableBTreeMap
 
-map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[nat8, str](memory_id=3, max_key_size=100, max_value_size=1_000)
 </code></pre>
 <p>This is a <code>StableBTreeMap</code> with a key of type <code>nat8</code> and a value of type <code>str</code>. Key and value types can be any <a href="./candid.html">Candid type</a>.</p>
-<p>This <code>StableBTreeMap</code> also has a <code>memory id</code> of <code>0</code>, a maximum key size of <code>100</code> bytes and a maximum value size of <code>1_000</code> bytes. You must statically specify the <code>memory id</code>, maximum key size, and maximum value sizes (they cannot be variables).</p>
+<p>This <code>StableBTreeMap</code> also has a <code>memory id</code> of <code>3</code>, a maximum key size of <code>100</code> bytes and a maximum value size of <code>1_000</code> bytes. You must statically specify the <code>memory id</code>, maximum key size, and maximum value sizes (they cannot be variables).</p>
+<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, but <code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved. We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need to specify it entirely.</p>
 <p>Each <code>StableBTreeMap</code> instance must have a unique <code>memory id</code>. Once a <code>memory id</code> is allocated, it cannot be used with a different <code>StableBTreeMap</code>. This means you can't create another <code>StableBTreeMap</code> using the same <code>memory id</code>, and you can't change the key or value types of an existing <code>StableBTreeMap</code>. <a href="https://github.com/demergent-labs/kybra/issues/215">This problem will be addressed</a>.</p>
 <p>Here's an example showing all of the basic <code>StableBTreeMap</code> operations:</p>
 <pre><code class="language-python">from kybra import (
-    InsertError,
-    match,
+    Alias,
     nat64,
     nat8,
     Opt,
@@ -178,20 +178,14 @@ map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_
     StableBTreeMap,
     Tuple,
     update,
-    Variant,
     Vec,
 )
 
-Key = nat8
-Value = str
+Key = Alias[nat8]
+Value = Alias[str]
 
 
-class InsertResult(Variant, total=False):
-    Ok: Opt[Value]
-    Err: InsertError
-
-
-map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[Key, Value](memory_id=3, max_key_size=100, max_value_size=1_000)
 
 
 @query
@@ -205,10 +199,8 @@ def get(key: Key) -&gt; Opt[Value]:
 
 
 @update
-def insert(key: Key, value: Value) -&gt; InsertResult:
-    result = map.insert(key, value)
-
-    return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
+def insert(key: Key, value: Value) -&gt; Opt[Value]:
+    return map.insert(key, value)
 
 
 @query
@@ -239,17 +231,13 @@ def remove(key: Key) -&gt; Opt[Value]:
 @query
 def values() -&gt; Vec[Value]:
     return map.values()
-
 </code></pre>
 <p>With these basic operations you can build more complex CRUD database applications:</p>
-<pre><code class="language-python">import math
-import _random
+<pre><code class="language-python">import secrets
 
 from kybra import (
     blob,
     ic,
-    InsertError,
-    match,
     nat64,
     Opt,
     Principal,
@@ -278,20 +266,15 @@ class Recording(Record):
 
 
 users = StableBTreeMap[Principal, User](
-    memory_id=0, max_key_size=38, max_value_size=100_000
+    memory_id=3, max_key_size=38, max_value_size=100_000
 )
 recordings = StableBTreeMap[Principal, Recording](
-    memory_id=1, max_key_size=38, max_value_size=5_000_000
+    memory_id=4, max_key_size=38, max_value_size=5_000_000
 )
-
-
-class CreateUserResult(Variant, total=False):
-    Ok: User
-    Err: InsertError
 
 
 @update
-def create_user(username: str) -&gt; CreateUserResult:
+def create_user(username: str) -&gt; User:
     id = generate_id()
     user: User = {
         &quot;id&quot;: id,
@@ -300,11 +283,9 @@ def create_user(username: str) -&gt; CreateUserResult:
         &quot;username&quot;: username,
     }
 
-    result = users.insert(user[&quot;id&quot;], user)
+    users.insert(user[&quot;id&quot;], user)
 
-    return match(
-        result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: user}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
-    )
+    return user
 
 
 @query
@@ -347,7 +328,6 @@ class CreateRecordingResult(Variant, total=False):
 
 
 class CreateRecordingErr(Variant, total=False):
-    InsertError: InsertError
     UserDoesNotExist: Principal
 
 
@@ -369,31 +349,18 @@ def create_recording(
         &quot;user_id&quot;: user_id,
     }
 
-    create_recording_result = recordings.insert(recording[&quot;id&quot;], recording)
+    recordings.insert(recording[&quot;id&quot;], recording)
 
-    def handle_create_record_result_ok(_) -&gt; CreateRecordingResult:
-        updated_user: User = {
-            **user,
-            &quot;recording_ids&quot;: [*user[&quot;recording_ids&quot;], recording[&quot;id&quot;]],
-        }
+    updated_user: User = {
+        &quot;id&quot;: user[&quot;id&quot;],
+        &quot;created_at&quot;: user[&quot;created_at&quot;],
+        &quot;username&quot;: user[&quot;username&quot;],
+        &quot;recording_ids&quot;: [*user[&quot;recording_ids&quot;], recording[&quot;id&quot;]],
+    }
 
-        update_user_result = users.insert(updated_user[&quot;id&quot;], updated_user)
+    users.insert(updated_user[&quot;id&quot;], updated_user)
 
-        return match(
-            update_user_result,
-            {
-                &quot;Ok&quot;: lambda _: {&quot;Ok&quot;: recording},
-                &quot;Err&quot;: lambda err: {&quot;Err&quot;: {&quot;InsertError&quot;: err}},
-            },
-        )
-
-    return match(
-        create_recording_result,
-        {
-            &quot;Ok&quot;: handle_create_record_result_ok,
-            &quot;Err&quot;: lambda err: {&quot;Err&quot;: {&quot;InsertError&quot;: err}},
-        },
-    )
+    return {&quot;Ok&quot;: recording}
 
 
 @query
@@ -412,7 +379,6 @@ class DeleteRecordingResult(Variant, total=False):
 
 
 class DeleteRecordingError(Variant, total=False):
-    InsertError: InsertError
     RecordingDoesNotExist: Principal
     UserDoesNotExist: Principal
 
@@ -430,7 +396,9 @@ def delete_recording(id: Principal) -&gt; DeleteRecordingResult:
         return {&quot;Err&quot;: {&quot;UserDoesNotExist&quot;: recording[&quot;user_id&quot;]}}
 
     updated_user: User = {
-        **user,
+        &quot;id&quot;: user[&quot;id&quot;],
+        &quot;created_at&quot;: user[&quot;created_at&quot;],
+        &quot;username&quot;: user[&quot;username&quot;],
         &quot;recording_ids&quot;: list(
             filter(
                 lambda recording_id: recording_id.to_str() != recording[&quot;id&quot;].to_str(),
@@ -439,25 +407,15 @@ def delete_recording(id: Principal) -&gt; DeleteRecordingResult:
         ),
     }
 
-    update_user_result = users.insert(updated_user[&quot;id&quot;], updated_user)
+    users.insert(updated_user[&quot;id&quot;], updated_user)
 
-    def handle_update_user_result_ok(_) -&gt; DeleteRecordingResult:
-        recordings.remove(id)
-        return {&quot;Ok&quot;: recording}
+    recordings.remove(id)
 
-    return match(
-        update_user_result,
-        {
-            &quot;Ok&quot;: handle_update_user_result_ok,
-            &quot;Err&quot;: lambda err: {&quot;Err&quot;: {&quot;InsertError&quot;: err}},
-        },
-    )
+    return {&quot;Ok&quot;: recording}
 
 
 def generate_id() -&gt; Principal:
-    random_bytes = bytes(
-        [math.floor(_random.Random().random() * 256) for _ in range(29)]
-    )
+    random_bytes = secrets.token_bytes(29)
 
     return Principal.from_hex(random_bytes.hex())
 </code></pre>
@@ -482,52 +440,25 @@ class Recording(Record):
 
 
 users = StableBTreeMap[Principal, User](
-    memory_id=0, max_key_size=38, max_value_size=100_000
+    memory_id=3, max_key_size=38, max_value_size=100_000
 )
 recordings = StableBTreeMap[Principal, Recording](
-    memory_id=1, max_key_size=38, max_value_size=5_000_000
+    memory_id=4, max_key_size=38, max_value_size=5_000_000
 )
 </code></pre>
 <p>Notice that each <code>StableBTreeMap</code> has a unique <code>memory id</code>. The maximum key and value sizes are also set according to the expected application usage.</p>
-<p>You can figure out the appropriate maximum key and value sizes by reasoning about your application and engaging in some trial and error using the <code>insert</code> method. Calling <code>insert</code> on a <code>StableBTreeMap</code> returns an <code>InsertResult</code> object that looks like this:</p>
-<pre><code class="language-python">from typing import Generic, Optional, TypeVar
-
-from kybra import nat32, Record, Variant
-
-
-K = TypeVar(&quot;K&quot;)
-V = TypeVar(&quot;V&quot;)
-
-
-class KeyTooLarge(Record):
-    given: nat32
-    max: nat32
-
-
-class ValueTooLarge(Record):
-    given: nat32
-    max: nat32
-
-
-class InsertError(Variant, total=False):
-    KeyTooLarge: KeyTooLarge
-    ValueTooLarge: ValueTooLarge
-
-
-class InsertResult(Generic[V]):
-    Ok: V
-    Err: Optional[InsertError]
-
-    def __init__(self, ok: V, err: InsertError):
-        self.Ok = ok
-        self.Err = err
-</code></pre>
-<p>The <code>InsertError</code> variant will in some cases have the information that you need to determine the maximum key or value size. If you attempt to insert a key or value that is too large, the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> records will show you the size of the value that you attempted to insert. You can increase the maximum key or value size based on the information you receive from the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> records and try inserting again.</p>
+<p>You can figure out the appropriate maximum key and value sizes by reasoning about your application and engaging in some trial and error using the <code>insert</code> method. Calling <code>insert</code> on a <code>StableBTreeMap</code> will throw an error which in some cases will have the information that you need to determine the maximum key or value size.</p>
+<p>If you attempt to insert a key or value that is too large, the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> errors will show you the size of the value that you attempted to insert. You can increase the maximum key or value size based on the information you receive from the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> errors and try inserting again.</p>
 <p>Thus through some trial and error you can whittle your way to a correct solution. In some cases all of your values will have an obvious static maximum size. In the audio recording example, trial and error revealed that <code>Principal</code> is most likely always 38 bytes, thus the maximum key size is set to 38.</p>
-<p>Maximum value sizes can be more tricky to figure out, especially if the values are records or variants with dynamic fields such as arrays. <code>User</code> has one such dynamic field, <code>recording_ids</code>. Since each recording id is a Principal, we know that each will take up 38 bytes. The other fields on <code>User</code> shouldn't take up too many bytes so we'll ignore them for our analysis.</p>
+<p>Maximum value sizes can be more tricky to figure out, especially if the values are records or variants with dynamic fields such as arrays. <code>User</code> has one such dynamic field, <code>recording_ids</code>. Since each recording id is a <code>Principal</code>, we know that each will take up 38 bytes. The other fields on <code>User</code> shouldn't take up too many bytes so we'll ignore them for our analysis.</p>
 <p>We've set the maximum value size of <code>User</code> to be 100_000 bytes. If we divide 100_00 by 38, we get ~2_631. This will result in each user being able to store around that many recordings. That's acceptable for our example, and so we'll go with it.</p>
 <p>As for <code>Recording</code>, the largest dynamic field is <code>audio</code>, which will be the actual bytes of the audio recording. We've set the maximum value size here to 5_000_000, which should allow for recordings of ~5 MB in size. That seems reasonable for our example, and so we'll go with it.</p>
 <p>As you can see, finding the correct maximum key and value sizes is a bit of an art right now. Combining some trial and error with reasoning about your specific application should get you a working solution in most cases. It's our hope that the need to specify maximum key and value sizes will be removed in the future.</p>
+<h2 id="caveats"><a class="header" href="#caveats">Caveats</a></h2>
+<h3 id="memory-ids"><a class="header" href="#memory-ids">memory ids</a></h3>
+<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, but <code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved. We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need for it entirely.</p>
+<h3 id="keys"><a class="header" href="#keys">Keys</a></h3>
+<p>You should be wary when using <code>float64</code>, <code>float32</code>, <code>service</code>, or <code>func</code> in any type that is a key for a stable structure. These types do not have the ability to be strictly ordered in all cases. <code>service</code> and <code>func</code> will have no order. <code>float64</code> and <code>float32</code> will treat <code>NaN</code> as less than any other type. These caveats may impact key performance.</p>
 
                     </main>
 

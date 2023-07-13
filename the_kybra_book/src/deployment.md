@@ -24,6 +24,18 @@ Alternatively you can start the local replica as a background process:
 dfx start --background
 ```
 
+If you want extra speedy deploys:
+
+```bash
+dfx start --artificial-delay 0
+```
+
+or
+
+```bash
+dfx start --background --artificial-delay 0
+```
+
 If you want to stop a local replica running in the background:
 
 ```bash
@@ -62,6 +74,15 @@ To deploy an individual canister:
 
 ```bash
 dfx deploy canister_name
+```
+
+If you are asked for a password, you'll need to create a new unencrypted dfx identity:
+
+```bash
+dfx identity new test_unencrypted --storage-mode plaintext
+dfx identity use test_unencrypted
+
+dfx deploy
 ```
 
 ## Interacting with your canister
@@ -137,4 +158,13 @@ To deploy an individual canister:
 
 ```bash
 dfx deploy --network ic canister_name
+```
+
+If you are asked for a password, you'll need to create a new unencrypted dfx identity:
+
+```bash
+dfx identity new test_unencrypted --storage-mode plaintext
+dfx identity use test_unencrypted
+
+dfx deploy --network ic
 ```

@@ -133,6 +133,12 @@ First startup the replica:
 dfx start --background
 ```
 
+If you want an extra speedy deploy:
+
+```bash
+dfx start --background --artificial-delay 0
+```
+
 Then deploy the canister:
 
 ```bash
@@ -148,7 +154,7 @@ dfx identity use test_unencrypted
 dfx deploy
 ```
 
-This is not ideal for security, but Kybra currently [does not support encrypted dfx identities](). TODO add in the true link
+This is not ideal for security, but Kybra currently [does not support encrypted dfx identities](./caveats.md#no-encrypted-dfx-identities).
 
 ## Interacting with your canister from the command line
 

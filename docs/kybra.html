@@ -149,13 +149,23 @@
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra">GitHub repo</a></li>
 <li><a href="https://pypi.org/project/kybra/">PyPI package</a></li>
+<li><a href="https://discord.gg/ux2Jc7psjd">Discord channel</a></li>
 </ul>
 <h2 id="disclaimer"><a class="header" href="#disclaimer">Disclaimer</a></h2>
-<p>Things to keep in mind (see the <a href="./caveats.html">caveats</a> section for more):</p>
+<p>Kybra may have unknown security vulnerabilities due to the following:</p>
 <ul>
 <li>Kybra does not yet have many live, successful, continuously operating applications deployed to the IC</li>
 <li>Kybra does not yet have extensive automated property tests</li>
 <li>Kybra does not yet have multiple independent security reviews/audits</li>
+<li>Kybra uses a new Python interpreter that is less mature than CPython</li>
+</ul>
+<h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
+<p>We hope to get to a production-ready 1.0 in 2024. The following are the major blockers to 1.0:</p>
+<ul>
+<li>CPython integration for performance, security, and stability</li>
+<li>Broad PyPI package support (C API/extensions)</li>
+<li>Extensive automated property testing</li>
+<li>Multiple independent security reviews/audits</li>
 </ul>
 <h2 id="demergent-labs"><a class="header" href="#demergent-labs">Demergent Labs</a></h2>
 <p>Kybra is currently developed by <a href="https://github.com/demergent-labs">Demergent Labs</a>, a for-profit company with a <a href="https://dfinity.org/grants">grant</a> from <a href="https://dfinity.org/">DFINITY</a>.</p>
@@ -219,7 +229,7 @@
 <p>The IC provides a number of threshold protocols that allow groups of independent nodes to perform cryptographic operations. These protocols remove central points of failure while providing familiar and useful cryptographic operations to developers. Included are <a href="https://internetcomputer.org/docs/current/developer-docs/integrations/t-ecdsa">ECDSA</a>, <a href="https://internetcomputer.org/how-it-works/response-certification/">BLS</a>, <a href="https://internetcomputer.org/how-it-works/chain-key-technology/">VRF-like</a>, and in the future <a href="https://forum.dfinity.org/t/threshold-key-derivation-privacy-on-the-ic/16560">threshold key derivation</a>.</p>
 <h5 id="verifiable-source-code"><a class="header" href="#verifiable-source-code">Verifiable source code</a></h5>
 <p>IC applications (canisters) are compiled into Wasm and deployed to the IC as Wasm modules. The IC hashes each canister's Wasm binary and stores it for public retrieval. The Wasm binary hash can be retrieved and compared with the hash of an independently compiled Wasm binary derived from available source code. If the hashes match, then one can know with a high degree of certainty that the application is executing the Wasm binary that was compiled from that source code.</p>
-<p>For the time being, Kybra source code is not verifiable for reasons explained in the <a href="./caveats.html">caveats section</a>. TODO add proper link</p>
+<p>For the time being, Kybra source code is not verifiable for reasons explained in the <a href="./caveats.html#wasm-module-hash-now-less-useful">caveats section</a>.</p>
 <h5 id="blockchain-integration"><a class="header" href="#blockchain-integration">Blockchain integration</a></h5>
 <p>When compared with web APIs built for the same purpose, the IC provides a high degree of security when integrating with various other blockchains. It has a direct client integration with Bitcoin, allowing applications to query its state with BFT guarantees. A similar integration is coming for Ethereum.</p>
 <p>In addition to these blockchain client integrations, a <a href="https://internetcomputer.org/docs/current/developer-docs/integrations/t-ecdsa/">threshold ECDSA protocol</a> (tECDSA) allows the IC to create keys and sign transactions on various <a href="http://ethanfast.com/top-crypto.html">ECDSA chains</a>. These chains include Bitcoin and Ethereum, and in the future the protocol may be extended to allow interaction with various <a href="http://ethanfast.com/top-crypto.html">EdDSA chains</a>. These direct integrations combined with tECDSA provide a much more secure way to provide blockchain functionality to end users than creating and storing their private keys on traditional cloud infrastructure.</p>
@@ -259,6 +269,7 @@
 <li>Kybra does not yet have many live, successful, continuously operating applications deployed to the IC</li>
 <li>Kybra does not yet have extensive automated property tests</li>
 <li>Kybra does not yet have multiple independent security reviews/audits</li>
+<li>Kybra uses a new Python interpreter that is less mature than CPython</li>
 </ul>
 <h5 id="high-cycle-usage"><a class="header" href="#high-cycle-usage">High cycle usage</a></h5>
 <p>We haven't done extensive benchmarking yet, but based on some preliminary evidence Kybra is likely much more performant than <a href="https://demergent-labs.github.io/azle/azle.html#high-cycle-usage">Azle</a>. We have done some preliminary benchmarking for Azle, and based on that our rough heuristic is that Azle will cost 2-4x more cycles than the equivalent project in Motoko or Rust. The performance of your application depends on many factors, and this should just be a rough estimate.</p>

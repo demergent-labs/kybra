@@ -237,6 +237,9 @@ def set_message(new_message: str) -&gt; void:
 <p>First startup the replica:</p>
 <pre><code class="language-bash">dfx start --background
 </code></pre>
+<p>If you want an extra speedy deploy:</p>
+<pre><code class="language-bash">dfx start --background --artificial-delay 0
+</code></pre>
 <p>Then deploy the canister:</p>
 <pre><code class="language-bash">dfx deploy
 </code></pre>
@@ -246,7 +249,7 @@ dfx identity use test_unencrypted
 
 dfx deploy
 </code></pre>
-<p>This is not ideal for security, but Kybra currently <a href="">does not support encrypted dfx identities</a>. TODO add in the true link</p>
+<p>This is not ideal for security, but Kybra currently <a href="./caveats.html#no-encrypted-dfx-identities">does not support encrypted dfx identities</a>.</p>
 <h2 id="interacting-with-your-canister-from-the-command-line"><a class="header" href="#interacting-with-your-canister-from-the-command-line">Interacting with your canister from the command line</a></h2>
 <p>Once we've deployed we can ask for our message:</p>
 <pre><code class="language-bash">dfx canister call kybra_hello_world get_message

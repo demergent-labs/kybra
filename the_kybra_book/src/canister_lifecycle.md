@@ -3,20 +3,24 @@
 This chapter is a work in progress.
 
 ```python
-from kybra import init, post_upgrade, pre_upgrade, void
+from kybra import ic, init, post_upgrade, pre_upgrade, void
 
 
 @init
 def init_() -> void:
-    print("runs on first canister install")
+    ic.print("runs on first canister install")
 
 
 @pre_upgrade
 def pre_upgrade_() -> void:
-    print("runs before canister upgrade")
+    ic.print("runs before canister upgrade")
 
 
 @post_upgrade
 def post_upgrade_() -> void:
-    print("runs after canister upgrade")
+    ic.print("runs after canister upgrade")
 ```
+
+Keep in mind [this caveat](./caveats.md#init-and-post_upgrade-params) when working with `init` or `post_upgrade` params.
+
+Also keep in mind that usually `ic.caller()` if called from `init` or `post_upgrade` is the principal of your local dfx identity. In Kybra canisters `ic.caller()` if called from `init` or `post_upgrade` is the canister's own principal.

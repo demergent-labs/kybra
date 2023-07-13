@@ -145,42 +145,43 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="caveats"><a class="header" href="#caveats">Caveats</a></h1>
-<p>This chapter is a work in progress.</p>
+<h2 id="unknown-security-vulnerabilities"><a class="header" href="#unknown-security-vulnerabilities">Unknown security vulnerabilities</a></h2>
+<p>Kybra is a beta project using a new Python interpreter. See the <a href="./kybra.html#disclaimer">disclaimer</a> for more information.</p>
+<h2 id="cdk-metadata"><a class="header" href="#cdk-metadata">cdk metadata</a></h2>
 <ul>
-<li>Most of the <code>stdlib</code> doesn't work yet</li>
-<li>Most PyPI packages will not work yet</li>
 <li>All Kybra canisters have a public metadata key-value pair named <code>cdk</code> which contains the version of Kybra the canister is using
 <ul>
 <li>Anyone can query this metadata which may be a security risk</li>
 </ul>
 </li>
-<li><a href="https://docs.python.org/3/library/datetime.html">The datetime stdlib</a> does not work yet, <a href="https://github.com/demergent-labs/kybra/blob/main/examples/date/src/main.py">see here for an alternative</a></li>
 </ul>
-<h2 id="python-stdlib"><a class="header" href="#python-stdlib">Python stdlib</a></h2>
-<p>There is limited support for the <code>stdlib</code>. The following modules may be supported as far as <a href="https://github.com/RustPython/RustPython">RustPython</a> or the IC support them:</p>
-<ul>
-<li>array</li>
-<li>binascii</li>
-<li>_bisect</li>
-<li>cmath</li>
-<li>_contextvars</li>
-<li>_csv</li>
-<li>_dis</li>
-<li>gc</li>
-<li>hashlib</li>
-<li>_json</li>
-<li>math</li>
-<li>pyexpat</li>
-<li>_struct</li>
-<li>_random</li>
-<li>_statistics</li>
-<li>unicodedata</li>
-<li>zlib</li>
-</ul>
-<h2 id="python-external-packages"><a class="header" href="#python-external-packages">Python External Packages</a></h2>
-<p>Installing external packages, such as from <a href="https://pypi.org/">PyPI</a>, will probably not work. The biggest problem you are most likely to run into is lack of support for most of the Python stdlib. Once the Wasm binary limit is increased on the IC, much more of the stdlib should be supported which should open up many external packages.</p>
-<p>Once the majority of the stdlib is supported, you are likely to run into issues with the environment that the Python code is running in. It is a Rust <code>wasm32-unknown-unknown</code> environment that has access to the IC APIs. Any external packages that can't compile or run in this environment with the supported APIs will not work.</p>
-<p>Much of the future work for enabling external packages will be forking and patching packages to support IC APIs.</p>
+<h2 id="no-c-extensions"><a class="header" href="#no-c-extensions">No C extensions</a></h2>
+<p>Any PyPI packages or other Python code that relies on C extensions will not currently work. It is a major goal for us to support C extensions in the future.</p>
+<h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
+<p>Kybra is probably ~7-20x less performant than what you would expect from <a href="https://github.com/python/cpython">CPython</a>. We hope to eventually use <code>CPython</code> as Kybra's underlying Python interpreter.</p>
+<h2 id="init-and-post_upgrade-params"><a class="header" href="#init-and-post_upgrade-params">init and post_upgrade params</a></h2>
+<p>If you add parameters to your <code>init</code> or <code>post_upgrade</code> methods, you will need to manually add these parameters to the service in your Candid file for the first deploy to succeed. Any time you change these parameters, you will need to manually add these changes into your Candid file.</p>
+<p>It is also recommended to start clean (<code>dfx start --clean</code>) when first deploying after changing these parameters.</p>
+<p>Here's an example of a basic Candid file with parameters <code>text</code>, <code>bool</code>, and <code>int32</code>:</p>
+<pre><code>service : (text, bool, int32) -&gt; {}
+</code></pre>
+<h2 id="no-encrypted-dfx-identities"><a class="header" href="#no-encrypted-dfx-identities">No encrypted dfx identities</a></h2>
+<p>Kybra currently does not support encrypted identities. If you are asked for a password during <code>dfx deploy</code>, you'll need to create a new unencrypted dfx identity:</p>
+<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
+dfx identity use test_unencrypted
+
+dfx deploy
+</code></pre>
+<h2 id="no-candidservice-metadata"><a class="header" href="#no-candidservice-metadata">No candid:service metadata</a></h2>
+<p>Kybra does not put the Candid metadata into <code>candid:service</code> automatically. Currently if you want to retrieve the Candid from the canister you can call the <code>__get_candid_interface_tmp_hack</code> method.</p>
+<h2 id="wasm-module-hash-now-less-useful"><a class="header" href="#wasm-module-hash-now-less-useful">Wasm module hash now less useful</a></h2>
+<p>Due to protocol and tooling limitations, Kybra must dynamically upload your application's Python bytecode and the Python stdlib bytecode. This means that the Wasm module hash is not computed from all of your application's source code. Thus the Wasm module hash retrieved from the IC should not be relied upon for security assumptions.</p>
+<h2 id="iccaller-in-init-and-post_upgrade"><a class="header" href="#iccaller-in-init-and-post_upgrade">ic.caller() in init and post_upgrade</a></h2>
+<p>Usually <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the principal of your local dfx identity. Keep in mind that in Kybra canisters <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the canister's own principal.</p>
+<h2 id="do-not-use-dictionary-unpacking"><a class="header" href="#do-not-use-dictionary-unpacking">Do not use dictionary unpacking</a></h2>
+<p>A bug in the <a href="https://github.com/RustPython/RustPython">RustPython</a> interpreter means that dictionary unpacking should not be used until <a href="https://github.com/RustPython/RustPython/issues/4932">this issue</a> is addressed.</p>
+<h2 id="reserved-memory-ids"><a class="header" href="#reserved-memory-ids">Reserved memory ids</a></h2>
+<p><code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved for <code>StableBTreeMap</code>.</p>
 
                     </main>
 

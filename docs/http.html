@@ -210,11 +210,12 @@ def http_request(req: HttpRequest) -&gt; HttpResponse:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
 <pre><code class="language-python">from kybra import (
+    Alias,
     Async,
     CallResult,
     ic,
-    init,
     match,
+    init,
     nat32,
     query,
     StableBTreeMap,
@@ -227,11 +228,11 @@ from kybra.canisters.management import (
     management_canister,
 )
 
-JSON = str
+JSON = Alias[str]
 
 
 stable_storage = StableBTreeMap[str, str](
-    memory_id=0, max_key_size=20, max_value_size=1_000
+    memory_id=3, max_key_size=20, max_value_size=1_000
 )
 
 
@@ -242,17 +243,10 @@ def init_(ethereum_url: str) -&gt; void:
 
 @update
 def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
-    max_response_bytes = 200
-
-    # TODO this is just a heuristic for cost, might change when the feature is officially released: https://forum.dfinity.org/t/enable-canisters-to-make-http-s-requests/9670/130
-    cycle_cost_base = 400_000_000
-    cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
-    cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
-
     http_result: CallResult[HttpResponse] = yield management_canister.http_request(
         {
             &quot;url&quot;: stable_storage.get(&quot;ethereum_url&quot;) or &quot;&quot;,
-            &quot;max_response_bytes&quot;: max_response_bytes,
+            &quot;max_response_bytes&quot;: 2_000,
             &quot;method&quot;: {&quot;post&quot;: None},
             &quot;headers&quot;: [],
             &quot;body&quot;: f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBalance&quot;,&quot;params&quot;:[&quot;{ethereum_address}&quot;,&quot;earliest&quot;],&quot;id&quot;:1}}'.encode(
@@ -260,7 +254,7 @@ def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
             ),
             &quot;transform&quot;: {&quot;function&quot;: (ic.id(), &quot;eth_transform&quot;), &quot;context&quot;: bytes()},
         }
-    ).with_cycles(cycle_cost_total)
+    ).with_cycles(50_000_000)
 
     return match(
         http_result,
@@ -270,17 +264,10 @@ def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
 
 @update
 def eth_get_block_by_number(number: nat32) -&gt; Async[JSON]:
-    max_response_bytes = 2_000
-
-    # TODO this is just a heuristic for cost, might change when the feature is officially released: https://forum.dfinity.org/t/enable-canisters-to-make-http-s-requests/9670/130
-    cycle_cost_base = 400_000_000
-    cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
-    cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
-
     http_result: CallResult[HttpResponse] = yield management_canister.http_request(
         {
             &quot;url&quot;: stable_storage.get(&quot;ethereum_url&quot;) or &quot;&quot;,
-            &quot;max_response_bytes&quot;: max_response_bytes,
+            &quot;max_response_bytes&quot;: 2_000,
             &quot;method&quot;: {&quot;post&quot;: None},
             &quot;headers&quot;: [],
             &quot;body&quot;: f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBlockByNumber&quot;,&quot;params&quot;:[&quot;{hex(number)}&quot;, false],&quot;id&quot;:1}}'.encode(
@@ -288,7 +275,7 @@ def eth_get_block_by_number(number: nat32) -&gt; Async[JSON]:
             ),
             &quot;transform&quot;: {&quot;function&quot;: (ic.id(), &quot;eth_transform&quot;), &quot;context&quot;: bytes()},
         }
-    ).with_cycles(cycle_cost_total)
+    ).with_cycles(50_000_000)
 
     return match(
         http_result,

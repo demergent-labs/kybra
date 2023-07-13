@@ -161,6 +161,12 @@
 <p>Alternatively you can start the local replica as a background process:</p>
 <pre><code class="language-bash">dfx start --background
 </code></pre>
+<p>If you want extra speedy deploys:</p>
+<pre><code class="language-bash">dfx start --artificial-delay 0
+</code></pre>
+<p>or</p>
+<pre><code class="language-bash">dfx start --background --artificial-delay 0
+</code></pre>
 <p>If you want to stop a local replica running in the background:</p>
 <pre><code class="language-bash">dfx stop
 </code></pre>
@@ -181,6 +187,12 @@ sudo kill -9 627260
 </code></pre>
 <p>To deploy an individual canister:</p>
 <pre><code class="language-bash">dfx deploy canister_name
+</code></pre>
+<p>If you are asked for a password, you'll need to create a new unencrypted dfx identity:</p>
+<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
+dfx identity use test_unencrypted
+
+dfx deploy
 </code></pre>
 <h2 id="interacting-with-your-canister"><a class="header" href="#interacting-with-your-canister">Interacting with your canister</a></h2>
 <p>As a developer you can generally interact with your canister in three ways:</p>
@@ -235,6 +247,12 @@ URLs:
 </code></pre>
 <p>To deploy an individual canister:</p>
 <pre><code class="language-bash">dfx deploy --network ic canister_name
+</code></pre>
+<p>If you are asked for a password, you'll need to create a new unencrypted dfx identity:</p>
+<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
+dfx identity use test_unencrypted
+
+dfx deploy --network ic
 </code></pre>
 
                     </main>

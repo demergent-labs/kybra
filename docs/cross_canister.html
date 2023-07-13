@@ -153,10 +153,12 @@
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/func_types">func_types</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/heartbeat">heartbeat</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/generators">generators</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ledger_canister">ledger_canister</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/threshold_ecdsa">threshold_ecdsa</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/rejections">rejections</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/timers">timers</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/whoami">whoami</a></li>
@@ -167,7 +169,7 @@
 <pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update
 
 accounts = StableBTreeMap[Principal, nat64](
-    memory_id=0, max_key_size=38, max_value_size=15
+    memory_id=3, max_key_size=38, max_value_size=15
 )
 
 
@@ -233,13 +235,13 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
     return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
 </code></pre>
 <p>Notice that the <code>token_canister.transfer</code> method, because it is a cross-canister method, returns a <code>CallResult</code>. All cross-canister calls return <code>CallResult</code>, which has an <code>Ok</code> or <code>Err</code> property depending on if the cross-canister call was successful or not.</p>
-<p>The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a <code>CallResult</code>. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a <code>try...except</code> most likely won't do anything useful.</p>
+<p>The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a <code>CallResult</code>. Kybra does not raise on cross-canister calls. Wrapping your cross-canister call in a <code>try...except</code> most likely won't do anything useful.</p>
 <p>Let's add to our example code and explore adding some practical result-based error-handling to stop people from stealing tokens.</p>
 <p><code>token_canister</code>:</p>
 <pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update, Variant
 
 accounts = StableBTreeMap[Principal, nat64](
-    memory_id=0, max_key_size=38, max_value_size=15
+    memory_id=3, max_key_size=38, max_value_size=15
 )
 
 
@@ -327,7 +329,7 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
     )
 </code></pre>
 <p>So far we have only shown a cross-canister call from an update method. Update methods can call other update methods or query methods (but not composite query methods as discussed below). If an update method calls a query method, that query method will be called in replicated mode. Replicated mode engages the consensus process, but for queries the state will still be discarded.</p>
-<p>Cross-canister calls can also be initiated from query methods (not yet live on IC mainnet but this works locally). These are known as composite queries, and in Kybra they are simply query methods that return a generator using the <code>Async</code> type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.</p>
+<p>Cross-canister calls can also be initiated from query methods. These are known as composite queries, and in Kybra they are simply query methods that return a generator using the <code>Async</code> type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.</p>
 <p>Here's an example of a composite query method:</p>
 <pre><code class="language-python">from kybra import (
     Async,

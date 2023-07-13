@@ -183,13 +183,23 @@ SOFTWARE.
 <ul>
 <li><a href="https://github.com/demergent-labs/kybra">GitHub repo</a></li>
 <li><a href="https://pypi.org/project/kybra/">PyPI package</a></li>
+<li><a href="https://discord.gg/ux2Jc7psjd">Discord channel</a></li>
 </ul>
 <h2 id="disclaimer"><a class="header" href="#disclaimer">Disclaimer</a></h2>
-<p>Things to keep in mind (see the <a href="./caveats.html">caveats</a> section for more):</p>
+<p>Kybra may have unknown security vulnerabilities due to the following:</p>
 <ul>
 <li>Kybra does not yet have many live, successful, continuously operating applications deployed to the IC</li>
 <li>Kybra does not yet have extensive automated property tests</li>
 <li>Kybra does not yet have multiple independent security reviews/audits</li>
+<li>Kybra uses a new Python interpreter that is less mature than CPython</li>
+</ul>
+<h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
+<p>We hope to get to a production-ready 1.0 in 2024. The following are the major blockers to 1.0:</p>
+<ul>
+<li>CPython integration for performance, security, and stability</li>
+<li>Broad PyPI package support (C API/extensions)</li>
+<li>Extensive automated property testing</li>
+<li>Multiple independent security reviews/audits</li>
 </ul>
 <h2 id="demergent-labs"><a class="header" href="#demergent-labs">Demergent Labs</a></h2>
 <p>Kybra is currently developed by <a href="https://github.com/demergent-labs">Demergent Labs</a>, a for-profit company with a <a href="https://dfinity.org/grants">grant</a> from <a href="https://dfinity.org/">DFINITY</a>.</p>
@@ -253,7 +263,7 @@ SOFTWARE.
 <p>The IC provides a number of threshold protocols that allow groups of independent nodes to perform cryptographic operations. These protocols remove central points of failure while providing familiar and useful cryptographic operations to developers. Included are <a href="https://internetcomputer.org/docs/current/developer-docs/integrations/t-ecdsa">ECDSA</a>, <a href="https://internetcomputer.org/how-it-works/response-certification/">BLS</a>, <a href="https://internetcomputer.org/how-it-works/chain-key-technology/">VRF-like</a>, and in the future <a href="https://forum.dfinity.org/t/threshold-key-derivation-privacy-on-the-ic/16560">threshold key derivation</a>.</p>
 <h5 id="verifiable-source-code"><a class="header" href="#verifiable-source-code">Verifiable source code</a></h5>
 <p>IC applications (canisters) are compiled into Wasm and deployed to the IC as Wasm modules. The IC hashes each canister's Wasm binary and stores it for public retrieval. The Wasm binary hash can be retrieved and compared with the hash of an independently compiled Wasm binary derived from available source code. If the hashes match, then one can know with a high degree of certainty that the application is executing the Wasm binary that was compiled from that source code.</p>
-<p>For the time being, Kybra source code is not verifiable for reasons explained in the <a href="./caveats.html">caveats section</a>. TODO add proper link</p>
+<p>For the time being, Kybra source code is not verifiable for reasons explained in the <a href="./caveats.html#wasm-module-hash-now-less-useful">caveats section</a>.</p>
 <h5 id="blockchain-integration"><a class="header" href="#blockchain-integration">Blockchain integration</a></h5>
 <p>When compared with web APIs built for the same purpose, the IC provides a high degree of security when integrating with various other blockchains. It has a direct client integration with Bitcoin, allowing applications to query its state with BFT guarantees. A similar integration is coming for Ethereum.</p>
 <p>In addition to these blockchain client integrations, a <a href="https://internetcomputer.org/docs/current/developer-docs/integrations/t-ecdsa/">threshold ECDSA protocol</a> (tECDSA) allows the IC to create keys and sign transactions on various <a href="http://ethanfast.com/top-crypto.html">ECDSA chains</a>. These chains include Bitcoin and Ethereum, and in the future the protocol may be extended to allow interaction with various <a href="http://ethanfast.com/top-crypto.html">EdDSA chains</a>. These direct integrations combined with tECDSA provide a much more secure way to provide blockchain functionality to end users than creating and storing their private keys on traditional cloud infrastructure.</p>
@@ -293,6 +303,7 @@ SOFTWARE.
 <li>Kybra does not yet have many live, successful, continuously operating applications deployed to the IC</li>
 <li>Kybra does not yet have extensive automated property tests</li>
 <li>Kybra does not yet have multiple independent security reviews/audits</li>
+<li>Kybra uses a new Python interpreter that is less mature than CPython</li>
 </ul>
 <h5 id="high-cycle-usage"><a class="header" href="#high-cycle-usage">High cycle usage</a></h5>
 <p>We haven't done extensive benchmarking yet, but based on some preliminary evidence Kybra is likely much more performant than <a href="https://demergent-labs.github.io/azle/azle.html#high-cycle-usage">Azle</a>. We have done some preliminary benchmarking for Azle, and based on that our rough heuristic is that Azle will cost 2-4x more cycles than the equivalent project in Motoko or Rust. The performance of your application depends on many factors, and this should just be a rough estimate.</p>
@@ -472,6 +483,9 @@ def set_message(new_message: str) -&gt; void:
 <p>First startup the replica:</p>
 <pre><code class="language-bash">dfx start --background
 </code></pre>
+<p>If you want an extra speedy deploy:</p>
+<pre><code class="language-bash">dfx start --background --artificial-delay 0
+</code></pre>
 <p>Then deploy the canister:</p>
 <pre><code class="language-bash">dfx deploy
 </code></pre>
@@ -481,7 +495,7 @@ dfx identity use test_unencrypted
 
 dfx deploy
 </code></pre>
-<p>This is not ideal for security, but Kybra currently <a href="">does not support encrypted dfx identities</a>. TODO add in the true link</p>
+<p>This is not ideal for security, but Kybra currently <a href="./caveats.html#no-encrypted-dfx-identities">does not support encrypted dfx identities</a>.</p>
 <h2 id="interacting-with-your-canister-from-the-command-line"><a class="header" href="#interacting-with-your-canister-from-the-command-line">Interacting with your canister from the command line</a></h2>
 <p>Once we've deployed we can ask for our message:</p>
 <pre><code class="language-bash">dfx canister call kybra_hello_world get_message
@@ -519,6 +533,12 @@ URLs:
 <p>Alternatively you can start the local replica as a background process:</p>
 <pre><code class="language-bash">dfx start --background
 </code></pre>
+<p>If you want extra speedy deploys:</p>
+<pre><code class="language-bash">dfx start --artificial-delay 0
+</code></pre>
+<p>or</p>
+<pre><code class="language-bash">dfx start --background --artificial-delay 0
+</code></pre>
 <p>If you want to stop a local replica running in the background:</p>
 <pre><code class="language-bash">dfx stop
 </code></pre>
@@ -539,6 +559,12 @@ sudo kill -9 627260
 </code></pre>
 <p>To deploy an individual canister:</p>
 <pre><code class="language-bash">dfx deploy canister_name
+</code></pre>
+<p>If you are asked for a password, you'll need to create a new unencrypted dfx identity:</p>
+<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
+dfx identity use test_unencrypted
+
+dfx deploy
 </code></pre>
 <h2 id="interacting-with-your-canister"><a class="header" href="#interacting-with-your-canister">Interacting with your canister</a></h2>
 <p>As a developer you can generally interact with your canister in three ways:</p>
@@ -593,6 +619,12 @@ URLs:
 </code></pre>
 <p>To deploy an individual canister:</p>
 <pre><code class="language-bash">dfx deploy --network ic canister_name
+</code></pre>
+<p>If you are asked for a password, you'll need to create a new unencrypted dfx identity:</p>
+<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
+dfx identity use test_unencrypted
+
+dfx deploy --network ic
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="examples"><a class="header" href="#examples">Examples</a></h1>
 <p>Kybra has many example projects showing nearly all Kybra APIs. They can be found in the <a href="https://github.com/demergent-labs/kybra/tree/main/examples">examples directory</a> of the <a href="https://github.com/demergent-labs/kybra">Kybra GitHub repository</a>.</p>
@@ -1649,15 +1681,15 @@ def print_empty(empty: empty) -&gt; empty:
 <p>Here's how to define a simple <code>StableBTreeMap</code>. Each <code>StableBTreeMap</code> must be defined in the global scope (not within any functions or objects etc):</p>
 <pre><code class="language-python">from kybra import nat8, StableBTreeMap
 
-map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[nat8, str](memory_id=3, max_key_size=100, max_value_size=1_000)
 </code></pre>
 <p>This is a <code>StableBTreeMap</code> with a key of type <code>nat8</code> and a value of type <code>str</code>. Key and value types can be any <a href="./candid.html">Candid type</a>.</p>
-<p>This <code>StableBTreeMap</code> also has a <code>memory id</code> of <code>0</code>, a maximum key size of <code>100</code> bytes and a maximum value size of <code>1_000</code> bytes. You must statically specify the <code>memory id</code>, maximum key size, and maximum value sizes (they cannot be variables).</p>
+<p>This <code>StableBTreeMap</code> also has a <code>memory id</code> of <code>3</code>, a maximum key size of <code>100</code> bytes and a maximum value size of <code>1_000</code> bytes. You must statically specify the <code>memory id</code>, maximum key size, and maximum value sizes (they cannot be variables).</p>
+<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, but <code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved. We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need to specify it entirely.</p>
 <p>Each <code>StableBTreeMap</code> instance must have a unique <code>memory id</code>. Once a <code>memory id</code> is allocated, it cannot be used with a different <code>StableBTreeMap</code>. This means you can't create another <code>StableBTreeMap</code> using the same <code>memory id</code>, and you can't change the key or value types of an existing <code>StableBTreeMap</code>. <a href="https://github.com/demergent-labs/kybra/issues/215">This problem will be addressed</a>.</p>
 <p>Here's an example showing all of the basic <code>StableBTreeMap</code> operations:</p>
 <pre><code class="language-python">from kybra import (
-    InsertError,
-    match,
+    Alias,
     nat64,
     nat8,
     Opt,
@@ -1665,20 +1697,14 @@ map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_
     StableBTreeMap,
     Tuple,
     update,
-    Variant,
     Vec,
 )
 
-Key = nat8
-Value = str
+Key = Alias[nat8]
+Value = Alias[str]
 
 
-class InsertResult(Variant, total=False):
-    Ok: Opt[Value]
-    Err: InsertError
-
-
-map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[Key, Value](memory_id=3, max_key_size=100, max_value_size=1_000)
 
 
 @query
@@ -1692,10 +1718,8 @@ def get(key: Key) -&gt; Opt[Value]:
 
 
 @update
-def insert(key: Key, value: Value) -&gt; InsertResult:
-    result = map.insert(key, value)
-
-    return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
+def insert(key: Key, value: Value) -&gt; Opt[Value]:
+    return map.insert(key, value)
 
 
 @query
@@ -1726,17 +1750,13 @@ def remove(key: Key) -&gt; Opt[Value]:
 @query
 def values() -&gt; Vec[Value]:
     return map.values()
-
 </code></pre>
 <p>With these basic operations you can build more complex CRUD database applications:</p>
-<pre><code class="language-python">import math
-import _random
+<pre><code class="language-python">import secrets
 
 from kybra import (
     blob,
     ic,
-    InsertError,
-    match,
     nat64,
     Opt,
     Principal,
@@ -1765,20 +1785,15 @@ class Recording(Record):
 
 
 users = StableBTreeMap[Principal, User](
-    memory_id=0, max_key_size=38, max_value_size=100_000
+    memory_id=3, max_key_size=38, max_value_size=100_000
 )
 recordings = StableBTreeMap[Principal, Recording](
-    memory_id=1, max_key_size=38, max_value_size=5_000_000
+    memory_id=4, max_key_size=38, max_value_size=5_000_000
 )
-
-
-class CreateUserResult(Variant, total=False):
-    Ok: User
-    Err: InsertError
 
 
 @update
-def create_user(username: str) -&gt; CreateUserResult:
+def create_user(username: str) -&gt; User:
     id = generate_id()
     user: User = {
         &quot;id&quot;: id,
@@ -1787,11 +1802,9 @@ def create_user(username: str) -&gt; CreateUserResult:
         &quot;username&quot;: username,
     }
 
-    result = users.insert(user[&quot;id&quot;], user)
+    users.insert(user[&quot;id&quot;], user)
 
-    return match(
-        result, {&quot;Ok&quot;: lambda _: {&quot;Ok&quot;: user}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}}
-    )
+    return user
 
 
 @query
@@ -1834,7 +1847,6 @@ class CreateRecordingResult(Variant, total=False):
 
 
 class CreateRecordingErr(Variant, total=False):
-    InsertError: InsertError
     UserDoesNotExist: Principal
 
 
@@ -1856,31 +1868,18 @@ def create_recording(
         &quot;user_id&quot;: user_id,
     }
 
-    create_recording_result = recordings.insert(recording[&quot;id&quot;], recording)
+    recordings.insert(recording[&quot;id&quot;], recording)
 
-    def handle_create_record_result_ok(_) -&gt; CreateRecordingResult:
-        updated_user: User = {
-            **user,
-            &quot;recording_ids&quot;: [*user[&quot;recording_ids&quot;], recording[&quot;id&quot;]],
-        }
+    updated_user: User = {
+        &quot;id&quot;: user[&quot;id&quot;],
+        &quot;created_at&quot;: user[&quot;created_at&quot;],
+        &quot;username&quot;: user[&quot;username&quot;],
+        &quot;recording_ids&quot;: [*user[&quot;recording_ids&quot;], recording[&quot;id&quot;]],
+    }
 
-        update_user_result = users.insert(updated_user[&quot;id&quot;], updated_user)
+    users.insert(updated_user[&quot;id&quot;], updated_user)
 
-        return match(
-            update_user_result,
-            {
-                &quot;Ok&quot;: lambda _: {&quot;Ok&quot;: recording},
-                &quot;Err&quot;: lambda err: {&quot;Err&quot;: {&quot;InsertError&quot;: err}},
-            },
-        )
-
-    return match(
-        create_recording_result,
-        {
-            &quot;Ok&quot;: handle_create_record_result_ok,
-            &quot;Err&quot;: lambda err: {&quot;Err&quot;: {&quot;InsertError&quot;: err}},
-        },
-    )
+    return {&quot;Ok&quot;: recording}
 
 
 @query
@@ -1899,7 +1898,6 @@ class DeleteRecordingResult(Variant, total=False):
 
 
 class DeleteRecordingError(Variant, total=False):
-    InsertError: InsertError
     RecordingDoesNotExist: Principal
     UserDoesNotExist: Principal
 
@@ -1917,7 +1915,9 @@ def delete_recording(id: Principal) -&gt; DeleteRecordingResult:
         return {&quot;Err&quot;: {&quot;UserDoesNotExist&quot;: recording[&quot;user_id&quot;]}}
 
     updated_user: User = {
-        **user,
+        &quot;id&quot;: user[&quot;id&quot;],
+        &quot;created_at&quot;: user[&quot;created_at&quot;],
+        &quot;username&quot;: user[&quot;username&quot;],
         &quot;recording_ids&quot;: list(
             filter(
                 lambda recording_id: recording_id.to_str() != recording[&quot;id&quot;].to_str(),
@@ -1926,25 +1926,15 @@ def delete_recording(id: Principal) -&gt; DeleteRecordingResult:
         ),
     }
 
-    update_user_result = users.insert(updated_user[&quot;id&quot;], updated_user)
+    users.insert(updated_user[&quot;id&quot;], updated_user)
 
-    def handle_update_user_result_ok(_) -&gt; DeleteRecordingResult:
-        recordings.remove(id)
-        return {&quot;Ok&quot;: recording}
+    recordings.remove(id)
 
-    return match(
-        update_user_result,
-        {
-            &quot;Ok&quot;: handle_update_user_result_ok,
-            &quot;Err&quot;: lambda err: {&quot;Err&quot;: {&quot;InsertError&quot;: err}},
-        },
-    )
+    return {&quot;Ok&quot;: recording}
 
 
 def generate_id() -&gt; Principal:
-    random_bytes = bytes(
-        [math.floor(_random.Random().random() * 256) for _ in range(29)]
-    )
+    random_bytes = secrets.token_bytes(29)
 
     return Principal.from_hex(random_bytes.hex())
 </code></pre>
@@ -1969,52 +1959,25 @@ class Recording(Record):
 
 
 users = StableBTreeMap[Principal, User](
-    memory_id=0, max_key_size=38, max_value_size=100_000
+    memory_id=3, max_key_size=38, max_value_size=100_000
 )
 recordings = StableBTreeMap[Principal, Recording](
-    memory_id=1, max_key_size=38, max_value_size=5_000_000
+    memory_id=4, max_key_size=38, max_value_size=5_000_000
 )
 </code></pre>
 <p>Notice that each <code>StableBTreeMap</code> has a unique <code>memory id</code>. The maximum key and value sizes are also set according to the expected application usage.</p>
-<p>You can figure out the appropriate maximum key and value sizes by reasoning about your application and engaging in some trial and error using the <code>insert</code> method. Calling <code>insert</code> on a <code>StableBTreeMap</code> returns an <code>InsertResult</code> object that looks like this:</p>
-<pre><code class="language-python">from typing import Generic, Optional, TypeVar
-
-from kybra import nat32, Record, Variant
-
-
-K = TypeVar(&quot;K&quot;)
-V = TypeVar(&quot;V&quot;)
-
-
-class KeyTooLarge(Record):
-    given: nat32
-    max: nat32
-
-
-class ValueTooLarge(Record):
-    given: nat32
-    max: nat32
-
-
-class InsertError(Variant, total=False):
-    KeyTooLarge: KeyTooLarge
-    ValueTooLarge: ValueTooLarge
-
-
-class InsertResult(Generic[V]):
-    Ok: V
-    Err: Optional[InsertError]
-
-    def __init__(self, ok: V, err: InsertError):
-        self.Ok = ok
-        self.Err = err
-</code></pre>
-<p>The <code>InsertError</code> variant will in some cases have the information that you need to determine the maximum key or value size. If you attempt to insert a key or value that is too large, the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> records will show you the size of the value that you attempted to insert. You can increase the maximum key or value size based on the information you receive from the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> records and try inserting again.</p>
+<p>You can figure out the appropriate maximum key and value sizes by reasoning about your application and engaging in some trial and error using the <code>insert</code> method. Calling <code>insert</code> on a <code>StableBTreeMap</code> will throw an error which in some cases will have the information that you need to determine the maximum key or value size.</p>
+<p>If you attempt to insert a key or value that is too large, the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> errors will show you the size of the value that you attempted to insert. You can increase the maximum key or value size based on the information you receive from the <code>KeyTooLarge</code> and <code>ValueTooLarge</code> errors and try inserting again.</p>
 <p>Thus through some trial and error you can whittle your way to a correct solution. In some cases all of your values will have an obvious static maximum size. In the audio recording example, trial and error revealed that <code>Principal</code> is most likely always 38 bytes, thus the maximum key size is set to 38.</p>
-<p>Maximum value sizes can be more tricky to figure out, especially if the values are records or variants with dynamic fields such as arrays. <code>User</code> has one such dynamic field, <code>recording_ids</code>. Since each recording id is a Principal, we know that each will take up 38 bytes. The other fields on <code>User</code> shouldn't take up too many bytes so we'll ignore them for our analysis.</p>
+<p>Maximum value sizes can be more tricky to figure out, especially if the values are records or variants with dynamic fields such as arrays. <code>User</code> has one such dynamic field, <code>recording_ids</code>. Since each recording id is a <code>Principal</code>, we know that each will take up 38 bytes. The other fields on <code>User</code> shouldn't take up too many bytes so we'll ignore them for our analysis.</p>
 <p>We've set the maximum value size of <code>User</code> to be 100_000 bytes. If we divide 100_00 by 38, we get ~2_631. This will result in each user being able to store around that many recordings. That's acceptable for our example, and so we'll go with it.</p>
 <p>As for <code>Recording</code>, the largest dynamic field is <code>audio</code>, which will be the actual bytes of the audio recording. We've set the maximum value size here to 5_000_000, which should allow for recordings of ~5 MB in size. That seems reasonable for our example, and so we'll go with it.</p>
 <p>As you can see, finding the correct maximum key and value sizes is a bit of an art right now. Combining some trial and error with reasoning about your specific application should get you a working solution in most cases. It's our hope that the need to specify maximum key and value sizes will be removed in the future.</p>
+<h2 id="caveats"><a class="header" href="#caveats">Caveats</a></h2>
+<h3 id="memory-ids"><a class="header" href="#memory-ids">memory ids</a></h3>
+<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, but <code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved. We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need for it entirely.</p>
+<h3 id="keys"><a class="header" href="#keys">Keys</a></h3>
+<p>You should be wary when using <code>float64</code>, <code>float32</code>, <code>service</code>, or <code>func</code> in any type that is a key for a stable structure. These types do not have the ability to be strictly ordered in all cases. <code>service</code> and <code>func</code> will have no order. <code>float64</code> and <code>float32</code> will treat <code>NaN</code> as less than any other type. These caveats may impact key performance.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="cross-canister"><a class="header" href="#cross-canister">Cross-canister</a></h1>
 <p>Examples:</p>
 <ul>
@@ -2024,10 +1987,12 @@ class InsertResult(Generic[V]):
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/cycles">cycles</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ethereum_json_rpc">ethereum_json_rpc</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/func_types">func_types</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/heartbeat">heartbeat</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/generators">generators</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/ledger_canister">ledger_canister</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/management_canister">management_canister</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
+<li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/threshold_ecdsa">threshold_ecdsa</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/rejections">rejections</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/timers">timers</a></li>
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/motoko_examples/whoami">whoami</a></li>
@@ -2038,7 +2003,7 @@ class InsertResult(Generic[V]):
 <pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update
 
 accounts = StableBTreeMap[Principal, nat64](
-    memory_id=0, max_key_size=38, max_value_size=15
+    memory_id=3, max_key_size=38, max_value_size=15
 )
 
 
@@ -2104,13 +2069,13 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
     return match(result, {&quot;Ok&quot;: lambda ok: {&quot;Ok&quot;: ok}, &quot;Err&quot;: lambda err: {&quot;Err&quot;: err}})
 </code></pre>
 <p>Notice that the <code>token_canister.transfer</code> method, because it is a cross-canister method, returns a <code>CallResult</code>. All cross-canister calls return <code>CallResult</code>, which has an <code>Ok</code> or <code>Err</code> property depending on if the cross-canister call was successful or not.</p>
-<p>The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a <code>CallResult</code>. Kybra does not throw on cross-canister calls. Wrapping your cross-canister call in a <code>try...except</code> most likely won't do anything useful.</p>
+<p>The IC guarantees that cross-canister calls will return. This means that, generally speaking, you will always receive a <code>CallResult</code>. Kybra does not raise on cross-canister calls. Wrapping your cross-canister call in a <code>try...except</code> most likely won't do anything useful.</p>
 <p>Let's add to our example code and explore adding some practical result-based error-handling to stop people from stealing tokens.</p>
 <p><code>token_canister</code>:</p>
 <pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update, Variant
 
 accounts = StableBTreeMap[Principal, nat64](
-    memory_id=0, max_key_size=38, max_value_size=15
+    memory_id=3, max_key_size=38, max_value_size=15
 )
 
 
@@ -2198,7 +2163,7 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
     )
 </code></pre>
 <p>So far we have only shown a cross-canister call from an update method. Update methods can call other update methods or query methods (but not composite query methods as discussed below). If an update method calls a query method, that query method will be called in replicated mode. Replicated mode engages the consensus process, but for queries the state will still be discarded.</p>
-<p>Cross-canister calls can also be initiated from query methods (not yet live on IC mainnet but this works locally). These are known as composite queries, and in Kybra they are simply query methods that return a generator using the <code>Async</code> type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.</p>
+<p>Cross-canister calls can also be initiated from query methods. These are known as composite queries, and in Kybra they are simply query methods that return a generator using the <code>Async</code> type. Composite queries can call other composite query methods and regular query methods. Composite queries cannot call update methods.</p>
 <p>Here's an example of a composite query method:</p>
 <pre><code class="language-python">from kybra import (
     Async,
@@ -2363,11 +2328,12 @@ def http_request(req: HttpRequest) -&gt; HttpResponse:
 <li><a href="https://github.com/demergent-labs/kybra/tree/main/examples/outgoing_http_requests">outgoing_http_requests</a></li>
 </ul>
 <pre><code class="language-python">from kybra import (
+    Alias,
     Async,
     CallResult,
     ic,
-    init,
     match,
+    init,
     nat32,
     query,
     StableBTreeMap,
@@ -2380,11 +2346,11 @@ from kybra.canisters.management import (
     management_canister,
 )
 
-JSON = str
+JSON = Alias[str]
 
 
 stable_storage = StableBTreeMap[str, str](
-    memory_id=0, max_key_size=20, max_value_size=1_000
+    memory_id=3, max_key_size=20, max_value_size=1_000
 )
 
 
@@ -2395,17 +2361,10 @@ def init_(ethereum_url: str) -&gt; void:
 
 @update
 def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
-    max_response_bytes = 200
-
-    # TODO this is just a heuristic for cost, might change when the feature is officially released: https://forum.dfinity.org/t/enable-canisters-to-make-http-s-requests/9670/130
-    cycle_cost_base = 400_000_000
-    cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
-    cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
-
     http_result: CallResult[HttpResponse] = yield management_canister.http_request(
         {
             &quot;url&quot;: stable_storage.get(&quot;ethereum_url&quot;) or &quot;&quot;,
-            &quot;max_response_bytes&quot;: max_response_bytes,
+            &quot;max_response_bytes&quot;: 2_000,
             &quot;method&quot;: {&quot;post&quot;: None},
             &quot;headers&quot;: [],
             &quot;body&quot;: f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBalance&quot;,&quot;params&quot;:[&quot;{ethereum_address}&quot;,&quot;earliest&quot;],&quot;id&quot;:1}}'.encode(
@@ -2413,7 +2372,7 @@ def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
             ),
             &quot;transform&quot;: {&quot;function&quot;: (ic.id(), &quot;eth_transform&quot;), &quot;context&quot;: bytes()},
         }
-    ).with_cycles(cycle_cost_total)
+    ).with_cycles(50_000_000)
 
     return match(
         http_result,
@@ -2423,17 +2382,10 @@ def eth_get_balance(ethereum_address: str) -&gt; Async[JSON]:
 
 @update
 def eth_get_block_by_number(number: nat32) -&gt; Async[JSON]:
-    max_response_bytes = 2_000
-
-    # TODO this is just a heuristic for cost, might change when the feature is officially released: https://forum.dfinity.org/t/enable-canisters-to-make-http-s-requests/9670/130
-    cycle_cost_base = 400_000_000
-    cycle_cost_per_byte = 300_000  # TODO not sure on this exact cost
-    cycle_cost_total = cycle_cost_base + cycle_cost_per_byte * max_response_bytes
-
     http_result: CallResult[HttpResponse] = yield management_canister.http_request(
         {
             &quot;url&quot;: stable_storage.get(&quot;ethereum_url&quot;) or &quot;&quot;,
-            &quot;max_response_bytes&quot;: max_response_bytes,
+            &quot;max_response_bytes&quot;: 2_000,
             &quot;method&quot;: {&quot;post&quot;: None},
             &quot;headers&quot;: [],
             &quot;body&quot;: f'{{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;eth_getBlockByNumber&quot;,&quot;params&quot;:[&quot;{hex(number)}&quot;, false],&quot;id&quot;:1}}'.encode(
@@ -2441,7 +2393,7 @@ def eth_get_block_by_number(number: nat32) -&gt; Async[JSON]:
             ),
             &quot;transform&quot;: {&quot;function&quot;: (ic.id(), &quot;eth_transform&quot;), &quot;context&quot;: bytes()},
         }
-    ).with_cycles(cycle_cost_total)
+    ).with_cycles(50_000_000)
 
     return match(
         http_result,
@@ -2476,23 +2428,25 @@ def random_bytes() -&gt; Async[RandomBytesResult]:
 <p>See the <a href="https://github.com/demergent-labs/kybra/blob/main/kybra/canisters/management/__init__.py">management canister types</a> for all methods and their parameter and return types.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="canister-lifecycle"><a class="header" href="#canister-lifecycle">Canister Lifecycle</a></h1>
 <p>This chapter is a work in progress.</p>
-<pre><code class="language-python">from kybra import init, post_upgrade, pre_upgrade, void
+<pre><code class="language-python">from kybra import ic, init, post_upgrade, pre_upgrade, void
 
 
 @init
 def init_() -&gt; void:
-    print(&quot;runs on first canister install&quot;)
+    ic.print(&quot;runs on first canister install&quot;)
 
 
 @pre_upgrade
 def pre_upgrade_() -&gt; void:
-    print(&quot;runs before canister upgrade&quot;)
+    ic.print(&quot;runs before canister upgrade&quot;)
 
 
 @post_upgrade
 def post_upgrade_() -&gt; void:
-    print(&quot;runs after canister upgrade&quot;)
+    ic.print(&quot;runs after canister upgrade&quot;)
 </code></pre>
+<p>Keep in mind <a href="./caveats.html#init-and-post_upgrade-params">this caveat</a> when working with <code>init</code> or <code>post_upgrade</code> params.</p>
+<p>Also keep in mind that usually <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the principal of your local dfx identity. In Kybra canisters <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the canister's own principal.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="timers"><a class="header" href="#timers">Timers</a></h1>
 <p>This chapter is a work in progress.</p>
 <pre><code class="language-python">from kybra import (
@@ -2507,6 +2461,7 @@ def post_upgrade_() -&gt; void:
     Record,
     TimerId,
     update,
+    void,
 )
 from kybra.canisters.management import management_canister
 
@@ -2540,7 +2495,7 @@ status: StatusReport = {
 
 
 @update
-def clear_timer(timer_id: TimerId):
+def clear_timer(timer_id: TimerId) -&gt; void:
     ic.clear_timer(timer_id)
     ic.print(f&quot;timer {timer_id} cancelled&quot;)
 
@@ -2608,31 +2563,26 @@ def update_capture_status(value: str):
     status[&quot;capture&quot;] = value
 
 
-# TODO It would probably be better for this to have a return type of Async[void] once we have void types working
-def single_cross_canister_timer_callback() -&gt; Async[blob]:
+def single_cross_canister_timer_callback() -&gt; Async[void]:
     ic.print(&quot;single_cross_canister_timer_callback&quot;)
 
     result: CallResult[blob] = yield management_canister.raw_rand()
 
-    def handle_result_ok(ok: blob) -&gt; blob:
+    def handle_ok(ok: blob):
         status[&quot;single_cross_canister&quot;] = ok
 
-        return ok
-
-    return match(result, {&quot;Ok&quot;: handle_result_ok, &quot;Err&quot;: lambda _: bytes()})
+    match(result, {&quot;Ok&quot;: handle_ok, &quot;Err&quot;: lambda err: ic.print(err)})
 
 
-# TODO It would probably be better for this to have a return type of Async[void] once we have void types working
-def repeat_cross_canister_timer_callback() -&gt; Async[blob]:
+def repeat_cross_canister_timer_callback() -&gt; Async[void]:
     ic.print(&quot;repeat_cross_canister_timer_callback&quot;)
 
     result: CallResult[blob] = yield management_canister.raw_rand()
 
-    def handle_result_ok(ok: blob) -&gt; blob:
+    def handle_ok(ok: blob):
         status[&quot;repeat_cross_canister&quot;] += ok
-        return ok
 
-    return match(result, {&quot;Ok&quot;: handle_result_ok, &quot;Err&quot;: lambda _: bytes()})
+    match(result, {&quot;Ok&quot;: handle_ok, &quot;Err&quot;: lambda err: ic.print(err)})
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="cycles"><a class="header" href="#cycles">Cycles</a></h1>
 <p>This chapter is a work in progress.</p>
@@ -2643,43 +2593,44 @@ def repeat_cross_canister_timer_callback() -&gt; Async[blob]:
 <p>Show all of the APIs for sending or receiving cycles?</p>
 <p>Perhaps we don't need to do that here, since each API will show this information.</p>
 <p>Maybe here we just show the basic concept of cycles, link to the main cycles cost page, and show a few examples of how to break down these costs or estimate these costs.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="caveats"><a class="header" href="#caveats">Caveats</a></h1>
-<p>This chapter is a work in progress.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="caveats-1"><a class="header" href="#caveats-1">Caveats</a></h1>
+<h2 id="unknown-security-vulnerabilities"><a class="header" href="#unknown-security-vulnerabilities">Unknown security vulnerabilities</a></h2>
+<p>Kybra is a beta project using a new Python interpreter. See the <a href="./kybra.html#disclaimer">disclaimer</a> for more information.</p>
+<h2 id="cdk-metadata"><a class="header" href="#cdk-metadata">cdk metadata</a></h2>
 <ul>
-<li>Most of the <code>stdlib</code> doesn't work yet</li>
-<li>Most PyPI packages will not work yet</li>
 <li>All Kybra canisters have a public metadata key-value pair named <code>cdk</code> which contains the version of Kybra the canister is using
 <ul>
 <li>Anyone can query this metadata which may be a security risk</li>
 </ul>
 </li>
-<li><a href="https://docs.python.org/3/library/datetime.html">The datetime stdlib</a> does not work yet, <a href="https://github.com/demergent-labs/kybra/blob/main/examples/date/src/main.py">see here for an alternative</a></li>
 </ul>
-<h2 id="python-stdlib"><a class="header" href="#python-stdlib">Python stdlib</a></h2>
-<p>There is limited support for the <code>stdlib</code>. The following modules may be supported as far as <a href="https://github.com/RustPython/RustPython">RustPython</a> or the IC support them:</p>
-<ul>
-<li>array</li>
-<li>binascii</li>
-<li>_bisect</li>
-<li>cmath</li>
-<li>_contextvars</li>
-<li>_csv</li>
-<li>_dis</li>
-<li>gc</li>
-<li>hashlib</li>
-<li>_json</li>
-<li>math</li>
-<li>pyexpat</li>
-<li>_struct</li>
-<li>_random</li>
-<li>_statistics</li>
-<li>unicodedata</li>
-<li>zlib</li>
-</ul>
-<h2 id="python-external-packages"><a class="header" href="#python-external-packages">Python External Packages</a></h2>
-<p>Installing external packages, such as from <a href="https://pypi.org/">PyPI</a>, will probably not work. The biggest problem you are most likely to run into is lack of support for most of the Python stdlib. Once the Wasm binary limit is increased on the IC, much more of the stdlib should be supported which should open up many external packages.</p>
-<p>Once the majority of the stdlib is supported, you are likely to run into issues with the environment that the Python code is running in. It is a Rust <code>wasm32-unknown-unknown</code> environment that has access to the IC APIs. Any external packages that can't compile or run in this environment with the supported APIs will not work.</p>
-<p>Much of the future work for enabling external packages will be forking and patching packages to support IC APIs.</p>
+<h2 id="no-c-extensions"><a class="header" href="#no-c-extensions">No C extensions</a></h2>
+<p>Any PyPI packages or other Python code that relies on C extensions will not currently work. It is a major goal for us to support C extensions in the future.</p>
+<h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
+<p>Kybra is probably ~7-20x less performant than what you would expect from <a href="https://github.com/python/cpython">CPython</a>. We hope to eventually use <code>CPython</code> as Kybra's underlying Python interpreter.</p>
+<h2 id="init-and-post_upgrade-params"><a class="header" href="#init-and-post_upgrade-params">init and post_upgrade params</a></h2>
+<p>If you add parameters to your <code>init</code> or <code>post_upgrade</code> methods, you will need to manually add these parameters to the service in your Candid file for the first deploy to succeed. Any time you change these parameters, you will need to manually add these changes into your Candid file.</p>
+<p>It is also recommended to start clean (<code>dfx start --clean</code>) when first deploying after changing these parameters.</p>
+<p>Here's an example of a basic Candid file with parameters <code>text</code>, <code>bool</code>, and <code>int32</code>:</p>
+<pre><code>service : (text, bool, int32) -&gt; {}
+</code></pre>
+<h2 id="no-encrypted-dfx-identities"><a class="header" href="#no-encrypted-dfx-identities">No encrypted dfx identities</a></h2>
+<p>Kybra currently does not support encrypted identities. If you are asked for a password during <code>dfx deploy</code>, you'll need to create a new unencrypted dfx identity:</p>
+<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
+dfx identity use test_unencrypted
+
+dfx deploy
+</code></pre>
+<h2 id="no-candidservice-metadata"><a class="header" href="#no-candidservice-metadata">No candid:service metadata</a></h2>
+<p>Kybra does not put the Candid metadata into <code>candid:service</code> automatically. Currently if you want to retrieve the Candid from the canister you can call the <code>__get_candid_interface_tmp_hack</code> method.</p>
+<h2 id="wasm-module-hash-now-less-useful"><a class="header" href="#wasm-module-hash-now-less-useful">Wasm module hash now less useful</a></h2>
+<p>Due to protocol and tooling limitations, Kybra must dynamically upload your application's Python bytecode and the Python stdlib bytecode. This means that the Wasm module hash is not computed from all of your application's source code. Thus the Wasm module hash retrieved from the IC should not be relied upon for security assumptions.</p>
+<h2 id="iccaller-in-init-and-post_upgrade"><a class="header" href="#iccaller-in-init-and-post_upgrade">ic.caller() in init and post_upgrade</a></h2>
+<p>Usually <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the principal of your local dfx identity. Keep in mind that in Kybra canisters <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the canister's own principal.</p>
+<h2 id="do-not-use-dictionary-unpacking"><a class="header" href="#do-not-use-dictionary-unpacking">Do not use dictionary unpacking</a></h2>
+<p>A bug in the <a href="https://github.com/RustPython/RustPython">RustPython</a> interpreter means that dictionary unpacking should not be used until <a href="https://github.com/RustPython/RustPython/issues/4932">this issue</a> is addressed.</p>
+<h2 id="reserved-memory-ids"><a class="header" href="#reserved-memory-ids">Reserved memory ids</a></h2>
+<p><code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved for <code>StableBTreeMap</code>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="reference"><a class="header" href="#reference">Reference</a></h1>
 <ul>
 <li><a href="reference/./call_apis/call_apis.html">Call APIs</a></li>
