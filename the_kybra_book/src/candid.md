@@ -886,6 +886,8 @@ service: () -> {
 
 Python classes that inherit from the Kybra type `Service` correspond to the [Candid service type](https://internetcomputer.org/docs/current/references/candid-ref#type-service-) and will become child classes capable of creating instances that can perform cross-canister calls at runtime.
 
+Python:
+
 ```python
 from kybra import (
     Async,
@@ -922,6 +924,12 @@ def call_service(service: SomeService) -> Async[str]:
         raise Exception(f"call to service.update1 failed with: {result.Err}")
 
     return result.Ok
+```
+
+Candid:
+
+```
+service { query1 : () -> (bool) query; update1 : () -> (text) }
 ```
 
 #### principal

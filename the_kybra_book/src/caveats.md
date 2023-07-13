@@ -59,3 +59,7 @@ A bug in the [RustPython](https://github.com/RustPython/RustPython) interpreter 
 ## Reserved memory ids
 
 `memory ids` `0`, `1`, `2`, `252`, `253`, and `254` are currently reserved for `StableBTreeMap`.
+
+## print does not work
+
+You should use `ic.print` instead of `print`.

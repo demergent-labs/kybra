@@ -14,28 +14,22 @@ Examples:
 
 ```python
 from kybra import (
-    InsertError,
-    match,
+    Alias,
     nat64,
     nat8,
     Opt,
     query,
-    Tuple,
     StableBTreeMap,
+    Tuple,
     update,
-    Variant,
+    Vec,
 )
 
-Key = nat8
-Value = str
+Key = Alias[nat8]
+Value = Alias[str]
 
 
-class InsertResult(Variant, total=False):
-    Ok: Opt[Value]
-    Err: InsertError
-
-
-map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[Key, Value](memory_id=3, max_key_size=100, max_value_size=1_000)
 
 
 @query
@@ -49,10 +43,8 @@ def get(key: Key) -> Opt[Value]:
 
 
 @update
-def insert(key: Key, value: Value) -> InsertResult:
-    result = map.insert(key, value)
-
-    return match(result, {"Ok": lambda ok: {"Ok": ok}, "Err": lambda err: {"Err": err}})
+def insert(key: Key, value: Value) -> Opt[Value]:
+    return map.insert(key, value)
 
 
 @query
