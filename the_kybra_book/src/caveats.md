@@ -29,6 +29,10 @@ Here's an example of a basic Candid file with parameters `text`, `bool`, and `in
 service : (text, bool, int32) -> {}
 ```
 
+## init and post_upgrade guard functions
+
+`init` and `post_upgrade` cannot have guard functions applied to them.
+
 ## No encrypted dfx identities
 
 Kybra currently does not support encrypted identities. If you are asked for a password during `dfx deploy`, you'll need to create a new unencrypted dfx identity:
@@ -63,3 +67,45 @@ A bug in the [RustPython](https://github.com/RustPython/RustPython) interpreter 
 ## print does not work
 
 You should use `ic.print` instead of `print`.
+
+## Kybra types
+
+### Imports
+
+Make sure to use the `from kybra` syntax when importing types from the `kybra` module, and to not rename types with `as`:
+
+Correct:
+
+```python
+from kybra import Record
+
+class MyRecord(Record):
+    prop1: str
+    prop2: int
+```
+
+Incorrect:
+
+```python
+import kybra
+
+class MyRecord(kybra.Record):
+    prop1: str
+    prop2: int
+```
+
+Incorrect:
+
+```python
+from kybra import Record as RenamedRecord
+
+class MyRecord(RenamedRecord):
+    prop1: str
+    prop2: int
+```
+
+We wish to improve this situation in the future to handle the many various ways of importing.
+
+### Treatment as keywords
+
+You should treat Kybra types essentially as keywords, not creating types of the same name elsewhere in your codebase or in other libraries. Any types exported from [this file](https://github.com/demergent-labs/kybra/blob/main/kybra/__init__.py) should be treated thusly.

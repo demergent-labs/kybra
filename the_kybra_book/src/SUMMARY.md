@@ -93,6 +93,7 @@
         -   [pre upgrade](./reference/canister_methods/pre_upgrade.md)
         -   [query](./reference/canister_methods/query.md)
         -   [update](./reference/canister_methods/update.md)
+    -   [Guard Functions](./reference/guard_functions.md)
     -   [Management Canister](./reference/management_canister/management_canister.md)
         -   [bitcoin_get_balance](./reference/management_canister/bitcoin_get_balance.md)
         -   [bitcoin_get_current_fee_percentiles](./reference/management_canister/bitcoin_get_current_fee_percentiles.md)
