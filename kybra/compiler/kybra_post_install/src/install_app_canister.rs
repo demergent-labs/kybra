@@ -48,6 +48,8 @@ fn handle_install_app_canister_failure(
 }
 
 fn check_for_interpreter(canister_name: &str) -> Result<(), String> {
+    let err_message = "The RustPython interpreter could not be initialized. init or post_upgrade has most likely trapped. Check your local replica logs if available".to_string();
+
     let does_interpreter_exist_output = dfx(
         "canister",
         "call",
@@ -55,9 +57,12 @@ fn check_for_interpreter(canister_name: &str) -> Result<(), String> {
     )?;
 
     if !does_interpreter_exist_output.status.success() {
-        return Err(create_error_string(&String::from_utf8_lossy(
-            &does_interpreter_exist_output.stderr,
-        )));
+        println!(
+            "{}",
+            String::from_utf8_lossy(&does_interpreter_exist_output.stderr,)
+        );
+
+        return Err(err_message);
     }
 
     let does_interpreter_exist = String::from_utf8_lossy(&does_interpreter_exist_output.stdout)
@@ -66,7 +71,7 @@ fn check_for_interpreter(canister_name: &str) -> Result<(), String> {
         == "(true)";
 
     if does_interpreter_exist == false {
-        return Err("The RustPython interpreter could not be initialized. init or post_upgrade has most likely trapped. Check your local replica logs if available".to_string());
+        return Err(err_message);
     }
 
     Ok(())
