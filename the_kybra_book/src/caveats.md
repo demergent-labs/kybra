@@ -17,7 +17,18 @@ Any PyPI packages or other Python code that relies on C extensions will not curr
 
 Kybra is probably ~7-20x less performant than what you would expect from [CPython](https://github.com/python/cpython). We hope to eventually use `CPython` as Kybra's underlying Python interpreter.
 
-## init and post_upgrade params
+## init and post_upgrade
+
+### under-the-hood nuances
+
+In order to allow for larger Kybra Wasm modules and to enable the Python stdlib, we had to introduce some trade-offs into the `init` and `post_upgrade` processes:
+
+1. The under-the-hood Rust `init` function of your application canister is never called directly, only the `post_upgrade` function. This function will call your Python `init` or `post_upgrade` function in a timer callback
+2. When deploying to a local replica, errors from your `init` or `post_upgrade` will be logged from your replica, not from the `dfx deploy` process
+3. When deploying to mainnet, errors from your `init` or `post_upgrade` will not be logged
+4. Your canister will go through the following main steps when deploying: first a deployer canister Wasm binary will be deployed to the canister, then your application Wasm binary will be chunk uploaded to the deployer canister along with the Python stdlib, and finally the deployer canister will call `install_code` on itself with the full application Wasm binary
+
+### params
 
 If you add parameters to your `init` or `post_upgrade` methods, you will need to manually add these parameters to the service in your Candid file for the first deploy to succeed. Any time you change these parameters, you will need to manually add these changes into your Candid file.
 
@@ -29,7 +40,7 @@ Here's an example of a basic Candid file with parameters `text`, `bool`, and `in
 service : (text, bool, int32) -> {}
 ```
 
-## init and post_upgrade guard functions
+### guard functions
 
 `init` and `post_upgrade` cannot have guard functions applied to them.
 
