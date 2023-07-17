@@ -159,13 +159,22 @@
 <p>Any PyPI packages or other Python code that relies on C extensions will not currently work. It is a major goal for us to support C extensions in the future.</p>
 <h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
 <p>Kybra is probably ~7-20x less performant than what you would expect from <a href="https://github.com/python/cpython">CPython</a>. We hope to eventually use <code>CPython</code> as Kybra's underlying Python interpreter.</p>
-<h2 id="init-and-post_upgrade-params"><a class="header" href="#init-and-post_upgrade-params">init and post_upgrade params</a></h2>
+<h2 id="init-and-post_upgrade"><a class="header" href="#init-and-post_upgrade">init and post_upgrade</a></h2>
+<h3 id="under-the-hood-nuances"><a class="header" href="#under-the-hood-nuances">under-the-hood nuances</a></h3>
+<p>In order to allow for larger Kybra Wasm modules and to enable the Python stdlib, we had to introduce some trade-offs into the <code>init</code> and <code>post_upgrade</code> processes:</p>
+<ol>
+<li>The under-the-hood Rust <code>init</code> function of your application canister is never called directly, only the <code>post_upgrade</code> function. This function will call your Python <code>init</code> or <code>post_upgrade</code> function in a timer callback</li>
+<li>When deploying to a local replica, errors from your <code>init</code> or <code>post_upgrade</code> will be logged from your replica, not from the <code>dfx deploy</code> process</li>
+<li>When deploying to mainnet, errors from your <code>init</code> or <code>post_upgrade</code> will not be logged</li>
+<li>Your canister will go through the following main steps when deploying: first a deployer canister Wasm binary will be deployed to the canister, then your application Wasm binary will be chunk uploaded to the deployer canister along with the Python stdlib, and finally the deployer canister will call <code>install_code</code> on itself with the full application Wasm binary</li>
+</ol>
+<h3 id="params"><a class="header" href="#params">params</a></h3>
 <p>If you add parameters to your <code>init</code> or <code>post_upgrade</code> methods, you will need to manually add these parameters to the service in your Candid file for the first deploy to succeed. Any time you change these parameters, you will need to manually add these changes into your Candid file.</p>
 <p>It is also recommended to start clean (<code>dfx start --clean</code>) when first deploying after changing these parameters.</p>
 <p>Here's an example of a basic Candid file with parameters <code>text</code>, <code>bool</code>, and <code>int32</code>:</p>
 <pre><code>service : (text, bool, int32) -&gt; {}
 </code></pre>
-<h2 id="init-and-post_upgrade-guard-functions"><a class="header" href="#init-and-post_upgrade-guard-functions">init and post_upgrade guard functions</a></h2>
+<h3 id="guard-functions"><a class="header" href="#guard-functions">guard functions</a></h3>
 <p><code>init</code> and <code>post_upgrade</code> cannot have guard functions applied to them.</p>
 <h2 id="no-encrypted-dfx-identities"><a class="header" href="#no-encrypted-dfx-identities">No encrypted dfx identities</a></h2>
 <p>Kybra currently does not support encrypted identities. If you are asked for a password during <code>dfx deploy</code>, you'll need to create a new unencrypted dfx identity:</p>
