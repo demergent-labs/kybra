@@ -10,7 +10,7 @@ pub fn generate() -> proc_macro2::TokenStream {
                 vm: &rustpython_vm::VirtualMachine,
                 message: String,
             ) -> rustpython_vm::builtins::PyBaseExceptionRef {
-                KybraError::subtype(vm, "KybraError", message)
+                KybraError::subtype(vm, "Error", message)
             }
 
             fn subtype(
@@ -26,6 +26,7 @@ pub fn generate() -> proc_macro2::TokenStream {
                         Ok(kybra_error_class) => kybra_error_class,
                         Err(py_base_exception) => return py_base_exception
                     };
+
                 let py_type_ref =
                     match rustpython_vm::builtins::PyTypeRef::try_from_object(vm, kybra_error_class)
                     {
@@ -36,6 +37,7 @@ pub fn generate() -> proc_macro2::TokenStream {
                 vm.new_exception_msg(py_type_ref, message)
             }
         }
+
         struct CandidError {}
 
         impl CandidError {

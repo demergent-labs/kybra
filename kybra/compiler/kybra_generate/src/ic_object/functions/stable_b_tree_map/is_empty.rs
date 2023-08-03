@@ -13,9 +13,7 @@ pub fn generate(stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>) -> TokenStrea
             memory_id_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine
         ) -> rustpython_vm::PyResult {
-            let memory_id: u8 = memory_id_py_object_ref
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+            let memory_id: u8 = memory_id_py_object_ref.try_from_vm_value(vm)?;
 
             match memory_id {
                 #(#match_arms)*
