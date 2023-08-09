@@ -45,10 +45,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
                         .try_from_vm_value(vm)?;
                     let args: Vec<rustpython_vm::PyObjectRef> = returned_py_object_ref
                         .get_attr("args", vm)?
-                        .try_into_value(vm)
-                        .map_err(|vmc_err| vm.new_type_error(
-                            format!("args cannot be converted into type Vec<T>")
-                        ))?;
+                        .try_into_value(vm)?;
 
                     match &name[..] {
                         "call" => async_result_handler_call(vm, py_object_ref, &args).await,

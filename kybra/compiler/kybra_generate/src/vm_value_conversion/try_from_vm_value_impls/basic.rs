@@ -24,14 +24,7 @@ pub fn generate() -> TokenStream {
                 self,
                 vm: &rustpython::vm::VirtualMachine,
             ) -> Result<bool, rustpython_vm::builtins::PyBaseExceptionRef> {
-                let type_name = self.class().name().to_string();
-
-                match self.try_into_value(vm) {
-                    Ok(value) => Ok(value),
-                    Err(err) => Err(vm.new_type_error(format!(
-                        "expected bool but received {type_name}"
-                    ))), // TODO consider using the try_into_value err
-                }
+                self.try_into_value(vm)
             }
         }
 
@@ -137,16 +130,7 @@ pub fn generate() -> TokenStream {
                 self,
                 vm: &rustpython::vm::VirtualMachine,
             ) -> Result<String, rustpython_vm::builtins::PyBaseExceptionRef> {
-                let type_name = self.class().name().to_string();
-
-                match self.try_into_value(vm) {
-                    Ok(value) => Ok(value),
-                    Err(err) => {
-                        Err(vm.new_type_error(format!(
-                            "expected str but received {type_name}"
-                        ))) // TODO consider using the try_into_value err
-                    }
-                }
+                self.try_into_value(vm)
             }
         }
 
