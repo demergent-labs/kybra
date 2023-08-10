@@ -103,7 +103,7 @@ let tests: Test[] = [
             } catch (err) {
                 return {
                     Ok: (err as AgentError).message.includes(
-                        'TypeError: expected str but received dict'
+                        "TypeError: Expected type 'str' but 'dict' found"
                     )
                 };
             }
