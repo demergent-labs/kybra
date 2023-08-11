@@ -12,8 +12,8 @@ pub fn derive_try_from_vm_value_struct(
     let field_variable_names = generate_field_initializers(data_struct);
 
     quote! {
-        impl CdkActTryFromVmValue<#struct_name, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<#struct_name, CdkActTryFromVmValueError> {
+        impl CdkActTryFromVmValue<#struct_name, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<#struct_name, rustpython_vm::builtins::PyBaseExceptionRef> {
                 #(#field_variable_definitions)*
 
                 Ok(#struct_name {
@@ -22,8 +22,8 @@ pub fn derive_try_from_vm_value_struct(
             }
         }
 
-        impl CdkActTryFromVmValue<Vec<#struct_name>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<#struct_name>, CdkActTryFromVmValueError> {
+        impl CdkActTryFromVmValue<Vec<#struct_name>, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<#struct_name>, rustpython_vm::builtins::PyBaseExceptionRef> {
                 try_from_vm_value_generic_array(self, vm)
             }
         }
@@ -53,8 +53,7 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
                 };
 
                 quote! {
-                    let #variable_name = self.get_item(stringify!(#restored_field_name), vm)
-                        .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
+                    let #variable_name = self.get_item(stringify!(#restored_field_name), vm)?;
                 }
             })
             .collect(),
@@ -70,11 +69,10 @@ fn generate_field_variable_definitions(data_struct: &DataStruct) -> Vec<TokenStr
                     // TODO tuple_self is being repeated more times than necessary
                     let tuple_self: rustpython_vm::builtins::PyTupleRef = self
                         .clone()
-                        .try_into_value(vm)
-                        .map_err(|err| err.to_cdk_act_try_from_vm_value_error(vm))?;
+                        .try_into_value(vm)?;
                     let #variable_name = match tuple_self.get(#syn_index) {
                         Some(element) => element,
-                        None => return Err(CdkActTryFromVmValueError(format!("IndexError: tuple index out of range"))),
+                        None => return Err(vm.new_index_error(format!("tuple index out of range"))),
                     };
                 }
             })

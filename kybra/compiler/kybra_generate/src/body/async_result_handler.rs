@@ -42,14 +42,10 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
 
                     let name: String = returned_py_object_ref
                         .get_attr("name", vm)?
-                        .try_from_vm_value(vm)
-                        .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                        .try_from_vm_value(vm)?;
                     let args: Vec<rustpython_vm::PyObjectRef> = returned_py_object_ref
                         .get_attr("args", vm)?
-                        .try_into_value(vm)
-                        .map_err(|vmc_err| vm.new_type_error(
-                            format!("args cannot be converted into type Vec<T>")
-                        ))?;
+                        .try_into_value(vm)?;
 
                     match &name[..] {
                         "call" => async_result_handler_call(vm, py_object_ref, &args).await,
@@ -108,12 +104,8 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
         ) -> rustpython_vm::PyResult {
             let canister_id_principal: ic_cdk::export::Principal = args[0]
                 .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
-            let qual_name: String = args[1]
-                .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                .try_from_vm_value(vm)?;
+            let qual_name: String = args[1].clone().try_from_vm_value(vm)?;
 
             let cross_canister_call_function_name =
                 format!("call_{}", qual_name.replace(".", "_"));
@@ -140,12 +132,8 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
         ) -> rustpython_vm::PyResult {
             let canister_id_principal: ic_cdk::export::Principal = args[0]
                 .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
-            let qual_name: String = args[1]
-                .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                .try_from_vm_value(vm)?;
+            let qual_name: String = args[1].clone().try_from_vm_value(vm)?;
 
             let cross_canister_call_with_payment_function_name =
                 format!("call_with_payment_{}", qual_name.replace(".", "_"));
@@ -172,12 +160,8 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
         ) -> rustpython_vm::PyResult {
             let canister_id_principal: ic_cdk::export::Principal = args[0]
                 .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
-            let qual_name: String = args[1]
-                .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                .try_from_vm_value(vm)?;
+            let qual_name: String = args[1].clone().try_from_vm_value(vm)?;
 
             let cross_canister_call_with_payment128_function_name =
                 format!("call_with_payment128_{}", qual_name.replace(".", "_"));
@@ -205,20 +189,10 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
         ) -> rustpython_vm::PyResult {
             let canister_id_principal: ic_cdk::export::Principal = args[0]
                 .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
-            let method_string: String = args[1]
-                .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
-            let args_raw_vec: Vec<u8> = args[2]
-                .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
-            let payment: u64 = args[3]
-                .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                .try_from_vm_value(vm)?;
+            let method_string: String = args[1].clone().try_from_vm_value(vm)?;
+            let args_raw_vec: Vec<u8> = args[2].clone().try_from_vm_value(vm)?;
+            let payment: u64 = args[3].clone().try_from_vm_value(vm)?;
 
             let call_raw_result = ic_cdk::api::call::call_raw(
                 canister_id_principal,
@@ -241,20 +215,10 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
         ) -> rustpython_vm::PyResult {
             let canister_id_principal: ic_cdk::export::Principal = args[0]
                 .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
-            let method_string: String = args[1]
-                .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
-            let args_raw_vec: Vec<u8> = args[2]
-                .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
-            let payment: u128 = args[3]
-                .clone()
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                .try_from_vm_value(vm)?;
+            let method_string: String = args[1].clone().try_from_vm_value(vm)?;
+            let args_raw_vec: Vec<u8> = args[2].clone().try_from_vm_value(vm)?;
+            let payment: u128 = args[3].clone().try_from_vm_value(vm)?;
 
             let call_raw_result = ic_cdk::api::call::call_raw128(
                 canister_id_principal,
@@ -373,8 +337,7 @@ fn generate_call_match_arms(services: &Vec<Service>) -> Vec<TokenStream> {
                             quote! {
                                 let #variable_name: (#variable_type) = args[#actual_index]
                                     .clone()
-                                    .try_from_vm_value(vm)
-                                    .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                                    .try_from_vm_value(vm)?;
                             }
                         })
                         .collect();
@@ -393,8 +356,7 @@ fn generate_call_match_arms(services: &Vec<Service>) -> Vec<TokenStream> {
                         #cross_canister_function_call_name => {
                             let canister_id_principal: ic_cdk::export::Principal = args[0]
                                 .clone()
-                                .try_from_vm_value(vm)
-                                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                                .try_from_vm_value(vm)?;
 
                             #(#param_variable_definitions)*
 
@@ -454,8 +416,7 @@ fn generate_call_with_payment_match_arms(services: &Vec<Service>) -> Vec<TokenSt
                             quote! {
                                 let #variable_name: (#variable_type) = args[#actual_index]
                                     .clone()
-                                    .try_from_vm_value(vm)
-                                    .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                                    .try_from_vm_value(vm)?;
                             }
                         })
                         .collect();
@@ -472,18 +433,14 @@ fn generate_call_with_payment_match_arms(services: &Vec<Service>) -> Vec<TokenSt
 
                     let payment_index = method.params.len() + 2;
                     let payment_variable_definition = quote! {
-                        let payment: u64 = args[#payment_index]
-                            .clone()
-                            .try_from_vm_value(vm)
-                            .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                        let payment: u64 = args[#payment_index].clone().try_from_vm_value(vm)?;
                     };
 
                     quote! {
                         #cross_canister_function_call_with_payment_name => {
                             let canister_id_principal: ic_cdk::export::Principal = args[0]
                                 .clone()
-                                .try_from_vm_value(vm)
-                                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                                .try_from_vm_value(vm)?;
 
                             #(#param_variable_definitions)*
                             #payment_variable_definition
@@ -543,8 +500,7 @@ fn generate_call_with_payment128_match_arms(services: &Vec<Service>) -> Vec<Toke
                             quote! {
                                 let #variable_name: (#variable_type) = args[#actual_index]
                                     .clone()
-                                    .try_from_vm_value(vm)
-                                    .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                                    .try_from_vm_value(vm)?;
                             }
                         })
                         .collect();
@@ -561,18 +517,14 @@ fn generate_call_with_payment128_match_arms(services: &Vec<Service>) -> Vec<Toke
 
                     let payment_index = method.params.len() + 2;
                     let payment_variable_definition = quote! {
-                        let payment: u128 = args[#payment_index]
-                            .clone()
-                            .try_from_vm_value(vm)
-                            .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                        let payment: u128 = args[#payment_index].clone().try_from_vm_value(vm)?;
                     };
 
                     quote! {
                         #cross_canister_function_call_with_payment128_name => {
                             let canister_id_principal: ic_cdk::export::Principal = args[0]
                                 .clone()
-                                .try_from_vm_value(vm)
-                                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                                .try_from_vm_value(vm)?;
 
                             #(#param_variable_definitions)*
                             #payment_variable_definition

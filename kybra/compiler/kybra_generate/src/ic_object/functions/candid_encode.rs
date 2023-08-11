@@ -9,9 +9,7 @@ pub fn generate() -> TokenStream {
             candid_string_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine,
         ) -> rustpython_vm::PyResult {
-            let candid_string: String = candid_string_py_object_ref
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+            let candid_string: String = candid_string_py_object_ref.try_from_vm_value(vm)?;
 
             let candid_args: candid::IDLArgs = candid_string
                 .parse::<candid::IDLArgs>()

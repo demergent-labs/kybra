@@ -8,16 +8,16 @@ pub fn derive_try_from_vm_value_enum(enum_name: &Ident, data_enum: &DataEnum) ->
     let item_initializers = derive_item_initializers(enum_name, data_enum);
 
     quote! {
-        impl CdkActTryFromVmValue<#enum_name, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<#enum_name, CdkActTryFromVmValueError> {
+        impl CdkActTryFromVmValue<#enum_name, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<#enum_name, rustpython_vm::builtins::PyBaseExceptionRef> {
                 #(#item_initializers)*
 
-                return Err(CdkActTryFromVmValueError("Enum variant does not exist".to_string()));
+                return Err(vm.new_type_error("Enum variant does not exist".to_string()));
             }
         }
 
-        impl CdkActTryFromVmValue<Vec<#enum_name>, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
-            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<#enum_name>, CdkActTryFromVmValueError> {
+        impl CdkActTryFromVmValue<Vec<#enum_name>, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine> for rustpython::vm::PyObjectRef {
+            fn try_from_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<Vec<#enum_name>, rustpython_vm::builtins::PyBaseExceptionRef> {
                 try_from_vm_value_generic_array(self, vm)
             }
         }

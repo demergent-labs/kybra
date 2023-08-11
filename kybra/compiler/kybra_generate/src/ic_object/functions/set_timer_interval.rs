@@ -10,9 +10,7 @@ pub fn generate() -> TokenStream {
             func_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine,
         ) -> rustpython_vm::PyResult {
-            let interval_as_u64: u64 = interval_py_object_ref
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+            let interval_as_u64: u64 = interval_py_object_ref.try_from_vm_value(vm)?;
 
             let interval = core::time::Duration::new(interval_as_u64, 0);
 

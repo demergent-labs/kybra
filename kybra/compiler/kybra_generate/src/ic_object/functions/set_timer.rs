@@ -10,9 +10,7 @@ pub fn generate() -> TokenStream {
             func_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine,
         ) -> rustpython_vm::PyResult {
-            let delay_as_u64: u64 = delay_py_object_ref
-                .try_from_vm_value(vm)
-                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+            let delay_as_u64: u64 = delay_py_object_ref.try_from_vm_value(vm)?;
 
             let delay = core::time::Duration::new(delay_as_u64, 0);
 

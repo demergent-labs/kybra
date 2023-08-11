@@ -40,10 +40,8 @@ pub fn generate(services: &Vec<Service>) -> Vec<TokenStream> {
                             args_py_object_refs: Vec<rustpython_vm::PyObjectRef>,
                             vm: &rustpython_vm::VirtualMachine
                         ) -> rustpython_vm::PyResult {
-                            let canister_id_principal: ic_cdk::export::Principal = args_py_object_refs[0]
-                                .clone()
-                                .try_from_vm_value(vm)
-                                .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                            let canister_id_principal: ic_cdk::export::Principal =
+                                args_py_object_refs[0].clone().try_from_vm_value(vm)?;
 
                             #(#param_variable_definitions)*
 
@@ -82,8 +80,7 @@ fn generate_param_variables(method: &Method, canister_name: &String) -> Vec<Toke
             quote! {
                 let #variable_name: (#variable_type) = args_py_object_refs[#actual_index]
                     .clone()
-                    .try_from_vm_value(vm)
-                    .map_err(|vmc_err| vm.new_type_error(vmc_err.0))?;
+                    .try_from_vm_value(vm)?;
             }
         })
         .collect()

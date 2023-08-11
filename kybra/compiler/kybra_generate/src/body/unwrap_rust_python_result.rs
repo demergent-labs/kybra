@@ -30,15 +30,6 @@ pub fn generate() -> TokenStream {
             }
         }
 
-        impl<T> UnwrapOrTrap<T> for Result<T, CdkActTryFromVmValueError> {
-            fn unwrap_or_trap(self) -> T {
-                match self {
-                    Ok(ok) => ok,
-                    Err(err) => ic_cdk::trap(&err.0)
-                }
-            }
-        }
-
         impl<T> UnwrapOrTrap<T> for Result<T, ic_stable_structures::cell::ValueError> {
             fn unwrap_or_trap(self) -> T {
                 match self {

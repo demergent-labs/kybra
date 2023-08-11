@@ -271,17 +271,7 @@ checksum = "50d30906286121d95be3d479533b458f87493b30a4b5f79a607db8f5d11aa91f"
 [[package]]
 name = "cdk_framework"
 version = "0.0.0"
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=13c4abdd72bdcfa6a5b1ddf7f08a4fd83eacb419#13c4abdd72bdcfa6a5b1ddf7f08a4fd83eacb419"
-dependencies = [
- "proc-macro2",
- "quote",
- "regex",
-]
-
-[[package]]
-name = "cdk_framework"
-version = "0.0.0"
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=1791111b792829da1a474758c5dfafb5cbe9115a#1791111b792829da1a474758c5dfafb5cbe9115a"
+source = "git+https://github.com/demergent-labs/cdk_framework?rev=b006618358f455e4a378552cfe821c934eb2fd3d#b006618358f455e4a378552cfe821c934eb2fd3d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -751,7 +741,7 @@ dependencies = [
 name = "kybra-vm-value-derive"
 version = "0.0.0"
 dependencies = [
- "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=13c4abdd72bdcfa6a5b1ddf7f08a4fd83eacb419)",
+ "cdk_framework",
  "proc-macro2",
  "quote",
  "syn 1.0.99",
@@ -775,7 +765,7 @@ version = "0.0.0"
 dependencies = [
  "annotate-snippets",
  "backtrace",
- "cdk_framework 0.0.0 (git+https://github.com/demergent-labs/cdk_framework?rev=1791111b792829da1a474758c5dfafb5cbe9115a)",
+ "cdk_framework",
  "num-bigint",
  "proc-macro2",
  "quote",
