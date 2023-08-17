@@ -11,7 +11,7 @@ pub fn generate() -> TokenStream {
         ) -> rustpython_vm::PyResult {
             let param_string: String = param_py_object_ref.try_from_vm_value(vm)?;
 
-            ic_cdk::println!("{:#?}", param_string)
+            ic_cdk::println!("{}", param_string)
                 .try_into_vm_value(vm)
                 .map_err(|vmc_err| vm.new_type_error(vmc_err.0))
         }
