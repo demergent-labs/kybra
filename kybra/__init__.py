@@ -18,7 +18,7 @@ from typing import (
 from .compiler.custom_modules.principal import Principal as PrincipalRenamed
 
 __version__ = "0.5.0"
-__rust_version__ = "1.68.2"
+__rust_version__ = "1.72.0"
 
 Principal = PrincipalRenamed
 
