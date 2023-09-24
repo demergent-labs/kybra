@@ -360,8 +360,9 @@ class ic(Generic[T]):
         return _kybra_ic.performance_counter(counter_type)  # type: ignore
 
     @staticmethod
-    def print(x: Any):
-        _kybra_ic.print(str(x))  # type: ignore
+    def print(*args: Any):
+        string_list = [str(arg) for arg in args]
+        _kybra_ic.print(" ".join(string_list))  # type: ignore
 
     @staticmethod
     def reject(x: str):
