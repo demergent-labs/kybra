@@ -18,7 +18,7 @@ from typing import (
 from .compiler.custom_modules.principal import Principal as PrincipalRenamed
 
 __version__ = "0.5.2"
-__rust_version__ = "1.72.0"
+__rust_version__ = "1.77.0"
 
 Principal = PrincipalRenamed
 
@@ -157,14 +157,11 @@ class CallResult(Generic[T]):
         self.Ok = Ok
         self.Err = Err
 
-    def notify(self) -> "NotifyResult":
-        ...
+    def notify(self) -> "NotifyResult": ...
 
-    def with_cycles(self, cycles: nat64) -> "CallResult[T]":
-        ...
+    def with_cycles(self, cycles: nat64) -> "CallResult[T]": ...
 
-    def with_cycles128(self, cycles: nat) -> "CallResult[T]":
-        ...
+    def with_cycles128(self, cycles: nat) -> "CallResult[T]": ...
 
 
 # TODO Once RustPython supports Python 3.11, we can use the below and unify CallResult with the other Variants
