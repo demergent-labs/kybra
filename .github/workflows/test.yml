@@ -173,7 +173,7 @@ jobs:
               uses: actions/cache@v3
               with:
                   path: ~/.cache/dfinity
-                  key: kybra-dfx-0.14.2
+                  key: kybra-dfx-0.17.0
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               name: Install dfx
               run: |
