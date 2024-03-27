@@ -21,12 +21,6 @@ use crate::{
 };
 
 impl PyAst {
-    /// To get around the Wasm binary limit we have adopted a deploy system with a chunk
-    /// uploading process. As part of this process we only use `post_upgrade` and do not
-    /// have an `init` that executes in Rust on the application canister. Because of this,
-    /// our `post_upgrade` function must call the developer's `init` function. If the developer
-    /// defines an `init` but does not define a `post_upgrade` function, then we must use
-    /// that `init` function's parameters as our Rust `post_upgrade` function's parameters.
     pub fn build_post_upgrade_method(&self) -> Result<PostUpgradeMethod, Vec<Error>> {
         let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
         let post_upgrade_function_defs =

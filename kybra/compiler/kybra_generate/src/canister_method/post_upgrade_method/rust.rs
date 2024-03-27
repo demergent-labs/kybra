@@ -1,3 +1,5 @@
+// TODO move the logic into init and import it into post_upgrade
+
 use cdk_framework::traits::CollectResults;
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -17,7 +19,6 @@ pub fn generate(
     )
         .collect_results()?;
 
-    let randomness = generate_randomness();
     let interpreter_init = generate_interpreter_init();
     let ic_object_init = generate_ic_object_init();
     let code_init = generate_code_init(entry_module_name);
@@ -27,57 +28,77 @@ pub fn generate(
         &call_to_post_upgrade_py_function,
     );
 
-    // TODO the set_timer below is here to allow the developer to see error messages
-    // TODO in their local replica during development. For some reason without
-    // TODO this the error messages can't be seen, I believe because they are part of
-    // TODO the cross-canister call from the kybra_deployer. We can't get that response
-    // TODO currently because the Wasm binary changes before the response returns
-    // TODO and calling the respone callback causes undefined behavior
-    // TODO two possible solutions are coming to these issues, named/default callbacks
-    // TODO and dfx chunk uploading. dfx chunk uploading should allow us to remove the
-    // TODO kybra_deployer entirely, get rid of the post_install process hopefully
-    // TODO and return to regular init/post_upgrade semantics
     Ok(quote! {
-        ic_cdk_timers::set_timer(std::time::Duration::from_secs(0), move || {
-            #randomness
+        unsafe { ic_wasi_polyfill::init(&[], &[]); };
 
-            unsafe { ic_wasi_polyfill::init(&randomness); };
+        #interpreter_init
 
-            #interpreter_init
+        #ic_object_init
 
-            #ic_object_init
+        #code_init
 
-            #code_init
+        #save_global_interpreter
 
-            #save_global_interpreter
-
-            #call_to_user_init_or_post_upgrade
-        });
+        #call_to_user_init_or_post_upgrade
     })
 }
 
-fn generate_randomness() -> TokenStream {
-    quote! {
-        let randomness = RANDOMNESS_STABLE_REF_CELL.with(|randomness_stable_ref_cell| randomness_stable_ref_cell.borrow().get().clone());
-
-        if randomness.len() == 0 {
-            ic_cdk::trap("Post Upgrade Error: randomness cannot have length 0");
-        }
-    }
-}
-
-fn generate_interpreter_init() -> TokenStream {
+pub fn generate_interpreter_init() -> TokenStream {
     quote! {
         let interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
+            ic_cdk::println!("with_init 0");
+
             vm.add_native_modules(rustpython_stdlib::get_module_inits());
+
+            ic_cdk::println!("with_init 1");
+
             vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
 
+            ic_cdk::println!("with_init 2");
+
             PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
-                let mut python_stdlib_stable_ref = python_stdlib_stable_ref_cell.borrow();
+
+                ic_cdk::println!("with_init 3");
+
+                #[cfg(feature = "azle_include_stdlib")]
+                {
+                    ic_cdk::println!("with_init 4");
+
+                    // TODO can we simplify this a bit?
+                    // TODO make sure to use a dynamic path here
+                    // TODO we will have to somehow pass in the current kybra version
+                    let mut python_stdlib_stable_ref_mut = python_stdlib_stable_ref_cell.borrow_mut();
+
+                    ic_cdk::println!("with_init 5");
+
+                    python_stdlib_stable_ref_mut
+                        .set(rustpython_vm::py_freeze!(dir = "/home/lastmjs/.config/kybra/0.5.2/RustPython/Lib").bytes.to_vec())
+                        .unwrap();
+                        // .map_err(|err| value_error_to_string(&err));
+
+                    ic_cdk::println!("with_init 6");
+                }
+
+                ic_cdk::println!("with_init 7");
 
                 // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
-                let python_stdlib_bytes_reference: &'static [u8] = python_stdlib_stable_ref.get().clone().leak();
+                let python_stdlib_bytes_reference: &'static [u8] = python_stdlib_stable_ref_cell.borrow().get().clone().leak();
+
+                ic_cdk::println!("with_init 8");
+
+                ic_cdk::println!("length: {}", python_stdlib_bytes_reference.len());
+
                 vm.add_frozen(rustpython_compiler_core::frozen_lib::FrozenLib::from_ref(python_stdlib_bytes_reference));
+
+                ic_cdk::println!("with_init 9");
+
+                pub fn value_error_to_string(err: &ic_stable_structures::cell::ValueError) -> String {
+                    match err {
+                        ic_stable_structures::cell::ValueError::ValueTooLarge { value_size } => {
+                            format!("ValueError: ValueTooLarge {value_size}")
+                        }
+                    }
+                }
             });
         });
         let scope = interpreter.enter(|vm| vm.new_scope_with_builtins());
@@ -85,14 +106,14 @@ fn generate_interpreter_init() -> TokenStream {
     }
 }
 
-fn generate_ic_object_init() -> TokenStream {
+pub fn generate_ic_object_init() -> TokenStream {
     quote! {
         Ic::make_class(&vm.ctx);
         vm.builtins.set_attr("_kybra_ic", vm.new_pyobj(Ic {}), vm).unwrap_or_trap(vm);
     }
 }
 
-fn generate_code_init(entry_module_name: &str) -> TokenStream {
+pub fn generate_code_init(entry_module_name: &str) -> TokenStream {
     quote! {
         vm.run_code_string(
             scope.clone(),
@@ -102,7 +123,7 @@ fn generate_code_init(entry_module_name: &str) -> TokenStream {
     }
 }
 
-fn generate_save_global_interpreter() -> TokenStream {
+pub fn generate_save_global_interpreter() -> TokenStream {
     quote! {
         unsafe {
             INTERPRETER_OPTION = Some(interpreter);
@@ -111,7 +132,7 @@ fn generate_save_global_interpreter() -> TokenStream {
     }
 }
 
-fn generate_call_to_user_init_or_post_upgrade(
+pub fn generate_call_to_user_init_or_post_upgrade(
     call_to_init_py_function: &TokenStream,
     call_to_post_upgrade_py_function: &TokenStream,
 ) -> TokenStream {

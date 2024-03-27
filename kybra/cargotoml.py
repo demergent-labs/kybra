@@ -14,11 +14,15 @@ codegen-units = 256
 [lib]
 crate-type = ["cdylib"]
 
+[features]
+azle_include_stdlib = []
+
 [dependencies]
-ic-cdk = "=0.8.0-beta.0"
-ic-cdk-macros = "0.6.10"
-ic-cdk-timers = "0.1.2"
-candid = {{ version = "0.9.0-beta.2", features = ["parser"] }}
+ic-cdk = "0.13.1"
+ic-cdk-macros = "0.9.0"
+ic-cdk-timers = "0.7.0"
+candid = {{ version = "0.10.6", features = ["value"] }}
+candid_parser = "0.1.4"
 kybra-vm-value-derive = {{ path = "./kybra_vm_value_derive" }}
 
 rustpython = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["stdlib", "encodings"] }}
@@ -42,11 +46,13 @@ rustpython-compiler-core = {{ git = "https://github.com/demergent-labs/RustPytho
 # rustpython = {{ path = "../../../../../../RustPython", default-features = false, features = [] }}
 serde = {{ version = "1.0.137", default-features = false, features = [] }}
 async-recursion = "1.0.0"
-ic-stable-structures = "0.5.2"
+ic-stable-structures = "0.5.2" # TODO shall we update? Shall we remove the need to specify max size?
 slotmap = "1.0.6"
-ic-wasi-polyfill = {{ git = "https://github.com/demergent-labs/ic-wasi-polyfill", rev = "9b039919427ccd76bf452f012bdbfe3695e549a6" }}
-# ic-wasi-polyfill = {{ git = "https://github.com/wasm-forge/ic-wasi-polyfill", rev = "5e986cb3b95a58fbbf9386582f5c48847f22dcca" }}
-# ic-wasi-polyfill = {{ path = "/home/lastmjs/development/ic-wasi-polyfill", features = ["transient", "report_wasi_calls"] }}
+
+# TODO transient feature can be removed once https://github.com/wasm-forge/stable-fs/issues/2 is resolved
+ic-wasi-polyfill = {{ git = "https://github.com/wasm-forge/ic-wasi-polyfill", rev = "2d2edb382816e12da9bc81b786b7cd1a00d36735" , features = [
+    "transient",
+] }}
 
 [patch.crates-io]
 num-bigint = {{ git = "https://github.com/rust-num/num-bigint" }}

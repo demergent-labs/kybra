@@ -53,13 +53,6 @@ def main():
     shutil.copytree(paths["compiler"], paths["canister"], dirs_exist_ok=True)
     create_file(f"{paths['canister']}/Cargo.toml", generate_cargo_toml(canister_name))
     create_file(f"{paths['canister']}/Cargo.lock", generate_cargo_lock())
-    create_file(
-        f"{paths['canister']}/post_install.sh",
-        generate_post_install_script(
-            canister_name, kybra.__rust_version__, is_verbose, paths["did"]
-        ),
-    )
-    os.system(f"chmod +x {paths['canister']}/post_install.sh")
 
     # Add CARGO_TARGET_DIR to env for all cargo commands
     cargo_env = {
@@ -84,42 +77,7 @@ def main():
         label=f"[2/3] 🚧 Building Wasm binary...{show_empathy(is_initial_compile)}",
     )
 
-    optimize_wasm_binary_or_exit(
-        paths,
-        canister_name,
-        cargo_env,
-        verbose=is_verbose,
-        label=f"[3/3] 🚀 Optimizing Wasm binary...{show_empathy(is_initial_compile)}",
-    )
-
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['wasm'])}")
-
-
-def generate_post_install_script(
-    canister_name: str, rust_version: str, is_verbose: bool, candid_path: str
-) -> str:
-    main_command = f"KYBRA_VERSION={kybra.__version__} $global_kybra_cargo_bin run --manifest-path=.kybra/{canister_name}/kybra_post_install/Cargo.toml {canister_name} {candid_path}"
-    main_command_not_verbose = f'exec 3>&1; output=$({main_command} 2>&1 1>&3 3>&-); exit_code=$?; exec 3>&-; if [ $exit_code -ne 0 ]; then echo "$output"; exit $exit_code; fi'
-
-    return f"""#!/bin/bash
-
-rust_version="{rust_version}"
-
-global_kybra_config_dir=~/.config/kybra
-global_kybra_rust_dir="$global_kybra_config_dir"/rust/"$rust_version"
-global_kybra_rust_bin_dir="$global_kybra_rust_dir"/bin
-global_kybra_logs_dir="$global_kybra_rust_dir"/logs
-global_kybra_cargo_bin="$global_kybra_rust_bin_dir"/cargo
-global_kybra_rustup_bin="$global_kybra_rust_bin_dir"/rustup
-
-export CARGO_TARGET_DIR="$global_kybra_config_dir"/rust/target
-export CARGO_HOME="$global_kybra_rust_dir"
-export RUSTUP_HOME="$global_kybra_rust_dir"
-
-echo "\nPreparing canister binaries for upload...\n"
-
-{main_command if is_verbose else main_command_not_verbose}
-    """
 
 
 def parse_args_or_exit(args: list[str]) -> Args:
@@ -345,84 +303,6 @@ def run_rustfmt_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool =
         print(
             f'\nPlease open an issue at https://github.com/demergent-labs/kybra/issues/new\nincluding this message and the following error:\n\n {red(rustfmt_result.stderr.decode("utf-8"))}'
         )
-        print("💀 Build failed")
-        sys.exit(1)
-
-
-@timed_inline
-def optimize_wasm_binary_or_exit(
-    paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
-):
-    optimization_result = subprocess.run(
-        [
-            f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
-            f"{paths['canister']}/{canister_name}_app.wasm",
-            "-o",
-            f"{paths['canister']}/{canister_name}_app.wasm",
-            "shrink",
-        ],
-        capture_output=not verbose,
-    )
-
-    if optimization_result.returncode != 0:
-        print(red("\n💣 Kybra error: optimizing generated Wasm"))
-        print(optimization_result.stderr.decode("utf-8"))
-        print("💀 Build failed")
-        sys.exit(1)
-
-    add_metadata_to_wasm_or_exit(paths, canister_name, verbose=verbose)
-
-    os.system(f"gzip -9 -f -k {paths['canister']}/{canister_name}_app.wasm")
-
-
-def add_metadata_to_wasm_or_exit(
-    paths: Paths, canister_name: str, verbose: bool = False
-):
-    # TODO removing this until we solve the Candid issue: https://forum.dfinity.org/t/automatically-generate-candid-from-rust-sources/5924/34
-    # TODO our current solution is to grab the Candid in post_install because of issues with Wasmer
-    # TODO Unfortunately this means that on first deploy the candid:service metadata is incorrect
-    # TODO thus we are relying on __get_candid_interface_tmp_hack for the time being
-    # add_candid_to_wasm_result = subprocess.run(
-    #     [
-    #         f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
-    #         f"{paths['canister']}/{canister_name}_app.wasm",
-    #         "-o",
-    #         f"{paths['canister']}/{canister_name}_app.wasm",
-    #         "metadata",
-    #         "candid:service",
-    #         "-f",
-    #         paths["did"],
-    #         "-v",
-    #         "public",
-    #     ],
-    #     capture_output=not verbose,
-    # )
-
-    # if add_candid_to_wasm_result.returncode != 0:
-    #     print(red("\n💣 Kybra error: adding candid to Wasm"))
-    #     print(add_candid_to_wasm_result.stderr.decode("utf-8"))
-    #     print("💀 Build failed")
-    #     sys.exit(1)
-
-    add_cdk_info_to_wasm_result = subprocess.run(
-        [
-            f"{paths['global_kybra_rust_bin_dir']}/ic-wasm",
-            f"{paths['canister']}/{canister_name}_app.wasm",
-            "-o",
-            f"{paths['canister']}/{canister_name}_app.wasm",
-            "metadata",
-            "cdk",
-            "-d",
-            f"kybra {kybra.__version__}",
-            "-v",
-            "public",
-        ],
-        capture_output=not verbose,
-    )
-
-    if add_cdk_info_to_wasm_result.returncode != 0:
-        print(red("\n💣 Kybra error: adding cdk name/version to Wasm"))
-        print(add_cdk_info_to_wasm_result.stderr.decode("utf-8"))
         print("💀 Build failed")
         sys.exit(1)
 
