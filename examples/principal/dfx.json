@@ -3,7 +3,6 @@
         "principal": {
             "type": "custom",
             "build": "python -m kybra principal src/main.py src/main.did",
-            "post_install": ".kybra/principal/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/principal/principal.wasm",
             "gzip": true,

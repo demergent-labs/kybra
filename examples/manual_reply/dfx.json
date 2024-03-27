@@ -3,7 +3,6 @@
         "manual_reply": {
             "type": "custom",
             "build": "python -m kybra manual_reply src/main.py src/main.did",
-            "post_install": ".kybra/manual_reply/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/manual_reply/manual_reply.wasm",
             "gzip": true,

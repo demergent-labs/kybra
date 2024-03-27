@@ -3,7 +3,6 @@
         "init": {
             "type": "custom",
             "build": "python -m kybra init src/main.py src/main.did",
-            "post_install": ".kybra/init/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/init/init.wasm",
             "gzip": true,

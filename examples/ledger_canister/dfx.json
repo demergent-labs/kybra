@@ -3,7 +3,6 @@
         "ledger_canister": {
             "type": "custom",
             "build": "python -m kybra ledger_canister src/ledger_canister/ledger_canister.py src/ledger_canister/ledger_canister.did",
-            "post_install": ".kybra/ledger_canister/post_install.sh",
             "candid": "src/ledger_canister/ledger_canister.did",
             "wasm": ".kybra/ledger_canister/ledger_canister.wasm",
             "gzip": true,

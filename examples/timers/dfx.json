@@ -3,7 +3,6 @@
         "timers": {
             "type": "custom",
             "build": "python -m kybra timers src/main.py src/main.did",
-            "post_install": ".kybra/timers/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/timers/timers.wasm",
             "gzip": true,

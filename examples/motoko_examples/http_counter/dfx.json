@@ -3,7 +3,6 @@
         "http_counter": {
             "type": "custom",
             "build": "python -m kybra http_counter src/main.py src/main.did",
-            "post_install": ".kybra/http_counter/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/http_counter/http_counter.wasm",
             "gzip": true,

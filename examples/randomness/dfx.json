@@ -3,7 +3,6 @@
         "randomness": {
             "type": "custom",
             "build": "python -m kybra randomness src/main.py src/main.did",
-            "post_install": ".kybra/randomness/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/randomness/randomness.wasm",
             "gzip": true,

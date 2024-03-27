@@ -3,7 +3,6 @@
         "persistent_storage": {
             "type": "custom",
             "build": "python -m kybra persistent_storage src/main.py src/main.did",
-            "post_install": ".kybra/persistent_storage/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/persistent_storage/persistent_storage.wasm",
             "gzip": true,

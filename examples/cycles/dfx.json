@@ -3,7 +3,6 @@
         "cycles": {
             "type": "custom",
             "build": "python -m kybra cycles src/cycles/cycles.py src/cycles/cycles.did",
-            "post_install": ".kybra/cycles/post_install.sh",
             "candid": "src/cycles/cycles.did",
             "wasm": ".kybra/cycles/cycles.wasm",
             "gzip": true,
@@ -15,7 +14,6 @@
         "intermediary": {
             "type": "custom",
             "build": "python -m kybra intermediary src/intermediary/intermediary.py src/intermediary/intermediary.did",
-            "post_install": ".kybra/intermediary/post_install.sh",
             "candid": "src/intermediary/intermediary.did",
             "wasm": ".kybra/intermediary/intermediary.wasm",
             "gzip": true,

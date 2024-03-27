@@ -3,7 +3,6 @@
         "hello_world": {
             "type": "custom",
             "build": "python -m kybra hello_world src/main.py src/main.did",
-            "post_install": ".kybra/hello_world/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/hello_world/hello_world.wasm",
             "gzip": true,
