@@ -3,7 +3,6 @@
         "primitive_types": {
             "type": "custom",
             "build": "python -m kybra primitive_types src/main.py src/main.did",
-            "post_install": ".kybra/primitive_types/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/primitive_types/primitive_types.wasm",
             "gzip": true,

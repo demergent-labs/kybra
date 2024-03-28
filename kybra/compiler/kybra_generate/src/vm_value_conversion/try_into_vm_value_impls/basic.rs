@@ -14,13 +14,13 @@ pub fn generate() -> TokenStream {
             }
         }
 
-        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::candid::Empty {
+        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for candid::Empty {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
                 Err(CdkActTryIntoVmValueError("type \"empty\" cannot be represented in python".to_string()))
             }
         }
 
-        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::candid::Func {
+        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for candid::Func {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
                 let principal = self.principal.try_into_vm_value(vm)?;
                 let method = self.method.try_into_vm_value(vm)?;
@@ -28,7 +28,7 @@ pub fn generate() -> TokenStream {
             }
         }
 
-        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::Principal {
+        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for candid::Principal {
             // TODO: In the future CdkActTryIntoVmValue needs to return rustpython_vm::object::PyResult
             // When it does all these map_err calls will be unnecessary and should be replaced with
             // question mark syntax.
@@ -67,7 +67,7 @@ pub fn generate() -> TokenStream {
             }
         }
 
-        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for ic_cdk::export::candid::Reserved {
+        impl CdkActTryIntoVmValue<&rustpython::vm::VirtualMachine, rustpython::vm::PyObjectRef> for candid::Reserved {
             fn try_into_vm_value(self, vm: &rustpython::vm::VirtualMachine) -> Result<rustpython::vm::PyObjectRef, CdkActTryIntoVmValueError> {
                 Ok(vm.ctx.none())
             }

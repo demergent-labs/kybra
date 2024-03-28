@@ -96,19 +96,19 @@ pub fn generate() -> TokenStream {
 
         impl<T> KybraTryFromVec for Option<T> {}
 
-        impl KybraTryFromVec for ic_cdk::export::candid::Empty {}
+        impl KybraTryFromVec for candid::Empty {}
 
-        impl KybraTryFromVec for ic_cdk::export::candid::Reserved {}
+        impl KybraTryFromVec for candid::Reserved {}
 
-        impl KybraTryFromVec for ic_cdk::export::candid::Func {}
+        impl KybraTryFromVec for candid::Func {}
 
-        impl KybraTryFromVec for ic_cdk::export::Principal {}
+        impl KybraTryFromVec for candid::Principal {}
 
         impl KybraTryFromVec for ic_cdk_timers::TimerId {}
 
-        impl KybraTryFromVec for ic_cdk::export::candid::Int {}
+        impl KybraTryFromVec for candid::Int {}
 
-        impl KybraTryFromVec for ic_cdk::export::candid::Nat {}
+        impl KybraTryFromVec for candid::Nat {}
 
         impl KybraTryFromVec for _CdkFloat32 {}
 

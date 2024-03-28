@@ -1,4 +1,5 @@
-import { createSnakeCaseProxy, getCanisterId, runTests, Test } from 'azle/test';
+import { getCanisterId } from 'azle/dfx';
+import { createSnakeCaseProxy, runTests, Test } from 'azle/test';
 import { getTests } from 'azle/examples/guard_functions/test/tests';
 import { createActor } from './dfx_generated/guard_functions';
 import { AgentError } from '@dfinity/agent/lib/cjs/errors';
@@ -12,34 +13,83 @@ const functionGuardCanister = createActor(getCanisterId('guard_functions'), {
 let tests: Test[] = [
     ...getTests(createSnakeCaseProxy(functionGuardCanister)).filter((value) => {
         return (
-            value.name !== 'heartbeat guard' &&
             value.name !== 'callExpressionWithEmptyOptionsObject' &&
             value.name !== 'looselyGuardedWithGuardOptionKeyAsString' &&
             value.name !== 'invalidReturnTypeGuarded' &&
             value.name !== 'badObjectGuarded' &&
             value.name !== 'nonNullOkValueGuarded' &&
             value.name !== 'nonStringErrValueGuarded' &&
-            // TODO remove this once this is resolved: https://forum.dfinity.org/t/not-calling-accept-message-in-inspect-message-not-rejecting-immediately-in-dfx-0-14-2-beta-2/21105
-            value.name !== 'unallowedMethod'
+            value.name !== 'modifyStateGuarded' &&
+            value.name !== 'tightlyGuarded' &&
+            value.name !== 'errorStringGuarded' &&
+            value.name !== 'customErrorGuarded'
         );
     }),
     {
-        name: 'heartbeat guard',
+        name: 'customErrorGuarded',
         test: async () => {
-            const initialState = await functionGuardCanister.get_state();
-            console.log(
-                `Value at initial check was: ${initialState.heartbeat_tick}`
-            );
-            await sleep(20_000);
-            const stateAfterRest = await functionGuardCanister.get_state();
-            console.log(
-                `Value after 15s delay was: ${stateAfterRest.heartbeat_tick}`
-            );
+            try {
+                const result =
+                    await functionGuardCanister.custom_error_guarded();
+                return {
+                    Err: 'Expected customErrorGuarded function to throw'
+                };
+            } catch (error) {
+                return {
+                    Ok: (error as AgentError).message.includes(
+                        `Execution halted by \\"throw custom error\\" guard function`
+                    )
+                };
+            }
+        }
+    },
+    {
+        name: 'errorStringGuarded',
+        test: async () => {
+            try {
+                const result =
+                    await functionGuardCanister.error_string_guarded();
+                return {
+                    Err: 'Expected errorStringGuarded function to throw'
+                };
+            } catch (error) {
+                return {
+                    Ok: (error as AgentError).message.includes(
+                        `Execution halted by \\"throw string\\" guard function`
+                    )
+                };
+            }
+        }
+    },
+    {
+        name: 'tightlyGuarded',
+        test: async () => {
+            try {
+                const result = await functionGuardCanister.tightly_guarded();
+                return {
+                    Err: 'Expected tightlyGuarded function to throw'
+                };
+            } catch (error) {
+                return {
+                    Ok: (error as AgentError).message.includes(
+                        `Execution halted by \\"unpassable\\" guard function`
+                    )
+                };
+            }
+        }
+    },
+    {
+        name: 'modifyStateGuarded',
+        test: async () => {
+            const counterBefore = (await functionGuardCanister.get_state())
+                .counter;
+            const methodExecuted =
+                await functionGuardCanister.modify_state_guarded();
+            const counterAfter = (await functionGuardCanister.get_state())
+                .counter;
 
             return {
-                Ok:
-                    initialState.heartbeat_tick <= 20 &&
-                    stateAfterRest.heartbeat_tick === 20
+                Ok: counterBefore === 0 && methodExecuted && counterAfter === 1
             };
         }
     },
@@ -129,7 +179,3 @@ let tests: Test[] = [
 ];
 
 runTests(tests);
-
-function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}

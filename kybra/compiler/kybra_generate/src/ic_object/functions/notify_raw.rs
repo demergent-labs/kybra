@@ -12,7 +12,7 @@ pub fn generate() -> TokenStream {
             payment_py_object_ref: rustpython_vm::PyObjectRef,
             vm: &rustpython_vm::VirtualMachine,
         ) -> rustpython_vm::PyResult {
-            let canister_id_principal: ic_cdk::export::Principal =
+            let canister_id_principal: candid::Principal =
                 canister_id_py_object_ref.try_from_vm_value(vm)?;
 
             let method_string: String = method_py_object_ref.try_from_vm_value(vm)?;

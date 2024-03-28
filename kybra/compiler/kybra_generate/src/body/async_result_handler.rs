@@ -102,7 +102,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             py_object_ref: &rustpython_vm::PyObjectRef,
             args: &Vec<rustpython_vm::PyObjectRef>
         ) -> rustpython_vm::PyResult {
-            let canister_id_principal: ic_cdk::export::Principal = args[0]
+            let canister_id_principal: candid::Principal = args[0]
                 .clone()
                 .try_from_vm_value(vm)?;
             let qual_name: String = args[1].clone().try_from_vm_value(vm)?;
@@ -130,7 +130,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             py_object_ref: &rustpython_vm::PyObjectRef,
             args: &Vec<rustpython_vm::PyObjectRef>
         ) -> rustpython_vm::PyResult {
-            let canister_id_principal: ic_cdk::export::Principal = args[0]
+            let canister_id_principal: candid::Principal = args[0]
                 .clone()
                 .try_from_vm_value(vm)?;
             let qual_name: String = args[1].clone().try_from_vm_value(vm)?;
@@ -158,7 +158,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             py_object_ref: &rustpython_vm::PyObjectRef,
             args: &Vec<rustpython_vm::PyObjectRef>,
         ) -> rustpython_vm::PyResult {
-            let canister_id_principal: ic_cdk::export::Principal = args[0]
+            let canister_id_principal: candid::Principal = args[0]
                 .clone()
                 .try_from_vm_value(vm)?;
             let qual_name: String = args[1].clone().try_from_vm_value(vm)?;
@@ -187,7 +187,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             py_object_ref: &rustpython_vm::PyObjectRef,
             args: &Vec<rustpython_vm::PyObjectRef>
         ) -> rustpython_vm::PyResult {
-            let canister_id_principal: ic_cdk::export::Principal = args[0]
+            let canister_id_principal: candid::Principal = args[0]
                 .clone()
                 .try_from_vm_value(vm)?;
             let method_string: String = args[1].clone().try_from_vm_value(vm)?;
@@ -213,7 +213,7 @@ pub fn generate(services: &Vec<Service>) -> TokenStream {
             py_object_ref: &rustpython_vm::PyObjectRef,
             args: &Vec<rustpython_vm::PyObjectRef>
         ) -> rustpython_vm::PyResult {
-            let canister_id_principal: ic_cdk::export::Principal = args[0]
+            let canister_id_principal: candid::Principal = args[0]
                 .clone()
                 .try_from_vm_value(vm)?;
             let method_string: String = args[1].clone().try_from_vm_value(vm)?;
@@ -354,7 +354,7 @@ fn generate_call_match_arms(services: &Vec<Service>) -> Vec<TokenStream> {
 
                     quote! {
                         #cross_canister_function_call_name => {
-                            let canister_id_principal: ic_cdk::export::Principal = args[0]
+                            let canister_id_principal: candid::Principal = args[0]
                                 .clone()
                                 .try_from_vm_value(vm)?;
 
@@ -438,7 +438,7 @@ fn generate_call_with_payment_match_arms(services: &Vec<Service>) -> Vec<TokenSt
 
                     quote! {
                         #cross_canister_function_call_with_payment_name => {
-                            let canister_id_principal: ic_cdk::export::Principal = args[0]
+                            let canister_id_principal: candid::Principal = args[0]
                                 .clone()
                                 .try_from_vm_value(vm)?;
 
@@ -522,7 +522,7 @@ fn generate_call_with_payment128_match_arms(services: &Vec<Service>) -> Vec<Toke
 
                     quote! {
                         #cross_canister_function_call_with_payment128_name => {
-                            let canister_id_principal: ic_cdk::export::Principal = args[0]
+                            let canister_id_principal: candid::Principal = args[0]
                                 .clone()
                                 .try_from_vm_value(vm)?;
 

@@ -3,7 +3,6 @@
         "works": {
             "type": "custom",
             "build": "python -m kybra --verbose works src/works/works.py src/works/works.did",
-            "post_install": ".kybra/works/post_install.sh",
             "candid": "src/works/works.did",
             "wasm": ".kybra/works/works.wasm",
             "gzip": true,
@@ -15,7 +14,6 @@
         "wip": {
             "type": "custom",
             "build": "python -m kybra --verbose wip src/wip/wip.py src/wip/wip.did",
-            "post_install": ".kybra/wip/post_install.sh",
             "candid": "src/wip/wip.did",
             "wasm": ".kybra/wip/wip.wasm",
             "gzip": true,
@@ -27,7 +25,6 @@
         "breaks": {
             "type": "custom",
             "build": "python -m kybra --verbose breaks src/breaks/breaks.py src/breaks/breaks.did",
-            "post_install": ".kybra/breaks/post_install.sh",
             "candid": "src/breaks/breaks.did",
             "wasm": ".kybra/breaks/breaks.wasm",
             "gzip": true,

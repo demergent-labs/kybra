@@ -3,7 +3,6 @@
         "superheroes": {
             "type": "custom",
             "build": "python -m kybra superheroes src/main.py src/main.did",
-            "post_install": ".kybra/superheroes/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/superheroes/superheroes.wasm",
             "gzip": true,

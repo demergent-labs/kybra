@@ -3,7 +3,6 @@
         "annotated_tests": {
             "type": "custom",
             "build": "python -m kybra annotated_tests src/main.py src/main.did",
-            "post_install": ".kybra/annotated_tests/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/annotated_tests/annotated_tests.wasm",
             "gzip": true,

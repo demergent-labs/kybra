@@ -28,13 +28,13 @@ pub fn generate() -> TokenStream {
             }
         }
 
-        impl CdkActTryFromVmValue<ic_cdk::export::candid::Empty, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
+        impl CdkActTryFromVmValue<candid::Empty, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
             for rustpython::vm::PyObjectRef
         {
             fn try_from_vm_value(
                 self,
                 vm: &rustpython::vm::VirtualMachine,
-            ) -> Result<ic_cdk::export::candid::Empty, rustpython_vm::builtins::PyBaseExceptionRef>
+            ) -> Result<candid::Empty, rustpython_vm::builtins::PyBaseExceptionRef>
             {
                 Err(vm.new_type_error(
                     "value cannot be converted to Empty".to_string(),
@@ -42,13 +42,13 @@ pub fn generate() -> TokenStream {
             }
         }
 
-        impl CdkActTryFromVmValue<ic_cdk::export::candid::Func, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
+        impl CdkActTryFromVmValue<candid::Func, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
             for rustpython::vm::PyObjectRef
         {
             fn try_from_vm_value(
                 self,
                 vm: &rustpython::vm::VirtualMachine,
-            ) -> Result<ic_cdk::export::candid::Func, rustpython_vm::builtins::PyBaseExceptionRef>
+            ) -> Result<candid::Func, rustpython_vm::builtins::PyBaseExceptionRef>
             {
                 let tuple_self: rustpython_vm::builtins::PyTupleRef = self.try_into_value(vm)?;
                 let principal = match tuple_self.get(0) {
@@ -70,25 +70,25 @@ pub fn generate() -> TokenStream {
                     }
                 };
 
-                Ok(ic_cdk::export::candid::Func {
+                Ok(candid::Func {
                     principal: principal.clone().try_from_vm_value(vm)?,
                     method: method.clone().try_from_vm_value(vm)?,
                 })
             }
         }
 
-        impl CdkActTryFromVmValue<ic_cdk::export::Principal, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
+        impl CdkActTryFromVmValue<candid::Principal, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
             for rustpython::vm::PyObjectRef
         {
             fn try_from_vm_value(
                 self,
                 vm: &rustpython::vm::VirtualMachine,
-            ) -> Result<ic_cdk::export::Principal, rustpython_vm::builtins::PyBaseExceptionRef>
+            ) -> Result<candid::Principal, rustpython_vm::builtins::PyBaseExceptionRef>
             {
                 let to_str = self.get_attr("to_str", vm)?;
                 let result = to_str.call((), vm)?;
                 let result_string: String = result.try_into_value(vm)?;
-                match ic_cdk::export::Principal::from_text(result_string) {
+                match candid::Principal::from_text(result_string) {
                     Ok(principal) => Ok(principal),
                     Err(err) => Err(vm.new_type_error(format!(
                         "could not convert value to Principal: {}",
@@ -98,15 +98,15 @@ pub fn generate() -> TokenStream {
             }
         }
 
-        impl CdkActTryFromVmValue<ic_cdk::export::candid::Reserved, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
+        impl CdkActTryFromVmValue<candid::Reserved, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
             for rustpython::vm::PyObjectRef
         {
             fn try_from_vm_value(
                 self,
                 vm: &rustpython::vm::VirtualMachine,
-            ) -> Result<ic_cdk::export::candid::Reserved, rustpython_vm::builtins::PyBaseExceptionRef>
+            ) -> Result<candid::Reserved, rustpython_vm::builtins::PyBaseExceptionRef>
             {
-                Ok(ic_cdk::export::candid::Reserved)
+                Ok(candid::Reserved)
             }
         }
 

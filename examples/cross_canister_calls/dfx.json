@@ -3,7 +3,6 @@
         "canister1": {
             "type": "custom",
             "build": "python -m kybra canister1 src/canister1/canister1.py src/canister1/canister1.did",
-            "post_install": ".kybra/canister1/post_install.sh",
             "candid": "src/canister1/canister1.did",
             "wasm": ".kybra/canister1/canister1.wasm",
             "gzip": true,
@@ -15,7 +14,6 @@
         "canister2": {
             "type": "custom",
             "build": "python -m kybra canister2 src/canister2/canister2.py src/canister2/canister2.did",
-            "post_install": ".kybra/canister2/post_install.sh",
             "candid": "src/canister2/canister2.did",
             "wasm": ".kybra/canister2/canister2.wasm",
             "gzip": true,

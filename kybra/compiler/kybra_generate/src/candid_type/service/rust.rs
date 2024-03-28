@@ -73,7 +73,7 @@ pub fn from_vm_value(name: String) -> TokenStream {
                 let to_str = canister_id.get_attr("to_str", vm)?;
                 let result = to_str.call((), vm)?;
                 let result_string: String = result.try_into_value(vm)?;
-                match ic_cdk::export::Principal::from_text(result_string) {
+                match candid::Principal::from_text(result_string) {
                     Ok(principal) => Ok(#service_name::new(principal)),
                     Err(err) => Err(vm.new_type_error(format!(
                         "TypeError: Could not convert value to Principal: {}",

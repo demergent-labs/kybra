@@ -10,13 +10,13 @@ pub fn generate() -> TokenStream {
 
         impl KybraTryIntoVec for String {}
 
-        impl KybraTryIntoVec for ic_cdk::export::candid::Empty {}
+        impl KybraTryIntoVec for candid::Empty {}
 
-        impl KybraTryIntoVec for ic_cdk::export::candid::Reserved {}
+        impl KybraTryIntoVec for candid::Reserved {}
 
-        impl KybraTryIntoVec for ic_cdk::export::candid::Func {}
+        impl KybraTryIntoVec for candid::Func {}
 
-        impl KybraTryIntoVec for ic_cdk::export::Principal {}
+        impl KybraTryIntoVec for candid::Principal {}
 
         impl KybraTryIntoVec for ic_cdk_timers::TimerId {}
 
@@ -30,7 +30,7 @@ pub fn generate() -> TokenStream {
 
         impl KybraTryIntoVec for _CdkFloat32 {}
 
-        impl KybraTryIntoVec for ic_cdk::export::candid::Int {}
+        impl KybraTryIntoVec for candid::Int {}
 
         impl KybraTryIntoVec for i128 {}
 
@@ -42,7 +42,7 @@ pub fn generate() -> TokenStream {
 
         impl KybraTryIntoVec for i8 {}
 
-        impl KybraTryIntoVec for ic_cdk::export::candid::Nat {}
+        impl KybraTryIntoVec for candid::Nat {}
 
         impl KybraTryIntoVec for u128 {}
 

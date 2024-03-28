@@ -21,7 +21,7 @@ impl PyAst {
     pub fn build_init_method(&self) -> Result<InitMethod, Vec<Error>> {
         let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
 
-        let init_methods = build_init_methods(&init_function_defs);
+        let init_methods = build_init_methods(&init_function_defs, &self.entry_module_name);
 
         if init_function_defs.len() > 1 {
             return Err(vec![
@@ -34,20 +34,18 @@ impl PyAst {
 
         Ok(match init_methods?.pop() {
             Some(init_method) => init_method,
-            None => build_init_method(None)?,
+            None => build_init_method(None, &self.entry_module_name)?,
         })
     }
 }
 
 fn build_init_method(
-    init_function_def: Option<&SourceMapped<&Located<StmtKind>>>,
+    init_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
+    entry_module_name: &str,
 ) -> Result<InitMethod, Vec<Error>> {
-    match init_function_def {
+    match init_function_def_option {
         Some(init_function_def) => {
-            let (guard_function_name, params, return_type) = (
-                init_function_def
-                    .get_guard_function_name()
-                    .map_err(Error::into),
+            let (params, return_type) = (
                 init_function_def.build_params(InternalOrExternal::Internal),
                 init_function_def.build_return_type(),
             )
@@ -63,23 +61,30 @@ fn build_init_method(
 
             Ok(InitMethod {
                 params: params.clone(),
-                body: rust::generate(),
-                guard_function_name,
+                body: rust::generate(
+                    init_function_def_option,
+                    init_function_def_option,
+                    entry_module_name,
+                )?,
             })
         }
         None => Ok(InitMethod {
             params: vec![],
-            body: rust::generate(),
-            guard_function_name: None,
+            body: rust::generate(
+                init_function_def_option,
+                init_function_def_option,
+                entry_module_name,
+            )?,
         }),
     }
 }
 
 fn build_init_methods(
     init_function_defs: &Vec<SourceMapped<&Located<StmtKind>>>,
+    entry_module_name: &str,
 ) -> Result<Vec<InitMethod>, Vec<Error>> {
     init_function_defs
         .iter()
-        .map(|init_function_def| build_init_method(Some(init_function_def)))
+        .map(|init_function_def| build_init_method(Some(init_function_def), entry_module_name))
         .collect_results()
 }
