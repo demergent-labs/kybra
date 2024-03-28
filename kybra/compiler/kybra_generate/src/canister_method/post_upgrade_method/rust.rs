@@ -72,7 +72,7 @@ pub fn generate_interpreter_init() -> TokenStream {
                     ic_cdk::println!("with_init 5");
 
                     python_stdlib_stable_ref_mut
-                        .set(rustpython_vm::py_freeze!(dir = "/home/lastmjs/.config/kybra/0.5.2/RustPython/Lib").bytes.to_vec())
+                        .set(rustpython_vm::py_freeze!(dir = "Lib").bytes.to_vec())
                         .unwrap();
                         // .map_err(|err| value_error_to_string(&err));
 

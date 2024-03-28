@@ -145,6 +145,7 @@ def create_paths(args: Args) -> Paths:
 
     home_dir = os.path.expanduser("~")
     global_kybra_config_dir = f"{home_dir}/.config/kybra"
+    global_kybra_version_dir = f"{global_kybra_config_dir}/{kybra.__version__}"
     global_kybra_rust_dir = f"{global_kybra_config_dir}/rust/{kybra.__rust_version__}"
     global_kybra_rust_bin_dir = f"{global_kybra_rust_dir}/bin"
     global_kybra_target_dir = f"{global_kybra_config_dir}/rust/target"
@@ -163,6 +164,7 @@ def create_paths(args: Args) -> Paths:
         "wasm": wasm_path,
         "custom_modules": custom_modules_path,
         "global_kybra_config_dir": global_kybra_config_dir,
+        "global_kybra_version_dir": global_kybra_version_dir,
         "global_kybra_rust_dir": global_kybra_rust_dir,
         "global_kybra_rust_bin_dir": global_kybra_rust_bin_dir,
         "global_kybra_target_dir": global_kybra_target_dir,
