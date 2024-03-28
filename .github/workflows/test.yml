@@ -173,11 +173,11 @@ jobs:
               uses: actions/cache@v3
               with:
                   path: ~/.cache/dfinity
-                  key: kybra-dfx-0.17.0
+                  key: kybra-dfx-0.18.0
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               name: Install dfx
               run: |
-                  DFXVM_INIT_YES=true DFX_VERSION=0.17.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+                  DFXVM_INIT_YES=true DFX_VERSION=0.18.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
                   echo "$HOME/.local/share/dfx/bin" >> $GITHUB_PATH
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               working-directory: ${{ matrix.example_directories }}
