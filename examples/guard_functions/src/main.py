@@ -1,16 +1,4 @@
-from kybra import (
-    GuardResult,
-    heartbeat,
-    ic,
-    inspect_message,
-    int32,
-    Manual,
-    pre_upgrade,
-    query,
-    Record,
-    update,
-    void,
-)
+from kybra import GuardResult, ic, int32, Manual, query, Record, update
 
 # region Types
 
@@ -30,24 +18,6 @@ class CustomError(Exception):
 state: State = {"counter": 0, "heartbeat_tick": 0}
 
 # region GuardFunctions
-
-
-def allow_modify_state_guarded() -> GuardResult:
-    ic.print("allow_modify_state_guarded called")
-
-    if (
-        ic.method_name() == "modify_state_guarded"
-        or ic.method_name() == "modifyStateGuarded"
-    ):
-        ic.print(
-            f"Method {ic.method_name()} allowed by inspectMessage's guard function: allow_modify_state_guarded"
-        )
-    else:
-        ic.print(
-            f"Method {ic.method_name()} would be rejected by inspectMessage's guard function... but we are in inspect message mode so doing so would be a contract violation. Therefore, proceeding."
-        )
-
-    return {"Ok": None}
 
 
 def allow_all() -> GuardResult:
@@ -124,33 +94,6 @@ def name_error() -> GuardResult:
 @query
 def get_state() -> State:
     return state
-
-
-@inspect_message(guard=allow_modify_state_guarded)
-def inspect_message_() -> void:
-    ic.print("inspect message called")
-
-    if (
-        ic.method_name() == "modify_state_guarded"
-        or ic.method_name() == "modifyStateGuarded"
-        or ic.method_name() == "does_interpreter_exist"
-        or ic.method_name() == "__get_candid_interface_tmp_hack"
-    ):
-        ic.print(f"Method {ic.method_name()} allowed by inspect_message")
-        ic.accept_message()
-    else:
-        ic.print(f"Method {ic.method_name()} rejected by inspect_message")
-
-
-@heartbeat(guard=accept_all_then_reject_all)
-def heartbeat_() -> void:
-    # ic.print("heartbeat called")
-    pass
-
-
-@pre_upgrade(guard=prevent_upgrades)
-def pre_upgrade_() -> void:
-    ic.print("pre_upgrade called")
 
 
 @query

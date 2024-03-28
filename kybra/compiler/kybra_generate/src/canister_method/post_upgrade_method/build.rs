@@ -25,7 +25,7 @@ impl PyAst {
         let init_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Init);
         let post_upgrade_function_defs =
             self.get_canister_stmt_of_type(CanisterMethodType::PostUpgrade);
-        let (init_params, (post_upgrade_params, guard_function_name), post_upgrade_method_body) = (
+        let (init_params, post_upgrade_params, post_upgrade_method_body) = (
             build_init_params(&init_function_defs),
             build_post_upgrade_info(&post_upgrade_function_defs),
             generate_post_upgrade_method_body(
@@ -41,7 +41,6 @@ impl PyAst {
         Ok(PostUpgradeMethod {
             params: post_upgrade_method_params,
             body: post_upgrade_method_body,
-            guard_function_name,
         })
     }
 }
@@ -59,30 +58,25 @@ fn build_init_params(
 
 fn build_post_upgrade_info(
     post_upgrade_function_defs: &Vec<SourceMapped<&Located<StmtKind>>>,
-) -> Result<(Vec<Param>, Option<String>), Vec<Error>> {
+) -> Result<Vec<Param>, Vec<Error>> {
     ensure_zero_or_one_function_defs(post_upgrade_function_defs, CanisterMethodType::PostUpgrade)?;
 
     match post_upgrade_function_defs.get(0) {
-        Some(post_upgrade_function_def) => {
-            build_post_upgrade_params_and_guard_name(post_upgrade_function_def)
-        }
-        None => Ok((vec![], None)),
+        Some(post_upgrade_function_def) => build_post_upgrade_params(post_upgrade_function_def),
+        None => Ok(vec![]),
     }
 }
 
-fn build_post_upgrade_params_and_guard_name(
+fn build_post_upgrade_params(
     post_upgrade_function_def: &SourceMapped<&Located<StmtKind>>,
-) -> Result<(Vec<Param>, Option<String>), Vec<Error>> {
-    let (post_upgrade_params, guard_function_name, _) = (
+) -> Result<Vec<Param>, Vec<Error>> {
+    let (post_upgrade_params, _) = (
         post_upgrade_function_def.build_params(InternalOrExternal::Internal),
-        post_upgrade_function_def
-            .get_guard_function_name()
-            .map_err(Error::into),
         validate_post_upgrade_return_type(post_upgrade_function_def),
     )
         .collect_results()?;
 
-    Ok((post_upgrade_params, guard_function_name))
+    Ok(post_upgrade_params)
 }
 
 fn select_post_upgrade_method_params(

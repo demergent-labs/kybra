@@ -45,10 +45,7 @@ fn build_init_method(
 ) -> Result<InitMethod, Vec<Error>> {
     match init_function_def_option {
         Some(init_function_def) => {
-            let (guard_function_name, params, return_type) = (
-                init_function_def
-                    .get_guard_function_name()
-                    .map_err(Error::into),
+            let (params, return_type) = (
                 init_function_def.build_params(InternalOrExternal::Internal),
                 init_function_def.build_return_type(),
             )
@@ -69,7 +66,6 @@ fn build_init_method(
                     init_function_def_option,
                     entry_module_name,
                 )?,
-                guard_function_name,
             })
         }
         None => Ok(InitMethod {
@@ -79,7 +75,6 @@ fn build_init_method(
                 init_function_def_option,
                 entry_module_name,
             )?,
-            guard_function_name: None,
         }),
     }
 }

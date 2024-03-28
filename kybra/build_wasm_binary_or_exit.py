@@ -45,7 +45,6 @@ def compile_generated_rust_code(
 
     canister_status_string = canister_status_result.stderr.decode()
 
-    # TODO change back to in
     azle_include_stdlib_feature = (
         "--features=azle_include_stdlib"
         if "Module hash: None" in canister_status_string
