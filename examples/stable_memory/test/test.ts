@@ -19,7 +19,7 @@ runTests([
             const result = await stableMemoryCanister.stable_size();
 
             return {
-                Ok: result === 769
+                Ok: result === 385
             };
         }
     },
@@ -29,7 +29,7 @@ runTests([
             const result = await stableMemoryCanister.stable64_size();
 
             return {
-                Ok: result === 769n
+                Ok: result === 385n
             };
         }
     },

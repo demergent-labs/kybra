@@ -10,6 +10,10 @@ function createIdentity(seed: number): SignIdentity {
     return Ed25519KeyIdentity.generate(Uint8Array.from(seed1));
 }
 
+const installationPrincipal = execSync(`dfx identity get-principal`)
+    .toString()
+    .trim();
+
 export const callingIdentity = createIdentity(1);
 const callingPrincipal = callingIdentity.getPrincipal().toString();
 
@@ -27,9 +31,7 @@ export function getTests(
                 const result = await whoamiCanister.installer();
 
                 return {
-                    Ok:
-                        result.toString() ===
-                        execSync(`dfx canister id whoami`).toString().trim()
+                    Ok: result.toString() === installationPrincipal
                 };
             }
         },

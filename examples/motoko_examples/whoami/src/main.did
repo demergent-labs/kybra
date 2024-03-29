@@ -1,5 +1,6 @@
 service : (principal) -> {
   argument : () -> (principal) query;
+  does_interpreter_exist : () -> (bool) query;
   id : () -> (principal);
   id_quick : () -> (principal) query;
   installer : () -> (principal) query;
