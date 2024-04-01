@@ -27,9 +27,10 @@ pub fn generate(
         &call_to_init_py_function,
         &call_to_post_upgrade_py_function,
     );
+    let randomness = generate_randomness();
 
     Ok(quote! {
-        unsafe { ic_wasi_polyfill::init(&[], &[]); };
+        ic_wasi_polyfill::init(&[], &[]);
 
         #interpreter_init
 
@@ -40,6 +41,8 @@ pub fn generate(
         #save_global_interpreter
 
         #call_to_user_init_or_post_upgrade
+
+        #randomness
     })
 }
 
@@ -150,5 +153,32 @@ pub fn generate_call_to_user_init_or_post_upgrade(
             }
 
             CANISTER_INITIALIZED_REF_CELL.with(|canister_initialized_ref_cell| canister_initialized_ref_cell.borrow_mut().set(1).unwrap_or_trap());
+    }
+}
+
+pub fn generate_randomness() -> TokenStream {
+    quote! {
+        ic_cdk_timers::set_timer(std::time::Duration::from_secs(0), || {
+            ic_cdk::spawn(async move {
+                let result: ic_cdk::api::call::CallResult<(Vec<u8>,)> = ic_cdk::api::management_canister::main::raw_rand().await;
+
+                match result {
+                    Ok(randomness) => {
+                        let interpreter = unsafe { INTERPRETER_OPTION.as_mut() }
+                            .ok_or_else(|| "SystemError: missing python interpreter".to_string()).unwrap();
+                        let scope = unsafe { SCOPE_OPTION.as_mut() }
+                            .ok_or_else(|| "SystemError: missing python scope".to_string()).unwrap();
+
+                        interpreter.enter(|vm| {
+                            let random_module = vm.import("random", None, 0).unwrap();
+                            let seed_fn = random_module.get_attr("seed", vm).unwrap();
+
+                            seed_fn.call((vm.ctx.new_bytes(randomness.0),), vm).unwrap();
+                        });
+                    },
+                    Err(err) => panic!(err)
+                };
+            });
+        });
     }
 }

@@ -6,7 +6,7 @@ use rustpython_parser::ast::{Located, StmtKind};
 use crate::canister_method::post_upgrade_method::generate_call;
 use crate::canister_method::post_upgrade_method::rust::{
     generate_call_to_user_init_or_post_upgrade, generate_code_init, generate_ic_object_init,
-    generate_interpreter_init, generate_save_global_interpreter,
+    generate_interpreter_init, generate_randomness, generate_save_global_interpreter,
 };
 use crate::{source_map::SourceMapped, Error};
 
@@ -29,9 +29,10 @@ pub fn generate(
         &call_to_init_py_function,
         &call_to_post_upgrade_py_function,
     );
+    let randomness = generate_randomness();
 
     Ok(quote! {
-        unsafe { ic_wasi_polyfill::init(&[], &[]); };
+        ic_wasi_polyfill::init(&[], &[]);
 
         #interpreter_init
 
@@ -42,5 +43,7 @@ pub fn generate(
         #save_global_interpreter
 
         #call_to_user_init_or_post_upgrade
+
+        #randomness
     })
 }
