@@ -30,7 +30,12 @@ pub fn generate(
 
         #save_global_interpreter
 
-        #call_to_post_upgrade_py_function
+        // This block is to avoid some difficult typings in call_global_python_function_sync
+        // If you make call_global_python_function_sync not return immediately by ommitting the semi-colon
+        // then you must explicitly type it which has proved somewhat difficult
+        {
+            #call_to_post_upgrade_py_function
+        }
 
         #randomness
     })
