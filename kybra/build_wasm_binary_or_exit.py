@@ -25,12 +25,18 @@ def build_wasm_binary_or_exit(
 def compile_generated_rust_code(
     paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool
 ):
-    # TODO We could maybe do this in a nicer way by using HTTP
-    # TODO and calling into the state tree to get the module hash
-    # TODO Or perhaps dfx could create an environment variable like
-    # TODO DFX_INSTALL_MODE
-    # TODO You can look into how install mode is done in dfx
-    # TODO here: https://github.com/dfinity/sdk/blob/master/src/dfx/src/lib/operations/canister/install_canister.rs#L67-L75
+    canister_status = get_canister_status(canister_name)
+    features = get_cargo_build_features(canister_status)
+    run_cargo_build(paths, canister_name, features, cargo_env, verbose)
+
+
+# TODO We could maybe do this in a nicer way by using HTTP
+# TODO and calling into the state tree to get the module hash
+# TODO Or perhaps dfx could create an environment variable like
+# TODO DFX_INSTALL_MODE
+# TODO You can look into how install mode is done in dfx
+# TODO here: https://github.com/dfinity/sdk/blob/master/src/dfx/src/lib/operations/canister/install_canister.rs#L67-L75
+def get_canister_status(canister_name: str) -> str:
     canister_status_result = subprocess.run(
         [
             "dfx",
@@ -43,14 +49,24 @@ def compile_generated_rust_code(
         capture_output=True,
     )
 
-    canister_status_string = canister_status_result.stderr.decode()
+    return canister_status_result.stderr.decode()
 
-    azle_include_stdlib_feature = (
+
+def get_cargo_build_features(canister_status: str) -> str:
+    return (
         "--features=azle_include_stdlib"
-        if "Module hash: None" in canister_status_string
+        if "Module hash: None" in canister_status
         else ""
     )
 
+
+def run_cargo_build(
+    paths: Paths,
+    canister_name: str,
+    features: str,
+    cargo_env: dict[str, str],
+    verbose: bool,
+):
     run_subprocess(
         [
             f"{paths['global_kybra_rust_bin_dir']}/cargo",
@@ -59,7 +75,7 @@ def compile_generated_rust_code(
             "--target=wasm32-wasi",
             f"--package={canister_name}",
             "--release",
-            *([azle_include_stdlib_feature] if azle_include_stdlib_feature else []),
+            *([features] if features != "" else []),
         ],
         verbose,
         cargo_env,
@@ -70,19 +86,6 @@ def copy_wasm_to_dev_location(paths: Paths, canister_name: str):
     copy_file(
         f"{paths['global_kybra_target_dir']}/wasm32-wasi/release/{canister_name}.wasm",
         f"{paths['canister']}/{canister_name}.wasm",
-    )
-
-
-def generate_and_create_candid_file(
-    paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool
-):
-    # TODO do we want to do this in a better/fancier way with verbose etc?
-    subprocess.run(
-        [
-            f"{paths['global_kybra_rust_bin_dir']}/candid-extractor {paths['canister']}/{canister_name}.wasm > {paths['did']}"
-        ],
-        shell=True,
-        check=True,
     )
 
 
@@ -98,6 +101,20 @@ def run_wasi2ic_on_wasm(
         verbose,
         cargo_env,
     )
+
+
+def generate_and_create_candid_file(
+    paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool
+):
+    candid_bytes = run_subprocess(
+        [
+            f"{paths['global_kybra_rust_bin_dir']}/candid-extractor",
+            f"{paths['canister']}/{canister_name}.wasm",
+        ],
+        verbose,
+        cargo_env,
+    )
+    create_file(paths["did"], candid_bytes.decode())
 
 
 def run_subprocess(args: list[str], verbose: bool, env: dict[str, str]) -> bytes:
