@@ -4,12 +4,11 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use rustpython_parser::ast::{Located, StmtKind};
 
-use super::generate_call;
-use crate::{source_map::SourceMapped, Error};
+use crate::{canister_method::init_method::rust::generate_call, source_map::SourceMapped, Error};
 
 pub fn generate(
     post_upgrade_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
-    entry_module_name: &String,
+    entry_module_name: &str,
 ) -> Result<TokenStream, Vec<Error>> {
     let call_to_post_upgrade_py_function = generate_call(&post_upgrade_function_def_option)?;
 

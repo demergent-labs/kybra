@@ -2,7 +2,6 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use rustpython_parser::ast::{Located, StmtKind};
 
-use crate::canister_method::post_upgrade_method::generate_call;
 use crate::canister_method::post_upgrade_method::rust::{
     generate_code_init, generate_ic_object_init, generate_interpreter_init, generate_randomness,
     generate_save_global_interpreter,
@@ -46,4 +45,13 @@ pub fn generate(
 
         #randomness
     })
+}
+
+pub fn generate_call(
+    function_def_option: &Option<&SourceMapped<&Located<StmtKind>>>,
+) -> Result<TokenStream, Vec<Error>> {
+    match &function_def_option {
+        Some(function_def) => function_def.generate_call_to_py_function(),
+        None => Ok(quote!()),
+    }
 }

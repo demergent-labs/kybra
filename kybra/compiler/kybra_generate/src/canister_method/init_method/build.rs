@@ -1,3 +1,5 @@
+// TODO init_method/build.rs and post_upgrade_method/build.rs are almost identical
+
 use super::rust;
 use cdk_framework::{
     act::node::canister_method::{CanisterMethodType, InitMethod},
@@ -39,6 +41,16 @@ impl PyAst {
     }
 }
 
+fn build_init_methods(
+    init_function_defs: &Vec<SourceMapped<&Located<StmtKind>>>,
+    entry_module_name: &str,
+) -> Result<Vec<InitMethod>, Vec<Error>> {
+    init_function_defs
+        .iter()
+        .map(|init_function_def| build_init_method(Some(init_function_def), entry_module_name))
+        .collect_results()
+}
+
 fn build_init_method(
     init_function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
     entry_module_name: &str,
@@ -69,14 +81,4 @@ fn build_init_method(
             body: rust::generate(init_function_def_option, entry_module_name)?,
         }),
     }
-}
-
-fn build_init_methods(
-    init_function_defs: &Vec<SourceMapped<&Located<StmtKind>>>,
-    entry_module_name: &str,
-) -> Result<Vec<InitMethod>, Vec<Error>> {
-    init_function_defs
-        .iter()
-        .map(|init_function_def| build_init_method(Some(init_function_def), entry_module_name))
-        .collect_results()
 }
