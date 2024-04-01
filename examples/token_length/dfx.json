@@ -6,6 +6,16 @@
             "candid": "src/works/works.did",
             "wasm": ".kybra/works/works.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/works/works.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/works",
                 "node_compatibility": true
@@ -17,6 +27,16 @@
             "candid": "src/wip/wip.did",
             "wasm": ".kybra/wip/wip.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/wip/wip.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/wip",
                 "node_compatibility": true
@@ -28,6 +48,16 @@
             "candid": "src/breaks/breaks.did",
             "wasm": ".kybra/breaks/breaks.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/breaks/breaks.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/breaks",
                 "node_compatibility": true

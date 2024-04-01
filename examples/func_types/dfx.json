@@ -6,6 +6,16 @@
             "candid": "src/func_types/main.did",
             "wasm": ".kybra/func_types/func_types.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/func_types/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/func_types",
                 "node_compatibility": true
@@ -17,6 +27,16 @@
             "candid": "src/notifiers/main.did",
             "wasm": ".kybra/notifiers/notifiers.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/notifiers/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/notifiers",
                 "node_compatibility": true

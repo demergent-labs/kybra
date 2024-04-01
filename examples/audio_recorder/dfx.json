@@ -6,6 +6,16 @@
             "candid": "src/main.did",
             "wasm": ".kybra/audio_recorder/audio_recorder.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/audio_recorder",
                 "node_compatibility": true

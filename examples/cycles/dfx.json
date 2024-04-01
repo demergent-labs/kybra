@@ -6,6 +6,16 @@
             "candid": "src/cycles/cycles.did",
             "wasm": ".kybra/cycles/cycles.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/cycles/cycles.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/cycles",
                 "node_compatibility": true
@@ -17,6 +27,16 @@
             "candid": "src/intermediary/intermediary.did",
             "wasm": ".kybra/intermediary/intermediary.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/intermediary/intermediary.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/intermediary",
                 "node_compatibility": true

@@ -6,6 +6,16 @@
             "candid": "src/management_canister.did",
             "wasm": ".kybra/management_canister/management_canister.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/management_canister.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/management_canister",
                 "node_compatibility": true

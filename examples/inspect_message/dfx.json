@@ -6,6 +6,16 @@
             "candid": "src/main.did",
             "wasm": ".kybra/inspect_message/inspect_message.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/inspect_message",
                 "node_compatibility": true

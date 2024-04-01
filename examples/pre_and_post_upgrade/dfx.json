@@ -6,6 +6,16 @@
             "candid": "src/main.did",
             "wasm": ".kybra/pre_and_post_upgrade/pre_and_post_upgrade.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/pre_and_post_upgrade",
                 "node_compatibility": true

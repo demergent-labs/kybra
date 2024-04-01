@@ -6,6 +6,16 @@
             "candid": "src/ledger_canister/ledger_canister.did",
             "wasm": ".kybra/ledger_canister/ledger_canister.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/ledger_canister/ledger_canister.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/ledger_canister",
                 "node_compatibility": true

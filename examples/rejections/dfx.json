@@ -6,6 +6,16 @@
             "candid": "src/rejections/rejections.did",
             "wasm": ".kybra/rejections/rejections.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/rejections/rejections.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/rejections",
                 "node_compatibility": true
@@ -17,6 +27,16 @@
             "candid": "src/some_service/some_service.did",
             "wasm": ".kybra/some_service/some_service.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/some_service/some_service.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/some_service",
                 "node_compatibility": true
