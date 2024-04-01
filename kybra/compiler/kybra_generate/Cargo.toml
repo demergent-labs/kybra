@@ -14,7 +14,7 @@ annotate-snippets = "0.9.1"
 num-bigint = "0.4.3"
 backtrace = "0.3.67" # The package isn't strickly neccesary. std::backtrace::Backtrace might be able to do what we need, but it isn't clonable and backtrace::Backtrace is, so we are using to avoid adding a buch of lifetime code
 # rustpython = { path = "../../../../RustPython", default-features = false, features = [] }
-cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "dee30cb310d571de0388b21e71288810a6a64e9a" }
+cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "faa101fa52b850b6129673c6074ab1f863926e90" }
 # cdk_framework = { path = "/home/cdk_framework" }
 # For local rust-analyzer uncomment this line and comment out the line above.
 # Update path/to/local to be the path to your local cdk_framework repo
