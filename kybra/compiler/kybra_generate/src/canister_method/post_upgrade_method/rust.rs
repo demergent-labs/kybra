@@ -34,6 +34,11 @@ pub fn generate(
         // If you make call_global_python_function_sync not return immediately by ommitting the semi-colon
         // then you must explicitly type it which has proved somewhat difficult
         {
+            // This is here so that the py function call below has access to the vm
+            // The vm ownership is transferred above, thus we do this for now
+            let interpreter = unsafe { INTERPRETER_OPTION.as_mut() }.unwrap_or_trap("SystemError: missing python interpreter");
+            let vm = &interpreter.vm;
+
             #call_to_post_upgrade_py_function
         }
 
