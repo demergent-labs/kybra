@@ -1,6 +1,5 @@
 service : () -> {
   balance : (text) -> (nat64) query;
-  does_interpreter_exist : () -> (bool) query;
   initialize_supply : (text, text, text, nat64) -> (bool);
   name : () -> (text) query;
   ticker : () -> (text) query;

@@ -25,39 +25,37 @@ def build_wasm_binary_or_exit(
 def compile_generated_rust_code(
     paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool
 ):
-    canister_status = get_canister_status(canister_name)
-    features = get_cargo_build_features(canister_status)
+    python_stdlib_is_installed = check_if_python_stdlib_installed(
+        canister_name, cargo_env, verbose
+    )
+    features = get_cargo_build_features(python_stdlib_is_installed)
     run_cargo_build(paths, canister_name, features, cargo_env, verbose)
 
 
-# TODO We could maybe do this in a nicer way by using HTTP
-# TODO and calling into the state tree to get the module hash
-# TODO Or perhaps dfx could create an environment variable like
-# TODO DFX_INSTALL_MODE
-# TODO You can look into how install mode is done in dfx
-# TODO here: https://github.com/dfinity/sdk/blob/master/src/dfx/src/lib/operations/canister/install_canister.rs#L67-L75
-def get_canister_status(canister_name: str) -> str:
-    canister_status_result = subprocess.run(
+def check_if_python_stdlib_installed(
+    canister_name: str, cargo_env: dict[str, str], verbose: bool
+) -> bool:
+    check_if_python_stdlib_installed_result = run_subprocess(
         [
             "dfx",
             "canister",
             "--network",
             str(os.environ.get("DFX_NETWORK")),
-            "status",
+            "call",
             canister_name,
+            "_kybra_check_if_python_stdlib_installed",
         ],
-        capture_output=True,
+        cargo_env,
+        verbose,
+        False,
     )
 
-    return canister_status_result.stderr.decode()
+    return check_if_python_stdlib_installed_result.decode().strip() == "(true)"
 
 
-def get_cargo_build_features(canister_status: str) -> str:
-    return (
-        "--features=azle_include_stdlib"
-        if "Module hash: None" in canister_status
-        else ""
-    )
+def get_cargo_build_features(python_stdlib_is_installed: bool) -> str:
+    print("python_stdlib_is_installed", python_stdlib_is_installed)
+    return "" if python_stdlib_is_installed else "--features=azle_include_stdlib"
 
 
 def run_cargo_build(
@@ -77,8 +75,8 @@ def run_cargo_build(
             "--release",
             *([features] if features != "" else []),
         ],
-        verbose,
         cargo_env,
+        verbose,
     )
 
 
@@ -98,8 +96,8 @@ def run_wasi2ic_on_wasm(
             f"{paths['canister']}/{canister_name}.wasm",
             f"{paths['canister']}/{canister_name}.wasm",
         ],
-        verbose,
         cargo_env,
+        verbose,
     )
 
 
@@ -111,16 +109,23 @@ def generate_and_create_candid_file(
             f"{paths['global_kybra_rust_bin_dir']}/candid-extractor",
             f"{paths['canister']}/{canister_name}.wasm",
         ],
-        verbose,
         cargo_env,
+        verbose,
     )
     create_file(paths["did"], candid_bytes.decode())
 
 
-def run_subprocess(args: list[str], verbose: bool, env: dict[str, str]) -> bytes:
-    result = subprocess.run(args, capture_output=not verbose, env=env)
+def run_subprocess(
+    args: list[str], env: dict[str, str], verbose: bool, throw: bool = True
+) -> bytes:
+    result = subprocess.run(args, env=env, capture_output=not verbose)
+
     if result.returncode != 0:
-        print_error_and_exit(result)
+        if throw == True:
+            print_error_and_exit(result)
+        else:
+            return result.stderr
+
     return result.stdout
 
 

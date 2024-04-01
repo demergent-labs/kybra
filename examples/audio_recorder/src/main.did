@@ -31,7 +31,6 @@ service : () -> {
   create_user : (text) -> (User);
   delete_recording : (principal) -> (DeleteRecordingResult);
   delete_user : (principal) -> (DeleteUserResult);
-  does_interpreter_exist : () -> (bool) query;
   read_recording_by_id : (principal) -> (opt Recording) query;
   read_recordings : () -> (vec Recording) query;
   read_user_by_id : (principal) -> (opt User) query;
