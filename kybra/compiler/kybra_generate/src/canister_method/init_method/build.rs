@@ -61,20 +61,12 @@ fn build_init_method(
 
             Ok(InitMethod {
                 params: params.clone(),
-                body: rust::generate(
-                    init_function_def_option,
-                    init_function_def_option,
-                    entry_module_name,
-                )?,
+                body: rust::generate(init_function_def_option, entry_module_name)?,
             })
         }
         None => Ok(InitMethod {
             params: vec![],
-            body: rust::generate(
-                init_function_def_option,
-                init_function_def_option,
-                entry_module_name,
-            )?,
+            body: rust::generate(init_function_def_option, entry_module_name)?,
         }),
     }
 }

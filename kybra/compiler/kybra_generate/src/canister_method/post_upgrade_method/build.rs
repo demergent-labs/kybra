@@ -30,7 +30,6 @@ impl PyAst {
             build_post_upgrade_info(&post_upgrade_function_defs),
             generate_post_upgrade_method_body(
                 &self.entry_module_name,
-                init_function_defs.get(0),
                 post_upgrade_function_defs.get(0),
             ),
         )
@@ -92,14 +91,9 @@ fn select_post_upgrade_method_params(
 
 fn generate_post_upgrade_method_body(
     entry_module_name: &String,
-    init_function_def: Option<&SourceMapped<&Located<StmtKind>>>,
     post_upgrade_function_def: Option<&SourceMapped<&Located<StmtKind>>>,
 ) -> Result<TokenStream, Vec<Error>> {
-    rust::generate(
-        init_function_def,
-        post_upgrade_function_def,
-        entry_module_name,
-    )
+    rust::generate(post_upgrade_function_def, entry_module_name)
 }
 
 fn ensure_zero_or_one_function_defs(
