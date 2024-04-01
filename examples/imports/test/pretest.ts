@@ -1,8 +1,6 @@
 import { execSync } from 'child_process';
 
 async function pretest() {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
     execSync(`pip install boltons==23.0.0`, {
         stdio: 'inherit'
     });
