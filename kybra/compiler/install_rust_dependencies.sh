@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# TODO If we want to save a little bit of time we might be able to instruct rustup to not install some components initially, like clippy and docs
 # TODO we might want to implement all of this in Python/Rust in the future for platform-independence etc
-# TODO once ic-wasm is no longer required, we can probably just check for the wasm32-wasi target being installed: $global_kybra_rustup_bin target list | grep -q "wasm32-wasi (installed)"
 
 kybra_version="$1"
 rust_version="$2"

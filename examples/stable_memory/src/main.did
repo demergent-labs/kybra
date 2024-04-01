@@ -2,7 +2,6 @@ type Stable64GrowResult = variant { Ok : nat64; Err : StableMemoryError };
 type StableGrowResult = variant { Ok : nat32; Err : StableMemoryError };
 type StableMemoryError = variant { OutOfBounds; OutOfMemory };
 service : () -> {
-  does_interpreter_exist : () -> (bool) query;
   stable64_grow : (nat64) -> (Stable64GrowResult);
   stable64_read : (nat64, nat64) -> (blob) query;
   stable64_size : () -> (nat64) query;

@@ -1,5 +1,2 @@
 type User = record { id : text };
-service : (record { text; User }) -> {
-  does_interpreter_exist : () -> (bool) query;
-  greet_user : () -> (text) query;
-}
+service : (record { text; User }) -> { greet_user : () -> (text) query }
