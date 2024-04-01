@@ -8,7 +8,6 @@ use crate::{ic_object, stable_b_tree_map_nodes::rust, StableBTreeMapNode};
 
 mod async_result_handler;
 mod call_global_python_function;
-mod does_interpreter_exist;
 mod unwrap_rust_python_result;
 mod utils;
 
@@ -20,7 +19,6 @@ pub fn generate(
 ) -> TokenStream {
     let async_result_handler = async_result_handler::generate(&services);
     let call_global_python_function = call_global_python_function::generate();
-    let does_interpreter_exist = does_interpreter_exist::generate();
     let ic_object = ic_object::generate(
         update_methods,
         query_methods,
@@ -34,7 +32,6 @@ pub fn generate(
     quote::quote! {
         #async_result_handler
         #call_global_python_function
-        #does_interpreter_exist
         #ic_object
         #stable_b_tree_map
         #unwrap_rust_python_result
