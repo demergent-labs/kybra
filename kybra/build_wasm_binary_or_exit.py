@@ -46,13 +46,16 @@ def check_if_python_stdlib_installed(
             "_kybra_check_if_python_stdlib_installed",
         ],
         cargo_env,
-        verbose,
+        False,  # Passing verbose along as True messes with the std outputs
         False,
     )
 
     check_if_python_stdlib_installed = (
         check_if_python_stdlib_installed_result.decode().strip()
     )
+
+    if verbose == True:
+        print(check_if_python_stdlib_installed)
 
     return check_if_python_stdlib_installed == "(true)"
 
@@ -113,9 +116,15 @@ def generate_and_create_candid_file(
             f"{paths['canister']}/{canister_name}.wasm",
         ],
         cargo_env,
-        verbose,
+        False,  # Passing verbose along as True messes with the std outputs
     )
-    create_file(paths["did"], candid_bytes.decode())
+
+    candid_string = candid_bytes.decode()
+
+    if verbose == True:
+        print(candid_string)
+
+    create_file(paths["did"], candid_string)
 
 
 def run_subprocess(

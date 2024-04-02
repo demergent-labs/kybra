@@ -147,7 +147,7 @@
                         <h1 id="stable-structures"><a class="header" href="#stable-structures">Stable Structures</a></h1>
 <h2 id="tldr"><a class="header" href="#tldr">TLDR</a></h2>
 <ul>
-<li>48 GiB of stable memory</li>
+<li>96 GiB of stable memory</li>
 <li>Persistent across upgrades</li>
 <li>Familiar API</li>
 <li>Must specify memory id</li>
@@ -155,7 +155,7 @@
 <li>Must specify maximum value size</li>
 <li>No migrations per memory id</li>
 </ul>
-<p>Stable structures are data structures with familiar APIs that allow access to stable memory. Stable memory is a separate memory location from the heap that currently allows up to 48 GiB of storage. Stable memory persists automatically across upgrades.</p>
+<p>Stable structures are data structures with familiar APIs that allow access to stable memory. Stable memory is a separate memory location from the heap that currently allows up to 96 GiB of storage. Stable memory persists automatically across upgrades.</p>
 <p>Persistence on the Internet Computer (IC) is very important to understand. When a canister is upgraded (its code is changed after being initially deployed) its heap is wiped. This includes all global variables.</p>
 <p>On the other hand, anything stored in stable memory will be preserved. Writing and reading to and from stable memory can be done with a <a href="./reference/stable_memory/stable_memory.html">low-level API</a>, but it is generally easier and preferable to use stable structures.</p>
 <p>Kybra currently provides one stable structure called <code>StableBTreeMap</code>. It's similar to a Python dictionary or a map that you'd find in most languages, and has most of the common operations you'd expect such as reading, inserting, and removing values.</p>
@@ -456,7 +456,7 @@ recordings = StableBTreeMap[Principal, Recording](
 <p>As you can see, finding the correct maximum key and value sizes is a bit of an art right now. Combining some trial and error with reasoning about your specific application should get you a working solution in most cases. It's our hope that the need to specify maximum key and value sizes will be removed in the future.</p>
 <h2 id="caveats"><a class="header" href="#caveats">Caveats</a></h2>
 <h3 id="memory-ids"><a class="header" href="#memory-ids">memory ids</a></h3>
-<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, but <code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved. We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need for it entirely.</p>
+<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, but <code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, and <code>254</code> are currently reserved. We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need for it entirely.</p>
 <h3 id="keys"><a class="header" href="#keys">Keys</a></h3>
 <p>You should be wary when using <code>float64</code>, <code>float32</code>, <code>service</code>, or <code>func</code> in any type that is a key for a stable structure. These types do not have the ability to be strictly ordered in all cases. <code>service</code> and <code>func</code> will have no order. <code>float64</code> and <code>float32</code> will treat <code>NaN</code> as less than any other type. These caveats may impact key performance.</p>
 

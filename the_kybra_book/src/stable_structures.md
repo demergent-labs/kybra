@@ -2,7 +2,7 @@
 
 ## TLDR
 
--   48 GiB of stable memory
+-   96 GiB of stable memory
 -   Persistent across upgrades
 -   Familiar API
 -   Must specify memory id
@@ -10,7 +10,7 @@
 -   Must specify maximum value size
 -   No migrations per memory id
 
-Stable structures are data structures with familiar APIs that allow access to stable memory. Stable memory is a separate memory location from the heap that currently allows up to 48 GiB of storage. Stable memory persists automatically across upgrades.
+Stable structures are data structures with familiar APIs that allow access to stable memory. Stable memory is a separate memory location from the heap that currently allows up to 96 GiB of storage. Stable memory persists automatically across upgrades.
 
 Persistence on the Internet Computer (IC) is very important to understand. When a canister is upgraded (its code is changed after being initially deployed) its heap is wiped. This includes all global variables.
 
@@ -342,7 +342,7 @@ As you can see, finding the correct maximum key and value sizes is a bit of an a
 
 ### memory ids
 
-The `memory id` can be a number between `0` and `254`, but `memory ids` `0`, `1`, `2`, `252`, `253`, and `254` are currently reserved. We hope to reduce the complexity around `memory id` in the future, and perhaps remove the need for it entirely.
+The `memory id` can be a number between `0` and `254`, but `memory ids` `0`, `1`, `2`, and `254` are currently reserved. We hope to reduce the complexity around `memory id` in the future, and perhaps remove the need for it entirely.
 
 ### Keys
 

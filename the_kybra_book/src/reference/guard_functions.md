@@ -1,6 +1,6 @@
 # Guard Functions
 
-Guard functions allow you to protect your `query`, `update`, `heartbeat`, `pre_upgrade`, and `inspect_message` methods.
+Guard functions allow you to protect your `query` and `update` methods.
 
 Guard functions return a `GuardResult` that looks like this:
 
