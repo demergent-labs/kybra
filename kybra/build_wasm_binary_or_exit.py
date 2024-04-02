@@ -50,7 +50,11 @@ def check_if_python_stdlib_installed(
         False,
     )
 
-    return check_if_python_stdlib_installed_result.decode().strip() == "(true)"
+    check_if_python_stdlib_installed = (
+        check_if_python_stdlib_installed_result.decode().strip()
+    )
+
+    return check_if_python_stdlib_installed == "(true)"
 
 
 def get_cargo_build_features(python_stdlib_is_installed: bool) -> str:
