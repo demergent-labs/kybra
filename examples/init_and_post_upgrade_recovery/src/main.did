@@ -1,4 +1,1 @@
-service : (bool) -> {
-  does_interpreter_exist : () -> (bool) query;
-  get_message : () -> (text) query;
-}
+service : (bool) -> { get_message : () -> (text) query }

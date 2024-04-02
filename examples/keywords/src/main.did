@@ -28,10 +28,10 @@ type KeywordRecord = record {
   lambda : opt text;
   False : bool;
   global : nat64;
-  break : opt vec nat8;
+  break : opt blob;
   except : nat8;
   while : bool;
-  raise : vec nat8;
+  raise : blob;
   yield : bool;
 };
 type KeywordVariant = variant {
@@ -62,7 +62,7 @@ type RustKeywordRecord = record {
   pub : null;
   const : int;
   crate : nat;
-  "type" : vec nat8;
+  "type" : blob;
   become : text;
   abstract : bool;
 };

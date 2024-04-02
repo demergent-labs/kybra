@@ -3,7 +3,6 @@ service : () -> {
   bad_object_guarded : () -> (bool) query;
   call_expression_without_options_object : () -> (bool) query;
   custom_error_guarded : () -> (bool) query;
-  does_interpreter_exist : () -> (bool) query;
   error_string_guarded : () -> (bool) query;
   get_state : () -> (State) query;
   identifier_annotation : () -> (bool) query;

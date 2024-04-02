@@ -1,4 +1,1 @@
-service : () -> {
-  does_interpreter_exist : () -> (bool) query;
-  random_number : () -> (float64);
-}
+service : () -> { random_number : () -> (float64) }
