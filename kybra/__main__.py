@@ -12,7 +12,7 @@ from typing import Any, Callable
 import kybra
 from kybra.build_wasm_binary_or_exit import build_wasm_binary_or_exit
 from kybra.cargotoml import generate_cargo_toml, generate_cargo_lock
-from kybra.colors import red, yellow, green, dim
+from kybra.colors import red, green, dim
 from kybra.run_kybra_generate_or_exit import run_kybra_generate_or_exit
 from kybra.timed import timed, timed_inline
 from kybra.types import Args, Paths
@@ -23,7 +23,6 @@ def main():
     args = parse_args_or_exit(sys.argv)
     paths = create_paths(args)
     is_verbose = args["flags"]["verbose"]
-    is_initial_compile = detect_initial_compile(paths["global_kybra_target_dir"])
 
     subprocess.run(
         [
@@ -39,13 +38,6 @@ def main():
     verbose_mode_qualifier = " in verbose mode" if is_verbose else ""
 
     print(f"\nBuilding canister {green(canister_name)}{verbose_mode_qualifier}\n")
-
-    if is_initial_compile:
-        print(
-            yellow(
-                "Initial build takes a few minutes. Don't panic. Subsequent builds will be faster.\n"
-            )
-        )
 
     # Copy all of the Rust project structure from the pip package to an area designed for Rust compiling
     if os.path.exists(paths["canister"]):
@@ -74,7 +66,7 @@ def main():
         canister_name,
         cargo_env,
         verbose=is_verbose,
-        label=f"[2/3] 🚧 Building Wasm binary...{show_empathy(is_initial_compile)}",
+        label=f"[2/3] 🚧 Building Wasm binary...",
     )
 
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['wasm'])}")
@@ -172,10 +164,6 @@ def create_paths(args: Args) -> Paths:
     }
 
 
-def detect_initial_compile(global_kybra_target_dir: str) -> bool:
-    return not os.path.exists(global_kybra_target_dir)
-
-
 @timed_inline
 def compile_python_or_exit(
     paths: Paths, cargo_env: dict[str, str], verbose: bool = False
@@ -183,10 +171,6 @@ def compile_python_or_exit(
     bundle_python_code(paths)
     run_kybra_generate_or_exit(paths, cargo_env, verbose)
     run_rustfmt_or_exit(paths, cargo_env, verbose)
-
-
-def encourage_patience(is_initial_compile: bool) -> str:
-    return " (be patient, this will take a while)" if is_initial_compile else ""
 
 
 def bundle_python_code(paths: Paths):
@@ -307,14 +291,6 @@ def run_rustfmt_or_exit(paths: Paths, cargo_env: dict[str, str], verbose: bool =
         )
         print("💀 Build failed")
         sys.exit(1)
-
-
-def show_empathy(is_initial_compile: bool) -> str:
-    return (
-        " (❤ hang in there, this will be faster next time)"
-        if is_initial_compile
-        else ""
-    )
 
 
 def create_file(file_path: str, contents: str):
