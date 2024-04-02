@@ -58,7 +58,6 @@ def check_if_python_stdlib_installed(
 
 
 def get_cargo_build_features(python_stdlib_is_installed: bool) -> str:
-    print("python_stdlib_is_installed", python_stdlib_is_installed)
     return "" if python_stdlib_is_installed else "--features=azle_include_stdlib"
 
 

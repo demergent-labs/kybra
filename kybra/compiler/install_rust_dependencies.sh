@@ -9,18 +9,19 @@ global_kybra_config_dir=~/.config/kybra
 global_kybra_version_dir="$global_kybra_config_dir"/"$kybra_version"
 global_kybra_rust_dir="$global_kybra_config_dir"/rust/"$rust_version"
 global_kybra_rust_bin_dir="$global_kybra_rust_dir"/bin
-global_kybra_logs_dir="$global_kybra_rust_dir"/logs
+global_kybra_logs_dir="$global_kybra_version_dir"/logs
 global_kybra_cargo_bin="$global_kybra_rust_bin_dir"/cargo
 global_kybra_rustup_bin="$global_kybra_rust_bin_dir"/rustup
 global_kybra_wasi2ic_bin="$global_kybra_rust_bin_dir"/wasi2ic
 global_kybra_rustc_bin="$global_kybra_rust_bin_dir"/rustc
+global_kybra_candid_extractor_bin="$global_kybra_rust_bin_dir"/candid-extractor
 
 export CARGO_TARGET_DIR="$global_kybra_config_dir"/rust/target
 export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
 function run() {
-    if ! ([ -e "$global_kybra_rustup_bin" ] && [ -e "$global_kybra_wasi2ic_bin" ] && [ -e "$global_kybra_cargo_bin" ] && [ -e "$global_kybra_rustc_bin" ] && [ -e "$global_kybra_version_dir"/RustPython ] && $global_kybra_rustup_bin target list | grep -q "wasm32-wasi (installed)"); then
+    if ! ([ -e "$global_kybra_rustup_bin" ] && [ -e "$global_kybra_cargo_bin" ] && [ -e "$global_kybra_rustc_bin" ] && $global_kybra_rustup_bin target list | grep -q "wasm32-wasi (installed)" && [ -e "$global_kybra_wasi2ic_bin" ] && [ -e "$global_kybra_version_dir"/RustPython ] && [ -e "$global_kybra_candid_extractor_bin" ]); then
         echo -e "\nKybra "$kybra_version" prerequisite installation (this may take a few minutes)\n"
 
         mkdir -p "$global_kybra_version_dir"
@@ -62,18 +63,18 @@ function install_wasi2ic() {
 function install_rust_python() {
     echo -e "4/5) Installing RustPython"
 
-    cd "$global_kybra_version_dir"
-    git clone https://github.com/RustPython/RustPython.git
-    cd RustPython
-    git checkout f12875027ce425297c07cbccb9be77514ed46157
-    cd -
-    cd -
+    cd "$global_kybra_version_dir" &> "$global_kybra_logs_dir"/install_rust_python
+    git clone https://github.com/RustPython/RustPython.git >> "$global_kybra_logs_dir"/install_rust_python 2>&1
+    cd RustPython >> "$global_kybra_logs_dir"/install_rust_python 2>&1
+    git checkout f12875027ce425297c07cbccb9be77514ed46157 >> "$global_kybra_logs_dir"/install_rust_python 2>&1
+    cd - >> "$global_kybra_logs_dir"/install_rust_python 2>&1
+    cd - >> "$global_kybra_logs_dir"/install_rust_python 2>&1
 }
 
 function install_candid_extractor() {
     echo -e "5/5) Installing candid-extractor"
 
-    "$global_kybra_cargo_bin" install candid-extractor
+    "$global_kybra_cargo_bin" install candid-extractor &> "$global_kybra_logs_dir"/install_candid_extractor
 }
 
 run
