@@ -13,12 +13,13 @@ use crate::{
 
 impl PyAst {
     pub fn build_heartbeat_method(&self) -> Result<Option<HeartbeatMethod>, Vec<Error>> {
-        let heartbeat_function_defs = self.get_canister_stmt_of_type(CanisterMethodType::Heartbeat);
+        let heartbeat_function_defs =
+            self.get_canister_stmt_of_type(&CanisterMethodType::Heartbeat);
 
         if heartbeat_function_defs.len() > 1 {
             return Err(MultipleSystemMethods::err_from_stmt(
                 &heartbeat_function_defs,
-                CanisterMethodType::Heartbeat,
+                &CanisterMethodType::Heartbeat,
             )
             .into());
         }
