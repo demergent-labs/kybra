@@ -12,14 +12,18 @@ from kybra.types import Paths
 def build_wasm_binary_or_exit(
     paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
 ):
-    shutil.copytree(
-        f"{paths['global_kybra_version_dir']}/RustPython/Lib",
-        f"{paths['canister']}/Lib",
-    )
+    copy_python_stdlib_to_dev_location(paths)
     compile_generated_rust_code(paths, canister_name, cargo_env, verbose)
     copy_wasm_to_dev_location(paths, canister_name)
     run_wasi2ic_on_wasm(paths, canister_name, cargo_env, verbose)
     generate_and_create_candid_file(paths, canister_name, cargo_env, verbose)
+
+
+def copy_python_stdlib_to_dev_location(paths: Paths):
+    shutil.copytree(
+        f"{paths['global_kybra_version_dir']}/RustPython/Lib",
+        f"{paths['canister']}/Lib",
+    )
 
 
 def compile_generated_rust_code(

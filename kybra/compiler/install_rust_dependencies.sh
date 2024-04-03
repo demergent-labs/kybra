@@ -24,7 +24,6 @@ function run() {
     if ! ([ -e "$global_kybra_rustup_bin" ] && [ -e "$global_kybra_cargo_bin" ] && [ -e "$global_kybra_rustc_bin" ] && $global_kybra_rustup_bin target list | grep -q "wasm32-wasi (installed)" && [ -e "$global_kybra_wasi2ic_bin" ] && [ -e "$global_kybra_version_dir"/RustPython ] && [ -e "$global_kybra_candid_extractor_bin" ]); then
         echo -e "\nKybra "$kybra_version" prerequisite installation (this may take a few minutes)\n"
 
-        mkdir -p "$global_kybra_version_dir"
         mkdir -p "$global_kybra_rust_dir"
         mkdir -p "$global_kybra_logs_dir"
 
