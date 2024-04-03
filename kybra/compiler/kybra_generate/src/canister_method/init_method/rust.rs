@@ -28,17 +28,7 @@ pub fn generate(
 
         #save_global_interpreter
 
-        // This block is to avoid some difficult typings in call_global_python_function_sync
-        // If you make call_global_python_function_sync not return immediately by ommitting the semi-colon
-        // then you must explicitly type it which has proved somewhat difficult
-        {
-            // This is here so that the py function call below has access to the vm
-            // The vm ownership is transferred above, thus we do this for now
-            let interpreter = unsafe { INTERPRETER_OPTION.as_mut() }.unwrap_or_trap("SystemError: missing python interpreter");
-            let vm = &interpreter.vm;
-
-            #call_to_init_py_function
-        }
+        #call_to_init_py_function
 
         #randomness
     })
@@ -66,22 +56,17 @@ pub fn generate_interpreter_init() -> TokenStream {
 
                     python_stdlib_stable_ref_mut
                         .set(rustpython_vm::py_freeze!(dir = "Lib").bytes.to_vec())
-                        .unwrap();
-                        // .map_err(|err| value_error_to_string(&err));
+                        .map_err(|err| match err {
+                            ic_stable_structures::cell::ValueError::ValueTooLarge { value_size } => {
+                                format!("ValueError: ValueTooLarge {value_size}")
+                            }
+                        });
                 }
 
                 // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
                 let python_stdlib_bytes_reference: &'static [u8] = python_stdlib_stable_ref_cell.borrow().get().clone().leak();
 
                 vm.add_frozen(rustpython_compiler_core::frozen_lib::FrozenLib::from_ref(python_stdlib_bytes_reference));
-
-                pub fn value_error_to_string(err: &ic_stable_structures::cell::ValueError) -> String {
-                    match err {
-                        ic_stable_structures::cell::ValueError::ValueTooLarge { value_size } => {
-                            format!("ValueError: ValueTooLarge {value_size}")
-                        }
-                    }
-                }
             });
         });
         let scope = interpreter.enter(|vm| vm.new_scope_with_builtins());
@@ -119,9 +104,10 @@ pub fn generate_call_to_py_function_with_interpreter_and_vm(
     call_to_py_function: &TokenStream,
 ) -> TokenStream {
     quote! {
-        // This block is to avoid some difficult typings in call_global_python_function_sync
+        // This block is to avoid either 1. some difficult typings in call_global_python_function_sync.
         // If you make call_global_python_function_sync not return immediately by ommitting the semi-colon
         // then you must explicitly type it which has proved somewhat difficult
+        // 2. avoiding syntax errors from not ending with a semi-colon
         {
             // This is here so that the py function call below has access to the vm
             // The vm ownership is transferred above, thus we do this for now
@@ -140,7 +126,7 @@ pub fn generate_randomness() -> TokenStream {
                 let result: ic_cdk::api::call::CallResult<(Vec<u8>,)> = ic_cdk::api::management_canister::main::raw_rand().await;
 
                 match result {
-                    Ok(randomness) => {
+                    Ok((randomness,)) => {
                         let interpreter = unsafe { INTERPRETER_OPTION.as_mut() }
                             .ok_or_else(|| "SystemError: missing python interpreter".to_string()).unwrap();
                         let scope = unsafe { SCOPE_OPTION.as_mut() }
@@ -150,7 +136,7 @@ pub fn generate_randomness() -> TokenStream {
                             let random_module = vm.import("random", None, 0).unwrap();
                             let seed_fn = random_module.get_attr("seed", vm).unwrap();
 
-                            seed_fn.call((vm.ctx.new_bytes(randomness.0),), vm).unwrap();
+                            seed_fn.call((vm.ctx.new_bytes(randomness),), vm).unwrap();
                         });
                     },
                     Err(err) => panic!(err)
