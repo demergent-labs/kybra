@@ -27,9 +27,7 @@ const tests: Test[] = [
     ...testCanisterFunctionality()
 ];
 
-// TODO reenable tests after: https://forum.dfinity.org/t/btc-integration-canister-endpoints-not-returning-expected-results/28395/6
-// whileRunningBitcoinDaemon(() => runTests(tests));
-whileRunningBitcoinDaemon(() => runTests([]));
+whileRunningBitcoinDaemon(() => runTests(tests));
 
 function testCanisterFunctionality() {
     return [
