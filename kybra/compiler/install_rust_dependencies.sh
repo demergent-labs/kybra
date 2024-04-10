@@ -21,14 +21,14 @@ export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
 function run() {
-    if ! ([ -e "$global_kybra_rustup_bin" ] && [ -e "$global_kybra_cargo_bin" ] && [ -e "$global_kybra_rustc_bin" ] && $global_kybra_rustup_bin target list | grep -q "wasm32-wasi (installed)" && [ -e "$global_kybra_wasi2ic_bin" ] && [ -e "$global_kybra_version_dir"/RustPython ] && [ -e "$global_kybra_candid_extractor_bin" ]); then
+    if ! rustup_exists || ! cargo_exists || ! rustc_exists || ! wasm32_wasi_target_installed || ! wasi2ic_exists || ! rust_python_exists || ! candid_extractor_exists; then
         echo -e "\nKybra "$kybra_version" prerequisite installation (this may take a few minutes)\n"
 
         mkdir -p "$global_kybra_rust_dir"
         mkdir -p "$global_kybra_logs_dir"
 
         install_rustup
-        install_wasm32
+        install_wasm32_wasi
         install_wasi2ic
         install_rust_python
         install_candid_extractor
@@ -47,8 +47,8 @@ function update_rustup() {
     "$global_kybra_rustup_bin" update "$rust_version" &> "$global_kybra_logs_dir"/rustup_update
 }
 
-function install_wasm32() {
-    echo -e "2/5) Installing wasm32"
+function install_wasm32_wasi() {
+    echo -e "2/5) Installing wasm32-wasi"
 
     "$global_kybra_rustup_bin" target add wasm32-wasi &> "$global_kybra_logs_dir"/install_wasm32_wasi
 }
@@ -74,6 +74,34 @@ function install_candid_extractor() {
     echo -e "5/5) Installing candid-extractor"
 
     "$global_kybra_cargo_bin" install candid-extractor &> "$global_kybra_logs_dir"/install_candid_extractor
+}
+
+function rustup_exists() {
+    [ -e "$global_kybra_rustup_bin" ]
+}
+
+function cargo_exists() {
+    [ -e "$global_kybra_cargo_bin" ]
+}
+
+function rustc_exists() {
+    [ -e "$global_kybra_rustc_bin" ]
+}
+
+function wasm32_wasi_target_installed() {
+    $global_kybra_rustup_bin target list | grep -q "wasm32-wasi (installed)"
+}
+
+function wasi2ic_exists() {
+    [ -e "$global_kybra_wasi2ic_bin" ]
+}
+
+function rust_python_exists() {
+    [ -e "$global_kybra_version_dir"/RustPython ]
+}
+
+function candid_extractor_exists() {
+    [ -e "$global_kybra_candid_extractor_bin" ]
 }
 
 run
