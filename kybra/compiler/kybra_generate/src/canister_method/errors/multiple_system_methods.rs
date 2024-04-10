@@ -19,7 +19,7 @@ pub struct MultipleSystemMethods {
 impl MultipleSystemMethods {
     pub fn err_from_stmt(
         stmt_kinds: &Vec<SourceMapped<&Located<StmtKind>>>,
-        method_type: &CanisterMethodType,
+        method_type: CanisterMethodType,
     ) -> Error {
         Self {
             locations: stmt_kinds

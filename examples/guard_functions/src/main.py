@@ -25,17 +25,6 @@ def allow_all() -> GuardResult:
     return {"Ok": None}
 
 
-def accept_all_then_reject_all() -> GuardResult:
-    global state
-    # ic.print("accept_all_then_reject called")
-    state["heartbeat_tick"] += 1
-    if state["heartbeat_tick"] > 20:
-        # ic.print("Heartbeat suppressed")
-        return {"Err": "This error message will never be seen"}
-    # ic.print(f"Accepted heartbeat tick {state['heartbeat_tick']}")
-    return {"Ok": None}
-
-
 def increment_counter_and_allow_all() -> GuardResult:
     global state
     ic.print("incrementCounterAndAllowAll called")
@@ -56,11 +45,6 @@ def throw_string() -> GuardResult:
 def throw_custom_error() -> GuardResult:
     ic.print("throw_custom_error called")
     raise CustomError('Execution halted by "throw custom error" guard function')
-
-
-def prevent_upgrades() -> GuardResult:
-    ic.print("prevent_upgrades called")
-    return {"Err": "Upgrades to this canister are disabled"}
 
 
 def return_invalid_type() -> GuardResult:

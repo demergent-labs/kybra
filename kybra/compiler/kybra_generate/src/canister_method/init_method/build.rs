@@ -24,7 +24,7 @@ use crate::{
 impl PyAst {
     pub fn build_init_method(&self) -> Result<InitMethod, Vec<Error>> {
         let init_or_post_upgrade_method =
-            self.build_init_or_post_upgrade_method(&CanisterMethodType::Init)?;
+            self.build_init_or_post_upgrade_method(CanisterMethodType::Init)?;
 
         match init_or_post_upgrade_method {
             CanisterMethod::Init(init_method) => Ok(init_method),
@@ -34,7 +34,7 @@ impl PyAst {
 
     pub fn build_init_or_post_upgrade_method(
         &self,
-        canister_method_type: &CanisterMethodType,
+        canister_method_type: CanisterMethodType,
     ) -> Result<CanisterMethod, Vec<Error>> {
         let function_defs = self.get_canister_stmt_of_type(canister_method_type);
 
@@ -64,7 +64,7 @@ impl PyAst {
 }
 
 fn build_init_or_post_upgrade_methods(
-    canister_method_type: &CanisterMethodType,
+    canister_method_type: CanisterMethodType,
     function_defs: &Vec<SourceMapped<&Located<StmtKind>>>,
     entry_module_name: &str,
 ) -> Result<Vec<CanisterMethod>, Vec<Error>> {
@@ -81,7 +81,7 @@ fn build_init_or_post_upgrade_methods(
 }
 
 fn build_init_or_post_upgrade_method(
-    canister_method_type: &CanisterMethodType,
+    canister_method_type: CanisterMethodType,
     function_def_option: Option<&SourceMapped<&Located<StmtKind>>>,
     entry_module_name: &str,
 ) -> Result<CanisterMethod, Vec<Error>> {

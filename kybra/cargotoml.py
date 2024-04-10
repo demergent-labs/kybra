@@ -49,7 +49,7 @@ async-recursion = "1.0.0"
 ic-stable-structures = "0.5.2" # TODO shall we update? Shall we remove the need to specify max size?
 slotmap = "1.0.6"
 
-# TODO transient feature can be removed once https://github.com/wasm-forge/stable-fs/issues/2 is resolved
+# TODO transient feature can be removed once https://github.com/demergent-labs/azle/issues/1731 is resolved
 ic-wasi-polyfill = {{ git = "https://github.com/wasm-forge/ic-wasi-polyfill", rev = "2d2edb382816e12da9bc81b786b7cd1a00d36735" , features = [
     "transient",
 ] }}

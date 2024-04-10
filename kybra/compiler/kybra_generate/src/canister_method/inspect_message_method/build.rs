@@ -16,12 +16,12 @@ use crate::{
 impl PyAst {
     pub fn build_inspect_method(&self) -> Result<Option<InspectMessageMethod>, Vec<Error>> {
         let inspect_message_function_defs =
-            self.get_canister_stmt_of_type(&CanisterMethodType::InspectMessage);
+            self.get_canister_stmt_of_type(CanisterMethodType::InspectMessage);
 
         if inspect_message_function_defs.len() > 1 {
             return Err(MultipleSystemMethods::err_from_stmt(
                 &inspect_message_function_defs,
-                &CanisterMethodType::InspectMessage,
+                CanisterMethodType::InspectMessage,
             )
             .into());
         }

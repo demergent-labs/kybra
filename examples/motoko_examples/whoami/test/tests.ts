@@ -1,4 +1,5 @@
-import { getCanisterId, Test } from 'azle/test';
+import { getCanisterId, getPrincipal, whoami } from 'azle/dfx';
+import { Test } from 'azle/test';
 import { execSync } from 'child_process';
 import { _SERVICE } from './dfx_generated/whoami/whoami.did';
 import { ActorSubclass } from '@dfinity/agent';
@@ -10,9 +11,7 @@ function createIdentity(seed: number): SignIdentity {
     return Ed25519KeyIdentity.generate(Uint8Array.from(seed1));
 }
 
-const installationPrincipal = execSync(`dfx identity get-principal`)
-    .toString()
-    .trim();
+const installationPrincipal = getPrincipal(whoami());
 
 export const callingIdentity = createIdentity(1);
 const callingPrincipal = callingIdentity.getPrincipal().toString();

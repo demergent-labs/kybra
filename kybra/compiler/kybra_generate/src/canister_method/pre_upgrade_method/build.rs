@@ -16,12 +16,12 @@ use crate::{
 impl PyAst {
     pub fn build_pre_upgrade_method(&self) -> Result<Option<PreUpgradeMethod>, Vec<Error>> {
         let pre_upgrade_function_defs =
-            self.get_canister_stmt_of_type(&CanisterMethodType::PreUpgrade);
+            self.get_canister_stmt_of_type(CanisterMethodType::PreUpgrade);
 
         if pre_upgrade_function_defs.len() > 1 {
             return Err(MultipleSystemMethods::err_from_stmt(
                 &pre_upgrade_function_defs,
-                &CanisterMethodType::PreUpgrade,
+                CanisterMethodType::PreUpgrade,
             )
             .into());
         }

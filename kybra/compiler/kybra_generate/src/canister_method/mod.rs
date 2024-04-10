@@ -35,7 +35,7 @@ use self::errors::GuardFunctionName;
 impl PyAst {
     fn get_canister_stmt_of_type(
         &self,
-        method_type: &CanisterMethodType,
+        method_type: CanisterMethodType,
     ) -> Vec<SourceMapped<&Located<StmtKind>>> {
         self.source_mapped_mods
             .iter()
