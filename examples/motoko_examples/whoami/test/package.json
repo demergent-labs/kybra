@@ -4,11 +4,11 @@
         "test": "cd .. && KYBRA_REBUILD=true ts-node --transpile-only --ignore=false test/test.ts"
     },
     "dependencies": {
-        "@dfinity/identity": "0.14.1",
-        "azle": "github:demergent-labs/azle"
+        "@dfinity/identity": "0.14.1"
     },
     "devDependencies": {
         "@dfinity/agent": "0.14.1",
+        "azle": "github:demergent-labs/azle",
         "ts-node": "10.7.0",
         "typescript": "4.6.3"
     }

@@ -15,7 +15,7 @@ type DeleteUserErr = variant { UserDoesNotExist : principal };
 type DeleteUserResult = variant { Ok : User; Err : DeleteUserErr };
 type Recording = record {
   id : principal;
-  audio : vec nat8;
+  audio : blob;
   name : text;
   created_at : nat64;
   user_id : principal;
@@ -27,7 +27,7 @@ type User = record {
   created_at : nat64;
 };
 service : () -> {
-  create_recording : (vec nat8, text, principal) -> (CreateRecordingResult);
+  create_recording : (blob, text, principal) -> (CreateRecordingResult);
   create_user : (text) -> (User);
   delete_recording : (principal) -> (DeleteRecordingResult);
   delete_user : (principal) -> (DeleteUserResult);

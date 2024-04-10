@@ -1,4 +1,5 @@
-import { getCanisterId, Test } from 'azle/test';
+import { getCanisterId, getPrincipal, whoami } from 'azle/dfx';
+import { Test } from 'azle/test';
 import { execSync } from 'child_process';
 import { _SERVICE } from './dfx_generated/whoami/whoami.did';
 import { ActorSubclass } from '@dfinity/agent';
@@ -9,6 +10,8 @@ function createIdentity(seed: number): SignIdentity {
     const seed1 = [seed, ...new Array(31).fill(0)];
     return Ed25519KeyIdentity.generate(Uint8Array.from(seed1));
 }
+
+const installationPrincipal = getPrincipal(whoami());
 
 export const callingIdentity = createIdentity(1);
 const callingPrincipal = callingIdentity.getPrincipal().toString();
@@ -27,9 +30,7 @@ export function getTests(
                 const result = await whoamiCanister.installer();
 
                 return {
-                    Ok:
-                        result.toString() ===
-                        execSync(`dfx canister id whoami`).toString().trim()
+                    Ok: result.toString() === installationPrincipal
                 };
             }
         },

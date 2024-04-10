@@ -3,7 +3,7 @@ type Archives = record { archives : vec Archive };
 type Block = record {
   transaction : Transaction;
   timestamp : TimeStamp;
-  parent_hash : opt vec nat8;
+  parent_hash : opt blob;
 };
 type BlockRange = record { blocks : vec Block };
 type ExecuteTransferResult = variant { Ok : TransferResult; Err : text };
@@ -19,12 +19,12 @@ type Operation = variant {
   Mint : Operation_Mint;
   Transfer : Operation_Transfer;
 };
-type Operation_Burn = record { from : vec nat8; amount : Tokens };
-type Operation_Mint = record { to : vec nat8; amount : Tokens };
+type Operation_Burn = record { from : blob; amount : Tokens };
+type Operation_Mint = record { to : blob; amount : Tokens };
 type Operation_Transfer = record {
-  to : vec nat8;
+  to : blob;
   fee : Tokens;
-  from : vec nat8;
+  from : blob;
   amount : Tokens;
 };
 type QueryArchiveError = variant {
@@ -41,7 +41,7 @@ type QueryArchiveError_Other = record {
 };
 type QueryArchiveResult = variant { Ok : BlockRange; Err : QueryArchiveError };
 type QueryBlocksResponse = record {
-  certificate : opt vec nat8;
+  certificate : opt blob;
   blocks : vec Block;
   chain_length : nat64;
   first_block_index : nat64;

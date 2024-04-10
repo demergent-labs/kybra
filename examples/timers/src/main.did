@@ -1,7 +1,7 @@
 type StatusReport = record {
-  single_cross_canister : vec nat8;
+  single_cross_canister : blob;
   repeat : nat8;
-  repeat_cross_canister : vec nat8;
+  repeat_cross_canister : blob;
   inline : nat8;
   capture : text;
   single : bool;

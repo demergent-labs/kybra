@@ -3,10 +3,19 @@
         "ethereum_json_rpc": {
             "type": "custom",
             "build": "python -m kybra ethereum_json_rpc src/main.py src/main.did",
-            "post_install": ".kybra/ethereum_json_rpc/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/ethereum_json_rpc/ethereum_json_rpc.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/ethereum_json_rpc",
                 "node_compatibility": true

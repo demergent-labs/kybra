@@ -3,10 +3,19 @@
         "randomness": {
             "type": "custom",
             "build": "python -m kybra randomness src/main.py src/main.did",
-            "post_install": ".kybra/randomness/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/randomness/randomness.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/randomness",
                 "node_compatibility": true

@@ -3,10 +3,19 @@
         "works": {
             "type": "custom",
             "build": "python -m kybra --verbose works src/works/works.py src/works/works.did",
-            "post_install": ".kybra/works/post_install.sh",
             "candid": "src/works/works.did",
             "wasm": ".kybra/works/works.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/works/works.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/works",
                 "node_compatibility": true
@@ -15,10 +24,19 @@
         "wip": {
             "type": "custom",
             "build": "python -m kybra --verbose wip src/wip/wip.py src/wip/wip.did",
-            "post_install": ".kybra/wip/post_install.sh",
             "candid": "src/wip/wip.did",
             "wasm": ".kybra/wip/wip.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/wip/wip.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/wip",
                 "node_compatibility": true
@@ -27,10 +45,19 @@
         "breaks": {
             "type": "custom",
             "build": "python -m kybra --verbose breaks src/breaks/breaks.py src/breaks/breaks.did",
-            "post_install": ".kybra/breaks/post_install.sh",
             "candid": "src/breaks/breaks.did",
             "wasm": ".kybra/breaks/breaks.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/breaks/breaks.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/breaks",
                 "node_compatibility": true

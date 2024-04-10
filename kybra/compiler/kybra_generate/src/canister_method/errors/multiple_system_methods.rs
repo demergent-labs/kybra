@@ -26,7 +26,7 @@ impl MultipleSystemMethods {
                 .iter()
                 .map(|stmt| stmt.create_location())
                 .collect(),
-            method_type,
+            method_type: method_type,
         }
         .into()
     }

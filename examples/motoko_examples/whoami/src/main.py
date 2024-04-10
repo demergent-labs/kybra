@@ -17,24 +17,19 @@ from kybra import (
 
 class WhoAmICanister(Service):
     @service_query
-    def installer(self) -> Principal:
-        ...
+    def installer(self) -> Principal: ...
 
     @service_query
-    def argument(self) -> Principal:
-        ...
+    def argument(self) -> Principal: ...
 
     @service_update
-    def whoami(self) -> Principal:
-        ...
+    def whoami(self) -> Principal: ...
 
     @service_update
-    def id(self) -> Principal:
-        ...
+    def id(self) -> Principal: ...
 
     @service_query
-    def idQuick(self) -> Principal:
-        ...
+    def idQuick(self) -> Principal: ...
 
 
 class WhoAmIResult(Variant, total=False):
@@ -64,9 +59,6 @@ def post_upgrade_(somebody: Principal) -> void:
     someone = somebody
 
 
-# Note that the installer in Kybra is the canister itself
-# This is because of Kybra's deployment canister approach
-# to allowing large Wasm binaries
 @query
 def installer() -> Principal:
     return install
@@ -86,7 +78,7 @@ def whoami() -> Principal:
 def id() -> Async[Principal]:
     thisCanister = WhoAmICanister(ic.id())
     result: CallResult[Principal] = yield thisCanister.whoami()
-    return result.Ok if result.Ok is not None else Principal.from_str("aaaaa-aa")
+    return Principal.from_str("aaaaa-aa") if result.Err is not None else result.Ok
 
 
 @query

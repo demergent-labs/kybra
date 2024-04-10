@@ -1,2 +1,2 @@
 pub mod build;
-mod rust;
+pub mod rust;

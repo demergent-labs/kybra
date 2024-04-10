@@ -1,8 +1,8 @@
-type PublicKey = record { public_key : vec nat8 };
+type PublicKey = record { public_key : blob };
 type PublicKeyResult = variant { Ok : PublicKey; Err : text };
 type SignResult = variant { Ok : Signature; Err : text };
-type Signature = record { signature : vec nat8 };
+type Signature = record { signature : blob };
 service : () -> {
   public_key : () -> (PublicKeyResult);
-  sign : (vec nat8) -> (SignResult);
+  sign : (blob) -> (SignResult);
 }

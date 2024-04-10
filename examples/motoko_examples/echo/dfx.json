@@ -3,10 +3,19 @@
         "echo": {
             "type": "custom",
             "build": "python -m kybra echo src/main.py src/main.did",
-            "post_install": ".kybra/echo/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/echo/echo.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/echo",
                 "node_compatibility": true

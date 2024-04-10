@@ -3,10 +3,19 @@
         "candid_encoding": {
             "type": "custom",
             "build": "python -m kybra candid_encoding src/main.py src/main.did",
-            "post_install": ".kybra/candid_encoding/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/candid_encoding/candid_encoding.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/candid_encoding",
                 "node_compatibility": true

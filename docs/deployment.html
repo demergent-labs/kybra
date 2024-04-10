@@ -188,12 +188,7 @@ sudo kill -9 627260
 <p>To deploy an individual canister:</p>
 <pre><code class="language-bash">dfx deploy canister_name
 </code></pre>
-<p>If you are asked for a password, you'll need to create a new unencrypted dfx identity:</p>
-<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
-
-dfx deploy
-</code></pre>
+<p>If you have problems deploying see <a href="./deployment.html#common-deployment-issues">Common deployment issues</a>.</p>
 <h2 id="interacting-with-your-canister"><a class="header" href="#interacting-with-your-canister">Interacting with your canister</a></h2>
 <p>As a developer you can generally interact with your canister in three ways:</p>
 <ul>
@@ -248,12 +243,15 @@ URLs:
 <p>To deploy an individual canister:</p>
 <pre><code class="language-bash">dfx deploy --network ic canister_name
 </code></pre>
-<p>If you are asked for a password, you'll need to create a new unencrypted dfx identity:</p>
-<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
-
-dfx deploy --network ic
-</code></pre>
+<p>If you have problems deploying see <a href="./deployment.html#common-deployment-issues">Common deployment issues</a>.</p>
+<h2 id="common-deployment-issues"><a class="header" href="#common-deployment-issues">Common deployment issues</a></h2>
+<p>If you run into an error during deployment, try the following:</p>
+<ol>
+<li>Ensure that you have followed the instructions correctly in <a href="./installation.html">the installation chapter</a>, especially noting <a href="./installation.html#common-installation-issues">the common installation issues</a></li>
+<li>Look for more error output by adding the <code>--verbose</code> flag to the <code>build</code> command in your <code>dfx.json</code> file like so: <code>&quot;build&quot;: &quot;python -m kybra canister_name src/main.py src/main.did --verbose</code></li>
+<li>Look for errors in each of the files in <code>~/.config/kybra/[kybra_version]/logs</code></li>
+<li>If the problem is still not resolved, reach out with any error outputs in <a href="https://discord.gg/ux2Jc7psjd">the Discord channel</a></li>
+</ol>
 
                     </main>
 

@@ -36,8 +36,6 @@ const stableStructuresCanister3 = createActorCanister3(
 //     {
 //         name: 'redeploy canisters',
 //         prep: async () => {
-//             await new Promise((resolve) => setTimeout(resolve, 5000));
-
 //             execSync(`dfx deploy`, {
 //                 stdio: 'inherit'
 //             });

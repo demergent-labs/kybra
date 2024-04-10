@@ -5,7 +5,7 @@ type CanisterStatusResult = record {
   memory_size : nat;
   cycles : nat;
   settings : DefiniteCanisterSettings;
-  module_hash : opt vec nat8;
+  module_hash : opt blob;
 };
 type CreateCanisterResult = record { canister_id : principal };
 type DefaultResult = variant { Ok : bool; Err : text };
@@ -23,12 +23,12 @@ type GetCanisterStatusResult = variant {
   Ok : CanisterStatusResult;
   Err : text;
 };
-type RawRandResult = variant { Ok : vec nat8; Err : text };
+type RawRandResult = variant { Ok : blob; Err : text };
 service : () -> {
   execute_create_canister : () -> (ExecuteCreateCanisterResult);
   execute_delete_canister : (principal) -> (DefaultResult);
   execute_deposit_cycles : (principal) -> (DefaultResult);
-  execute_install_code : (principal, vec nat8) -> (DefaultResult);
+  execute_install_code : (principal, blob) -> (DefaultResult);
   execute_start_canister : (principal) -> (DefaultResult);
   execute_stop_canister : (principal) -> (DefaultResult);
   execute_uninstall_code : (principal) -> (DefaultResult);

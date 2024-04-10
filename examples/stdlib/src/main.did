@@ -1,5 +1,5 @@
 service : () -> {
-  test_base64 : () -> (vec nat8) query;
+  test_base64 : () -> (blob) query;
   test_collections : () -> (text) query;
   test_datetime : () -> (text) query;
   test_itertools : () -> (vec text) query;

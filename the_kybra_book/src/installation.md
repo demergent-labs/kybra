@@ -10,7 +10,7 @@ Follow the instructions exactly as stated below to avoid issues.
 You should be using a \*nix environment (Linux, Mac OS, [WSL if using Windows](https://learn.microsoft.com/en-us/windows/wsl/install)) with bash and have the following installed on your system:
 
 -   Python 3.10.7
--   dfx 0.17.0
+-   dfx 0.19.0
 -   Python VS Code Extension
 
 ### Python 3.10.7
@@ -27,10 +27,10 @@ curl https://pyenv.run | bash
 
 ### dfx
 
-Run the following command to install dfx 0.17.0:
+Run the following command to install dfx 0.19.0:
 
 ```bash
-DFX_VERSION=0.17.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+DFX_VERSION=0.19.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
 ```
 
 If after trying to run `dfx` commands you encounter an error such as `dfx: command not found`, you might need to add `$HOME/bin` to your path. Here's an example of doing this in your `.bashrc`:

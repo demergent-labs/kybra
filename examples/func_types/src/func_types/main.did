@@ -12,7 +12,7 @@ type ComplexFunc = func (
     },
   ) -> (nat64);
 type GetNotifierFromNotifiersCanisterResult = variant {
-  Ok : func (vec nat8) -> () oneway;
+  Ok : func (blob) -> () oneway;
   Err : text;
 };
 type Reaction = variant {

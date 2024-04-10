@@ -147,52 +147,14 @@
                         <h1 id="caveats"><a class="header" href="#caveats">Caveats</a></h1>
 <h2 id="unknown-security-vulnerabilities"><a class="header" href="#unknown-security-vulnerabilities">Unknown security vulnerabilities</a></h2>
 <p>Kybra is a beta project using a new Python interpreter. See the <a href="./kybra.html#disclaimer">disclaimer</a> for more information.</p>
-<h2 id="cdk-metadata"><a class="header" href="#cdk-metadata">cdk metadata</a></h2>
-<ul>
-<li>All Kybra canisters have a public metadata key-value pair named <code>cdk</code> which contains the version of Kybra the canister is using
-<ul>
-<li>Anyone can query this metadata which may be a security risk</li>
-</ul>
-</li>
-</ul>
 <h2 id="no-c-extensions"><a class="header" href="#no-c-extensions">No C extensions</a></h2>
 <p>Any PyPI packages or other Python code that relies on C extensions will not currently work. It is a major goal for us to support C extensions in the future.</p>
 <h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
 <p>Kybra is probably ~7-20x less performant than what you would expect from <a href="https://github.com/python/cpython">CPython</a>. We hope to eventually use <code>CPython</code> as Kybra's underlying Python interpreter.</p>
-<h2 id="init-and-post_upgrade"><a class="header" href="#init-and-post_upgrade">init and post_upgrade</a></h2>
-<h3 id="under-the-hood-nuances"><a class="header" href="#under-the-hood-nuances">under-the-hood nuances</a></h3>
-<p>In order to allow for larger Kybra Wasm modules and to enable the Python stdlib, we had to introduce some trade-offs into the <code>init</code> and <code>post_upgrade</code> processes:</p>
-<ol>
-<li>The under-the-hood Rust <code>init</code> function of your application canister is never called directly, only the <code>post_upgrade</code> function. This function will call your Python <code>init</code> or <code>post_upgrade</code> function in a timer callback</li>
-<li>When deploying to a local replica, errors from your <code>init</code> or <code>post_upgrade</code> will be logged from your replica, not from the <code>dfx deploy</code> process</li>
-<li>When deploying to mainnet, errors from your <code>init</code> or <code>post_upgrade</code> will not be logged</li>
-<li>Your canister will go through the following main steps when deploying: first a deployer canister Wasm binary will be deployed to the canister, then your application Wasm binary will be chunk uploaded to the deployer canister along with the Python stdlib, and finally the deployer canister will call <code>install_code</code> on itself with the full application Wasm binary</li>
-</ol>
-<h3 id="params"><a class="header" href="#params">params</a></h3>
-<p>If you add parameters to your <code>init</code> or <code>post_upgrade</code> methods, you will need to manually add these parameters to the service in your Candid file for the first deploy to succeed. Any time you change these parameters, you will need to manually add these changes into your Candid file.</p>
-<p>It is also recommended to start clean (<code>dfx start --clean</code>) when first deploying after changing these parameters.</p>
-<p>Here's an example of a basic Candid file with parameters <code>text</code>, <code>bool</code>, and <code>int32</code>:</p>
-<pre><code>service : (text, bool, int32) -&gt; {}
-</code></pre>
-<h3 id="guard-functions"><a class="header" href="#guard-functions">guard functions</a></h3>
-<p><code>init</code> and <code>post_upgrade</code> cannot have guard functions applied to them.</p>
-<h2 id="no-encrypted-dfx-identities"><a class="header" href="#no-encrypted-dfx-identities">No encrypted dfx identities</a></h2>
-<p>Kybra currently does not support encrypted identities. If you are asked for a password during <code>dfx deploy</code>, you'll need to create a new unencrypted dfx identity:</p>
-<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
-
-dfx deploy
-</code></pre>
-<h2 id="no-candidservice-metadata"><a class="header" href="#no-candidservice-metadata">No candid:service metadata</a></h2>
-<p>Kybra does not put the Candid metadata into <code>candid:service</code> automatically. Currently if you want to retrieve the Candid from the canister you can call the <code>__get_candid_interface_tmp_hack</code> method.</p>
-<h2 id="wasm-module-hash-now-less-useful"><a class="header" href="#wasm-module-hash-now-less-useful">Wasm module hash now less useful</a></h2>
-<p>Due to protocol and tooling limitations, Kybra must dynamically upload your application's Python bytecode and the Python stdlib bytecode. This means that the Wasm module hash is not computed from all of your application's source code. Thus the Wasm module hash retrieved from the IC should not be relied upon for security assumptions.</p>
-<h2 id="iccaller-in-init-and-post_upgrade"><a class="header" href="#iccaller-in-init-and-post_upgrade">ic.caller() in init and post_upgrade</a></h2>
-<p>Usually <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the principal of your local dfx identity. Keep in mind that in Kybra canisters <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the canister's own principal.</p>
 <h2 id="do-not-use-dictionary-unpacking"><a class="header" href="#do-not-use-dictionary-unpacking">Do not use dictionary unpacking</a></h2>
 <p>A bug in the <a href="https://github.com/RustPython/RustPython">RustPython</a> interpreter means that dictionary unpacking should not be used until <a href="https://github.com/RustPython/RustPython/issues/4932">this issue</a> is addressed.</p>
 <h2 id="reserved-memory-ids"><a class="header" href="#reserved-memory-ids">Reserved memory ids</a></h2>
-<p><code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved for <code>StableBTreeMap</code>.</p>
+<p><code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, and <code>254</code> are currently reserved for <code>StableBTreeMap</code>.</p>
 <h2 id="print-does-not-work"><a class="header" href="#print-does-not-work">print does not work</a></h2>
 <p>You should use <code>ic.print</code> instead of <code>print</code>.</p>
 <h2 id="kybra-types"><a class="header" href="#kybra-types">Kybra types</a></h2>

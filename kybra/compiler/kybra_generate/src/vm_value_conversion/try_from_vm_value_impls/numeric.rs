@@ -42,19 +42,19 @@ pub fn generate() -> TokenStream {
             }
         }
 
-        impl CdkActTryFromVmValue<ic_cdk::export::candid::Int, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
+        impl CdkActTryFromVmValue<candid::Int, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
             for rustpython::vm::PyObjectRef
         {
             fn try_from_vm_value(
                 self,
                 vm: &rustpython::vm::VirtualMachine,
-            ) -> Result<ic_cdk::export::candid::Int, rustpython_vm::builtins::PyBaseExceptionRef>
+            ) -> Result<candid::Int, rustpython_vm::builtins::PyBaseExceptionRef>
             {
                 let int_result: Result<rustpython_vm::builtins::PyIntRef, _> =
                     self.try_into_value(vm);
 
                 match int_result {
-                    Ok(int) => Ok(ic_cdk::export::candid::Int(int.as_bigint().clone())),
+                    Ok(int) => Ok(candid::Int(int.as_bigint().clone())),
                     Err(_) => Err(vm.new_type_error("PyObjectRef is not a PyIntRef".to_string())),
                 }
             }
@@ -105,17 +105,17 @@ pub fn generate() -> TokenStream {
             }
         }
 
-        impl CdkActTryFromVmValue<ic_cdk::export::candid::Nat, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
+        impl CdkActTryFromVmValue<candid::Nat, rustpython_vm::builtins::PyBaseExceptionRef, &rustpython::vm::VirtualMachine>
             for rustpython::vm::PyObjectRef
         {
             fn try_from_vm_value(
                 self,
                 vm: &rustpython::vm::VirtualMachine,
-            ) -> Result<ic_cdk::export::candid::Nat, rustpython_vm::builtins::PyBaseExceptionRef>
+            ) -> Result<candid::Nat, rustpython_vm::builtins::PyBaseExceptionRef>
             {
                 let int: rustpython_vm::builtins::PyIntRef = self.try_into_value(vm)?;
 
-                match ic_cdk::export::candid::Nat::from_str(&int.as_bigint().to_string()) {
+                match candid::Nat::from_str(&int.as_bigint().to_string()) {
                     // TODO probably not the best conversion
                     Ok(nat) => Ok(nat),
                     Err(_) => {
