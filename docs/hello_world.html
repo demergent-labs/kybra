@@ -224,10 +224,19 @@ def set_message(new_message: str) -&gt; void:
         &quot;kybra_hello_world&quot;: {
             &quot;type&quot;: &quot;custom&quot;,
             &quot;build&quot;: &quot;python -m kybra kybra_hello_world src/main.py src/main.did&quot;,
-            &quot;post_install&quot;: &quot;.kybra/kybra_hello_world/post_install.sh&quot;,
             &quot;candid&quot;: &quot;src/main.did&quot;,
             &quot;wasm&quot;: &quot;.kybra/kybra_hello_world/kybra_hello_world.wasm&quot;,
-            &quot;gzip&quot;: true
+            &quot;gzip&quot;: true,
+            &quot;metadata&quot;: [
+                {
+                    &quot;name&quot;: &quot;candid:service&quot;,
+                    &quot;path&quot;: &quot;src/main.did&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;cdk:name&quot;,
+                    &quot;content&quot;: &quot;kybra&quot;
+                }
+            ]
         }
     }
 }
@@ -243,13 +252,7 @@ def set_message(new_message: str) -&gt; void:
 <p>Then deploy the canister:</p>
 <pre><code class="language-bash">dfx deploy
 </code></pre>
-<p>If you are asked for a password, you'll need to create a new unencrypted dfx identity:</p>
-<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
-
-dfx deploy
-</code></pre>
-<p>This is not ideal for security, but Kybra currently <a href="./caveats.html#no-encrypted-dfx-identities">does not support encrypted dfx identities</a>.</p>
+<p>If you have problems deploying see <a href="./deployment.html#common-deployment-issues">Common deployment issues</a>.</p>
 <h2 id="interacting-with-your-canister-from-the-command-line"><a class="header" href="#interacting-with-your-canister-from-the-command-line">Interacting with your canister from the command line</a></h2>
 <p>Once we've deployed we can ask for our message:</p>
 <pre><code class="language-bash">dfx canister call kybra_hello_world get_message

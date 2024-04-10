@@ -154,7 +154,7 @@
 <li>Latency ~2-5 seconds</li>
 <li>20 billion Wasm instruction limit</li>
 <li>4 GiB heap limit</li>
-<li>48 GiB stable memory limit</li>
+<li>96 GiB stable memory limit</li>
 <li>~900 updates per second per canister</li>
 </ul>
 <p>Update methods are similar to query methods, but state changes can be persisted. Here's an example of a simple update method:</p>
@@ -204,7 +204,7 @@ def set(key: str, value: str) -&gt; void:
     db[key] = value
 
 </code></pre>
-<p>If you need more than 4 GiB of storage, consider taking advantage of the 48 GiB of stable memory. Stable structures like <code>StableBTreeMap</code> give you a nice API for interacting with stable memory. These data structures will be <a href="./stable_structures.html">covered in more detail later</a>. Here's a simple example:</p>
+<p>If you need more than 4 GiB of storage, consider taking advantage of the 96 GiB of stable memory. Stable structures like <code>StableBTreeMap</code> give you a nice API for interacting with stable memory. These data structures will be <a href="./stable_structures.html">covered in more detail later</a>. Here's a simple example:</p>
 <pre><code class="language-python">from kybra import Opt, query, StableBTreeMap, update, void
 
 db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)

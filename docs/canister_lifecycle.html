@@ -163,13 +163,6 @@ def pre_upgrade_() -&gt; void:
 def post_upgrade_() -&gt; void:
     ic.print(&quot;runs after canister upgrade&quot;)
 </code></pre>
-<h2 id="caveats"><a class="header" href="#caveats">Caveats</a></h2>
-<h3 id="params"><a class="header" href="#params">params</a></h3>
-<p>Keep in mind <a href="./caveats.html#init-and-post_upgrade-params">this caveat</a> when working with <code>init</code> or <code>post_upgrade</code> params.</p>
-<h3 id="iccaller"><a class="header" href="#iccaller">ic.caller()</a></h3>
-<p>Usually <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the principal of your local dfx identity. In Kybra canisters <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the canister's own principal.</p>
-<h3 id="guard-functions"><a class="header" href="#guard-functions">guard functions</a></h3>
-<p><code>init</code> and <code>post_upgrade</code> cannot have guard functions applied to them.</p>
 
                     </main>
 

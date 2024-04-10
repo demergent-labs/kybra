@@ -24,3 +24,5 @@ def random_bytes() -> Async[RandomBytesResult]:
 ```
 
 See the [management canister types](https://github.com/demergent-labs/kybra/blob/main/kybra/canisters/management/__init__.py) for all methods and their parameter and return types.
+
+See the [management canister reference section](./reference/management_canister/management_canister.md) for more information.

@@ -14,11 +14,15 @@ codegen-units = 256
 [lib]
 crate-type = ["cdylib"]
 
+[features]
+azle_include_stdlib = []
+
 [dependencies]
-ic-cdk = "=0.8.0-beta.0"
-ic-cdk-macros = "0.6.10"
-ic-cdk-timers = "0.1.2"
-candid = {{ version = "0.9.0-beta.2", features = ["parser"] }}
+ic-cdk = "0.13.1"
+ic-cdk-macros = "0.9.0"
+ic-cdk-timers = "0.7.0"
+candid = {{ version = "0.10.6", features = ["value"] }}
+candid_parser = "0.1.4"
 kybra-vm-value-derive = {{ path = "./kybra_vm_value_derive" }}
 
 rustpython = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["stdlib", "encodings"] }}
@@ -42,11 +46,13 @@ rustpython-compiler-core = {{ git = "https://github.com/demergent-labs/RustPytho
 # rustpython = {{ path = "../../../../../../RustPython", default-features = false, features = [] }}
 serde = {{ version = "1.0.137", default-features = false, features = [] }}
 async-recursion = "1.0.0"
-ic-stable-structures = "0.5.2"
+ic-stable-structures = "0.5.2" # TODO shall we update? Shall we remove the need to specify max size?
 slotmap = "1.0.6"
-ic-wasi-polyfill = {{ git = "https://github.com/demergent-labs/ic-wasi-polyfill", rev = "9b039919427ccd76bf452f012bdbfe3695e549a6" }}
-# ic-wasi-polyfill = {{ git = "https://github.com/wasm-forge/ic-wasi-polyfill", rev = "5e986cb3b95a58fbbf9386582f5c48847f22dcca" }}
-# ic-wasi-polyfill = {{ path = "/home/lastmjs/development/ic-wasi-polyfill", features = ["transient", "report_wasi_calls"] }}
+
+# TODO transient feature can be removed once https://github.com/demergent-labs/azle/issues/1731 is resolved
+ic-wasi-polyfill = {{ git = "https://github.com/wasm-forge/ic-wasi-polyfill", rev = "2d2edb382816e12da9bc81b786b7cd1a00d36735" , features = [
+    "transient",
+] }}
 
 [patch.crates-io]
 num-bigint = {{ git = "https://github.com/rust-num/num-bigint" }}
@@ -111,6 +117,12 @@ name = "anyhow"
 version = "1.0.71"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c7d0618f0e0b7e8ff11427422b64564d5fb0be1940354bfe2e0529b18a9d9b8"
+
+[[package]]
+name = "arbitrary"
+version = "1.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d5a26814d8dcb93b0e5a0ff3c6d80a8843bafb21b39e8e18a6f05471870e110"
 
 [[package]]
 name = "arrayvec"
@@ -255,7 +267,7 @@ checksum = "ba3569f383e8f1598449f1a423e72e99569137b47740b1da11ef19af3d5c3223"
 dependencies = [
  "lazy_static",
  "memchr",
- "regex-automata",
+ "regex-automata 0.1.10",
 ]
 
 [[package]]
@@ -266,9 +278,9 @@ checksum = "a3e2c3daef883ecc1b5d58c15adae93470a91d425f3532ba1695849656af3fc1"
 
 [[package]]
 name = "byteorder"
-version = "1.4.3"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
+checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
 name = "candid"
@@ -284,15 +296,15 @@ dependencies = [
  "crc32fast",
  "data-encoding",
  "hex",
- "lalrpop",
- "lalrpop-util",
+ "lalrpop 0.19.12",
+ "lalrpop-util 0.19.12",
  "leb128",
- "logos",
+ "logos 0.12.1",
  "num-bigint",
  "num-traits",
  "num_enum",
  "paste",
- "pretty",
+ "pretty 0.10.0",
  "serde",
  "serde_bytes",
  "sha2",
@@ -301,30 +313,23 @@ dependencies = [
 
 [[package]]
 name = "candid"
-version = "0.9.0-beta.4"
+version = "0.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3005be607a05b449b5a5a144839c5731699af5c309ce20eb5c812f889683601e"
+checksum = "965e86b1bd1c0c26df70cf0c92ae16c56204ab402eb915c26a541cf949d841cf"
 dependencies = [
  "anyhow",
  "binread",
  "byteorder",
- "candid_derive 0.6.1",
- "codespan-reporting",
- "crc32fast",
- "data-encoding",
+ "candid_derive 0.6.6",
  "hex",
- "lalrpop",
- "lalrpop-util",
+ "ic_principal",
  "leb128",
- "logos",
  "num-bigint",
  "num-traits",
- "num_enum",
  "paste",
- "pretty",
+ "pretty 0.12.3",
  "serde",
  "serde_bytes",
- "sha2",
  "stacker",
  "thiserror",
 ]
@@ -343,14 +348,33 @@ dependencies = [
 
 [[package]]
 name = "candid_derive"
-version = "0.6.1"
+version = "0.6.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "041ce1020740a400035899b2909a6f4f275b79c8db502cbd59ace9b2cc88af58"
+checksum = "3de398570c386726e7a59d9887b68763c481477f9a043fb998a2e09d428df1a9"
 dependencies = [
  "lazy_static",
  "proc-macro2",
  "quote",
- "syn 1.0.109",
+ "syn 2.0.18",
+]
+
+[[package]]
+name = "candid_parser"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "48a3da76f989cd350b7342c64c6c6008341bb6186f6832ef04e56dc50ba0fd76"
+dependencies = [
+ "anyhow",
+ "candid 0.10.6",
+ "codespan-reporting",
+ "convert_case",
+ "hex",
+ "lalrpop 0.20.2",
+ "lalrpop-util 0.20.2",
+ "logos 0.13.0",
+ "num-bigint",
+ "pretty 0.12.3",
+ "thiserror",
 ]
 
 [[package]]
@@ -372,7 +396,7 @@ checksum = "50d30906286121d95be3d479533b458f87493b30a4b5f79a607db8f5d11aa91f"
 [[package]]
 name = "cdk_framework"
 version = "0.0.0"
-source = "git+https://github.com/demergent-labs/cdk_framework?rev=13c4abdd72bdcfa6a5b1ddf7f08a4fd83eacb419#13c4abdd72bdcfa6a5b1ddf7f08a4fd83eacb419"
+source = "git+https://github.com/demergent-labs/cdk_framework?rev=b006618358f455e4a378552cfe821c934eb2fd3d#b006618358f455e4a378552cfe821c934eb2fd3d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -462,24 +486,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "complex_init"
-version = "0.0.0"
+name = "convert_case"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec182b0ca2f35d8fc196cf3404988fd8b8c739a4d270ff118a398feb0cbec1ca"
 dependencies = [
- "async-recursion",
- "candid 0.9.0-beta.4",
- "ic-cdk 0.8.0-beta.0",
- "ic-cdk-macros 0.6.10",
- "ic-cdk-timers",
- "ic-stable-structures",
- "ic-wasi-polyfill",
- "kybra-vm-value-derive",
- "rustpython",
- "rustpython-compiler-core",
- "rustpython-derive",
- "rustpython-stdlib",
- "rustpython-vm",
- "serde",
- "slotmap",
+ "unicode-segmentation",
 ]
 
 [[package]]
@@ -917,20 +929,33 @@ checksum = "9beb0bf1dcd0639c313630e34aa547a2b19450ddf1969c176e13225ef3b29048"
 dependencies = [
  "candid 0.8.4",
  "ic-cdk-macros 0.6.10",
- "ic0",
+ "ic0 0.18.10",
  "serde",
  "serde_bytes",
 ]
 
 [[package]]
 name = "ic-cdk"
-version = "0.8.0-beta.0"
+version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "229a2796b731794363b45ab7b3a8ae28dc4220256997709e52746887425c5135"
+checksum = "9f3d204af0b11c45715169c997858edb58fa8407d08f4fae78a6b415dd39a362"
 dependencies = [
- "candid 0.9.0-beta.4",
- "ic-cdk-macros 0.8.0-beta.0",
- "ic0",
+ "candid 0.10.6",
+ "ic-cdk-macros 0.8.4",
+ "ic0 0.21.1",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
+name = "ic-cdk"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c63a6fceb94127bda86bd6d05f859a0e2a67d128a8ffb5ddab17e1f15ac8f555"
+dependencies = [
+ "candid 0.10.6",
+ "ic-cdk-macros 0.9.0",
+ "ic0 0.21.1",
  "serde",
  "serde_bytes",
 ]
@@ -951,11 +976,25 @@ dependencies = [
 
 [[package]]
 name = "ic-cdk-macros"
-version = "0.8.0-beta.0"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a8ed566a9a45e97f8dd7eed3db58c95875272dbf053f0d94a965319cbffdb9e0"
+checksum = "a5a618e4020cea88e933d8d2f8c7f86d570ec06213506a80d4f2c520a9bba512"
 dependencies = [
- "candid 0.9.0-beta.4",
+ "candid 0.10.6",
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_tokenstream",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "ic-cdk-macros"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2fde5ca6ef1e69825c68916ff1bf7256b8f7ed69ac5ea3f1756f6e57f1503e27"
+dependencies = [
+ "candid 0.10.6",
  "proc-macro2",
  "quote",
  "serde",
@@ -965,13 +1004,13 @@ dependencies = [
 
 [[package]]
 name = "ic-cdk-timers"
-version = "0.1.2"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c739e7c592cb66df4f15c6b6c4859b1195782f63923e2fb1b29553d9c0819bd4"
+checksum = "054727a3a1c486528b96349817d54290ff70df6addf417def456ea708a16f7fb"
 dependencies = [
  "futures",
- "ic-cdk 0.7.4",
- "ic0",
+ "ic-cdk 0.13.1",
+ "ic0 0.21.1",
  "serde",
  "serde_bytes",
  "slotmap",
@@ -984,13 +1023,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4e026318236de13568edafd85534ad29910908bf08cdcf177d4403fd4a5f6c4"
 
 [[package]]
+name = "ic-stable-structures"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a314297eb9edb4bbcc2e04d2e634e38d5900b68eadae661e927946d1aba3f9f7"
+dependencies = [
+ "ic_principal",
+]
+
+[[package]]
 name = "ic-wasi-polyfill"
-version = "0.3.9"
-source = "git+https://github.com/demergent-labs/ic-wasi-polyfill?rev=9b039919427ccd76bf452f012bdbfe3695e549a6#9b039919427ccd76bf452f012bdbfe3695e549a6"
+version = "0.3.14"
+source = "git+https://github.com/wasm-forge/ic-wasi-polyfill?rev=2d2edb382816e12da9bc81b786b7cd1a00d36735#2d2edb382816e12da9bc81b786b7cd1a00d36735"
 dependencies = [
  "function_name",
- "ic-cdk 0.8.0-beta.0",
- "ic-stable-structures",
+ "ic-cdk 0.12.1",
+ "ic-stable-structures 0.6.3",
  "rand",
  "stable-fs",
 ]
@@ -1000,6 +1048,26 @@ name = "ic0"
 version = "0.18.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "187fa0cecf46628330b7a390a1a65fb0637ea00d3a1121aa847ecbebc0f3ff79"
+
+[[package]]
+name = "ic0"
+version = "0.21.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a54b5297861c651551676e8c43df805dad175cc33bc97dbd992edbbb85dcbcdf"
+
+[[package]]
+name = "ic_principal"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1762deb6f7c8d8c2bdee4b6c5a47b60195b74e9b5280faa5ba29692f8e17429c"
+dependencies = [
+ "arbitrary",
+ "crc32fast",
+ "data-encoding",
+ "serde",
+ "sha2",
+ "thiserror",
+]
 
 [[package]]
 name = "indexmap"
@@ -1057,6 +1125,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "keccak"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1086,8 +1163,8 @@ dependencies = [
  "diff",
  "ena",
  "is-terminal",
- "itertools",
- "lalrpop-util",
+ "itertools 0.10.5",
+ "lalrpop-util 0.19.12",
  "petgraph",
  "regex",
  "regex-syntax 0.6.29",
@@ -1098,12 +1175,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "lalrpop"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "55cb077ad656299f160924eb2912aa147d7339ea7d69e1b5517326fdcec3c1ca"
+dependencies = [
+ "ascii-canvas",
+ "bit-set",
+ "ena",
+ "itertools 0.11.0",
+ "lalrpop-util 0.20.2",
+ "petgraph",
+ "pico-args",
+ "regex",
+ "regex-syntax 0.8.3",
+ "string_cache",
+ "term",
+ "tiny-keccak",
+ "unicode-xid",
+ "walkdir",
+]
+
+[[package]]
 name = "lalrpop-util"
 version = "0.19.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3c48237b9604c5a4702de6b824e02006c3214327564636aef27c1028a8fa0ed"
 dependencies = [
  "regex",
+]
+
+[[package]]
+name = "lalrpop-util"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "507460a910eb7b32ee961886ff48539633b788a36b65692b95f225b844c82553"
+dependencies = [
+ "regex-automata 0.4.6",
 ]
 
 [[package]]
@@ -1193,7 +1301,30 @@ version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bf8b031682c67a8e3d5446840f9573eb7fe26efe7ec8d195c9ac4c0647c502f1"
 dependencies = [
- "logos-derive",
+ "logos-derive 0.12.1",
+]
+
+[[package]]
+name = "logos"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c000ca4d908ff18ac99b93a062cb8958d331c3220719c52e77cb19cc6ac5d2c1"
+dependencies = [
+ "logos-derive 0.13.0",
+]
+
+[[package]]
+name = "logos-codegen"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc487311295e0002e452025d6b580b77bb17286de87b57138f3b5db711cded68"
+dependencies = [
+ "beef",
+ "fnv",
+ "proc-macro2",
+ "quote",
+ "regex-syntax 0.6.29",
+ "syn 2.0.18",
 ]
 
 [[package]]
@@ -1208,6 +1339,15 @@ dependencies = [
  "quote",
  "regex-syntax 0.6.29",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "logos-derive"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dbfc0d229f1f42d790440136d941afd806bc9e949e2bcb8faa813b0f00d1267e"
+dependencies = [
+ "logos-codegen",
 ]
 
 [[package]]
@@ -1252,9 +1392,9 @@ dependencies = [
 
 [[package]]
 name = "memchr"
-version = "2.5.0"
+version = "2.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
+checksum = "6c8640c5d730cb13ebd907d8d04b52f55ac9a2eec55b440c8892f40d56c76c1d"
 
 [[package]]
 name = "memmap2"
@@ -1534,6 +1674,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "pico-args"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5be167a7af36ee22fe3115051bc51f6e6c7054c9348e28deb4f49bd6f705a315"
+
+[[package]]
 name = "pin-project-lite"
 version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1569,6 +1715,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 
 [[package]]
+name = "pre_and_post_upgrade"
+version = "0.0.0"
+dependencies = [
+ "async-recursion",
+ "candid 0.10.6",
+ "candid_parser",
+ "ic-cdk 0.13.1",
+ "ic-cdk-macros 0.9.0",
+ "ic-cdk-timers",
+ "ic-stable-structures 0.5.4",
+ "ic-wasi-polyfill",
+ "kybra-vm-value-derive",
+ "rustpython",
+ "rustpython-compiler-core",
+ "rustpython-derive",
+ "rustpython-stdlib",
+ "rustpython-vm",
+ "serde",
+ "slotmap",
+]
+
+[[package]]
 name = "precomputed-hash"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1582,6 +1750,17 @@ checksum = "ad9940b913ee56ddd94aec2d3cd179dd47068236f42a1a6415ccf9d880ce2a61"
 dependencies = [
  "arrayvec",
  "typed-arena",
+]
+
+[[package]]
+name = "pretty"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b55c4d17d994b637e2f4daf6e5dc5d660d209d5642377d675d7a1c3ab69fa579"
+dependencies = [
+ "arrayvec",
+ "typed-arena",
+ "unicode-width",
 ]
 
 [[package]]
@@ -1720,6 +1899,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c230d73fb8d8c1b9c0b3135c5142a8acee3a0558fb8db5cf1cb65f8d7862132"
 
 [[package]]
+name = "regex-automata"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "86b83b8b9847f9bf95ef68afb0b8e6cdb80f498442f5179a29fad448fcc1eaea"
+dependencies = [
+ "aho-corasick",
+ "memchr",
+ "regex-syntax 0.8.3",
+]
+
+[[package]]
 name = "regex-syntax"
 version = "0.6.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1730,6 +1920,12 @@ name = "regex-syntax"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "436b050e76ed2903236f032a59761c1eb99e1b0aead2c257922771dab1fc8c78"
+
+[[package]]
+name = "regex-syntax"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "adad44e29e4c806119491a7f06f03de4d1af22c3a680dd47f1e6e179439d1f56"
 
 [[package]]
 name = "result-like"
@@ -1820,7 +2016,7 @@ dependencies = [
  "ahash",
  "bitflags 1.3.2",
  "indexmap",
- "itertools",
+ "itertools 0.10.5",
  "log",
  "num-complex",
  "num-traits",
@@ -1838,7 +2034,7 @@ dependencies = [
  "bstr",
  "cfg-if",
  "hexf-parse",
- "itertools",
+ "itertools 0.10.5",
  "lexical-parse-float",
  "libc",
  "lock_api",
@@ -1871,7 +2067,7 @@ source = "git+https://github.com/demergent-labs/RustPython?rev=b7b0a4994d7871bf1
 dependencies = [
  "bitflags 1.3.2",
  "bstr",
- "itertools",
+ "itertools 0.10.5",
  "lz4_flex",
  "num-bigint",
  "num-complex",
@@ -1893,7 +2089,7 @@ version = "0.2.0"
 source = "git+https://github.com/demergent-labs/RustPython?rev=b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874#b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874"
 dependencies = [
  "indexmap",
- "itertools",
+ "itertools 0.10.5",
  "maplit",
  "once_cell",
  "proc-macro2",
@@ -1920,9 +2116,9 @@ source = "git+https://github.com/demergent-labs/RustPython?rev=b7b0a4994d7871bf1
 dependencies = [
  "ahash",
  "anyhow",
- "itertools",
- "lalrpop",
- "lalrpop-util",
+ "itertools 0.10.5",
+ "lalrpop 0.19.12",
+ "lalrpop-util 0.19.12",
  "log",
  "num-bigint",
  "num-traits",
@@ -1967,7 +2163,7 @@ dependencies = [
  "flate2",
  "gethostname",
  "hex",
- "itertools",
+ "itertools 0.10.5",
  "libc",
  "libsqlite3-sys",
  "mac_address",
@@ -2036,7 +2232,7 @@ dependencies = [
  "ic-cdk 0.7.4",
  "indexmap",
  "is-macro",
- "itertools",
+ "itertools 0.10.5",
  "libc",
  "log",
  "memchr",
@@ -2113,6 +2309,15 @@ dependencies = [
  "unicode-width",
  "utf8parse",
  "winapi",
+]
+
+[[package]]
+name = "same-file"
+version = "1.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
+dependencies = [
+ "winapi-util",
 ]
 
 [[package]]
@@ -2261,13 +2466,14 @@ dependencies = [
 
 [[package]]
 name = "stable-fs"
-version = "0.1.8"
-source = "git+https://github.com/demergent-labs/stable-fs?rev=f85a7919c7468552ec6aa123f80634ebf168093c#f85a7919c7468552ec6aa123f80634ebf168093c"
+version = "0.1.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "85e88946666828308003420895ebdca375b0aa8e9b06503cb366aedb4cc0020a"
 dependencies = [
  "bitflags 2.3.2",
  "ciborium",
- "ic-cdk 0.8.0-beta.0",
- "ic-stable-structures",
+ "ic-cdk 0.12.1",
+ "ic-stable-structures 0.6.3",
  "serde",
  "serde_bytes",
 ]
@@ -2777,6 +2983,16 @@ name = "volatile"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8e76fae08f03f96e166d2dfda232190638c10e0383841252416f9cfe2ae60e6"
+
+[[package]]
+name = "walkdir"
+version = "2.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b"
+dependencies = [
+ "same-file",
+ "winapi-util",
+]
 
 [[package]]
 name = "wasi"

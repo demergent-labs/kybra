@@ -114,10 +114,19 @@ Create the following in `kybra_hello_world/dfx.json`:
         "kybra_hello_world": {
             "type": "custom",
             "build": "python -m kybra kybra_hello_world src/main.py src/main.did",
-            "post_install": ".kybra/kybra_hello_world/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/kybra_hello_world/kybra_hello_world.wasm",
-            "gzip": true
+            "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ]
         }
     }
 }
@@ -145,16 +154,7 @@ Then deploy the canister:
 dfx deploy
 ```
 
-If you are asked for a password, you'll need to create a new unencrypted dfx identity:
-
-```bash
-dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
-
-dfx deploy
-```
-
-This is not ideal for security, but Kybra currently [does not support encrypted dfx identities](./caveats.md#no-encrypted-dfx-identities).
+If you have problems deploying see [Common deployment issues](./deployment.md#common-deployment-issues).
 
 ## Interacting with your canister from the command line
 

@@ -8,13 +8,13 @@ quote = "1.0.21"
 syn = "1.0.99"
 proc-macro2 = "1.0.43"
 regex = "1.7.0"
-rustpython-parser = { git = "https://github.com/demergent-labs/RustPython", branch = "kybra_initial", default-features = false, features = [] }
+rustpython-parser = { git = "https://github.com/demergent-labs/RustPython", branch = "kybra_initial", default-features = false, features = [
+] }
 annotate-snippets = "0.9.1"
 num-bigint = "0.4.3"
 backtrace = "0.3.67" # The package isn't strickly neccesary. std::backtrace::Backtrace might be able to do what we need, but it isn't clonable and backtrace::Backtrace is, so we are using to avoid adding a buch of lifetime code
 # rustpython = { path = "../../../../RustPython", default-features = false, features = [] }
-cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "b006618358f455e4a378552cfe821c934eb2fd3d" }
+cdk_framework = { git = "https://github.com/demergent-labs/cdk_framework", rev = "86b5acf42f2eba83728328b64112f446a3f8f4cb" }
 # cdk_framework = { path = "/home/cdk_framework" }
 # For local rust-analyzer uncomment this line and comment out the line above.
 # Update path/to/local to be the path to your local cdk_framework repo
-shared_utils = { path = "../shared_utils" }

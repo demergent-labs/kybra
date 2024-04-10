@@ -5,20 +5,17 @@ type CallbackStrategy = record {
 type HttpRequest = record {
   url : text;
   method : text;
-  body : vec nat8;
+  body : blob;
   headers : vec record { text; text };
 };
 type HttpResponse = record {
-  body : vec nat8;
+  body : blob;
   headers : vec record { text; text };
   upgrade : opt bool;
   streaming_strategy : opt StreamingStrategy;
   status_code : nat16;
 };
-type StreamingCallbackHttpResponse = record {
-  token : opt Token;
-  body : vec nat8;
-};
+type StreamingCallbackHttpResponse = record { token : opt Token; body : blob };
 type StreamingStrategy = variant { Callback : CallbackStrategy };
 type Token = record { arbitrary_data : text };
 service : () -> {

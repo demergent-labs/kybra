@@ -76,14 +76,7 @@ To deploy an individual canister:
 dfx deploy canister_name
 ```
 
-If you are asked for a password, you'll need to create a new unencrypted dfx identity:
-
-```bash
-dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
-
-dfx deploy
-```
+If you have problems deploying see [Common deployment issues](./deployment.md#common-deployment-issues).
 
 ## Interacting with your canister
 
@@ -160,11 +153,13 @@ To deploy an individual canister:
 dfx deploy --network ic canister_name
 ```
 
-If you are asked for a password, you'll need to create a new unencrypted dfx identity:
+If you have problems deploying see [Common deployment issues](./deployment.md#common-deployment-issues).
 
-```bash
-dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
+## Common deployment issues
 
-dfx deploy --network ic
-```
+If you run into an error during deployment, try the following:
+
+1. Ensure that you have followed the instructions correctly in [the installation chapter](./installation.md), especially noting [the common installation issues](./installation.md#common-installation-issues)
+2. Look for more error output by adding the `--verbose` flag to the `build` command in your `dfx.json` file like so: `"build": "python -m kybra canister_name src/main.py src/main.did --verbose`
+3. Look for errors in each of the files in `~/.config/kybra/[kybra_version]/logs`
+4. If the problem is still not resolved, reach out with any error outputs in [the Discord channel](https://discord.gg/ux2Jc7psjd)

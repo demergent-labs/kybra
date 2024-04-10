@@ -1,1 +1,1 @@
-service : () -> { get_initialized : () -> (vec nat8) query }
+service : () -> { get_initialized : () -> (blob) query }

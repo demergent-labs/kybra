@@ -40,7 +40,7 @@ pub fn generate(services: &Vec<Service>) -> Vec<TokenStream> {
                             args_py_object_refs: Vec<rustpython_vm::PyObjectRef>,
                             vm: &rustpython_vm::VirtualMachine
                         ) -> rustpython_vm::PyResult {
-                            let canister_id_principal: ic_cdk::export::Principal =
+                            let canister_id_principal: candid::Principal =
                                 args_py_object_refs[0].clone().try_from_vm_value(vm)?;
 
                             #(#param_variable_definitions)*

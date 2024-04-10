@@ -2,7 +2,7 @@ type Gas = variant { Elemental; Mixed; Toxic };
 type ManualReply = record { id : text; orbitals : vec Orbital; state : State };
 type ManualReply_1 = record {
   "int" : int;
-  "blob" : vec nat8;
+  "blob" : blob;
   "bool" : bool;
   "text" : text;
   "variant" : Options;
@@ -14,7 +14,7 @@ type State = variant { Gas : Gas; Solid : Solid; Liquid };
 service : () -> {
   manual_query : (text) -> (text) query;
   manual_update : (text) -> (text);
-  query_blob : () -> (vec nat8) query;
+  query_blob : () -> (blob) query;
   query_float32 : () -> (float32) query;
   query_int8 : () -> (int8) query;
   query_nat : () -> (nat) query;
@@ -25,7 +25,7 @@ service : () -> {
   query_variant : () -> (Gas) query;
   query_void : () -> (null) query;
   reply_raw : () -> (ManualReply_1) query;
-  update_blob : () -> (vec nat8);
+  update_blob : () -> (blob);
   update_float32 : () -> (float32);
   update_inline_type : () -> (record { text; text });
   update_int8 : () -> (int8);

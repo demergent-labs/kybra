@@ -163,7 +163,7 @@ jobs:
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               uses: actions/setup-node@v3
               with:
-                  node-version: 18
+                  node-version: 20
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               uses: actions/cache@v3
               with:
@@ -173,9 +173,12 @@ jobs:
               uses: actions/cache@v3
               with:
                   path: ~/.cache/dfinity
-                  key: kybra-dfx-0.14.2
+                  key: kybra-dfx-0.19.0
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
-              run: DFX_VERSION=0.14.2 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)" # Find latest dfx version at https://raw.githubusercontent.com/dfinity/sdk/public-manifest/manifest.json
+              name: Install dfx
+              run: |
+                  DFXVM_INIT_YES=true DFX_VERSION=0.19.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+                  echo "$HOME/.local/share/dfx/bin" >> $GITHUB_PATH
             - if: ${{ needs.release-candidate-deploy.outputs.should_run_tests }}
               working-directory: ${{ matrix.example_directories }}
               run: curl https://pyenv.run | bash

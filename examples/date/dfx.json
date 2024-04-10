@@ -3,10 +3,19 @@
         "date": {
             "type": "custom",
             "build": "python -m kybra date src/main.py src/main.did",
-            "post_install": ".kybra/date/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/date/date.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/date",
                 "node_compatibility": true

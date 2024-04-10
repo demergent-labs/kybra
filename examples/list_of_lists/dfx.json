@@ -3,10 +3,19 @@
         "list_of_lists": {
             "type": "custom",
             "build": "python -m kybra list_of_lists src/main.py src/main.did",
-            "post_install": ".kybra/list_of_lists/post_install.sh",
             "candid": "src/main.did",
             "wasm": ".kybra/list_of_lists/list_of_lists.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/list_of_lists",
                 "node_compatibility": true

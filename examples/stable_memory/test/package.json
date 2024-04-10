@@ -5,10 +5,8 @@
     },
     "devDependencies": {
         "@dfinity/agent": "0.11.1",
+        "azle": "github:demergent-labs/azle",
         "ts-node": "10.7.0",
         "typescript": "4.6.3"
-    },
-    "dependencies": {
-        "azle": "github:demergent-labs/azle"
     }
 }

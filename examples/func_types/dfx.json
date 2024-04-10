@@ -3,10 +3,19 @@
         "func_types": {
             "type": "custom",
             "build": "python -m kybra func_types src/func_types/main.py src/func_types/main.did",
-            "post_install": ".kybra/func_types/post_install.sh",
             "candid": "src/func_types/main.did",
             "wasm": ".kybra/func_types/func_types.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/func_types/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/func_types",
                 "node_compatibility": true
@@ -15,10 +24,19 @@
         "notifiers": {
             "type": "custom",
             "build": "python -m kybra notifiers src/notifiers/main.py src/notifiers/main.did",
-            "post_install": ".kybra/notifiers/post_install.sh",
             "candid": "src/notifiers/main.did",
             "wasm": ".kybra/notifiers/notifiers.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/notifiers/main.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/notifiers",
                 "node_compatibility": true

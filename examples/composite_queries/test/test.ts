@@ -23,6 +23,27 @@ runTests(
             };
         }
 
+        // TODO we can use the Azle test again once we update Azle to dfx 0.19.0
+        // TODO Rejection code was changed from 3 to 5
+        if (test.name === 'update_query test') {
+            return {
+                ...test,
+                test: async () => {
+                    const result = await canister1.update_query();
+
+                    return {
+                        Ok:
+                            'Err' in result &&
+                            result.Err.includes(
+                                `Rejection code 5, Canister ${getCanisterId(
+                                    'canister2'
+                                )} has no query method`
+                            )
+                    };
+                }
+            };
+        }
+
         return test;
     })
 );

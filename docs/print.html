@@ -158,7 +158,7 @@
 <p>The Kybra Book is subject to the following license:</p>
 <pre><code>MIT License
 
-Copyright (c) 2023 Demergent Labs LLC
+Copyright (c) 2024 Demergent Labs LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
@@ -342,7 +342,7 @@ SOFTWARE.
 <p>You should be using a *nix environment (Linux, Mac OS, <a href="https://learn.microsoft.com/en-us/windows/wsl/install">WSL if using Windows</a>) with bash and have the following installed on your system:</p>
 <ul>
 <li>Python 3.10.7</li>
-<li>dfx 0.14.2</li>
+<li>dfx 0.19.0</li>
 <li>Python VS Code Extension</li>
 </ul>
 <h3 id="python-3107"><a class="header" href="#python-3107">Python 3.10.7</a></h3>
@@ -354,8 +354,8 @@ curl https://pyenv.run | bash
 ~/.pyenv/bin/pyenv install 3.10.7
 </code></pre>
 <h3 id="dfx"><a class="header" href="#dfx">dfx</a></h3>
-<p>Run the following command to install dfx 0.14.2:</p>
-<pre><code class="language-bash">DFX_VERSION=0.14.2 sh -ci &quot;$(curl -fsSL https://sdk.dfinity.org/install.sh)&quot;
+<p>Run the following command to install dfx 0.19.0:</p>
+<pre><code class="language-bash">DFX_VERSION=0.19.0 sh -ci &quot;$(curl -fsSL https://sdk.dfinity.org/install.sh)&quot;
 </code></pre>
 <p>If after trying to run <code>dfx</code> commands you encounter an error such as <code>dfx: command not found</code>, you might need to add <code>$HOME/bin</code> to your path. Here's an example of doing this in your <code>.bashrc</code>:</p>
 <pre><code class="language-bash">echo 'export PATH=&quot;$PATH:$HOME/bin&quot;' &gt;&gt; &quot;$HOME/.bashrc&quot;
@@ -470,10 +470,19 @@ def set_message(new_message: str) -&gt; void:
         &quot;kybra_hello_world&quot;: {
             &quot;type&quot;: &quot;custom&quot;,
             &quot;build&quot;: &quot;python -m kybra kybra_hello_world src/main.py src/main.did&quot;,
-            &quot;post_install&quot;: &quot;.kybra/kybra_hello_world/post_install.sh&quot;,
             &quot;candid&quot;: &quot;src/main.did&quot;,
             &quot;wasm&quot;: &quot;.kybra/kybra_hello_world/kybra_hello_world.wasm&quot;,
-            &quot;gzip&quot;: true
+            &quot;gzip&quot;: true,
+            &quot;metadata&quot;: [
+                {
+                    &quot;name&quot;: &quot;candid:service&quot;,
+                    &quot;path&quot;: &quot;src/main.did&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;cdk:name&quot;,
+                    &quot;content&quot;: &quot;kybra&quot;
+                }
+            ]
         }
     }
 }
@@ -489,13 +498,7 @@ def set_message(new_message: str) -&gt; void:
 <p>Then deploy the canister:</p>
 <pre><code class="language-bash">dfx deploy
 </code></pre>
-<p>If you are asked for a password, you'll need to create a new unencrypted dfx identity:</p>
-<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
-
-dfx deploy
-</code></pre>
-<p>This is not ideal for security, but Kybra currently <a href="./caveats.html#no-encrypted-dfx-identities">does not support encrypted dfx identities</a>.</p>
+<p>If you have problems deploying see <a href="./deployment.html#common-deployment-issues">Common deployment issues</a>.</p>
 <h2 id="interacting-with-your-canister-from-the-command-line"><a class="header" href="#interacting-with-your-canister-from-the-command-line">Interacting with your canister from the command line</a></h2>
 <p>Once we've deployed we can ask for our message:</p>
 <pre><code class="language-bash">dfx canister call kybra_hello_world get_message
@@ -560,12 +563,7 @@ sudo kill -9 627260
 <p>To deploy an individual canister:</p>
 <pre><code class="language-bash">dfx deploy canister_name
 </code></pre>
-<p>If you are asked for a password, you'll need to create a new unencrypted dfx identity:</p>
-<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
-
-dfx deploy
-</code></pre>
+<p>If you have problems deploying see <a href="./deployment.html#common-deployment-issues">Common deployment issues</a>.</p>
 <h2 id="interacting-with-your-canister"><a class="header" href="#interacting-with-your-canister">Interacting with your canister</a></h2>
 <p>As a developer you can generally interact with your canister in three ways:</p>
 <ul>
@@ -620,12 +618,15 @@ URLs:
 <p>To deploy an individual canister:</p>
 <pre><code class="language-bash">dfx deploy --network ic canister_name
 </code></pre>
-<p>If you are asked for a password, you'll need to create a new unencrypted dfx identity:</p>
-<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
-
-dfx deploy --network ic
-</code></pre>
+<p>If you have problems deploying see <a href="./deployment.html#common-deployment-issues">Common deployment issues</a>.</p>
+<h2 id="common-deployment-issues"><a class="header" href="#common-deployment-issues">Common deployment issues</a></h2>
+<p>If you run into an error during deployment, try the following:</p>
+<ol>
+<li>Ensure that you have followed the instructions correctly in <a href="./installation.html">the installation chapter</a>, especially noting <a href="./installation.html#common-installation-issues">the common installation issues</a></li>
+<li>Look for more error output by adding the <code>--verbose</code> flag to the <code>build</code> command in your <code>dfx.json</code> file like so: <code>&quot;build&quot;: &quot;python -m kybra canister_name src/main.py src/main.did --verbose</code></li>
+<li>Look for errors in each of the files in <code>~/.config/kybra/[kybra_version]/logs</code></li>
+<li>If the problem is still not resolved, reach out with any error outputs in <a href="https://discord.gg/ux2Jc7psjd">the Discord channel</a></li>
+</ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="examples"><a class="header" href="#examples">Examples</a></h1>
 <p>Kybra has many example projects showing nearly all Kybra APIs. They can be found in the <a href="https://github.com/demergent-labs/kybra/tree/main/examples">examples directory</a> of the <a href="https://github.com/demergent-labs/kybra">Kybra GitHub repository</a>.</p>
 <p>We'll highlight a few of them here:</p>
@@ -652,7 +653,7 @@ dfx deploy --network ic
 <p>View the <a href="https://dashboard.internetcomputer.org/subnets">IC Dashboard</a> to explore all data centers, subnets, node operators, and many other aspects of the IC.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="canisters-overview"><a class="header" href="#canisters-overview">Canisters Overview</a></h1>
 <p>Canisters are <a href="https://internetcomputer.org/">Internet Computer</a> (IC) applications. They are the encapsulation of your code and state, and are essentially Wasm modules.</p>
-<p>State can be stored on the 4 GiB heap or in a larger 64 GiB location called stable memory. You can store state on the heap using your language's native global variables. You can store state in stable memory using low-level APIs or special stable data structures that behave similarly to native language data structures.</p>
+<p>State can be stored on the 4 GiB heap or in a larger 96 GiB location called stable memory. You can store state on the heap using your language's native global variables. You can store state in stable memory using low-level APIs or special stable data structures that behave similarly to native language data structures.</p>
 <p>State changes must go through a process called consensus. The consensus process ensures that state changes are <a href="https://en.wikipedia.org/wiki/Byzantine_fault">Byzantine Fault Tolerant</a>. This process takes a few seconds to complete.</p>
 <p>Operations on canister state are exposed to users through canister methods. These methods can be invoked through HTTP requests. Query methods allow state to be read and are low-latency. Update methods allow state to be changed and are higher-latency. Update methods take a few seconds to complete because of the consensus process.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="query-methods"><a class="header" href="#query-methods">Query Methods</a></h1>
@@ -722,7 +723,7 @@ def pyramid(levels: nat32) -&gt; str:
 <li>Latency ~2-5 seconds</li>
 <li>20 billion Wasm instruction limit</li>
 <li>4 GiB heap limit</li>
-<li>48 GiB stable memory limit</li>
+<li>96 GiB stable memory limit</li>
 <li>~900 updates per second per canister</li>
 </ul>
 <p>Update methods are similar to query methods, but state changes can be persisted. Here's an example of a simple update method:</p>
@@ -772,7 +773,7 @@ def set(key: str, value: str) -&gt; void:
     db[key] = value
 
 </code></pre>
-<p>If you need more than 4 GiB of storage, consider taking advantage of the 48 GiB of stable memory. Stable structures like <code>StableBTreeMap</code> give you a nice API for interacting with stable memory. These data structures will be <a href="./stable_structures.html">covered in more detail later</a>. Here's a simple example:</p>
+<p>If you need more than 4 GiB of storage, consider taking advantage of the 96 GiB of stable memory. Stable structures like <code>StableBTreeMap</code> give you a nice API for interacting with stable memory. These data structures will be <a href="./stable_structures.html">covered in more detail later</a>. Here's a simple example:</p>
 <pre><code class="language-python">from kybra import Opt, query, StableBTreeMap, update, void
 
 db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
@@ -1670,7 +1671,7 @@ def print_empty(empty: empty) -&gt; empty:
 <div style="break-before: page; page-break-before: always;"></div><h1 id="stable-structures"><a class="header" href="#stable-structures">Stable Structures</a></h1>
 <h2 id="tldr-2"><a class="header" href="#tldr-2">TLDR</a></h2>
 <ul>
-<li>48 GiB of stable memory</li>
+<li>96 GiB of stable memory</li>
 <li>Persistent across upgrades</li>
 <li>Familiar API</li>
 <li>Must specify memory id</li>
@@ -1678,7 +1679,7 @@ def print_empty(empty: empty) -&gt; empty:
 <li>Must specify maximum value size</li>
 <li>No migrations per memory id</li>
 </ul>
-<p>Stable structures are data structures with familiar APIs that allow access to stable memory. Stable memory is a separate memory location from the heap that currently allows up to 48 GiB of storage. Stable memory persists automatically across upgrades.</p>
+<p>Stable structures are data structures with familiar APIs that allow access to stable memory. Stable memory is a separate memory location from the heap that currently allows up to 96 GiB of storage. Stable memory persists automatically across upgrades.</p>
 <p>Persistence on the Internet Computer (IC) is very important to understand. When a canister is upgraded (its code is changed after being initially deployed) its heap is wiped. This includes all global variables.</p>
 <p>On the other hand, anything stored in stable memory will be preserved. Writing and reading to and from stable memory can be done with a <a href="./reference/stable_memory/stable_memory.html">low-level API</a>, but it is generally easier and preferable to use stable structures.</p>
 <p>Kybra currently provides one stable structure called <code>StableBTreeMap</code>. It's similar to a Python dictionary or a map that you'd find in most languages, and has most of the common operations you'd expect such as reading, inserting, and removing values.</p>
@@ -1979,7 +1980,7 @@ recordings = StableBTreeMap[Principal, Recording](
 <p>As you can see, finding the correct maximum key and value sizes is a bit of an art right now. Combining some trial and error with reasoning about your specific application should get you a working solution in most cases. It's our hope that the need to specify maximum key and value sizes will be removed in the future.</p>
 <h2 id="caveats"><a class="header" href="#caveats">Caveats</a></h2>
 <h3 id="memory-ids"><a class="header" href="#memory-ids">memory ids</a></h3>
-<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, but <code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved. We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need for it entirely.</p>
+<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, but <code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, and <code>254</code> are currently reserved. We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need for it entirely.</p>
 <h3 id="keys"><a class="header" href="#keys">Keys</a></h3>
 <p>You should be wary when using <code>float64</code>, <code>float32</code>, <code>service</code>, or <code>func</code> in any type that is a key for a stable structure. These types do not have the ability to be strictly ordered in all cases. <code>service</code> and <code>func</code> will have no order. <code>float64</code> and <code>float32</code> will treat <code>NaN</code> as less than any other type. These caveats may impact key performance.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="cross-canister"><a class="header" href="#cross-canister">Cross-canister</a></h1>
@@ -2434,6 +2435,7 @@ def random_bytes() -&gt; Async[RandomBytesResult]:
     )
 </code></pre>
 <p>See the <a href="https://github.com/demergent-labs/kybra/blob/main/kybra/canisters/management/__init__.py">management canister types</a> for all methods and their parameter and return types.</p>
+<p>See the <a href="./reference/management_canister/management_canister.html">management canister reference section</a> for more information.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="canister-lifecycle"><a class="header" href="#canister-lifecycle">Canister Lifecycle</a></h1>
 <p>This chapter is a work in progress.</p>
 <pre><code class="language-python">from kybra import ic, init, post_upgrade, pre_upgrade, void
@@ -2453,13 +2455,6 @@ def pre_upgrade_() -&gt; void:
 def post_upgrade_() -&gt; void:
     ic.print(&quot;runs after canister upgrade&quot;)
 </code></pre>
-<h2 id="caveats-1"><a class="header" href="#caveats-1">Caveats</a></h2>
-<h3 id="params"><a class="header" href="#params">params</a></h3>
-<p>Keep in mind <a href="./caveats.html#init-and-post_upgrade-params">this caveat</a> when working with <code>init</code> or <code>post_upgrade</code> params.</p>
-<h3 id="iccaller"><a class="header" href="#iccaller">ic.caller()</a></h3>
-<p>Usually <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the principal of your local dfx identity. In Kybra canisters <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the canister's own principal.</p>
-<h3 id="guard-functions"><a class="header" href="#guard-functions">guard functions</a></h3>
-<p><code>init</code> and <code>post_upgrade</code> cannot have guard functions applied to them.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="timers"><a class="header" href="#timers">Timers</a></h1>
 <p>This chapter is a work in progress.</p>
 <pre><code class="language-python">from kybra import (
@@ -2599,62 +2594,24 @@ def repeat_cross_canister_timer_callback() -&gt; Async[void]:
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="cycles"><a class="header" href="#cycles">Cycles</a></h1>
 <p>This chapter is a work in progress.</p>
-<p>Cycles are essentially units of computational resources such as bandwidth, memory, and CPU instructions. Costs are generally metered on the Internet Computer (IC) by cycles. You can see a breakdown of all cycle costs here: https://internetcomputer.org/docs/current/developer-docs/production/computation-and-storage-costs</p>
+<p>Cycles are essentially units of computational resources such as bandwidth, memory, and CPU instructions. Costs are generally metered on the Internet Computer (IC) by cycles. You can see a breakdown of all cycle costs <a href="https://internetcomputer.org/docs/current/developer-docs/gas-cost">here</a>.</p>
 <p>Currently queries do not have any cycle costs.</p>
 <p>Most important to you will probably be update costs.</p>
 <p>TODO break down some cycle scenarios maybe? Perhaps we should show some of our analyses for different types of applications. Maybe show how to send and receive cycles, exactly how to do it.</p>
 <p>Show all of the APIs for sending or receiving cycles?</p>
 <p>Perhaps we don't need to do that here, since each API will show this information.</p>
 <p>Maybe here we just show the basic concept of cycles, link to the main cycles cost page, and show a few examples of how to break down these costs or estimate these costs.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="caveats-2"><a class="header" href="#caveats-2">Caveats</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="caveats-1"><a class="header" href="#caveats-1">Caveats</a></h1>
 <h2 id="unknown-security-vulnerabilities"><a class="header" href="#unknown-security-vulnerabilities">Unknown security vulnerabilities</a></h2>
 <p>Kybra is a beta project using a new Python interpreter. See the <a href="./kybra.html#disclaimer">disclaimer</a> for more information.</p>
-<h2 id="cdk-metadata"><a class="header" href="#cdk-metadata">cdk metadata</a></h2>
-<ul>
-<li>All Kybra canisters have a public metadata key-value pair named <code>cdk</code> which contains the version of Kybra the canister is using
-<ul>
-<li>Anyone can query this metadata which may be a security risk</li>
-</ul>
-</li>
-</ul>
 <h2 id="no-c-extensions"><a class="header" href="#no-c-extensions">No C extensions</a></h2>
 <p>Any PyPI packages or other Python code that relies on C extensions will not currently work. It is a major goal for us to support C extensions in the future.</p>
 <h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
 <p>Kybra is probably ~7-20x less performant than what you would expect from <a href="https://github.com/python/cpython">CPython</a>. We hope to eventually use <code>CPython</code> as Kybra's underlying Python interpreter.</p>
-<h2 id="init-and-post_upgrade"><a class="header" href="#init-and-post_upgrade">init and post_upgrade</a></h2>
-<h3 id="under-the-hood-nuances"><a class="header" href="#under-the-hood-nuances">under-the-hood nuances</a></h3>
-<p>In order to allow for larger Kybra Wasm modules and to enable the Python stdlib, we had to introduce some trade-offs into the <code>init</code> and <code>post_upgrade</code> processes:</p>
-<ol>
-<li>The under-the-hood Rust <code>init</code> function of your application canister is never called directly, only the <code>post_upgrade</code> function. This function will call your Python <code>init</code> or <code>post_upgrade</code> function in a timer callback</li>
-<li>When deploying to a local replica, errors from your <code>init</code> or <code>post_upgrade</code> will be logged from your replica, not from the <code>dfx deploy</code> process</li>
-<li>When deploying to mainnet, errors from your <code>init</code> or <code>post_upgrade</code> will not be logged</li>
-<li>Your canister will go through the following main steps when deploying: first a deployer canister Wasm binary will be deployed to the canister, then your application Wasm binary will be chunk uploaded to the deployer canister along with the Python stdlib, and finally the deployer canister will call <code>install_code</code> on itself with the full application Wasm binary</li>
-</ol>
-<h3 id="params-1"><a class="header" href="#params-1">params</a></h3>
-<p>If you add parameters to your <code>init</code> or <code>post_upgrade</code> methods, you will need to manually add these parameters to the service in your Candid file for the first deploy to succeed. Any time you change these parameters, you will need to manually add these changes into your Candid file.</p>
-<p>It is also recommended to start clean (<code>dfx start --clean</code>) when first deploying after changing these parameters.</p>
-<p>Here's an example of a basic Candid file with parameters <code>text</code>, <code>bool</code>, and <code>int32</code>:</p>
-<pre><code>service : (text, bool, int32) -&gt; {}
-</code></pre>
-<h3 id="guard-functions-1"><a class="header" href="#guard-functions-1">guard functions</a></h3>
-<p><code>init</code> and <code>post_upgrade</code> cannot have guard functions applied to them.</p>
-<h2 id="no-encrypted-dfx-identities"><a class="header" href="#no-encrypted-dfx-identities">No encrypted dfx identities</a></h2>
-<p>Kybra currently does not support encrypted identities. If you are asked for a password during <code>dfx deploy</code>, you'll need to create a new unencrypted dfx identity:</p>
-<pre><code class="language-bash">dfx identity new test_unencrypted --storage-mode plaintext
-dfx identity use test_unencrypted
-
-dfx deploy
-</code></pre>
-<h2 id="no-candidservice-metadata"><a class="header" href="#no-candidservice-metadata">No candid:service metadata</a></h2>
-<p>Kybra does not put the Candid metadata into <code>candid:service</code> automatically. Currently if you want to retrieve the Candid from the canister you can call the <code>__get_candid_interface_tmp_hack</code> method.</p>
-<h2 id="wasm-module-hash-now-less-useful"><a class="header" href="#wasm-module-hash-now-less-useful">Wasm module hash now less useful</a></h2>
-<p>Due to protocol and tooling limitations, Kybra must dynamically upload your application's Python bytecode and the Python stdlib bytecode. This means that the Wasm module hash is not computed from all of your application's source code. Thus the Wasm module hash retrieved from the IC should not be relied upon for security assumptions.</p>
-<h2 id="iccaller-in-init-and-post_upgrade"><a class="header" href="#iccaller-in-init-and-post_upgrade">ic.caller() in init and post_upgrade</a></h2>
-<p>Usually <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the principal of your local dfx identity. Keep in mind that in Kybra canisters <code>ic.caller()</code> if called from <code>init</code> or <code>post_upgrade</code> is the canister's own principal.</p>
 <h2 id="do-not-use-dictionary-unpacking"><a class="header" href="#do-not-use-dictionary-unpacking">Do not use dictionary unpacking</a></h2>
 <p>A bug in the <a href="https://github.com/RustPython/RustPython">RustPython</a> interpreter means that dictionary unpacking should not be used until <a href="https://github.com/RustPython/RustPython/issues/4932">this issue</a> is addressed.</p>
 <h2 id="reserved-memory-ids"><a class="header" href="#reserved-memory-ids">Reserved memory ids</a></h2>
-<p><code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved for <code>StableBTreeMap</code>.</p>
+<p><code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, and <code>254</code> are currently reserved for <code>StableBTreeMap</code>.</p>
 <h2 id="print-does-not-work"><a class="header" href="#print-does-not-work">print does not work</a></h2>
 <p>You should use <code>ic.print</code> instead of <code>print</code>.</p>
 <h2 id="kybra-types"><a class="header" href="#kybra-types">Kybra types</a></h2>
@@ -4480,8 +4437,8 @@ def set_message(new_message: str) -&gt; void:
     global message
     message = new_message
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="guard-functions-2"><a class="header" href="#guard-functions-2">Guard Functions</a></h1>
-<p>Guard functions allow you to protect your <code>query</code>, <code>update</code>, <code>heartbeat</code>, <code>pre_upgrade</code>, and <code>inspect_message</code> methods.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="guard-functions"><a class="header" href="#guard-functions">Guard Functions</a></h1>
+<p>Guard functions allow you to protect your <code>query</code> and <code>update</code> methods.</p>
 <p>Guard functions return a <code>GuardResult</code> that looks like this:</p>
 <pre><code class="language-python">class GuardResult(Variant, total=False):
     Ok: null

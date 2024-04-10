@@ -3,10 +3,19 @@
         "complex_types": {
             "type": "custom",
             "build": "python -m kybra complex_types src/complex_types.py src/complex_types.did",
-            "post_install": ".kybra/complex_types/post_install.sh",
             "candid": "src/complex_types.did",
             "wasm": ".kybra/complex_types/complex_types.wasm",
             "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service",
+                    "path": "src/complex_types.did"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
             "declarations": {
                 "output": "test/dfx_generated/complex_types",
                 "node_compatibility": true
