@@ -67,7 +67,6 @@ runTests([
     },
     {
         name: 'stable bytes',
-        skip: true, // TODO I believe this test now hits the cycle limit because we store a value at memory id 254 to distinguish between init/post_upgrade
         test: async () => {
             // TODO this test used to check that the entire stable memory was empty
             // TODO but with the stable filesystem we use with ic-wasi-polyfill
