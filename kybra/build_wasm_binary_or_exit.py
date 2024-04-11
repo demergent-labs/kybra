@@ -1,9 +1,7 @@
-import os
 import shutil
 import subprocess
 import sys
 
-import kybra
 from kybra.colors import red
 from kybra.timed import timed_inline
 from kybra.types import Paths
@@ -13,16 +11,14 @@ from kybra.types import Paths
 def build_wasm_binary_or_exit(
     paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
 ):
-    copy_python_stdlib_to_dev_location(paths, cargo_env, verbose)
+    compile_python_stdlib(paths, cargo_env, verbose)
     compile_generated_rust_code(paths, canister_name, cargo_env, verbose)
     copy_wasm_to_dev_location(paths, canister_name)
     run_wasi2ic_on_wasm(paths, canister_name, cargo_env, verbose)
     generate_and_create_candid_file(paths, canister_name, cargo_env, verbose)
 
 
-def copy_python_stdlib_to_dev_location(
-    paths: Paths, cargo_env: dict[str, str], verbose: bool
-):
+def compile_python_stdlib(paths: Paths, cargo_env: dict[str, str], verbose: bool):
     shutil.copytree(
         f"{paths['global_kybra_version_dir']}/RustPython/Lib",
         f"{paths['canister']}/Lib",
@@ -44,55 +40,6 @@ def copy_python_stdlib_to_dev_location(
 def compile_generated_rust_code(
     paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool
 ):
-    python_stdlib_is_installed = check_if_python_stdlib_installed(
-        canister_name, cargo_env, verbose
-    )
-    features = get_cargo_build_features(python_stdlib_is_installed)
-    run_cargo_build(paths, canister_name, features, cargo_env, verbose)
-
-
-def check_if_python_stdlib_installed(
-    canister_name: str, cargo_env: dict[str, str], verbose: bool
-) -> bool:
-    check_if_python_stdlib_installed_result = run_subprocess(
-        [
-            "dfx",
-            "canister",
-            "--network",
-            str(os.environ.get("DFX_NETWORK")),
-            "call",
-            "--output",
-            "json",
-            canister_name,
-            "_kybra_check_if_python_stdlib_installed",
-            f'("{kybra.__version__}")',
-        ],
-        cargo_env,
-        False,  # Passing verbose along as True messes with the std outputs
-        False,
-    )
-
-    check_if_python_stdlib_installed = (
-        check_if_python_stdlib_installed_result.decode().strip()
-    )
-
-    if verbose == True:
-        print(check_if_python_stdlib_installed)
-
-    return check_if_python_stdlib_installed == "true"
-
-
-def get_cargo_build_features(python_stdlib_is_installed: bool) -> str:
-    return "" if python_stdlib_is_installed else "--features=azle_include_stdlib"
-
-
-def run_cargo_build(
-    paths: Paths,
-    canister_name: str,
-    features: str,
-    cargo_env: dict[str, str],
-    verbose: bool,
-):
     run_subprocess(
         [
             f"{paths['global_kybra_rust_bin_dir']}/cargo",
@@ -101,7 +48,6 @@ def run_cargo_build(
             "--target=wasm32-wasi",
             f"--package={canister_name}",
             "--release",
-            *([features] if features != "" else []),
         ],
         cargo_env,
         verbose,

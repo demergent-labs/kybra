@@ -16,7 +16,6 @@ fn main() {
     let py_file_names_path = &args[1];
     let py_entry_module_name = &args[2];
     let output_file_path = &args[3];
-    let kybra_version = &args[4];
 
     let py_file_names_string = fs::read_to_string(py_file_names_path).unwrap_or_else(|err| {
         eprintln!("Error reading {py_file_names_path}: {err}");
@@ -24,7 +23,7 @@ fn main() {
     });
     let py_file_names: Vec<&str> = py_file_names_string.split(",").collect();
 
-    let lib_file = generate_canister(&py_file_names, py_entry_module_name, kybra_version)
+    let lib_file = generate_canister(&py_file_names, py_entry_module_name)
         .unwrap_or_else(|errors| {
             eprintln!("Canister compilation failed:");
             for error in errors {
