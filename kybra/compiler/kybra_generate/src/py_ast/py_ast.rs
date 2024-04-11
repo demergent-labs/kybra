@@ -9,10 +9,15 @@ use crate::source_map::{SourceMap, SourceMapped};
 pub struct PyAst {
     pub source_mapped_mods: Vec<SourceMapped<Mod>>,
     pub entry_module_name: String,
+    pub kybra_version: String,
 }
 
 impl PyAst {
-    pub fn new(py_file_names: &Vec<&str>, entry_module_name: &str) -> Result<PyAst, Vec<Error>> {
+    pub fn new(
+        py_file_names: &Vec<&str>,
+        entry_module_name: &str,
+        kybra_version: &str,
+    ) -> Result<PyAst, Vec<Error>> {
         // TODO: Use collect_results from CDK Framework instead once
         // https://github.com/demergent-labs/cdk_framework/pull/75 is merged.
         let (source_mapped_mods, errors) = py_file_names
@@ -38,6 +43,7 @@ impl PyAst {
             return Ok(PyAst {
                 source_mapped_mods,
                 entry_module_name: entry_module_name.to_string(),
+                kybra_version: kybra_version.to_string(),
             });
         }
 
