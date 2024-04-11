@@ -58,7 +58,7 @@ def main():
         os.makedirs(paths["global_kybra_bin_dir"])
 
     compile_python_or_exit(
-        paths, cargo_env, verbose=is_verbose, label="[1/3] 🔨 Compiling Python..."
+        paths, cargo_env, verbose=is_verbose, label="[1/2] 🔨 Compiling Python..."
     )
 
     build_wasm_binary_or_exit(
@@ -66,7 +66,7 @@ def main():
         canister_name,
         cargo_env,
         verbose=is_verbose,
-        label=f"[2/3] 🚧 Building Wasm binary...",
+        label=f"[2/2] 🚧 Building Wasm binary...",
     )
 
     print(f"\n🎉 Built canister {green(canister_name)} at {dim(paths['wasm'])}")
