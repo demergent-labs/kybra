@@ -50,7 +50,7 @@ NullFunc = Func(
 notifiers_principal = Principal.from_str("aaaaa-aa")
 
 stable_storage = StableBTreeMap[str, StableFunc](
-    memory_id=3, max_key_size=25, max_value_size=1_000
+    memory_id=0, max_key_size=25, max_value_size=1_000
 )
 
 

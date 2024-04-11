@@ -23,14 +23,14 @@ Here's how to define a simple `StableBTreeMap`. Each `StableBTreeMap` must be de
 ```python
 from kybra import nat8, StableBTreeMap
 
-map = StableBTreeMap[nat8, str](memory_id=3, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_000)
 ```
 
 This is a `StableBTreeMap` with a key of type `nat8` and a value of type `str`. Key and value types can be any [Candid type](./candid.md).
 
-This `StableBTreeMap` also has a `memory id` of `3`, a maximum key size of `100` bytes and a maximum value size of `1_000` bytes. You must statically specify the `memory id`, maximum key size, and maximum value sizes (they cannot be variables).
+This `StableBTreeMap` also has a `memory id` of `0`, a maximum key size of `100` bytes and a maximum value size of `1_000` bytes. You must statically specify the `memory id`, maximum key size, and maximum value sizes (they cannot be variables).
 
-The `memory id` can be a number between `0` and `254`, but `memory ids` `0`, `1`, `2`, `252`, `253`, and `254` are currently reserved. We hope to reduce the complexity around `memory id` in the future, and perhaps remove the need to specify it entirely.
+The `memory id` can be a number between `0` and `254`, We hope to reduce the complexity around `memory id` in the future, and perhaps remove the need to specify it entirely.
 
 Each `StableBTreeMap` instance must have a unique `memory id`. Once a `memory id` is allocated, it cannot be used with a different `StableBTreeMap`. This means you can't create another `StableBTreeMap` using the same `memory id`, and you can't change the key or value types of an existing `StableBTreeMap`. [This problem will be addressed](https://github.com/demergent-labs/kybra/issues/215).
 
@@ -53,7 +53,7 @@ Key = Alias[nat8]
 Value = Alias[str]
 
 
-map = StableBTreeMap[Key, Value](memory_id=3, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
 
 
 @query
@@ -137,10 +137,10 @@ class Recording(Record):
 
 
 users = StableBTreeMap[Principal, User](
-    memory_id=3, max_key_size=38, max_value_size=100_000
+    memory_id=0, max_key_size=38, max_value_size=100_000
 )
 recordings = StableBTreeMap[Principal, Recording](
-    memory_id=4, max_key_size=38, max_value_size=5_000_000
+    memory_id=1, max_key_size=38, max_value_size=5_000_000
 )
 
 
@@ -315,10 +315,10 @@ class Recording(Record):
 
 
 users = StableBTreeMap[Principal, User](
-    memory_id=3, max_key_size=38, max_value_size=100_000
+    memory_id=0, max_key_size=38, max_value_size=100_000
 )
 recordings = StableBTreeMap[Principal, Recording](
-    memory_id=4, max_key_size=38, max_value_size=5_000_000
+    memory_id=1, max_key_size=38, max_value_size=5_000_000
 )
 ```
 
@@ -339,10 +339,6 @@ As for `Recording`, the largest dynamic field is `audio`, which will be the actu
 As you can see, finding the correct maximum key and value sizes is a bit of an art right now. Combining some trial and error with reasoning about your specific application should get you a working solution in most cases. It's our hope that the need to specify maximum key and value sizes will be removed in the future.
 
 ## Caveats
-
-### memory ids
-
-The `memory id` can be a number between `0` and `254`, but `memory ids` `0`, `1`, `2`, and `254` are currently reserved. We hope to reduce the complexity around `memory id` in the future, and perhaps remove the need for it entirely.
 
 ### Keys
 

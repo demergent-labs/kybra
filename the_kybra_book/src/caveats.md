@@ -16,10 +16,6 @@ Kybra is probably ~7-20x less performant than what you would expect from [CPytho
 
 A bug in the [RustPython](https://github.com/RustPython/RustPython) interpreter means that dictionary unpacking should not be used until [this issue](https://github.com/RustPython/RustPython/issues/4932) is addressed.
 
-## Reserved memory ids
-
-`memory ids` `0`, `1`, `2`, and `254` are currently reserved for `StableBTreeMap`.
-
 ## print does not work
 
 You should use `ic.print` instead of `print`.

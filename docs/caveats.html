@@ -153,8 +153,6 @@
 <p>Kybra is probably ~7-20x less performant than what you would expect from <a href="https://github.com/python/cpython">CPython</a>. We hope to eventually use <code>CPython</code> as Kybra's underlying Python interpreter.</p>
 <h2 id="do-not-use-dictionary-unpacking"><a class="header" href="#do-not-use-dictionary-unpacking">Do not use dictionary unpacking</a></h2>
 <p>A bug in the <a href="https://github.com/RustPython/RustPython">RustPython</a> interpreter means that dictionary unpacking should not be used until <a href="https://github.com/RustPython/RustPython/issues/4932">this issue</a> is addressed.</p>
-<h2 id="reserved-memory-ids"><a class="header" href="#reserved-memory-ids">Reserved memory ids</a></h2>
-<p><code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, and <code>254</code> are currently reserved for <code>StableBTreeMap</code>.</p>
 <h2 id="print-does-not-work"><a class="header" href="#print-does-not-work">print does not work</a></h2>
 <p>You should use <code>ic.print</code> instead of <code>print</code>.</p>
 <h2 id="kybra-types"><a class="header" href="#kybra-types">Kybra types</a></h2>

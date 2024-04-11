@@ -29,7 +29,7 @@ Key = Alias[nat8]
 Value = Alias[str]
 
 
-map = StableBTreeMap[Key, Value](memory_id=3, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
 
 
 @query

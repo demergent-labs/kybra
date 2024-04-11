@@ -93,7 +93,7 @@ JSON = Alias[str]
 
 
 stable_storage = StableBTreeMap[str, str](
-    memory_id=3, max_key_size=20, max_value_size=1_000
+    memory_id=0, max_key_size=20, max_value_size=1_000
 )
 
 

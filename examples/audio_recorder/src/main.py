@@ -31,10 +31,10 @@ class Recording(Record):
 
 
 users = StableBTreeMap[Principal, User](
-    memory_id=3, max_key_size=38, max_value_size=100_000
+    memory_id=0, max_key_size=38, max_value_size=100_000
 )
 recordings = StableBTreeMap[Principal, Recording](
-    memory_id=4, max_key_size=38, max_value_size=5_000_000
+    memory_id=1, max_key_size=38, max_value_size=5_000_000
 )
 
 

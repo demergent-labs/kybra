@@ -169,7 +169,7 @@
 <pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update
 
 accounts = StableBTreeMap[Principal, nat64](
-    memory_id=3, max_key_size=38, max_value_size=15
+    memory_id=0, max_key_size=38, max_value_size=15
 )
 
 
@@ -241,7 +241,7 @@ def payout(to: Principal, amount: nat64) -&gt; Async[PayoutResult]:
 <pre><code class="language-python">from kybra import ic, nat64, Principal, StableBTreeMap, update, Variant
 
 accounts = StableBTreeMap[Principal, nat64](
-    memory_id=3, max_key_size=38, max_value_size=15
+    memory_id=0, max_key_size=38, max_value_size=15
 )
 
 
