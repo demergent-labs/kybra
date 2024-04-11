@@ -14,6 +14,7 @@ global_kybra_cargo_bin="$global_kybra_rust_bin_dir"/cargo
 global_kybra_rustup_bin="$global_kybra_rust_bin_dir"/rustup
 global_kybra_wasi2ic_bin="$global_kybra_rust_bin_dir"/wasi2ic
 global_kybra_rustc_bin="$global_kybra_rust_bin_dir"/rustc
+global_kybra_cargo_binstall_bin="$global_kybra_rust_bin_dir"/cargo-binstall
 global_kybra_candid_extractor_bin="$global_kybra_rust_bin_dir"/candid-extractor
 
 export CARGO_TARGET_DIR="$global_kybra_config_dir"/rust/target
@@ -21,7 +22,7 @@ export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
 function run() {
-    if ! rustup_exists || ! cargo_exists || ! rustc_exists || ! wasm32_wasi_target_installed || ! wasi2ic_exists || ! rust_python_exists || ! candid_extractor_exists; then
+    if ! rustup_exists || ! cargo_exists || ! rustc_exists || ! wasm32_wasi_target_installed || ! wasi2ic_exists || ! rust_python_exists || ! candid_extractor_exists || ! cargo_binstall_exists; then
         echo -e "\nKybra "$kybra_version" prerequisite installation (this may take a few minutes)\n"
 
         mkdir -p "$global_kybra_rust_dir"
@@ -73,7 +74,9 @@ function install_rust_python() {
 function install_candid_extractor() {
     echo -e "5/5) Installing candid-extractor"
 
-    "$global_kybra_cargo_bin" install candid-extractor &> "$global_kybra_logs_dir"/install_candid_extractor
+    # cargo binstall makes the installation process for candid-extractor much faster
+    curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash &> "$global_kybra_logs_dir"/install_cargo_binstall
+    "$global_kybra_cargo_bin" binstall -y candid-extractor@0.1.2 &> "$global_kybra_logs_dir"/install_candid_extractor
 }
 
 function rustup_exists() {
@@ -98,6 +101,10 @@ function wasi2ic_exists() {
 
 function rust_python_exists() {
     [ -e "$global_kybra_version_dir"/RustPython ]
+}
+
+function cargo_binstall_exists() {
+    [ -e "$global_kybra_cargo_binstall_bin" ]
 }
 
 function candid_extractor_exists() {
