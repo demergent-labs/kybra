@@ -28,8 +28,9 @@ pub use stable_b_tree_map_nodes::StableBTreeMapNode;
 pub fn generate_canister(
     py_file_names: &Vec<&str>,
     entry_module_name: &str,
+    kybra_version: &str,
 ) -> Result<TokenStream, Vec<Error>> {
-    PyAst::new(py_file_names, entry_module_name)
+    PyAst::new(py_file_names, entry_module_name, kybra_version)
         .map_err(|py_ast_errors| {
             py_ast_errors
                 .into_iter()

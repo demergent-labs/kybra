@@ -18,10 +18,12 @@ pub fn generate(
     query_methods: &Vec<QueryMethod>,
     services: &Vec<Service>,
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
+    kybra_version: &str,
 ) -> TokenStream {
     let async_result_handler = async_result_handler::generate(&services);
     let call_global_python_function = call_global_python_function::generate();
-    let check_if_python_stdlib_installed = check_if_python_stdlib_installed::generate();
+    let check_if_python_stdlib_installed =
+        check_if_python_stdlib_installed::generate(kybra_version);
     let guard_against_non_controllers = guard_against_non_controllers::generate();
     let ic_object = ic_object::generate(
         update_methods,

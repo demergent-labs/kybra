@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import sys
 
+import kybra
 from kybra.colors import red
 from kybra.timed import timed_inline
 from kybra.types import Paths
@@ -46,8 +47,11 @@ def check_if_python_stdlib_installed(
             "--network",
             str(os.environ.get("DFX_NETWORK")),
             "call",
+            "--output",
+            "json",
             canister_name,
             "_kybra_check_if_python_stdlib_installed",
+            f'("{kybra.__version__}")',
         ],
         cargo_env,
         False,  # Passing verbose along as True messes with the std outputs
@@ -61,7 +65,7 @@ def check_if_python_stdlib_installed(
     if verbose == True:
         print(check_if_python_stdlib_installed)
 
-    return check_if_python_stdlib_installed == "(true)"
+    return check_if_python_stdlib_installed == "true"
 
 
 def get_cargo_build_features(python_stdlib_is_installed: bool) -> str:
