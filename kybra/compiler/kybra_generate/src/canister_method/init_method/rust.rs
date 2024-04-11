@@ -48,26 +48,7 @@ pub fn generate_interpreter_init() -> TokenStream {
         let interpreter = rustpython_vm::Interpreter::with_init(Default::default(), |vm| {
             vm.add_native_modules(rustpython_stdlib::get_module_inits());
             vm.add_frozen(rustpython_vm::py_freeze!(dir = "python_source"));
-
-            PYTHON_STDLIB_STABLE_REF_CELL.with(|python_stdlib_stable_ref_cell| {
-                #[cfg(feature = "azle_include_stdlib")]
-                {
-                    let mut python_stdlib_stable_ref_mut = python_stdlib_stable_ref_cell.borrow_mut();
-
-                    python_stdlib_stable_ref_mut
-                        .set(rustpython_vm::py_freeze!(dir = "Lib").bytes.to_vec())
-                        .map_err(|err| match err {
-                            ic_stable_structures::cell::ValueError::ValueTooLarge { value_size } => {
-                                format!("ValueError: ValueTooLarge {value_size}")
-                            }
-                        });
-                }
-
-                // TODO why is this necessary? It would be great to just pass in the bytes to FrozenLib::from_ref
-                let python_stdlib_bytes_reference: &'static [u8] = python_stdlib_stable_ref_cell.borrow().get().clone().leak();
-
-                vm.add_frozen(rustpython_compiler_core::frozen_lib::FrozenLib::from_ref(python_stdlib_bytes_reference));
-            });
+            vm.add_frozen(rustpython_compiler_core::frozen_lib::FrozenLib::from_ref(PYTHON_STDLIB));
         });
         let scope = interpreter.enter(|vm| vm.new_scope_with_builtins());
         let vm = &interpreter.vm;

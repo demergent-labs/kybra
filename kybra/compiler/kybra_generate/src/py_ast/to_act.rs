@@ -34,7 +34,6 @@ impl PyAst {
                 &canister_methods.query_methods,
                 &candid_types.services,
                 &stable_b_tree_map_nodes,
-                &self.kybra_version,
             ),
             candid_types,
             canister_methods,

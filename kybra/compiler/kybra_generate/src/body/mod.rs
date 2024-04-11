@@ -8,7 +8,6 @@ use crate::{ic_object, stable_b_tree_map_nodes::rust, StableBTreeMapNode};
 
 mod async_result_handler;
 mod call_global_python_function;
-mod check_if_python_stdlib_installed;
 mod guard_against_non_controllers;
 mod unwrap_rust_python_result;
 mod utils;
@@ -18,12 +17,9 @@ pub fn generate(
     query_methods: &Vec<QueryMethod>,
     services: &Vec<Service>,
     stable_b_tree_map_nodes: &Vec<StableBTreeMapNode>,
-    kybra_version: &str,
 ) -> TokenStream {
     let async_result_handler = async_result_handler::generate(&services);
     let call_global_python_function = call_global_python_function::generate();
-    let check_if_python_stdlib_installed =
-        check_if_python_stdlib_installed::generate(kybra_version);
     let guard_against_non_controllers = guard_against_non_controllers::generate();
     let ic_object = ic_object::generate(
         update_methods,
@@ -38,7 +34,6 @@ pub fn generate(
     quote::quote! {
         #async_result_handler
         #call_global_python_function
-        #check_if_python_stdlib_installed
         #guard_against_non_controllers
         #ic_object
         #stable_b_tree_map
