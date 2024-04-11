@@ -16,6 +16,8 @@ pub fn generate() -> TokenStream {
         #ref_cells
         #traits
 
+        const PYTHON_STDLIB: &[u8] = include_bytes!("../python_stdlib");
+
         static mut INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;
 

@@ -1,0 +1,10 @@
+[package]
+name = "kybra_compile_python_stdlib"
+version = "0.0.0"
+edition = "2018"
+
+[dependencies]
+rustpython = { git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [
+] }
+rustpython-vm = { git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [
+] }

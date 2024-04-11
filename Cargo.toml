@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "kybra/compiler/kybra_compile_python_stdlib",
     "kybra/compiler/kybra_generate",
     "kybra/compiler/kybra_vm_value_derive",
 ]

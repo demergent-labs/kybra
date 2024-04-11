@@ -13,17 +13,31 @@ from kybra.types import Paths
 def build_wasm_binary_or_exit(
     paths: Paths, canister_name: str, cargo_env: dict[str, str], verbose: bool = False
 ):
-    copy_python_stdlib_to_dev_location(paths)
+    copy_python_stdlib_to_dev_location(paths, cargo_env, verbose)
     compile_generated_rust_code(paths, canister_name, cargo_env, verbose)
     copy_wasm_to_dev_location(paths, canister_name)
     run_wasi2ic_on_wasm(paths, canister_name, cargo_env, verbose)
     generate_and_create_candid_file(paths, canister_name, cargo_env, verbose)
 
 
-def copy_python_stdlib_to_dev_location(paths: Paths):
+def copy_python_stdlib_to_dev_location(
+    paths: Paths, cargo_env: dict[str, str], verbose: bool
+):
     shutil.copytree(
         f"{paths['global_kybra_version_dir']}/RustPython/Lib",
         f"{paths['canister']}/Lib",
+    )
+
+    run_subprocess(
+        [
+            f"{paths['global_kybra_rust_bin_dir']}/cargo",
+            "run",
+            f"--manifest-path={paths['canister']}/kybra_compile_python_stdlib/Cargo.toml",
+            f"--package=kybra_compile_python_stdlib",
+            f"{paths['canister']}/python_stdlib",
+        ],
+        cargo_env,
+        verbose,
     )
 
 
