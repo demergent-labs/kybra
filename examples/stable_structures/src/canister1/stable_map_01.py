@@ -11,7 +11,7 @@ from kybra import nat64, nat16
 
 
 stable_map1 = StableBTreeMap[nat16, blob](
-    memory_id=4, max_key_size=100, max_value_size=1_000
+    memory_id=1, max_key_size=100, max_value_size=1_000
 )
 
 

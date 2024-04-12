@@ -28,7 +28,7 @@ Imagine a simple service called `token_canister`:
 from kybra import ic, nat64, Principal, StableBTreeMap, update
 
 accounts = StableBTreeMap[Principal, nat64](
-    memory_id=3, max_key_size=38, max_value_size=15
+    memory_id=0, max_key_size=38, max_value_size=15
 )
 
 
@@ -116,7 +116,7 @@ Let's add to our example code and explore adding some practical result-based err
 from kybra import ic, nat64, Principal, StableBTreeMap, update, Variant
 
 accounts = StableBTreeMap[Principal, nat64](
-    memory_id=3, max_key_size=38, max_value_size=15
+    memory_id=0, max_key_size=38, max_value_size=15
 )
 
 

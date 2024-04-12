@@ -207,7 +207,7 @@ def set(key: str, value: str) -&gt; void:
 <p>If you need more than 4 GiB of storage, consider taking advantage of the 96 GiB of stable memory. Stable structures like <code>StableBTreeMap</code> give you a nice API for interacting with stable memory. These data structures will be <a href="./stable_structures.html">covered in more detail later</a>. Here's a simple example:</p>
 <pre><code class="language-python">from kybra import Opt, query, StableBTreeMap, update, void
 
-db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
+db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
 
 
 @query
@@ -230,7 +230,7 @@ class Entry(Record):
     value: str
 
 
-db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
+db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
 
 
 @query
@@ -261,7 +261,7 @@ class Entry(Record):
     value: str
 
 
-db = StableBTreeMap[str, str](memory_id=3, max_key_size=1_000, max_value_size=1_000)
+db = StableBTreeMap[str, str](memory_id=0, max_key_size=1_000, max_value_size=1_000)
 
 
 @query

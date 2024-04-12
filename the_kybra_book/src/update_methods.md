@@ -76,7 +76,7 @@ If you need more than 4 GiB of storage, consider taking advantage of the 96 GiB 
 ```python
 from kybra import Opt, query, StableBTreeMap, update, void
 
-db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
+db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
 
 
 @query
@@ -104,7 +104,7 @@ class Entry(Record):
     value: str
 
 
-db = StableBTreeMap[str, str](memory_id=3, max_key_size=10, max_value_size=10)
+db = StableBTreeMap[str, str](memory_id=0, max_key_size=10, max_value_size=10)
 
 
 @query
@@ -139,7 +139,7 @@ class Entry(Record):
     value: str
 
 
-db = StableBTreeMap[str, str](memory_id=3, max_key_size=1_000, max_value_size=1_000)
+db = StableBTreeMap[str, str](memory_id=0, max_key_size=1_000, max_value_size=1_000)
 
 
 @query

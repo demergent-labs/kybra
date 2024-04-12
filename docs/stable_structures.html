@@ -162,11 +162,11 @@
 <p>Here's how to define a simple <code>StableBTreeMap</code>. Each <code>StableBTreeMap</code> must be defined in the global scope (not within any functions or objects etc):</p>
 <pre><code class="language-python">from kybra import nat8, StableBTreeMap
 
-map = StableBTreeMap[nat8, str](memory_id=3, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[nat8, str](memory_id=0, max_key_size=100, max_value_size=1_000)
 </code></pre>
 <p>This is a <code>StableBTreeMap</code> with a key of type <code>nat8</code> and a value of type <code>str</code>. Key and value types can be any <a href="./candid.html">Candid type</a>.</p>
-<p>This <code>StableBTreeMap</code> also has a <code>memory id</code> of <code>3</code>, a maximum key size of <code>100</code> bytes and a maximum value size of <code>1_000</code> bytes. You must statically specify the <code>memory id</code>, maximum key size, and maximum value sizes (they cannot be variables).</p>
-<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, but <code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, <code>252</code>, <code>253</code>, and <code>254</code> are currently reserved. We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need to specify it entirely.</p>
+<p>This <code>StableBTreeMap</code> also has a <code>memory id</code> of <code>0</code>, a maximum key size of <code>100</code> bytes and a maximum value size of <code>1_000</code> bytes. You must statically specify the <code>memory id</code>, maximum key size, and maximum value sizes (they cannot be variables).</p>
+<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need to specify it entirely.</p>
 <p>Each <code>StableBTreeMap</code> instance must have a unique <code>memory id</code>. Once a <code>memory id</code> is allocated, it cannot be used with a different <code>StableBTreeMap</code>. This means you can't create another <code>StableBTreeMap</code> using the same <code>memory id</code>, and you can't change the key or value types of an existing <code>StableBTreeMap</code>. <a href="https://github.com/demergent-labs/kybra/issues/215">This problem will be addressed</a>.</p>
 <p>Here's an example showing all of the basic <code>StableBTreeMap</code> operations:</p>
 <pre><code class="language-python">from kybra import (
@@ -185,7 +185,7 @@ Key = Alias[nat8]
 Value = Alias[str]
 
 
-map = StableBTreeMap[Key, Value](memory_id=3, max_key_size=100, max_value_size=1_000)
+map = StableBTreeMap[Key, Value](memory_id=0, max_key_size=100, max_value_size=1_000)
 
 
 @query
@@ -266,10 +266,10 @@ class Recording(Record):
 
 
 users = StableBTreeMap[Principal, User](
-    memory_id=3, max_key_size=38, max_value_size=100_000
+    memory_id=0, max_key_size=38, max_value_size=100_000
 )
 recordings = StableBTreeMap[Principal, Recording](
-    memory_id=4, max_key_size=38, max_value_size=5_000_000
+    memory_id=1, max_key_size=38, max_value_size=5_000_000
 )
 
 
@@ -440,10 +440,10 @@ class Recording(Record):
 
 
 users = StableBTreeMap[Principal, User](
-    memory_id=3, max_key_size=38, max_value_size=100_000
+    memory_id=0, max_key_size=38, max_value_size=100_000
 )
 recordings = StableBTreeMap[Principal, Recording](
-    memory_id=4, max_key_size=38, max_value_size=5_000_000
+    memory_id=1, max_key_size=38, max_value_size=5_000_000
 )
 </code></pre>
 <p>Notice that each <code>StableBTreeMap</code> has a unique <code>memory id</code>. The maximum key and value sizes are also set according to the expected application usage.</p>
@@ -455,8 +455,6 @@ recordings = StableBTreeMap[Principal, Recording](
 <p>As for <code>Recording</code>, the largest dynamic field is <code>audio</code>, which will be the actual bytes of the audio recording. We've set the maximum value size here to 5_000_000, which should allow for recordings of ~5 MB in size. That seems reasonable for our example, and so we'll go with it.</p>
 <p>As you can see, finding the correct maximum key and value sizes is a bit of an art right now. Combining some trial and error with reasoning about your specific application should get you a working solution in most cases. It's our hope that the need to specify maximum key and value sizes will be removed in the future.</p>
 <h2 id="caveats"><a class="header" href="#caveats">Caveats</a></h2>
-<h3 id="memory-ids"><a class="header" href="#memory-ids">memory ids</a></h3>
-<p>The <code>memory id</code> can be a number between <code>0</code> and <code>254</code>, but <code>memory ids</code> <code>0</code>, <code>1</code>, <code>2</code>, and <code>254</code> are currently reserved. We hope to reduce the complexity around <code>memory id</code> in the future, and perhaps remove the need for it entirely.</p>
 <h3 id="keys"><a class="header" href="#keys">Keys</a></h3>
 <p>You should be wary when using <code>float64</code>, <code>float32</code>, <code>service</code>, or <code>func</code> in any type that is a key for a stable structure. These types do not have the ability to be strictly ordered in all cases. <code>service</code> and <code>func</code> will have no order. <code>float64</code> and <code>float32</code> will treat <code>NaN</code> as less than any other type. These caveats may impact key performance.</p>
 
