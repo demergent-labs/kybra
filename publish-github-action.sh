@@ -40,7 +40,8 @@ dfx start --background
 cd examples/simple_erc20
 pip install ../..
 KYBRA_COMPILE_RUST_PYTHON_STDLIB=true KYBRA_REBUILD=true dfx deploy
-tar -cf "$HOME/.config/kybra/$VERSION/rust_python_stdlib.tar" ".kybra/simple_erc20/rust_python_stdlib"
+cd .kybra/simple_erc20
+tar -czf "$HOME/.config/kybra/$VERSION/rust_python_stdlib.tar.gz" "rust_python_stdlib"
 
 git add --all
 git commit -am "kybra-bot automated release $VERSION"
@@ -51,7 +52,7 @@ git push origin $VERSION
 
 if [[ "$VERSION" == *"rc"* ]];
 then
-    gh release create "$VERSION" "$HOME/.config/kybra/$VERSION/rust_python_stdlib.tar" -t "$VERSION" --prerelease
+    gh release create "$VERSION" "$HOME/.config/kybra/$VERSION/rust_python_stdlib.tar.gz" -t "$VERSION" --prerelease
 else
-    gh release create "$VERSION" "$HOME/.config/kybra/$VERSION/rust_python_stdlib.tar" -t "$VERSION"
+    gh release create "$VERSION" "$HOME/.config/kybra/$VERSION/rust_python_stdlib.tar.gz" -t "$VERSION"
 fi

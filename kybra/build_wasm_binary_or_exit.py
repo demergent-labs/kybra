@@ -20,7 +20,6 @@ def build_wasm_binary_or_exit(
     generate_and_create_candid_file(paths, canister_name, cargo_env, verbose)
 
 
-# TODO should we also gzip?
 def compile_python_stdlib(paths: Paths, cargo_env: dict[str, str], verbose: bool):
     if os.environ.get("KYBRA_COMPILE_RUST_PYTHON_STDLIB") == "true":
         rust_python_path = f"{paths['global_kybra_version_dir']}/RustPython"
@@ -76,9 +75,9 @@ def compile_python_stdlib(paths: Paths, cargo_env: dict[str, str], verbose: bool
                 [
                     "curl",
                     "-Lf",
-                    f"https://github.com/demergent-labs/kybra/releases/download/{kybra.__version__}/rust_python_stdlib.tar",
+                    f"https://github.com/demergent-labs/kybra/releases/download/{kybra.__version__}/rust_python_stdlib.tar.gz",
                     "-o",
-                    "rust_python_stdlib.tar",
+                    "rust_python_stdlib.tar.gz",
                 ],
                 cargo_env,
                 verbose,
@@ -86,7 +85,7 @@ def compile_python_stdlib(paths: Paths, cargo_env: dict[str, str], verbose: bool
             )
 
             run_subprocess(
-                ["tar", "-xvf", "rust_python_stdlib.tar"],
+                ["tar", "-xvf", "rust_python_stdlib.tar.gz"],
                 cargo_env,
                 verbose,
                 cwd=paths["global_kybra_version_dir"],
