@@ -38,6 +38,8 @@ done
 
 dfx start --background
 cd examples/simple_erc20
+~/.pyenv/versions/3.10.7/bin/python -m venv venv
+source venv/bin/activate
 pip install ../..
 KYBRA_COMPILE_RUST_PYTHON_STDLIB=true KYBRA_REBUILD=true dfx deploy
 cd .kybra/simple_erc20
