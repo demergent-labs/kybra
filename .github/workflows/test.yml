@@ -148,6 +148,8 @@ jobs:
         runs-on: ubuntu-latest
         env:
             ETHEREUM_URL: ${{ secrets.ETHEREUM_URL }}
+            KYBRA_COMPILE_RUST_PYTHON_STDLIB: ${{ matrix.azle_source == 'repo' }}
+            KYBRA_VERBOSE: true # TODO should we remove this or keep this?
         strategy:
             fail-fast: false # We want to see which example tests succeed and which ones fail, we don't want one example test to cancel the rest
             matrix:
