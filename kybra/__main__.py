@@ -22,7 +22,7 @@ from kybra.types import Args, Paths
 def main():
     args = parse_args_or_exit(sys.argv)
     paths = create_paths(args)
-    is_verbose = args["flags"]["verbose"]
+    is_verbose = args["flags"]["verbose"] or os.environ.get("KYBRA_VERBOSE") == "true"
 
     subprocess.run(
         [

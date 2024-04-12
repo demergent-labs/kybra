@@ -22,7 +22,7 @@ export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
 function run() {
-    if ! rustup_exists || ! cargo_exists || ! rustc_exists || ! wasm32_wasi_target_installed || ! wasi2ic_exists || ! rust_python_exists || ! candid_extractor_exists || ! cargo_binstall_exists; then
+    if ! rustup_exists || ! cargo_exists || ! rustc_exists || ! wasm32_wasi_target_installed || ! wasi2ic_exists || ! candid_extractor_exists || ! cargo_binstall_exists; then
         echo -e "\nKybra "$kybra_version" prerequisite installation (this may take a few minutes)\n"
 
         mkdir -p "$global_kybra_rust_dir"
@@ -31,7 +31,6 @@ function run() {
         install_rustup
         install_wasm32_wasi
         install_wasi2ic
-        install_rust_python
         install_candid_extractor
     else
         update_rustup
@@ -39,7 +38,7 @@ function run() {
 }
 
 function install_rustup() {
-    echo -e "1/5) Installing Rust"
+    echo -e "1/4) Installing Rust"
 
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y --default-toolchain="$rust_version" &> "$global_kybra_logs_dir"/install_rustup
 }
@@ -49,30 +48,19 @@ function update_rustup() {
 }
 
 function install_wasm32_wasi() {
-    echo -e "2/5) Installing wasm32-wasi"
+    echo -e "2/4) Installing wasm32-wasi"
 
     "$global_kybra_rustup_bin" target add wasm32-wasi &> "$global_kybra_logs_dir"/install_wasm32_wasi
 }
 
 function install_wasi2ic() {
-    echo -e "3/5) Installing wasi2ic"
+    echo -e "3/4) Installing wasi2ic"
 
     "$global_kybra_cargo_bin" install --git https://github.com/wasm-forge/wasi2ic --rev 7418e0bd1a7810c8e9c55cc0155c921503a793b8 &> "$global_kybra_logs_dir"/install_wasi2ic
 }
 
-function install_rust_python() {
-    echo -e "4/5) Installing RustPython"
-
-    cd "$global_kybra_version_dir" &> "$global_kybra_logs_dir"/install_rust_python
-    git clone https://github.com/RustPython/RustPython.git >> "$global_kybra_logs_dir"/install_rust_python 2>&1
-    cd RustPython >> "$global_kybra_logs_dir"/install_rust_python 2>&1
-    git checkout f12875027ce425297c07cbccb9be77514ed46157 >> "$global_kybra_logs_dir"/install_rust_python 2>&1
-    cd - >> "$global_kybra_logs_dir"/install_rust_python 2>&1
-    cd - >> "$global_kybra_logs_dir"/install_rust_python 2>&1
-}
-
 function install_candid_extractor() {
-    echo -e "5/5) Installing candid-extractor"
+    echo -e "4/4) Installing candid-extractor"
 
     # cargo binstall makes the installation process for candid-extractor much faster
     curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash &> "$global_kybra_logs_dir"/install_cargo_binstall
@@ -97,10 +85,6 @@ function wasm32_wasi_target_installed() {
 
 function wasi2ic_exists() {
     [ -e "$global_kybra_wasi2ic_bin" ]
-}
-
-function rust_python_exists() {
-    [ -e "$global_kybra_version_dir"/RustPython ]
 }
 
 function cargo_binstall_exists() {

@@ -25,6 +25,7 @@ jobs:
         env:
             GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }} # All commits must be verified
             PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         outputs:
             # These outputs are used to pass information along to the next job
             should_run_tests: ${{ steps.should_run_tests.outputs.should_run_tests }} # We only want the next job to run the tests once we have finished deploying to PyPI and GitHub
@@ -35,6 +36,11 @@ jobs:
               with:
                   ref: ${{ contains(github.head_ref, 'release--') && github.event.pull_request.head.ref || github.ref }} # This is necessary for this job to be able to commit and push to the origin remote properly
                   token: ${{ secrets.LASTMJS_GITHUB_TOKEN || github.token }} # A personal GitHub token is setup as a secret so that committing and pushing to GitHub from the Action will trigger another workflow
+            - if: contains(github.head_ref, 'release--')
+              name: Install dfx
+              run: |
+                  DFXVM_INIT_YES=true DFX_VERSION=0.19.0 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+                  echo "$HOME/.local/share/dfx/bin" >> $GITHUB_PATH
             # TODO we should use some Action-specific bot account
             - if: contains(github.head_ref, 'release--')
               run: git config --global user.name 'Jordan Last'
@@ -142,6 +148,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             ETHEREUM_URL: ${{ secrets.ETHEREUM_URL }}
+            KYBRA_COMPILE_RUST_PYTHON_STDLIB: ${{ matrix.kybra_source == 'repo' }}
         strategy:
             fail-fast: false # We want to see which example tests succeed and which ones fail, we don't want one example test to cancel the rest
             matrix:
