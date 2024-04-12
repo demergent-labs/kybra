@@ -1,0 +1,1 @@
+This file is here because kybra/compiler/kybra_compile_python_stdlib/src main.rs looks for a ../Lib directory. We don't actually run that code inside of the repository, but in the Rust staging area of Kybra projects, thus to get rid of the rust-analyzer error we are creating this directory.
