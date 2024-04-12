@@ -1,7 +1,9 @@
+import os
 import shutil
 import subprocess
 import sys
 
+import kybra
 from kybra.colors import red
 from kybra.timed import timed_inline
 from kybra.types import Paths
@@ -18,23 +20,82 @@ def build_wasm_binary_or_exit(
     generate_and_create_candid_file(paths, canister_name, cargo_env, verbose)
 
 
+# TODO should we also gzip?
 def compile_python_stdlib(paths: Paths, cargo_env: dict[str, str], verbose: bool):
-    shutil.copytree(
-        f"{paths['global_kybra_version_dir']}/RustPython/Lib",
-        f"{paths['canister']}/Lib",
-    )
+    if os.environ.get("KYBRA_COMPILE_RUST_PYTHON_STDLIB") == "true":
+        rust_python_path = f"{paths['global_kybra_version_dir']}/RustPython"
 
-    run_subprocess(
-        [
-            f"{paths['global_kybra_rust_bin_dir']}/cargo",
-            "run",
-            f"--manifest-path={paths['canister']}/kybra_compile_python_stdlib/Cargo.toml",
-            f"--package=kybra_compile_python_stdlib",
-            f"{paths['canister']}/python_stdlib",
-        ],
-        cargo_env,
-        verbose,
-    )
+        if not os.path.exists(rust_python_path):
+            run_subprocess(
+                ["git", "clone", "https://github.com/RustPython/RustPython.git"],
+                cargo_env,
+                verbose,
+                cwd=paths["global_kybra_version_dir"],
+            )
+
+            run_subprocess(
+                ["git", "checkout", "f12875027ce425297c07cbccb9be77514ed46157"],
+                cargo_env,
+                verbose,
+                cwd=f"{paths['global_kybra_version_dir']}/RustPython",
+            )
+
+        shutil.copytree(
+            f"{rust_python_path}/Lib",
+            f"{paths['canister']}/Lib",
+        )
+
+        os.makedirs(f"{paths['canister']}/rust_python_stdlib")
+        shutil.copy(
+            os.path.dirname(kybra.__file__) + "/compiler/LICENSE-RustPython",
+            f"{paths['canister']}/rust_python_stdlib/LICENSE-RustPython",
+        )
+        shutil.copy(
+            os.path.dirname(kybra.__file__) + "/compiler/python_3_10_13_licenses.pdf",
+            f"{paths['canister']}/rust_python_stdlib/python_3_10_13_licenses.pdf",
+        )
+
+        run_subprocess(
+            [
+                f"{paths['global_kybra_rust_bin_dir']}/cargo",
+                "run",
+                f"--manifest-path={paths['canister']}/kybra_compile_python_stdlib/Cargo.toml",
+                f"--package=kybra_compile_python_stdlib",
+                f"{paths['canister']}/rust_python_stdlib/stdlib",
+            ],
+            cargo_env,
+            verbose,
+        )
+    else:
+        rust_python_stdlib_path = (
+            f"{paths['global_kybra_version_dir']}/rust_python_stdlib"
+        )
+
+        if not os.path.exists(rust_python_stdlib_path):
+            run_subprocess(
+                [
+                    "curl",
+                    "-Lf",
+                    f"https://github.com/demergent-labs/kybra/releases/download/{kybra.__version__}/rust_python_stdlib.tar",
+                    "-o",
+                    "rust_python_stdlib.tar",
+                ],
+                cargo_env,
+                verbose,
+                cwd=paths["global_kybra_version_dir"],
+            )
+
+            run_subprocess(
+                ["tar", "-xvf", "rust_python_stdlib.tar"],
+                cargo_env,
+                verbose,
+                cwd=paths["global_kybra_version_dir"],
+            )
+
+        shutil.copytree(
+            rust_python_stdlib_path,
+            f"{paths['canister']}/rust_python_stdlib",
+        )
 
 
 def compile_generated_rust_code(
@@ -96,9 +157,13 @@ def generate_and_create_candid_file(
 
 
 def run_subprocess(
-    args: list[str], env: dict[str, str], verbose: bool, throw: bool = True
+    args: list[str],
+    env: dict[str, str],
+    verbose: bool,
+    throw: bool = True,
+    cwd: str | None = None,
 ) -> bytes:
-    result = subprocess.run(args, env=env, capture_output=not verbose)
+    result = subprocess.run(args, env=env, capture_output=not verbose, cwd=cwd)
 
     if result.returncode != 0:
         if throw == True:

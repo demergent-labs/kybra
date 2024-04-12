@@ -13,7 +13,7 @@ pub fn generate() -> TokenStream {
         #use_statements
         #traits
 
-        const PYTHON_STDLIB: &[u8] = include_bytes!("../python_stdlib");
+        const PYTHON_STDLIB: &[u8] = include_bytes!("../rust_python_stdlib/stdlib");
 
         static mut INTERPRETER_OPTION: Option<rustpython_vm::Interpreter> = None;
         static mut SCOPE_OPTION: Option<rustpython_vm::scope::Scope> = None;
