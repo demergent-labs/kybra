@@ -8,7 +8,11 @@ async function pretest() {
         }
     );
 
-    execSync(`dfx build`, {
+    execSync(`dfx canister create init_and_post_upgrade_recovery`, {
+        stdio: 'inherit'
+    });
+
+    execSync(`dfx build init_and_post_upgrade_recovery`, {
         stdio: 'inherit'
     });
 
