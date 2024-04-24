@@ -1,21 +1,8 @@
 {
     "canisters": {
         "outgoing_http_requests": {
-            "type": "custom",
-            "build": "python -m kybra outgoing_http_requests src/main.py src/main.did",
-            "candid": "src/main.did",
-            "wasm": ".kybra/outgoing_http_requests/outgoing_http_requests.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/main.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ],
+            "type": "kybra",
+            "main": "src/main.py",
             "declarations": {
                 "output": "test/dfx_generated/outgoing_http_requests",
                 "node_compatibility": true

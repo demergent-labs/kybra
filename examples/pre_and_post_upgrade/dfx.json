@@ -1,21 +1,8 @@
 {
     "canisters": {
         "pre_and_post_upgrade": {
-            "type": "custom",
-            "build": "python -m kybra pre_and_post_upgrade src/main.py src/main.did",
-            "candid": "src/main.did",
-            "wasm": ".kybra/pre_and_post_upgrade/pre_and_post_upgrade.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/main.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ],
+            "type": "kybra",
+            "main": "src/main.py",
             "declarations": {
                 "output": "test/dfx_generated/pre_and_post_upgrade",
                 "node_compatibility": true

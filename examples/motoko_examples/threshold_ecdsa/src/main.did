@@ -1,8 +1,0 @@
-type PublicKey = record { public_key : blob };
-type PublicKeyResult = variant { Ok : PublicKey; Err : text };
-type SignResult = variant { Ok : Signature; Err : text };
-type Signature = record { signature : blob };
-service : () -> {
-  public_key : () -> (PublicKeyResult);
-  sign : (blob) -> (SignResult);
-}

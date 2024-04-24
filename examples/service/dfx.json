@@ -1,42 +1,16 @@
 {
     "canisters": {
         "service": {
-            "type": "custom",
-            "build": "python -m kybra service src/service/service.py src/service/service.did",
-            "candid": "src/service/service.did",
-            "wasm": ".kybra/service/service.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/service/service.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ],
+            "type": "kybra",
+            "main": "src/service/service.py",
             "declarations": {
                 "output": "test/dfx_generated/service",
                 "node_compatibility": true
             }
         },
         "some_service": {
-            "type": "custom",
-            "build": "python -m kybra some_service src/some_service/some_service.py src/some_service/some_service.did",
-            "candid": "src/some_service/some_service.did",
-            "wasm": ".kybra/some_service/some_service.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/some_service/some_service.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ],
+            "type": "kybra",
+            "main": "src/some_service/some_service.py",
             "declarations": {
                 "output": "test/dfx_generated/some_service",
                 "node_compatibility": true
