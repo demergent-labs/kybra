@@ -20,6 +20,13 @@ from kybra.types import Args, Paths
 
 @timed
 def main():
+    if sys.argv[1] == "install-dfx-extension":
+        subprocess.run(
+            ["./install.sh"],
+            cwd=os.path.join(kybra.__file__, "compiler", "dfx_extension"),
+        )
+        return
+
     args = parse_args_or_exit(sys.argv)
     paths = create_paths(args)
     is_verbose = args["flags"]["verbose"] or os.environ.get("KYBRA_VERBOSE") == "true"
@@ -80,12 +87,12 @@ def parse_args_or_exit(args: list[str]) -> Args:
 
     if len(args) == 0:
         print(f"\nkybra {kybra.__version__}")
-        print("\nUsage: kybra [-v|--verbose] <canister_name> <entry_point> <did_path>")
+        print("\nUsage: kybra [-v|--verbose] <canister_name> <entry_point>")
         sys.exit(0)
 
-    if len(args) != 3:
+    if len(args) != 2:
         print(red("\n💣 Kybra error: wrong number of arguments\n"))
-        print("Usage: kybra [-v|--verbose] <canister_name> <entry_point> <did_path>")
+        print("Usage: kybra [-v|--verbose] <canister_name> <entry_point>")
         print("\n💀 Build failed!")
         sys.exit(1)
 
@@ -94,7 +101,6 @@ def parse_args_or_exit(args: list[str]) -> Args:
         "flags": {"verbose": "--verbose" in flags or "-v" in flags},
         "canister_name": args[0],
         "entry_point": args[1],
-        "did_path": args[2],
     }
 
 
@@ -118,7 +124,7 @@ def create_paths(args: Args) -> Paths:
     py_file_names_file_path = f"{canister_path}/py_file_names.csv"
 
     # This is the path to the developer's Candid file passed into python -m kybra from the dfx.json build command
-    did_path = args["did_path"]
+    did_path = os.environ.get("CANISTER_CANDID_PATH", "CANDID_PATH_NOT_FOUND")
 
     # This is the path to the Kybra compiler Rust code delivered with the Python package
     compiler_path = os.path.dirname(kybra.__file__) + "/compiler"

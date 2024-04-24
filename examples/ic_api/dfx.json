@@ -1,21 +1,8 @@
 {
     "canisters": {
         "ic_api": {
-            "type": "custom",
-            "build": "python -m kybra ic_api src/main.py src/main.did",
-            "candid": "src/main.did",
-            "wasm": ".kybra/ic_api/ic_api.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/main.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ],
+            "type": "kybra",
+            "main": "src/main.py",
             "declarations": {
                 "output": "test/dfx_generated/ic_api",
                 "node_compatibility": true

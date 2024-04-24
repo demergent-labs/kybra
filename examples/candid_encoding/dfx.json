@@ -1,21 +1,8 @@
 {
     "canisters": {
         "candid_encoding": {
-            "type": "custom",
-            "build": "python -m kybra candid_encoding src/main.py src/main.did",
-            "candid": "src/main.did",
-            "wasm": ".kybra/candid_encoding/candid_encoding.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/main.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ],
+            "type": "kybra",
+            "main": "src/main.py",
             "declarations": {
                 "output": "test/dfx_generated/candid_encoding",
                 "node_compatibility": true

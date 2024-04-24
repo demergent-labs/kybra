@@ -1,8 +1,0 @@
-type StringQueryResult = variant { Ok : text; Err : text };
-service : (principal) -> {
-  deep_query : () -> (StringQueryResult) query;
-  inc_counter : () -> (nat) query;
-  manual_query : () -> (text) query;
-  simple_query : () -> (text) query;
-  update_query : () -> (text);
-}

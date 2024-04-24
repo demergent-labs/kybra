@@ -1,21 +1,8 @@
 {
     "canisters": {
         "annotated_tests": {
-            "type": "custom",
-            "build": "python -m kybra annotated_tests src/main.py src/main.did",
-            "candid": "src/main.did",
-            "wasm": ".kybra/annotated_tests/annotated_tests.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/main.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ],
+            "type": "kybra",
+            "main": "src/main.py",
             "declarations": {
                 "output": "test/dfx_generated/annotated_tests",
                 "node_compatibility": true

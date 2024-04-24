@@ -1,21 +1,8 @@
 {
     "canisters": {
         "complex_types": {
-            "type": "custom",
-            "build": "python -m kybra complex_types src/complex_types.py src/complex_types.did",
-            "candid": "src/complex_types.did",
-            "wasm": ".kybra/complex_types/complex_types.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/complex_types.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ],
+            "type": "kybra",
+            "main": "src/complex_types.py",
             "declarations": {
                 "output": "test/dfx_generated/complex_types",
                 "node_compatibility": true

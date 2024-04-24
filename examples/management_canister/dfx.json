@@ -1,21 +1,8 @@
 {
     "canisters": {
         "management_canister": {
-            "type": "custom",
-            "build": "python -m kybra management_canister src/management_canister.py src/management_canister.did",
-            "candid": "src/management_canister.did",
-            "wasm": ".kybra/management_canister/management_canister.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/management_canister.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ],
+            "type": "kybra",
+            "main": "src/management_canister.py",
             "declarations": {
                 "output": "test/dfx_generated/management_canister",
                 "node_compatibility": true
