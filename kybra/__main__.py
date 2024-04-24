@@ -23,7 +23,9 @@ def main():
     if sys.argv[1] == "install-dfx-extension":
         subprocess.run(
             ["./install.sh"],
-            cwd=os.path.join(kybra.__file__, "compiler", "dfx_extension"),
+            cwd=os.path.join(
+                os.path.dirname(kybra.__file__), "compiler", "dfx_extension"
+            ),
         )
         return
 

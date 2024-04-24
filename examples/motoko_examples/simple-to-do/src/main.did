@@ -1,8 +1,0 @@
-type ToDo = record { completed : bool; description : text };
-service : () -> {
-  add_todo : (text) -> (nat);
-  clear_completed : () -> ();
-  complete_todo : (nat) -> ();
-  get_todos : () -> (vec ToDo) query;
-  show_todos : () -> (text) query;
-}
