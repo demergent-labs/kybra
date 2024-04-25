@@ -20,6 +20,9 @@ from kybra.types import Args, Paths
 
 @timed
 def main():
+    # TODO this way of installing the extension is just temporary
+    # TODO we should use the official dfx extension install command
+    # TODO are the dfx extensions repository once those mature
     if sys.argv[1] == "install-dfx-extension":
         subprocess.run(
             ["./install.sh"],
