@@ -128,8 +128,11 @@ def create_paths(args: Args) -> Paths:
 
     py_file_names_file_path = f"{canister_path}/py_file_names.csv"
 
-    # This is the path to the developer's Candid file passed into python -m kybra from the dfx.json build command
-    did_path = os.environ.get("CANISTER_CANDID_PATH", "CANDID_PATH_NOT_FOUND")
+    # This is the path to the developer's Candid file as resolved by dfx
+    did_path = os.environ.get("CANISTER_CANDID_PATH")
+
+    if did_path is None:
+        raise Exception("Kybra: CANISTER_CANDID_PATH is not defined")
 
     # This is the path to the Kybra compiler Rust code delivered with the Python package
     compiler_path = os.path.dirname(kybra.__file__) + "/compiler"
