@@ -1,0 +1,34 @@
+{
+    "name": "kybra",
+    "version": "0.0.0",
+    "homepage": "https://github.com/dfinity/dfx-extensions",
+    "authors": "",
+    "summary": "",
+    "categories": [],
+    "keywords": [],
+    "canister_type": {
+        "defaults": {
+            "candid": ".kybra/{{canister_name}}/{{canister_name}}.did",
+            "build": "python -m kybra {{canister_name}} {{canister.main}}",
+            "wasm": ".kybra/{{canister_name}}/{{canister_name}}.wasm",
+            "gzip": true,
+            "metadata": [
+                {
+                    "name": "candid:service"
+                },
+                {
+                    "name": "cdk:name",
+                    "content": "kybra"
+                }
+            ],
+            "tech_stack": {
+                "cdk": {
+                    "kybra": {}
+                },
+                "language": {
+                    "python": {}
+                }
+            }
+        }
+    }
+}

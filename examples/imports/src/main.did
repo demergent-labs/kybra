@@ -1,8 +1,0 @@
-service : () -> {
-  boltons_floor : (float64) -> (int) query;
-  get_math_message : () -> (int) query;
-  get_one : () -> (text) query;
-  get_three : () -> (text) query;
-  get_two : () -> (text) query;
-  sha224_hash : (text) -> (text) query;
-}

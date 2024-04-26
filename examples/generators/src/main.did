@@ -1,5 +1,0 @@
-service : () -> {
-  get_randomness_directly : () -> (blob);
-  get_randomness_indirectly : () -> (blob);
-  get_randomness_super_indirectly : () -> (blob);
-}

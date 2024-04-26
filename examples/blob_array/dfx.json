@@ -1,21 +1,8 @@
 {
     "canisters": {
         "blob_array": {
-            "type": "custom",
-            "build": "python -m kybra blob_array src/main.py src/main.did",
-            "candid": "src/main.did",
-            "wasm": ".kybra/blob_array/blob_array.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/main.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ],
+            "type": "kybra",
+            "main": "src/main.py",
             "declarations": {
                 "output": "test/dfx_generated/blob_array",
                 "node_compatibility": true

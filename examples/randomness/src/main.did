@@ -1,1 +1,0 @@
-service : () -> { random_number : () -> (float64) }

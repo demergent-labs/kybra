@@ -6,7 +6,6 @@ class Args(TypedDict):
     flags: "Args_flags"
     canister_name: str
     entry_point: str
-    did_path: str
 
 
 class Args_flags(TypedDict):

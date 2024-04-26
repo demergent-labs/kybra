@@ -12,6 +12,10 @@ async function pretest() {
         stdio: 'inherit'
     });
 
+    execSync(`dfx build init_and_post_upgrade_recovery`, {
+        stdio: 'inherit'
+    });
+
     execSync(`dfx generate init_and_post_upgrade_recovery`, {
         stdio: 'inherit'
     });

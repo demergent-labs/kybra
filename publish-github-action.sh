@@ -11,6 +11,7 @@ directories_json_string="${directories_json_string_with_linebreaks//$'\\n'/''}"
 directories=$(echo "$directories_json_string" | jq -c -r '.[]')
 
 sed -E -i "s/(__version__ = \")(.*)(\")/\1$VERSION\3/" kybra/__init__.py
+sed -E -i "s/(\"version\": \")(.*)(\")/\1$VERSION\3/" kybra/compiler/dfx_extension/extension.json
 
 # prepare on new machine
 ~/.pyenv/versions/3.10.7/bin/python -m pip install --upgrade build
@@ -36,11 +37,12 @@ do
     cd $root_dir
 done
 
-dfx start --background
 cd examples/simple_erc20
 ~/.pyenv/versions/3.10.7/bin/python -m venv venv
 source venv/bin/activate
 pip install ../..
+python -m kybra install-dfx-extension
+dfx start --background
 KYBRA_COMPILE_RUST_PYTHON_STDLIB=true KYBRA_REBUILD=true dfx deploy
 cd .kybra/simple_erc20
 tar -czf "$HOME/.config/kybra/$VERSION/rust_python_stdlib.tar.gz" "rust_python_stdlib"
