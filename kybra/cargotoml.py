@@ -25,11 +25,11 @@ candid = {{ version = "0.10.6", features = ["value"] }}
 candid_parser = "0.1.4"
 kybra-vm-value-derive = {{ path = "./kybra_vm_value_derive" }}
 
-rustpython = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["stdlib", "encodings"] }}
-rustpython-vm = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["ic"] }}
-rustpython-stdlib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }}
-rustpython-derive = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }}
-rustpython-compiler-core = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = [] }}
+rustpython = {{ git = "https://github.com/demergent-labs/RustPython", rev = "e87c5ddc56ac94fc5dc42aedb1e03bee21e5b9b7", default-features = false, features = ["stdlib", "encodings"] }}
+rustpython-vm = {{ git = "https://github.com/demergent-labs/RustPython", rev = "e87c5ddc56ac94fc5dc42aedb1e03bee21e5b9b7", default-features = false, features = ["ic"] }}
+rustpython-stdlib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "e87c5ddc56ac94fc5dc42aedb1e03bee21e5b9b7", default-features = false, features = [] }}
+rustpython-derive = {{ git = "https://github.com/demergent-labs/RustPython", rev = "e87c5ddc56ac94fc5dc42aedb1e03bee21e5b9b7", default-features = false, features = [] }}
+rustpython-compiler-core = {{ git = "https://github.com/demergent-labs/RustPython", rev = "e87c5ddc56ac94fc5dc42aedb1e03bee21e5b9b7", default-features = false, features = [] }}
 
 # rustpython = {{ path = "/home/lastmjs/development/RustPython", default-features = false, features = ["stdlib", "encodings"] }}
 # rustpython-vm = {{ path = "/home/lastmjs/development/RustPython/vm", default-features = false, features = ["ic"] }}
@@ -42,7 +42,7 @@ rustpython-compiler-core = {{ git = "https://github.com/demergent-labs/RustPytho
 # rustpython-stdlib = {{ path = "/home/RustPython/stdlib", default-features = false, features = [] }}
 # rustpython-derive = {{ path = "/home/RustPython/derive", default-features = false, features = [] }}
 # TODO add this back once we support the full stdlib: https://github.com/demergent-labs/kybra/issues/12
-# rustpython-pylib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "b7b0a4994d7871bf1e21fedb6bd0f0e5639fa874", default-features = false, features = ["freeze-stdlib"] }}
+# rustpython-pylib = {{ git = "https://github.com/demergent-labs/RustPython", rev = "e87c5ddc56ac94fc5dc42aedb1e03bee21e5b9b7", default-features = false, features = ["freeze-stdlib"] }}
 # rustpython = {{ path = "../../../../../../RustPython", default-features = false, features = [] }}
 serde = {{ version = "1.0.137", default-features = false, features = [] }}
 async-recursion = "1.0.0"
