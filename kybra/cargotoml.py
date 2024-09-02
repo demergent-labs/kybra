@@ -18,7 +18,7 @@ crate-type = ["cdylib"]
 azle_include_stdlib = []
 
 [dependencies]
-ic-cdk = "0.13.1"
+ic-cdk = "0.13.5"
 ic-cdk-macros = "0.9.0"
 ic-cdk-timers = "0.7.0"
 candid = {{ version = "0.10.6", features = ["value"] }}
