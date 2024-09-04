@@ -25,6 +25,7 @@ runTests(
 
         // TODO we can use the Azle test again once we update Azle to dfx 0.19.0
         // TODO Rejection code was changed from 3 to 5
+        // TODO Update: This will probably just hang around until we update to jest
         if (test.name === 'update_query test') {
             return {
                 ...test,
@@ -35,9 +36,9 @@ runTests(
                         Ok:
                             'Err' in result &&
                             result.Err.includes(
-                                `Rejection code 5, Canister ${getCanisterId(
+                                `Rejection code 5, Error from Canister ${getCanisterId(
                                     'canister2'
-                                )} has no query method`
+                                )}: Canister has no query method`
                             )
                     };
                 }
