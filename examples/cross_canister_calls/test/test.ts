@@ -16,5 +16,25 @@ const canister2 = createActorCanister2(getCanisterId('canister2'), {
 });
 
 runTests(
-    getTests(createSnakeCaseProxy(canister1), createSnakeCaseProxy(canister2))
+    getTests(
+        createSnakeCaseProxy(canister1),
+        createSnakeCaseProxy(canister2)
+    ).map((test) => {
+        if (test.name === 'canister1 trap') {
+            return {
+                ...test,
+                test: async () => {
+                    const result = await canister1.trap();
+                    const expected = `Rejection code 5, IC0503: Error from Canister ${getCanisterId(
+                        'canister2'
+                    )}: Canister called \`ic0.trap\` with message: hahahaha.`;
+
+                    return {
+                        Ok: 'Err' in result && result.Err.includes(expected)
+                    };
+                }
+            };
+        }
+        return test;
+    })
 );
