@@ -17,7 +17,7 @@ Kybra may have unknown security vulnerabilities due to the following:
 
 ## Roadmap
 
-We hope to get to a production-ready 1.0 in 2024. The following are the major blockers to 1.0:
+We hope to get to a production-ready 1.0 in 2025. The following are the major blockers to 1.0:
 
 -   CPython integration for performance, security, and stability
 -   Broad PyPI package support (C API/extensions)

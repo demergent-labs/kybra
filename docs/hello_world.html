@@ -170,8 +170,9 @@ touch dfx.json
 <pre><code class="language-bash">~/.pyenv/versions/3.10.7/bin/python -m venv venv
 source venv/bin/activate
 </code></pre>
-<p>Now install Kybra:</p>
+<p>Now install Kybra and the Kybra dfx extension:</p>
 <pre><code class="language-bash">pip install kybra
+python -m kybra install-dfx-extension
 </code></pre>
 <p>Open up <code>kybra_hello_world</code> in your text editor (we recommend <a href="https://code.visualstudio.com/">VS Code</a> with the <a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Microsoft Python extension</a>).</p>
 <h2 id="mainpy"><a class="header" href="#mainpy">main.py</a></h2>
@@ -222,21 +223,8 @@ def set_message(new_message: str) -&gt; void:
 <pre><code class="language-json">{
     &quot;canisters&quot;: {
         &quot;kybra_hello_world&quot;: {
-            &quot;type&quot;: &quot;custom&quot;,
-            &quot;build&quot;: &quot;python -m kybra kybra_hello_world src/main.py src/main.did&quot;,
-            &quot;candid&quot;: &quot;src/main.did&quot;,
-            &quot;wasm&quot;: &quot;.kybra/kybra_hello_world/kybra_hello_world.wasm&quot;,
-            &quot;gzip&quot;: true,
-            &quot;metadata&quot;: [
-                {
-                    &quot;name&quot;: &quot;candid:service&quot;,
-                    &quot;path&quot;: &quot;src/main.did&quot;
-                },
-                {
-                    &quot;name&quot;: &quot;cdk:name&quot;,
-                    &quot;content&quot;: &quot;kybra&quot;
-                }
-            ]
+            &quot;type&quot;: &quot;kybra&quot;,
+            &quot;main&quot;: &quot;src/main.py&quot;
         }
     }
 }
