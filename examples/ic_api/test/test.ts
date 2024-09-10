@@ -8,4 +8,31 @@ const icApiCanister = createActor(getCanisterId('ic_api'), {
     }
 });
 
-runTests(getTests(createSnakeCaseProxy(icApiCanister)));
+runTests(
+    getTests(createSnakeCaseProxy(icApiCanister)).map((test) => {
+        if (test.name === 'trap') {
+            return {
+                ...test,
+                test: async () => {
+                    try {
+                        const result = await icApiCanister.trap(
+                            'here is the message'
+                        );
+                        return {
+                            Ok: result
+                        };
+                    } catch (error: any) {
+                        const expected = `IC0503: Error from Canister ${getCanisterId(
+                            'ic_api'
+                        )}: Canister called \`ic0.trap\` with message: here is the message.`;
+
+                        return {
+                            Ok: error.props.Message.includes(expected)
+                        };
+                    }
+                }
+            };
+        }
+        return test;
+    })
+);
