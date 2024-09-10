@@ -35,10 +35,10 @@ state: State = {"created_canister_id": Principal.from_str("aaaaa-aa")}
 
 @update
 def execute_create_canister() -> Async[ExecuteCreateCanisterResult]:
-    create_canister_result_call_result: CallResult[
-        CreateCanisterResult
-    ] = yield management_canister.create_canister({"settings": None}).with_cycles(
-        50_000_000_000_000
+    create_canister_result_call_result: CallResult[CreateCanisterResult] = (
+        yield management_canister.create_canister({"settings": None}).with_cycles(
+            50_000_000_000_000
+        )
     )
     # TODO in Azle the amount we send is much smaller, I think something changed from dfx 11 to dfx 12, look into it
 
@@ -127,9 +127,9 @@ def execute_stop_canister(canister_id: Principal) -> Async[DefaultResult]:
 
 @update
 def get_canister_status(args: CanisterStatusArgs) -> Async[GetCanisterStatusResult]:
-    canister_status_result_call_result: CallResult[
-        CanisterStatusResult
-    ] = yield management_canister.canister_status({"canister_id": args["canister_id"]})
+    canister_status_result_call_result: CallResult[CanisterStatusResult] = (
+        yield management_canister.canister_status({"canister_id": args["canister_id"]})
+    )
 
     return match(
         canister_status_result_call_result,
@@ -155,7 +155,7 @@ def execute_delete_canister(canister_id: Principal) -> Async[DefaultResult]:
 def execute_deposit_cycles(canister_id: Principal) -> Async[DefaultResult]:
     call_result: CallResult[void] = yield management_canister.deposit_cycles(
         {"canister_id": canister_id}
-    ).with_cycles(1_000_000)
+    ).with_cycles(10_000_000)
 
     return match(
         call_result, {"Ok": lambda _: {"Ok": True}, "Err": lambda err: {"Err": err}}
@@ -182,10 +182,10 @@ def get_raw_rand() -> Async[RawRandResult]:
 def provisional_create_canister_with_cycles() -> (
     Async[ExecuteProvisionalCreateCanisterWithCyclesResult]
 ):
-    call_result: CallResult[
-        ProvisionalCreateCanisterWithCyclesResult
-    ] = yield management_canister.provisional_create_canister_with_cycles(
-        {"amount": None, "settings": None}
+    call_result: CallResult[ProvisionalCreateCanisterWithCyclesResult] = (
+        yield management_canister.provisional_create_canister_with_cycles(
+            {"amount": None, "settings": None}
+        )
     )
 
     return match(
@@ -203,10 +203,10 @@ def provisional_create_canister_with_cycles() -> (
 def provisional_top_up_canister(
     canister_id: Principal, amount: nat
 ) -> Async[DefaultResult]:
-    call_result: CallResult[
-        void
-    ] = yield management_canister.provisional_top_up_canister(
-        {"canister_id": canister_id, "amount": amount}
+    call_result: CallResult[void] = (
+        yield management_canister.provisional_top_up_canister(
+            {"canister_id": canister_id, "amount": amount}
+        )
     )
 
     return match(
