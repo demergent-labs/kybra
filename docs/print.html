@@ -194,7 +194,7 @@ SOFTWARE.
 <li>Kybra uses a new Python interpreter that is less mature than CPython</li>
 </ul>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
-<p>We hope to get to a production-ready 1.0 in 2024. The following are the major blockers to 1.0:</p>
+<p>We hope to get to a production-ready 1.0 in 2025. The following are the major blockers to 1.0:</p>
 <ul>
 <li>CPython integration for performance, security, and stability</li>
 <li>Broad PyPI package support (C API/extensions)</li>
@@ -342,7 +342,7 @@ SOFTWARE.
 <p>You should be using a *nix environment (Linux, Mac OS, <a href="https://learn.microsoft.com/en-us/windows/wsl/install">WSL if using Windows</a>) with bash and have the following installed on your system:</p>
 <ul>
 <li>Python 3.10.7</li>
-<li>dfx 0.19.0</li>
+<li>dfx 0.23.0</li>
 <li>Python VS Code Extension</li>
 </ul>
 <h3 id="python-3107"><a class="header" href="#python-3107">Python 3.10.7</a></h3>
@@ -354,8 +354,8 @@ curl https://pyenv.run | bash
 ~/.pyenv/bin/pyenv install 3.10.7
 </code></pre>
 <h3 id="dfx"><a class="header" href="#dfx">dfx</a></h3>
-<p>Run the following command to install dfx 0.19.0:</p>
-<pre><code class="language-bash">DFX_VERSION=0.19.0 sh -ci &quot;$(curl -fsSL https://sdk.dfinity.org/install.sh)&quot;
+<p>Run the following command to install dfx 0.23.0:</p>
+<pre><code class="language-bash">DFX_VERSION=0.23.0 sh -ci &quot;$(curl -fsSL https://sdk.dfinity.org/install.sh)&quot;
 </code></pre>
 <p>If after trying to run <code>dfx</code> commands you encounter an error such as <code>dfx: command not found</code>, you might need to add <code>$HOME/bin</code> to your path. Here's an example of doing this in your <code>.bashrc</code>:</p>
 <pre><code class="language-bash">echo 'export PATH=&quot;$PATH:$HOME/bin&quot;' &gt;&gt; &quot;$HOME/.bashrc&quot;
@@ -416,8 +416,9 @@ touch dfx.json
 <pre><code class="language-bash">~/.pyenv/versions/3.10.7/bin/python -m venv venv
 source venv/bin/activate
 </code></pre>
-<p>Now install Kybra:</p>
+<p>Now install Kybra and the Kybra dfx extension:</p>
 <pre><code class="language-bash">pip install kybra
+python -m kybra install-dfx-extension
 </code></pre>
 <p>Open up <code>kybra_hello_world</code> in your text editor (we recommend <a href="https://code.visualstudio.com/">VS Code</a> with the <a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Microsoft Python extension</a>).</p>
 <h2 id="mainpy"><a class="header" href="#mainpy">main.py</a></h2>
@@ -468,21 +469,8 @@ def set_message(new_message: str) -&gt; void:
 <pre><code class="language-json">{
     &quot;canisters&quot;: {
         &quot;kybra_hello_world&quot;: {
-            &quot;type&quot;: &quot;custom&quot;,
-            &quot;build&quot;: &quot;python -m kybra kybra_hello_world src/main.py src/main.did&quot;,
-            &quot;candid&quot;: &quot;src/main.did&quot;,
-            &quot;wasm&quot;: &quot;.kybra/kybra_hello_world/kybra_hello_world.wasm&quot;,
-            &quot;gzip&quot;: true,
-            &quot;metadata&quot;: [
-                {
-                    &quot;name&quot;: &quot;candid:service&quot;,
-                    &quot;path&quot;: &quot;src/main.did&quot;
-                },
-                {
-                    &quot;name&quot;: &quot;cdk:name&quot;,
-                    &quot;content&quot;: &quot;kybra&quot;
-                }
-            ]
+            &quot;type&quot;: &quot;kybra&quot;,
+            &quot;main&quot;: &quot;src/main.py&quot;
         }
     }
 }
@@ -622,10 +610,27 @@ URLs:
 <h2 id="common-deployment-issues"><a class="header" href="#common-deployment-issues">Common deployment issues</a></h2>
 <p>If you run into an error during deployment, try the following:</p>
 <ol>
-<li>Ensure that you have followed the instructions correctly in <a href="./installation.html">the installation chapter</a>, especially noting <a href="./installation.html#common-installation-issues">the common installation issues</a></li>
-<li>Look for more error output by adding the <code>--verbose</code> flag to the <code>build</code> command in your <code>dfx.json</code> file like so: <code>&quot;build&quot;: &quot;python -m kybra canister_name src/main.py src/main.did --verbose</code></li>
-<li>Look for errors in each of the files in <code>~/.config/kybra/[kybra_version]/logs</code></li>
-<li>If the problem is still not resolved, reach out with any error outputs in <a href="https://discord.gg/ux2Jc7psjd">the Discord channel</a></li>
+<li>
+<p>Ensure that you have followed the instructions correctly in <a href="./installation.html">the installation chapter</a>, especially noting <a href="./installation.html#common-installation-issues">the common installation issues</a></p>
+</li>
+<li>
+<p>Ensure that you have created and activated your virtual environment, and that you have done the following from within that virtual environment: installed Kybra, installed the Kybra dfx extension, and run <code>dfx deploy</code>:</p>
+<pre><code class="language-bash">~/.pyenv/versions/3.10.7/bin/python -m venv venv
+source venv/bin/activate
+pip install kybra
+python -m kybra install-dfx-extension
+dfx deploy
+</code></pre>
+</li>
+<li>
+<p>Look for more error output by adding the <code>KYBRA_VERBOSE=true</code> environment variable to <code>dfx deploy</code> like so: <code>KYBRA_VERBOSE=true dfx deploy</code></p>
+</li>
+<li>
+<p>Look for errors in each of the files in <code>~/.config/kybra/[kybra_version]/logs</code></p>
+</li>
+<li>
+<p>If the problem is still not resolved, reach out with any error outputs in <a href="https://discord.gg/ux2Jc7psjd">the Discord channel</a></p>
+</li>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="examples"><a class="header" href="#examples">Examples</a></h1>
 <p>Kybra has many example projects showing nearly all Kybra APIs. They can be found in the <a href="https://github.com/demergent-labs/kybra/tree/main/examples">examples directory</a> of the <a href="https://github.com/demergent-labs/kybra">Kybra GitHub repository</a>.</p>

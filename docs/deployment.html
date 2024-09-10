@@ -247,10 +247,27 @@ URLs:
 <h2 id="common-deployment-issues"><a class="header" href="#common-deployment-issues">Common deployment issues</a></h2>
 <p>If you run into an error during deployment, try the following:</p>
 <ol>
-<li>Ensure that you have followed the instructions correctly in <a href="./installation.html">the installation chapter</a>, especially noting <a href="./installation.html#common-installation-issues">the common installation issues</a></li>
-<li>Look for more error output by adding the <code>--verbose</code> flag to the <code>build</code> command in your <code>dfx.json</code> file like so: <code>&quot;build&quot;: &quot;python -m kybra canister_name src/main.py src/main.did --verbose</code></li>
-<li>Look for errors in each of the files in <code>~/.config/kybra/[kybra_version]/logs</code></li>
-<li>If the problem is still not resolved, reach out with any error outputs in <a href="https://discord.gg/ux2Jc7psjd">the Discord channel</a></li>
+<li>
+<p>Ensure that you have followed the instructions correctly in <a href="./installation.html">the installation chapter</a>, especially noting <a href="./installation.html#common-installation-issues">the common installation issues</a></p>
+</li>
+<li>
+<p>Ensure that you have created and activated your virtual environment, and that you have done the following from within that virtual environment: installed Kybra, installed the Kybra dfx extension, and run <code>dfx deploy</code>:</p>
+<pre><code class="language-bash">~/.pyenv/versions/3.10.7/bin/python -m venv venv
+source venv/bin/activate
+pip install kybra
+python -m kybra install-dfx-extension
+dfx deploy
+</code></pre>
+</li>
+<li>
+<p>Look for more error output by adding the <code>KYBRA_VERBOSE=true</code> environment variable to <code>dfx deploy</code> like so: <code>KYBRA_VERBOSE=true dfx deploy</code></p>
+</li>
+<li>
+<p>Look for errors in each of the files in <code>~/.config/kybra/[kybra_version]/logs</code></p>
+</li>
+<li>
+<p>If the problem is still not resolved, reach out with any error outputs in <a href="https://discord.gg/ux2Jc7psjd">the Discord channel</a></p>
+</li>
 </ol>
 
                     </main>

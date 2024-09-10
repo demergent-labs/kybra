@@ -160,6 +160,16 @@ If you have problems deploying see [Common deployment issues](./deployment.md#co
 If you run into an error during deployment, try the following:
 
 1. Ensure that you have followed the instructions correctly in [the installation chapter](./installation.md), especially noting [the common installation issues](./installation.md#common-installation-issues)
-2. Look for more error output by adding the `--verbose` flag to the `build` command in your `dfx.json` file like so: `"build": "python -m kybra canister_name src/main.py src/main.did --verbose`
-3. Look for errors in each of the files in `~/.config/kybra/[kybra_version]/logs`
-4. If the problem is still not resolved, reach out with any error outputs in [the Discord channel](https://discord.gg/ux2Jc7psjd)
+2. Ensure that you have created and activated your virtual environment, and that you have done the following from within that virtual environment: installed Kybra, installed the Kybra dfx extension, and run `dfx deploy`:
+
+    ```bash
+    ~/.pyenv/versions/3.10.7/bin/python -m venv venv
+    source venv/bin/activate
+    pip install kybra
+    python -m kybra install-dfx-extension
+    dfx deploy
+    ```
+
+3. Look for more error output by adding the `KYBRA_VERBOSE=true` environment variable to `dfx deploy` like so: `KYBRA_VERBOSE=true dfx deploy`
+4. Look for errors in each of the files in `~/.config/kybra/[kybra_version]/logs`
+5. If the problem is still not resolved, reach out with any error outputs in [the Discord channel](https://discord.gg/ux2Jc7psjd)

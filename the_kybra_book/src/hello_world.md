@@ -34,10 +34,11 @@ Now create and source a virtual environment:
 source venv/bin/activate
 ```
 
-Now install Kybra:
+Now install Kybra and the Kybra dfx extension:
 
 ```bash
 pip install kybra
+python -m kybra install-dfx-extension
 ```
 
 Open up `kybra_hello_world` in your text editor (we recommend [VS Code](https://code.visualstudio.com/) with the [Microsoft Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)).
@@ -112,21 +113,8 @@ Create the following in `kybra_hello_world/dfx.json`:
 {
     "canisters": {
         "kybra_hello_world": {
-            "type": "custom",
-            "build": "python -m kybra kybra_hello_world src/main.py src/main.did",
-            "candid": "src/main.did",
-            "wasm": ".kybra/kybra_hello_world/kybra_hello_world.wasm",
-            "gzip": true,
-            "metadata": [
-                {
-                    "name": "candid:service",
-                    "path": "src/main.did"
-                },
-                {
-                    "name": "cdk:name",
-                    "content": "kybra"
-                }
-            ]
+            "type": "kybra",
+            "main": "src/main.py"
         }
     }
 }
