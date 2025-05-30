@@ -165,7 +165,7 @@ def compile_generated_rust_code(
             f"{paths['global_kybra_rust_bin_dir']}/cargo",
             "build",
             f"--manifest-path={paths['canister']}/Cargo.toml",
-            "--target=wasm32-wasi",
+            "--target=wasm32-wasip1",
             f"--package={canister_name}",
             "--release",
         ],
@@ -176,7 +176,7 @@ def compile_generated_rust_code(
 
 def copy_wasm_to_dev_location(paths: Paths, canister_name: str):
     copy_file(
-        f"{paths['global_kybra_target_dir']}/wasm32-wasi/release/{canister_name}.wasm",
+        f"{paths['global_kybra_target_dir']}/wasm32-wasip1/release/{canister_name}.wasm",
         f"{paths['canister']}/{canister_name}.wasm",
     )
 
