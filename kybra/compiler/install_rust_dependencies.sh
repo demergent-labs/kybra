@@ -22,14 +22,14 @@ export CARGO_HOME="$global_kybra_rust_dir"
 export RUSTUP_HOME="$global_kybra_rust_dir"
 
 function run() {
-    if ! rustup_exists || ! cargo_exists || ! rustc_exists || ! wasm32_wasi_target_installed || ! wasi2ic_exists || ! candid_extractor_exists || ! cargo_binstall_exists; then
+    if ! rustup_exists || ! cargo_exists || ! rustc_exists || ! wasm32_wasip1_target_installed || ! wasi2ic_exists || ! candid_extractor_exists || ! cargo_binstall_exists; then
         echo -e "\nKybra "$kybra_version" prerequisite installation (this may take a few minutes)\n"
 
         mkdir -p "$global_kybra_rust_dir"
         mkdir -p "$global_kybra_logs_dir"
 
         install_rustup
-        install_wasm32_wasi
+        install_wasm32_wasip1
         install_wasi2ic
         install_candid_extractor
     else
@@ -47,10 +47,10 @@ function update_rustup() {
     "$global_kybra_rustup_bin" update "$rust_version" &> "$global_kybra_logs_dir"/rustup_update
 }
 
-function install_wasm32_wasi() {
-    echo -e "2/4) Installing wasm32-wasi"
+function install_wasm32_wasip1() {
+    echo -e "2/4) Installing wasm32-wasip1"
 
-    "$global_kybra_rustup_bin" target add wasm32-wasi &> "$global_kybra_logs_dir"/install_wasm32_wasi
+    "$global_kybra_rustup_bin" target add wasm32-wasip1 &> "$global_kybra_logs_dir"/install_wasm32_wasip1
 }
 
 function install_wasi2ic() {
@@ -79,8 +79,8 @@ function rustc_exists() {
     [ -e "$global_kybra_rustc_bin" ]
 }
 
-function wasm32_wasi_target_installed() {
-    $global_kybra_rustup_bin target list | grep -q "wasm32-wasi (installed)"
+function wasm32_wasip1_target_installed() {
+    $global_kybra_rustup_bin target list | grep -q "wasm32-wasip1 (installed)"
 }
 
 function wasi2ic_exists() {
