@@ -1,2 +1,2 @@
-kybra==0.7.0
+kybra==0.7.1
 boltons==23.0.0
